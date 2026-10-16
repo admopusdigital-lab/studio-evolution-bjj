@@ -1,0 +1,1179 @@
+<title>Redesign Studio Evolution</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "inicio");
+  try {
+    if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img");
+    if (sessionStorage.getItem("evo-seen")) d.classList.add("seen");
+  } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="stylesheet" href="site.css">
+<style>
+/* Página inicial, contada como uma aula: abertura de cinema com o vídeo da faixa, o lema da Equipe TRUE,
+   a primeira aula passo a passo, as turmas na horizontal, a faixa que muda de cor, o quiz de turma e o app em 3D.
+   Capítulos escuros (.cine) e claros se alternam para dar ritmo. */
+html.seen #loader { display: none; }
+#loader { position: fixed; inset: 0; z-index: 150; background: var(--paper); display: grid; grid-template-rows: 1fr auto; padding: max(28px, env(safe-area-inset-top, 0px)) var(--gut-r) max(28px, env(safe-area-inset-bottom, 0px)) var(--gut); animation: ld-fallback 0.6s ease 4.4s forwards; }
+@keyframes ld-fallback { to { opacity: 0; visibility: hidden; } }
+.ld-center { align-self: center; justify-self: center; display: grid; justify-items: center; gap: 26px; width: min(78vw, 820px); }
+.ld-logo { width: 100%; clip-path: inset(0% 0% 0% 0%); }
+.ld-sub { font: 600 11.5px/1.4 var(--sans); letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-3); text-align: center; }
+.ld-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+.ld-k { font: 500 34px/1 var(--mincho); color: var(--gold-text); letter-spacing: 0.1em; }
+.ld-count { font: 400 clamp(56px, 8vw, 120px)/0.8 var(--serif); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.ld-bar { position: absolute; left: var(--gut); right: var(--gut-r); bottom: max(18px, env(safe-area-inset-bottom, 0px)); height: 1px; background: var(--rule); }
+.ld-bar i { display: block; height: 100%; background: var(--gold); transform: scaleX(0); transform-origin: left; }
+.ld-tail { position: absolute; left: -5%; right: -5%; top: 100%; height: 22vh; background: var(--paper); border-radius: 0 0 50% 50% / 0 0 100% 100%; }
+
+/* abertura: o vídeo da faixa ao fundo, fumaça de ouro em WebGL por cima (com mouse), um kanji gigante
+   em contorno e o título em três camadas: sólido, contornado e em ouro metálico */
+.hero { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; overflow: hidden; isolation: isolate; }
+.hv { position: absolute; inset: 0; z-index: -4; overflow: hidden; background: var(--cine-bg); will-change: transform; }
+.hv-v { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; filter: grayscale(0.3) sepia(0.28) contrast(1.12) brightness(0.9); }
+.hv-shade { position: absolute; inset: 0; z-index: -3; pointer-events: none;
+  background: radial-gradient(ellipse 110% 85% at 72% 28%, transparent 0%, color-mix(in oklch, var(--cine-bg) 50%, transparent) 58%, var(--cine-bg) 100%),
+              linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 70%, transparent) 0%, transparent 28%, transparent 46%, var(--cine-bg) 100%); }
+.hv-gl { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity 1.8s var(--ease); }
+.hv-gl.on { opacity: 1; }
+.hero-ghost { position: absolute; z-index: -1; right: -3vw; top: 50%; translate: 0 -50%; writing-mode: vertical-rl; font: 500 min(70vh, 44vw)/0.9 var(--mincho); color: transparent; -webkit-text-stroke: 1px oklch(0.83 0.13 84 / 0.2); pointer-events: none; user-select: none; will-change: transform; }
+.hero-in { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; padding-top: clamp(108px, 14vh, 150px); padding-bottom: clamp(30px, 5vh, 60px); }
+.hero-top { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
+.hero-coord { font: 500 11px/1.4 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); text-shadow: 0 1px 12px oklch(0 0 0 / 0.9); }
+.hero-main { margin-top: auto; padding-top: 28px; perspective: 1300px; perspective-origin: 26% 50%; }
+/* o tamanho também depende da altura da tela, para o botão caber sempre na primeira dobra.
+   As três linhas ficam em profundidades diferentes: quando o título gira com o mouse, elas se separam */
+.hero-title { position: relative; display: flex; flex-direction: column; font-size: clamp(54px, min(12.4vw, 18vh), 232px); line-height: 0.84; letter-spacing: -0.025em; transform-style: preserve-3d; }
+.hero-title .ln { display: block; overflow: hidden; padding: 0.06em 0.12em 0.05em 0.02em; margin: -0.06em -0.12em -0.05em -0.02em; }
+.hero-title .ln2 { transform: translateZ(34px); }
+.hero-title .ln3 { transform: translateZ(76px); }
+/* o tatame em perspectiva: placas de EVA com o encaixe em zigue-zague, sob uma luz que segue o mouse */
+.tatame { position: absolute; left: 0; right: 0; bottom: 0; height: 60%; z-index: -3; overflow: hidden; pointer-events: none; perspective: 560px; perspective-origin: 50% 0%;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 44%); mask-image: linear-gradient(180deg, transparent 0%, #000 44%); }
+.tt-plane { position: absolute; left: -50%; right: -50%; bottom: -2%; height: 270%; transform-origin: 50% 100%; transform: rotateX(76deg); will-change: transform; overflow: hidden;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cg fill='none' stroke='%23e2bd66' stroke-opacity='.38' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M0 3l7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5'/%3E%3Cpath d='M3 0l5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 150px 150px; }
+.tt-light { position: absolute; left: 50%; bottom: 0; width: 1100px; height: 900px; margin-left: -550px; border-radius: 50%; background: radial-gradient(closest-side, oklch(0.83 0.13 84 / 0.34), oklch(0.83 0.13 84 / 0.08) 55%, transparent); will-change: transform; }
+@media (max-width: 900px) { .tatame { height: 46%; opacity: 0.55; } }
+.hero-title .lni { display: inline-block; white-space: nowrap; transform-origin: 0% 100%; will-change: transform; }
+.hero-title .ln2 { padding-left: 0.62em; }
+.hero-title .o { color: transparent; -webkit-text-stroke: 0.022em var(--ink); }
+.hero-title em { font-style: normal; background: linear-gradient(100deg, oklch(0.6 0.12 72) 0%, oklch(0.84 0.13 85) 22%, oklch(0.98 0.06 92) 40%, oklch(0.84 0.13 85) 56%, oklch(0.6 0.12 72) 78%, oklch(0.84 0.13 85) 100%);
+  background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 34px oklch(0.83 0.13 84 / 0.28)); }
+@media (prefers-reduced-motion: no-preference) { .hero-title em { animation: hero-metal 6.5s linear infinite; } }
+@keyframes hero-metal { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+.hero-title .dot { color: var(--gold); }
+.hero-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 26px 48px; margin-top: clamp(24px, 3.8vh, 46px); }
+.hb-l { display: grid; gap: 24px; }
+.hero-bottom .lede { font-size: 18px; color: var(--ink-2); max-width: 44ch; text-shadow: 0 1px 16px oklch(0 0 0 / 0.95), 0 0 2px oklch(0 0 0 / 0.6); }
+.hb-r { display: grid; justify-items: end; gap: 26px; }
+.next { display: inline-flex; align-items: center; gap: 12px; padding: 11px 18px 11px 14px; border-radius: 999px; background: oklch(1 0 0 / 0.06); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.14); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font: 500 11px/1.2 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; }
+.next i { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+.next i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--gold); opacity: 0; }
+@media (prefers-reduced-motion: no-preference) { .next i::after { animation: ping 1.8s var(--ease) infinite; } }
+@keyframes ping { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(2.2); opacity: 0; } }
+.next.live i { background: var(--hot); }
+.next.live i::after { box-shadow: 0 0 0 1.5px var(--hot); }
+.next b { color: var(--ink); font-weight: 600; }
+.cue { display: inline-flex; align-items: center; gap: 14px; font: 500 11px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; }
+.cue i { position: relative; width: 1px; height: 58px; background: var(--rule); overflow: hidden; }
+.cue i::after { content: ""; position: absolute; inset: 0; background: var(--gold); transform: translateY(-100%); }
+@media (prefers-reduced-motion: no-preference) { .cue i::after { animation: cue 2.2s var(--ease) infinite; } }
+@keyframes cue { 0% { transform: translateY(-100%); } 55%, 100% { transform: translateY(100%); } }
+@media (max-width: 900px) {
+  .hero-title { font-size: 13.4vw; }
+  .hero-title .ln2 { padding-left: 0.3em; }
+  .hero-ghost { right: -14vw; font-size: 92vw; opacity: 0.7; }
+  .hb-r { justify-items: start; }
+  .cue { display: none; }
+  /* no celular o texto ocupa a metade de baixo inteira: a sombra sobe mais para ele continuar legível */
+  .hv-shade { background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 72%, transparent) 0%, transparent 20%, transparent 28%, color-mix(in oklch, var(--cine-bg) 88%, transparent) 60%, var(--cine-bg) 100%); }
+}
+
+/* as fitas cruzadas (em 3D) vêm do site.css, iguais em todas as páginas */
+
+/* manifesto: abre com o lema da Equipe TRUE */
+.manifesto { padding-block: clamp(110px, 14vw, 220px) clamp(80px, 10vw, 160px); }
+.lema { margin: 0 0 clamp(80px, 10vw, 150px); }
+.lema p { font: 400 clamp(46px, 6.6vw, 118px)/0.98 var(--serif); letter-spacing: -0.04em; max-width: 15ch; text-wrap: balance; }
+.lema p em { color: var(--gold-text); }
+.lema cite { display: flex; align-items: center; gap: 14px; margin-top: 30px; font: normal 600 12px/1.4 var(--sans); letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-3); }
+.lema cite::before { content: ""; width: 32px; height: 1px; background: var(--gold); flex-shrink: 0; }
+.man-grid { display: grid; gap: 32px; }
+@media (min-width: 1000px) { .man-grid { grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 48px; } }
+.statement { font: 400 clamp(32px, 3.7vw, 64px)/1.14 var(--serif); letter-spacing: -0.02em; }
+.statement em { color: var(--gold-text); }
+.pill { display: inline-block; width: 1.75em; height: 0.84em; border-radius: 999px; overflow: hidden; vertical-align: -0.05em; margin: 0 0.06em; box-shadow: 0 10px 20px -10px oklch(0.2 0.02 75 / 0.5); }
+.pill img { width: 100%; height: 100%; object-fit: cover; }
+.numbers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: clamp(80px, 9vw, 140px); border-top: 1px solid var(--ink); }
+.numbers div { padding: 26px 24px 0 0; }
+.numbers div + div { padding-left: 24px; border-left: 1px solid var(--rule); }
+.numbers b { display: block; font: 400 clamp(64px, 7.4vw, 128px)/0.85 var(--serif); letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+.numbers span { display: block; margin-top: 14px; font-size: 15px; color: var(--ink-2); }
+@media (max-width: 800px) { .numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); } .numbers div:nth-child(3) { padding-left: 0; border-left: 0; } .numbers div { padding-bottom: 28px; } .numbers div + div { padding-left: 18px; } .numbers b { font-size: clamp(46px, 13.5vw, 64px); white-space: nowrap; } }
+
+/* colagem em camadas: no computador, cada foto flutua numa profundidade e o conjunto gira com a rolagem */
+.collage { position: relative; height: min(62vw, 1000px); margin-bottom: clamp(60px, 8vw, 140px); }
+@media (min-width: 901px) { .collage { transform-style: preserve-3d; will-change: transform; } }
+/* as fotos mais próximas podem passar da borda da tela: o recorte fica na própria seção */
+.col-sec { overflow-x: clip; }
+.col-it { position: absolute; margin: 0; }
+.col-it .ci { overflow: hidden; box-shadow: var(--shadow-lg); background: var(--paper-2); will-change: transform; clip-path: inset(0% 0% 0% 0%); }
+.col-it img { width: 100%; height: 100%; object-fit: cover; }
+.col-it figcaption { margin-top: 12px; font: italic 400 14px/1.4 var(--serif); color: var(--ink-3); }
+.c-main { left: 17%; top: 9%; width: 60%; z-index: 1; }
+.c-main .ci { aspect-ratio: 1200 / 684; }
+.c-a { left: 0; top: 0; width: 21%; z-index: 2; }
+.c-a .ci { aspect-ratio: 4 / 5; }
+.c-b { right: 0; top: 30%; width: 24%; z-index: 3; }
+.c-b .ci { aspect-ratio: 3 / 4; }
+.c-c { left: 33%; top: 64%; width: 25%; z-index: 2; }
+.c-c .ci { aspect-ratio: 4 / 3; }
+@media (max-width: 900px) {
+  .collage { height: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .col-it { position: static; width: auto; }
+  .c-main, .c-c { grid-column: 1 / -1; }
+}
+
+/* Equipe TRUE: o medalhão da equipe na parede do Studio, que se dissolve no escuro */
+.true-sec { position: relative; padding-block: clamp(110px, 13vw, 200px); overflow: hidden; }
+.true-grid { display: grid; gap: 48px; align-items: start; }
+@media (min-width: 1000px) {
+  .true-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 5vw; }
+  .true-ph { position: sticky; top: 14vh; }
+}
+.true-ph { position: relative; margin: 0; aspect-ratio: 4 / 3; overflow: hidden;
+  -webkit-mask-image: radial-gradient(ellipse 74% 72% at 50% 42%, #000 50%, transparent 100%); mask-image: radial-gradient(ellipse 74% 72% at 50% 42%, #000 50%, transparent 100%); }
+/* um leve zoom tira da foto a faixa clara do teto e deixa o medalhão no centro da atenção */
+.true-ph img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; transform: scale(1.18); transform-origin: 50% 72%; }
+.true-tx .h2 { margin-top: 26px; font-size: clamp(40px, 4.4vw, 76px); }
+.true-tx .lead { margin-top: 26px; }
+.vals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin-top: 44px; border-top: 1px solid var(--rule); }
+.vals li { padding-block: 22px; border-bottom: 1px solid var(--rule); }
+.vals span { font: italic 400 15px/1 var(--serif); color: var(--gold-text); }
+.vals b { display: block; margin-top: 10px; font: 400 clamp(26px, 2.2vw, 34px)/1.1 var(--serif); letter-spacing: -0.02em; }
+.vals p { margin-top: 8px; font-size: 15px; color: var(--ink-2); }
+.true-tx .link { display: inline-block; margin-top: 36px; }
+@media (max-width: 520px) { .vals { grid-template-columns: minmax(0, 1fr); } }
+
+/* sua primeira aula: no celular, uma linha do tempo; no computador, um capítulo preso na tela */
+.pa-pin { position: relative; padding-block: clamp(96px, 12vw, 160px); }
+.pa-head, .pa-steps, .pa-note { max-width: 1560px; margin-inline: auto; padding-left: var(--gut); padding-right: var(--gut-r); }
+.pa-head h2 { margin-top: 24px; font-size: clamp(40px, 4.6vw, 80px); line-height: 1; letter-spacing: -0.035em; max-width: 16ch; }
+.pa-head h2 em { color: var(--gold-text); }
+.pa-steps { display: grid; gap: 64px; margin-top: clamp(48px, 6vw, 80px); }
+.pa-step { display: grid; gap: 22px; }
+@media (min-width: 700px) and (max-width: 1023px) { .pa-step { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 40px; } }
+.pa-ph { position: relative; margin: 0; aspect-ratio: 4 / 3; overflow: hidden; }
+.pa-ph img { width: 100%; height: 100%; object-fit: cover; }
+.pa-t { display: block; font: 400 clamp(52px, 6vw, 112px)/0.9 var(--serif); letter-spacing: -0.04em; color: var(--gold-text); font-variant-numeric: tabular-nums; }
+.pa-tx h3 { margin-top: 14px; font-size: clamp(32px, 3.2vw, 54px); line-height: 1.02; letter-spacing: -0.03em; }
+.pa-tx p { margin-top: 16px; font-size: 18px; color: var(--ink-2); max-width: 36ch; }
+.pa-tx .btn { margin-top: 30px; }
+.pa-ui { display: none; }
+.pa-note { margin-top: 48px; font-size: 13px; color: var(--ink-3); }
+html.pa-live .pa-pin { height: 100vh; padding: 0; overflow: hidden; }
+html.pa-live .pa-head { position: absolute; z-index: 3; top: clamp(100px, 13vh, 132px); left: 60vw; right: var(--gut-r); padding: 0; margin: 0; max-width: none; }
+html.pa-live .pa-head h2 { font-size: clamp(28px, 2.4vw, 40px); max-width: 20ch; }
+html.pa-live .pa-steps { display: block; margin: 0; padding: 0; max-width: none; }
+html.pa-live .pa-step { position: absolute; inset: 0; display: block; pointer-events: none; }
+html.pa-live .pa-step.on { pointer-events: auto; }
+html.pa-live .pa-ph { position: absolute; left: 0; top: 0; bottom: 0; width: 56vw; aspect-ratio: auto; opacity: 0; transition: opacity 900ms var(--ease); }
+html.pa-live .pa-ph::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 60%, var(--paper) 100%); }
+html.pa-live .pa-ph img { transform: scale(1.1); transition: transform 2600ms var(--ease); }
+html.pa-live .pa-step.on .pa-ph { opacity: 1; }
+html.pa-live .pa-step.on .pa-ph img { transform: scale(1); }
+html.pa-live .pa-tx { position: absolute; left: 60vw; right: var(--gut-r); top: 56%; transform: translateY(-40%); opacity: 0; transition: opacity 450ms var(--ease), transform 900ms var(--ease); }
+html.pa-live .pa-step.on .pa-tx { opacity: 1; transform: translateY(-50%); transition-delay: 180ms; }
+html.pa-live .pa-t { font-size: min(6vw, 11vh, 112px); }
+html.pa-live .pa-tx h3 { font-size: min(3.2vw, 6vh, 54px); }
+html.pa-live .pa-ui { position: absolute; z-index: 3; left: 60vw; right: var(--gut-r); bottom: clamp(64px, 10vh, 104px); display: flex; align-items: center; gap: 18px; }
+html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(--gut-r); bottom: clamp(28px, 4.5vh, 52px); margin: 0; padding: 0; max-width: none; }
+.pa-bars { display: flex; gap: 6px; flex: 1; }
+.pa-bars i { flex: 1; height: 2px; background: var(--rule); transition: background-color 500ms var(--ease); }
+.pa-bars i.on { background: var(--gold); }
+.pa-n { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+/* qual turma é a sua? */
+.quiz-sec { padding-block: clamp(100px, 12vw, 180px); }
+.quiz-grid { display: grid; gap: 48px; align-items: start; }
+@media (min-width: 1000px) { .quiz-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 6vw; } }
+.quiz-intro .h2 { margin-top: 26px; }
+.quiz-intro .lead { margin-top: 26px; }
+.quiz { position: relative; min-height: 440px; padding: clamp(24px, 3.4vw, 48px); background: var(--paper-2); border-top: 1px solid var(--gold); box-shadow: var(--shadow-lg); }
+.qz-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 28px; font-size: 13px; color: var(--ink-3); }
+.qz-back { padding: 6px 0; border: 0; background: none; color: var(--ink-2); font: 500 13px/1 var(--sans); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.qz-bar { height: 2px; margin-top: 12px; background: var(--rule); }
+.qz-bar i { display: block; width: 33.3%; height: 100%; background: var(--gold); transition: width 600ms var(--ease); }
+.qz-q { min-width: 0; margin: 28px 0 0; padding: 0; border: 0; }
+.qz-q legend { padding: 0; font: 400 clamp(28px, 2.6vw, 40px)/1.1 var(--serif); letter-spacing: -0.02em; }
+.qz-opts { display: grid; gap: 10px; margin-top: 24px; }
+.qz-o { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 66px; padding: 14px 20px; border: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.3 var(--sans); text-align: left; cursor: pointer; box-shadow: inset 0 0 0 1px var(--rule); transition: box-shadow 300ms var(--ease); }
+.qz-o small { display: block; margin-top: 3px; font-size: 13.5px; color: var(--ink-3); }
+.qz-o .ar { color: var(--gold-text); transition: transform 300ms var(--ease); }
+.qz-o:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.qz-o:hover .ar { transform: translateX(4px); }
+/* cada pergunta entra girando como uma carta que vira */
+.qz-in { animation: qz-in 800ms var(--ease) both; transform-origin: 0% 50%; }
+@keyframes qz-in { from { opacity: 0; transform: perspective(1100px) rotateY(-34deg) translateX(36px); } }
+@media (prefers-reduced-motion: reduce) { .qz-in { animation: none; } }
+.qz-res { margin-top: 28px; }
+.qz-res .k { font: 600 11px/1.4 var(--sans); letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-text); }
+.qz-res h3 { margin-top: 12px; font-size: clamp(40px, 4vw, 64px); line-height: 1; letter-spacing: -0.035em; }
+.qz-res h3 em { color: var(--gold-text); }
+.qz-res p { margin-top: 14px; color: var(--ink-2); max-width: 44ch; }
+.qz-res .note { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 15px; }
+.qz-res .ctas { margin-top: 28px; }
+.qz-redo { padding: 8px 0; border: 0; background: none; color: var(--ink-2); font: 500 15px/1 var(--sans); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+
+/* programas com rolagem horizontal */
+.hs { position: relative; background: var(--paper); }
+.hs-pin { position: relative; height: 100vh; display: flex; align-items: center; overflow: hidden; }
+.hs-bg { position: absolute; left: 0; bottom: 4vh; z-index: 0; font: italic 400 22vw/0.8 var(--serif); letter-spacing: -0.05em; white-space: nowrap; color: color-mix(in oklch, var(--ink) 4%, transparent); pointer-events: none; user-select: none; will-change: transform; }
+.hs-track { position: relative; z-index: 1; display: flex; align-items: center; gap: 7vw; width: max-content; padding-left: var(--gut); padding-right: 10vw; will-change: transform; }
+.panel-intro { width: 36vw; flex-shrink: 0; }
+.panel-intro .h2 { margin-top: 26px; }
+.panel-intro .lead { margin-top: 26px; }
+.hint { display: inline-flex; align-items: center; gap: 14px; margin-top: 40px; font: 600 11.5px/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-3); }
+.hint svg { width: 22px; height: 22px; }
+@media (prefers-reduced-motion: no-preference) { .hint svg { animation: nudge 1.8s var(--ease) infinite; } }
+@keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(8px); } }
+.prog { width: 66vw; flex-shrink: 0; display: grid; grid-template-columns: 31vw minmax(0, 1fr); gap: 4vw; align-items: end; }
+.p-img { height: min(72vh, 700px); overflow: hidden; box-shadow: var(--shadow-lg); background: var(--paper-2); clip-path: inset(0% 0% 0% 0%); will-change: transform; }
+.p-img img { width: 118%; max-width: none; height: 100%; object-fit: cover; margin-left: -9%; will-change: transform; }
+.p-meta { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); font-size: 14px; color: var(--ink-3); }
+.prog h3 { margin-top: 22px; font-size: clamp(72px, 8.4vw, 150px); line-height: 0.86; letter-spacing: -0.05em; }
+.prog p { margin-top: 22px; color: var(--ink-2); max-width: 34ch; }
+.prog .link { display: inline-block; margin-top: 26px; }
+.hs-bar { position: absolute; z-index: 2; left: var(--gut); right: var(--gut-r); bottom: 6vh; height: 1px; background: var(--rule); }
+.hs-bar span { display: block; height: 100%; background: var(--ink); transform: scaleX(0); transform-origin: left; }
+.prog-row { display: contents; }
+.hint .hint-m { display: none; }
+/* celular e tablet: as três turmas viram um trilho que desliza com o dedo, cartão por cartão */
+@media (max-width: 1023px) {
+  .hs-pin { height: auto; display: block; padding-block: 96px 80px; }
+  .hs-track { flex-direction: column; align-items: stretch; width: auto; gap: 44px; padding-right: var(--gut-r); }
+  .panel-intro { width: auto; }
+  .hint { margin-top: 28px; }
+  .hint .hint-d { display: none; }
+  .hint .hint-m { display: inline; }
+  .prog-row { display: flex; gap: 14px; margin-left: calc(-1 * var(--gut)); margin-right: calc(-1 * var(--gut-r)); padding-inline: var(--gut) var(--gut-r); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gut); scrollbar-width: none; }
+  .prog-row::-webkit-scrollbar { display: none; }
+  .prog { flex: 0 0 min(84%, 440px); width: auto; grid-template-columns: minmax(0, 1fr); gap: 22px; scroll-snap-align: start; }
+  .p-img { height: auto; aspect-ratio: 1 / 1.08; box-shadow: none; }
+  .p-img img { width: 100%; margin-left: 0; }
+  .prog h3 { font-size: clamp(54px, 15vw, 84px); }
+  .hs-track .swipe-dots { margin-top: -18px; }
+  .hs-bar, .hs-bg { display: none; }
+}
+
+/* a faixa */
+.belt-sec { background: var(--paper); overflow: hidden; }
+.bp { display: grid; gap: 56px; align-items: center; padding-block: clamp(96px, 12vh, 140px); }
+@media (min-width: 1024px) { .bp { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 6vw; min-height: 100vh; } }
+.bp .h2 { margin-top: 26px; }
+.bp .lead { margin-top: 26px; }
+.bp-stage { margin-top: clamp(40px, 6vh, 72px); }
+.belt-big { display: block; width: 100%; height: auto; overflow: visible; }
+.bp-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-top: 22px; }
+.bp-names { height: 1.04em; overflow: hidden; font: 400 clamp(46px, 4.8vw, 84px)/1.04 var(--serif); letter-spacing: -0.03em; }
+.bp-names-in { display: flex; flex-direction: column; will-change: transform; }
+.bp-names-in span { display: block; height: 1.04em; }
+.bp-names-in em { font-style: italic; }
+.bp-count { font-size: 14px; color: var(--ink-3); font-variant-numeric: tabular-nums; padding-bottom: 8px; }
+.bp-note { margin-top: 18px; font: italic 400 16px/1.5 var(--serif); color: var(--ink-3); max-width: 46ch; }
+.bp-video .vclip { overflow: hidden; clip-path: inset(0% 0% 0% 0%); box-shadow: var(--shadow-lg); }
+.bp-video video { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: oklch(0.15 0.008 75); }
+.bp-video figcaption { margin-top: 14px; font: italic 400 14.5px/1.4 var(--serif); color: var(--ink-3); }
+
+
+/* benefícios */
+.ben-sec { padding-block: clamp(80px, 10vw, 160px); }
+.blist { margin-top: clamp(48px, 6vw, 96px); border-bottom: 1px solid var(--rule); }
+.blist li { --sx: 1; position: relative; display: grid; gap: 10px 48px; align-items: center; padding-block: clamp(22px, 2.6vw, 40px); }
+.blist li::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--rule); transform: scaleX(var(--sx)); transform-origin: left; }
+@media (min-width: 900px) { .blist li { grid-template-columns: minmax(0, 1fr) minmax(0, 36ch); } }
+.blist h3 { font-size: clamp(38px, 4.6vw, 84px); line-height: 1; letter-spacing: -0.035em; transition: transform 700ms var(--ease), color 400ms var(--ease); }
+.blist li:hover h3 { transform: translateX(28px); color: var(--gold-text); }
+.blist p { color: var(--ink-2); font-size: 16.5px; }
+.hover-img { position: fixed; top: 0; left: 0; z-index: 60; width: 300px; aspect-ratio: 4 / 5; overflow: hidden; pointer-events: none; opacity: 0; box-shadow: var(--shadow-lg); }
+.hover-img img { width: 100%; height: 100%; object-fit: cover; }
+@media (hover: none), (max-width: 899px) { .hover-img { display: none; } }
+
+/* depoimento */
+.quote { position: relative; background: var(--paper-2); padding-block: clamp(110px, 13vw, 210px); overflow: hidden; }
+.qmark { position: absolute; left: var(--gut); top: -2vw; font: italic 400 min(24vw, 380px)/1 var(--serif); color: color-mix(in oklch, var(--gold) 9%, transparent); -webkit-text-stroke: 1.25px color-mix(in oklch, var(--gold) 75%, transparent); pointer-events: none; user-select: none; }
+.quote blockquote { position: relative; margin: 0; max-width: 1180px; }
+.quote p { font: italic 400 clamp(34px, 4.4vw, 76px)/1.12 var(--serif); letter-spacing: -0.025em; }
+.quote cite { display: block; margin-top: 40px; font: normal 600 12.5px/1.4 var(--sans); letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-2); }
+
+/* equipe */
+.team-sec { padding-block: clamp(110px, 13vw, 200px) clamp(60px, 7vw, 120px); }
+.team { display: grid; gap: 24px; margin-top: clamp(56px, 7vw, 110px); grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; }
+.team .a { grid-column: 1 / span 4; }
+.team .b { grid-column: 6 / span 7; margin-bottom: 12vw; }
+.team .tilt { overflow: hidden; box-shadow: var(--shadow-lg); transform-style: preserve-3d; will-change: transform; clip-path: inset(0% 0% 0% 0%); }
+.team .a .tilt { aspect-ratio: 713 / 1000; }
+.team .b .tilt { aspect-ratio: 3 / 2; }
+.team img { width: 100%; height: 100%; object-fit: cover; }
+.team figcaption { margin-top: 14px; font: italic 400 14.5px/1.4 var(--serif); color: var(--ink-3); }
+@media (max-width: 900px) { .team { grid-template-columns: minmax(0, 1fr); } .team .a, .team .b { grid-column: auto; margin-bottom: 0; } .team .a .tilt { aspect-ratio: 4 / 5; } }
+
+/* horários */
+.sched-sec { padding-block: clamp(80px, 9vw, 150px); }
+.sched { display: grid; gap: 56px; }
+@media (min-width: 1000px) { .sched { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 6vw; align-items: start; } }
+.sched .lead { margin-top: 26px; }
+.sched .btn { margin-top: 40px; }
+.day-label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
+.day-label b { font: 400 34px/1 var(--serif); }
+.day-label span { font-size: 14px; color: var(--ink-3); }
+.ruler { position: relative; height: 230px; margin-top: 8px; }
+.ruler .axis { position: absolute; left: 0; right: 0; top: 112px; height: 1px; background: var(--ink); transform-origin: left; }
+.ruler .tick { position: absolute; top: 106px; width: 1px; height: 13px; background: var(--rule); }
+.ruler .hour { position: absolute; top: 128px; transform: translateX(-50%); font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.ruler .cls { position: absolute; transform: translateX(-50%); display: grid; justify-items: center; text-align: center; width: 104px; }
+.ruler .cls.up { bottom: 128px; }
+.ruler .cls.down { top: 158px; }
+.ruler .cls .t { display: block; font: 400 36px/1 var(--serif); font-variant-numeric: tabular-nums; }
+.ruler .cls .n { display: block; margin-top: 6px; font: 600 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-2); }
+.ruler .cls.kids .n { color: var(--gold-text); }
+.ruler .pin { position: absolute; top: 106px; width: 13px; height: 13px; margin-left: -6.5px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 5px var(--paper); }
+.ruler .pin.kids { background: var(--gold); }
+.sched-notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 16px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.sched-notes p { font-size: 15px; color: var(--ink-2); }
+.sched-notes b { display: block; font: 400 22px/1.2 var(--serif); color: var(--ink); margin-bottom: 4px; }
+.slist { display: none; }
+@media (max-width: 760px) {
+  .ruler { display: none; }
+  .slist { display: grid; }
+  .slist li { display: flex; justify-content: space-between; align-items: baseline; padding-block: 16px; border-bottom: 1px solid var(--rule); }
+  .slist .t { font: 400 32px/1 var(--serif); font-variant-numeric: tabular-nums; }
+  .slist .n { font: 600 12px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-2); }
+  .slist .kids .n { color: var(--gold-text); }
+  .sched-notes { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* app em 3D */
+.app-sec { background: var(--paper-2); padding-block: clamp(100px, 11vw, 180px); overflow: hidden; }
+.app { display: grid; gap: 72px; align-items: center; }
+@media (min-width: 1000px) { .app { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 6vw; } }
+.app .h2 { margin-top: 26px; }
+.features { margin-top: 40px; border-top: 1px solid var(--rule); }
+.features li { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; padding-block: 20px; border-bottom: 1px solid var(--rule); }
+.features .ic { width: 22px; height: 22px; color: var(--gold-text); margin-top: 3px; }
+.features b { display: block; font: 400 23px/1.2 var(--serif); }
+.features span { color: var(--ink-2); font-size: 15.5px; }
+.app .link { display: inline-block; margin-top: 36px; }
+.stage { position: relative; height: 760px; display: grid; place-items: center; perspective: 1700px; }
+.stage .kj { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font: 500 min(42vw, 560px)/1 var(--mincho); color: color-mix(in oklch, var(--gold) 14%, transparent); pointer-events: none; user-select: none; }
+.tiltwrap { transform-style: preserve-3d; will-change: transform; }
+.phone { position: relative; width: 310px; padding: 10px; border-radius: 50px; background: linear-gradient(150deg, oklch(0.38 0.008 75), oklch(0.14 0.006 75) 60%); box-shadow: 40px 60px 90px -40px oklch(0.1 0.02 75 / 0.6), 0 0 0 1px oklch(0.12 0.006 75), inset 0 1px 0 oklch(0.6 0.01 75); transform-style: preserve-3d; will-change: transform; }
+/* espessura do aparelho: duas placas atrás da tela, que aparecem de lado quando o celular gira */
+.phone::before, .phone::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.phone::before { background: oklch(0.22 0.006 75); transform: translateZ(-8px); box-shadow: 0 0 0 1px oklch(0.3 0.008 75); }
+.phone::after { background: oklch(0.16 0.006 75); transform: translateZ(-16px); }
+.screen { position: relative; height: 640px; border-radius: 40px; overflow: hidden; background: var(--paper); color: var(--ink); font-size: 13px; line-height: 1.45; }
+.screen::before { content: ""; position: absolute; top: 10px; left: 50%; width: 86px; height: 25px; margin-left: -43px; border-radius: 14px; background: oklch(0.12 0.006 75); z-index: 5; }
+.sbar { display: flex; justify-content: space-between; padding: 14px 28px 0; font-size: 12.5px; font-weight: 600; height: 44px; }
+.scr { padding: 6px 18px 0; }
+.scr .lb { font: 600 10px/1.3 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3); }
+.scr .lb.gold { color: var(--gold-text); }
+.scr .hi { font: 400 28px/1.05 var(--serif); letter-spacing: -0.02em; margin-top: 6px; }
+.card { margin-top: 16px; padding: 16px; background: var(--paper-2); border-top: 1px solid var(--gold); }
+.card .big { display: flex; align-items: flex-end; gap: 10px; margin-top: 8px; }
+.card .big b { font: 400 64px/0.8 var(--serif); letter-spacing: -0.04em; }
+.card .big span { font: italic 400 18px/1.1 var(--serif); padding-bottom: 2px; }
+.card .sub { margin-top: 8px; color: var(--ink-2); font-size: 12px; }
+.dots { display: flex; gap: 4px; margin-top: 12px; }
+.dots i { flex: 1; height: 4px; background: var(--rule); }
+.dots i.on { background: var(--ink); }
+.pbtn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; margin-top: 14px; background: var(--btn-bg); color: var(--btn-fg); font-weight: 500; font-size: 13px; border-radius: 999px; }
+.pbtn .ic { width: 15px; height: 15px; stroke-width: 2; }
+.wk { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 10px; text-align: center; }
+.wk div { padding: 7px 0 10px; position: relative; border: 1px solid transparent; }
+.wk span { display: block; font-size: 10px; color: var(--ink-3); }
+.wk b { font: 400 18px/1.1 var(--serif); }
+.wk i { position: absolute; left: 50%; bottom: 4px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--gold); }
+.wk .today { border-color: var(--ink); }
+.prow { display: flex; justify-content: space-between; padding-block: 11px; border-top: 1px solid var(--rule); font-size: 12.5px; }
+.prow span:last-child { color: var(--ok); }
+.dock { position: absolute; left: 10px; right: 10px; bottom: 12px; height: 54px; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--glass); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-top: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 10px 24px -14px oklch(0.1 0.01 75 / 0.5); }
+.dock span { display: grid; justify-items: center; align-content: center; gap: 2px; font-size: 9.5px; color: var(--ink-3); position: relative; }
+.dock .ic { width: 18px; height: 18px; }
+.dock .on { color: var(--ink); font-weight: 600; }
+.dock .on::before { content: ""; position: absolute; top: -1px; width: 18px; height: 2px; background: var(--gold); }
+.chip { position: absolute; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: var(--glass); color: var(--ink); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: var(--shadow-lg); border-radius: 16px; font-size: 14px; line-height: 1.3; white-space: nowrap; will-change: transform; }
+.chip small { display: block; font-size: 11px; color: var(--ink-3); letter-spacing: 0.04em; }
+.chip .ok { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--btn-bg); color: var(--btn-fg); }
+.chip .ok .ic { width: 14px; height: 14px; stroke-width: 2.2; }
+.chip.c1 { left: 0; top: 14%; }
+.chip.c2 { right: 0; top: 44%; }
+.chip.c3 { left: 6%; bottom: 12%; }
+.chip .beltchip { width: 46px; height: 12px; border-radius: 2px; background: linear-gradient(90deg, oklch(0.55 0.17 258) 0 66%, oklch(0.2 0.006 285) 66% 92%, oklch(0.55 0.17 258) 92%); }
+@media (max-width: 700px) { .stage { height: 620px; } .tiltwrap { scale: 0.84; } .chip { font-size: 12.5px; padding: 10px 14px; } .chip.c1 { left: -6px; top: 10%; } .chip.c2 { right: -6px; } .chip.c3 { left: 0; bottom: 9%; } }
+</style>
+<link rel="stylesheet" href="tema.css">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12l6 6L20 6"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M2.5 10.5c3-1 6.5-4 9.5-6.5 3 2.5 6.5 5.5 9.5 6.5"/><path d="M5.5 10v9M18.5 10v9"/><path d="M3 20h18"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M19 6.5A9 9 0 1 0 20.5 15"/><path d="M10 8.5v7l6-3.5z"/></symbol>
+    <symbol id="i-belt" viewBox="0 0 24 24"><path d="M2 9h7M15 9h7"/><rect x="9" y="6.5" width="6" height="5" rx="1"/><path d="M10.5 11.5L7.5 21M13.5 11.5l3 9.5"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M7 12h.01M11 12h.01M15 12h.01"/></symbol>
+  </defs>
+</svg>
+
+<div id="loader" aria-hidden="true">
+  <div class="ld-center">
+    <span class="logo ld-logo"></span>
+    <p class="ld-sub">Jiu-Jitsu · Jardim São Paulo, Sorocaba</p>
+  </div>
+  <div class="ld-row"><span class="ld-k">柔術</span><span class="ld-count" id="ldCount">000</span></div>
+  <div class="ld-bar"><i></i></div>
+  <div class="ld-tail"></div>
+</div>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+      <a class="tagp" href="area-do-aluno.html" data-int title="Esta página é uma proposta de redesign. Ver também a Área do Aluno"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero cine" data-dark aria-labelledby="t-hero">
+    <div class="hv" aria-hidden="true"><video class="hv-v" data-src="img/faixa-amarrando.mp4" poster="img/faixa-hero.jpg" data-ambient data-eager muted loop playsinline preload="none"></video></div>
+    <div class="hv-shade" aria-hidden="true"></div>
+    <div class="tatame" aria-hidden="true"><div class="tt-plane" id="ttPlane"><i class="tt-light" id="ttLight"></i></div></div>
+    <canvas class="hv-gl" id="heroGL" aria-hidden="true"></canvas>
+    <span class="hero-ghost" aria-hidden="true">柔術</span>
+    <div class="wrap hero-in">
+      <div class="hero-top">
+        <p class="label gold">Jiu-Jitsu · Equipe TRUE</p>
+        <p class="hero-coord">23°31′S · 47°29′W · Sorocaba/SP</p>
+      </div>
+      <div class="hero-main">
+        <h1 class="hero-title" id="t-hero">
+          <span class="ln ln1"><span class="lni">Jiu-Jitsu</span></span>
+          <span class="ln ln2"><span class="lni"><span class="o">para toda</span></span></span>
+          <span class="ln ln3"><span class="lni"><em>a família</em><span class="dot">.</span></span></span>
+        </h1>
+        <div class="hero-bottom">
+          <div class="hb-l">
+            <p class="lede">O treino vira qualidade de vida, confiança e alívio do estresse. Aulas para adultos e crianças, no Jardim São Paulo, com acompanhamento de perto.</p>
+            <div class="ctas">
+              <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
+              <a class="link" href="#primeira-aula">Como é a primeira aula</a>
+            </div>
+          </div>
+          <div class="hb-r">
+            <p class="next" id="nextClass"><i aria-hidden="true"></i><span>Próxima aula</span><b>Adulto · 19h</b></p>
+            <a class="cue" href="#studio">Role<i></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bands" aria-hidden="true">
+    <div class="band b2"><div class="mq-track" data-dir="1">
+      <div class="mq-item"><span>Jiu-Jitsu</span><span class="k">柔</span><span class="o">Arte suave</span><span class="k">柔</span><span>Equipe TRUE</span><span class="k">柔</span><span class="o">Sorocaba</span><span class="k">柔</span><span>Jiu-Jitsu</span><span class="k">柔</span><span class="o">Arte suave</span><span class="k">柔</span><span>Equipe TRUE</span><span class="k">柔</span><span class="o">Sorocaba</span><span class="k">柔</span></div>
+      <div class="mq-item"><span>Jiu-Jitsu</span><span class="k">柔</span><span class="o">Arte suave</span><span class="k">柔</span><span>Equipe TRUE</span><span class="k">柔</span><span class="o">Sorocaba</span><span class="k">柔</span><span>Jiu-Jitsu</span><span class="k">柔</span><span class="o">Arte suave</span><span class="k">柔</span><span>Equipe TRUE</span><span class="k">柔</span><span class="o">Sorocaba</span><span class="k">柔</span></div>
+    </div></div>
+    <div class="band b1"><div class="mq-track" data-dir="-1">
+      <div class="mq-item"><span>Técnica</span><span class="k">道</span><span>Respeito</span><span class="k">道</span><span>Unidade</span><span class="k">道</span><span>Excelência</span><span class="k">道</span><span>Técnica</span><span class="k">道</span><span>Respeito</span><span class="k">道</span><span>Unidade</span><span class="k">道</span><span>Excelência</span><span class="k">道</span></div>
+      <div class="mq-item"><span>Técnica</span><span class="k">道</span><span>Respeito</span><span class="k">道</span><span>Unidade</span><span class="k">道</span><span>Excelência</span><span class="k">道</span><span>Técnica</span><span class="k">道</span><span>Respeito</span><span class="k">道</span><span>Unidade</span><span class="k">道</span><span>Excelência</span><span class="k">道</span></div>
+    </div></div>
+  </div>
+
+  <section class="manifesto" id="studio" aria-labelledby="t-studio">
+    <div class="wrap">
+      <blockquote class="lema">
+        <p class="split">A luta é o meio. <em>A evolução é o propósito.</em></p>
+        <cite>Lema da Equipe TRUE, da qual o Studio faz parte</cite>
+      </blockquote>
+      <div class="man-grid">
+        <p class="label" id="t-studio">O Studio</p>
+        <p class="statement" id="statement" data-fadewords>Um tatame acolhedor <span class="pill"><img src="img/treino-tecnica.webp" alt=""></span> no Jardim São Paulo, para quem quer <em>começar</em>, quem quer <em>voltar a se cuidar</em> <span class="pill"><img src="img/aula-jiu-jitsu.webp" alt="" style="object-position:40% 45%"></span> e quem quer <em>dividir o esporte com a família</em> <span class="pill"><img src="img/programa-familia-real.jpg" alt=""></span></p>
+      </div>
+      <div class="numbers">
+        <div data-stand="76"><b class="count" data-to="15">15</b><span>academias na Equipe TRUE</span></div>
+        <div data-stand="76"><b class="count" data-to="5">5</b><span>aulas por dia, de segunda a sexta</span></div>
+        <div data-stand="76"><b>4–12</b><span>anos na turma Kids</span></div>
+        <div data-stand="76"><b>1<em style="font-size:.5em;vertical-align:.7em">ª</em></b><span>aula por nossa conta, com kimono emprestado</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="true-sec cine" id="equipe-true" data-dark aria-labelledby="t-true">
+    <div class="wrap true-grid">
+      <figure class="true-ph" data-tilt3d="7"><img src="img/ambiente-studio.webp" alt="Medalhão dourado da Equipe TRUE acima do painel do Studio Evolution BJJ, na parede preta da academia" loading="lazy" width="1200" height="800"></figure>
+      <div class="true-tx">
+        <p class="label">Equipe TRUE BJJ</p>
+        <h2 class="h2 split" id="t-true">Uma academia. <em>Uma equipe inteira</em> por trás.</h2>
+        <p class="lead">O Studio Evolution faz parte da Equipe TRUE, uma rede com 15 academias e uma metodologia própria, a Lifestyle BJJ®. Você treina no Jardim São Paulo com o apoio de uma equipe inteira.</p>
+        <ol class="vals" data-rise>
+          <li><span>01</span><b>Técnica</b><p>Fundamento antes de força. Cada detalhe ensinado com calma.</p></li>
+          <li><span>02</span><b>Respeito</b><p>Pelo professor, pelo parceiro de treino e pelo seu ritmo.</p></li>
+          <li><span>03</span><b>Unidade</b><p>Quem treina aqui faz parte de uma equipe, dentro e fora do tatame.</p></li>
+          <li><span>04</span><b>Excelência</b><p>Um pouco melhor a cada treino. Sem pressa e sem parar.</p></li>
+        </ol>
+        <a class="link" href="https://bjjtrue.com/" target="_blank" rel="noopener">Conheça a Equipe TRUE</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap col-sec" aria-label="Fotos do Studio">
+    <div class="collage">
+      <figure class="col-it c-main" data-speed="0"><div class="ci" data-reveal><img src="img/comunidade-evolution.webp" alt="Alunos e professores do Studio Evolution BJJ sentados no tatame em frente ao painel da academia" loading="lazy" width="1200" height="684" style="object-position:50% 72%"></div><figcaption>A turma reunida na inauguração do Studio.</figcaption></figure>
+      <figure class="col-it c-a" data-speed="-0.35"><div class="ci" data-reveal><img src="img/treino-tecnica.webp" alt="Dois alunos treinando técnica no chão do tatame" loading="lazy" width="1200" height="800"></div></figure>
+      <figure class="col-it c-b" data-speed="0.3"><div class="ci" data-reveal><img src="img/jiu-jitsu-kids.webp" alt="Professor sentado no tatame com uma criança nos ombros" loading="lazy" width="741" height="1100" style="object-position:50% 30%"></div></figure>
+      <figure class="col-it c-c" data-speed="-0.2"><div class="ci" data-reveal><img src="img/programa-familia-real.jpg" alt="Alunos adultos de kimono em frente ao painel do Studio Evolution" loading="lazy" width="1264" height="848"></div></figure>
+    </div>
+  </section>
+
+  <section class="pa cine" id="primeira-aula" data-dark aria-labelledby="t-pa">
+    <div class="pa-pin">
+      <div class="pa-head">
+        <p class="label">Sua primeira aula</p>
+        <h2 id="t-pa">Do momento em que você chega <em>até a vontade de voltar</em>.</h2>
+      </div>
+      <ol class="pa-steps">
+        <li class="pa-step on">
+          <figure class="pa-ph"><img src="img/hero-real.jpg" alt="Professores do Studio Evolution BJJ sorrindo no tatame, de kimono branco" loading="lazy" width="1531" height="1027" style="object-position:48% 30%"></figure>
+          <div class="pa-tx"><span class="pa-t">18:50</span><h3>Você chega.</h3><p>Alguns minutos antes da aula. Tira o tênis, veste o kimono emprestado e conhece o professor, que te recebe pelo nome.</p></div>
+        </li>
+        <li class="pa-step">
+          <figure class="pa-ph"><img src="img/comunidade-evolution.webp" alt="Alunos e professores sentados lado a lado no tatame" loading="lazy" width="1200" height="684" style="object-position:50% 70%"></figure>
+          <div class="pa-tx"><span class="pa-t">19:00</span><h3>A turma se alinha.</h3><p>Todo mundo no tatame, um cumprimento ao professor e a aula começa. Aqui, cada um respeita o ritmo do outro.</p></div>
+        </li>
+        <li class="pa-step">
+          <figure class="pa-ph"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame" loading="lazy" width="1264" height="848" style="object-position:52% 60%"></figure>
+          <div class="pa-tx"><span class="pa-t">19:05</span><h3>Aquecimento.</h3><p>Você aquece junto com a turma, com movimentos do próprio jiu-jitsu. Quem está começando faz a versão mais leve.</p></div>
+        </li>
+        <li class="pa-step">
+          <figure class="pa-ph"><img src="img/aula-jiu-jitsu.webp" alt="Professor ensinando um movimento a um aluno pequeno" loading="lazy" width="900" height="913" style="object-position:40% 50%"></figure>
+          <div class="pa-tx"><span class="pa-t">19:20</span><h3>Movimentos básicos.</h3><p>O professor mostra uma posição passo a passo e você repete com um parceiro, devagar, até ficar natural.</p></div>
+        </li>
+        <li class="pa-step">
+          <figure class="pa-ph"><img src="img/treino-tecnica.webp" alt="Dois alunos repetindo uma técnica no chão do tatame" loading="lazy" width="1200" height="800"></figure>
+          <div class="pa-tx"><span class="pa-t">19:40</span><h3>Sem luta pesada.</h3><p>No primeiro dia, ninguém te coloca numa luta. Você aprende, repete e entende o jogo. O resto vem com o tempo.</p></div>
+        </li>
+        <li class="pa-step">
+          <figure class="pa-ph"><img src="img/professores-evolution.webp" alt="Professores do Studio Evolution lado a lado, sorrindo" loading="lazy" width="1200" height="800" style="object-position:50% 40%"></figure>
+          <div class="pa-tx"><span class="pa-t">Fim</span><h3>Você sai mais leve.</h3><p>Cansado, com a cabeça leve e com vontade de voltar. A primeira aula é por nossa conta.</p><a class="btn btn-ink" href="agendamento.html" data-int>Agendar minha primeira aula<svg class="ic"><use href="#i-arrow"/></svg></a></div>
+        </li>
+      </ol>
+      <div class="pa-ui" aria-hidden="true"><div class="pa-bars"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div><span class="pa-n">01 / 06</span></div>
+      <p class="pa-note">Roteiro de uma aula experimental das 19h. Os horários são aproximados.</p>
+    </div>
+  </section>
+
+  <section class="hs" id="programas" aria-labelledby="t-prog">
+    <div class="hs-pin">
+      <span class="hs-bg" id="hsBg" aria-hidden="true">Programas · Programas</span>
+      <div class="hs-track">
+        <div class="panel-intro">
+          <p class="label">Programas</p>
+          <h2 class="h2 split" id="t-prog">Um caminho para <em>cada fase</em> da vida.</h2>
+          <p class="lead">Três turmas, um mesmo cuidado: técnica de verdade, respeito ao corpo de cada um e nenhuma pressão para competir.</p>
+          <p class="hint"><span class="hint-d">Continue rolando</span><span class="hint-m">Deslize para ver as turmas</span><svg class="ic"><use href="#i-arrow"/></svg></p>
+        </div>
+        <div class="prog-row" data-swipe>
+        <article class="prog" data-vt-card data-cursor="Ver turma">
+          <div class="p-img"><img src="img/programa-adulto-real.jpg" alt="Aluno adulto trabalhando a guarda com um colega no tatame" width="1264" height="848" style="object-position:62% 50%"></div>
+          <div>
+            <div class="p-meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h</span></div>
+            <h3>Adulto</h3>
+            <p>Treino que respeita seu corpo e seu ritmo. Mais leveza, menos estresse e mais disposição para o dia a dia.</p>
+            <a class="link" href="agendamento.html#adulto" data-int>Agendar na turma Adulto</a>
+          </div>
+        </article>
+        <article class="prog" data-vt-card data-cursor="Ver turma">
+          <div class="p-img"><img src="img/programa-kids-real.jpg" alt="Professor sentado no tatame com duas crianças de kimono" width="768" height="1376" style="object-position:50% 78%"></div>
+          <div>
+            <div class="p-meta"><span>4 a 12 anos</span><span class="tnum">10h · 18h</span></div>
+            <h3><em>Kids</em></h3>
+            <p>Disciplina, foco e respeito para crianças de 4 a 12 anos. Ótimo para quem tem hiperatividade e precisa de uma direção.</p>
+            <a class="link" href="agendamento.html#kids" data-int>Agendar na turma Kids</a>
+          </div>
+        </article>
+        <article class="prog" data-vt-card data-cursor="Ver turma">
+          <div class="p-img"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame durante a aula" width="1264" height="848" style="object-position:52% 60%"></div>
+          <div>
+            <div class="p-meta"><span>Junto com o adulto</span><span class="tnum">8h · 11h · 19h</span></div>
+            <h3>Feminino</h3>
+            <p>Espaço seguro para fortalecer o corpo, a voz e a confiança. Defesa pessoal e autoestima em primeiro lugar.</p>
+            <a class="link" href="agendamento.html#feminino" data-int>Agendar no Feminino</a>
+          </div>
+        </article>
+        </div>
+      </div>
+      <div class="hs-bar" aria-hidden="true"><span></span></div>
+    </div>
+  </section>
+
+  <section class="belt-sec cine" id="faixa" data-dark aria-labelledby="t-faixa">
+    <div class="wrap bp">
+      <div>
+        <p class="label">A faixa</p>
+        <h2 class="h2 split" id="t-faixa">Cada nó é um passo do <em>seu caminho</em>.</h2>
+        <p class="lead">A faixa não é troféu, é diário de bordo. Ela guarda cada treino, cada respiro difícil e cada dia em que você escolheu voltar ao tatame.</p>
+        <div class="bp-stage">
+          <svg class="belt-big" viewBox="0 0 900 112" role="img" aria-label="O caminho das faixas do adulto: branca, azul, roxa, marrom e preta">
+            <defs>
+              <linearGradient id="bsheen" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.32"/>
+                <stop offset="0.42" stop-color="#ffffff" stop-opacity="0"/>
+                <stop offset="1" stop-color="#000000" stop-opacity="0.28"/>
+              </linearGradient>
+              <filter id="bblur" x="-10%" y="-200%" width="120%" height="500%"><feGaussianBlur stdDeviation="7"/></filter>
+            </defs>
+            <ellipse cx="450" cy="98" rx="420" ry="6" fill="#000000" fill-opacity="0.28" filter="url(#bblur)"/>
+            <rect id="beltBase" x="10" y="8" width="880" height="76" rx="4" fill="#f3f2ed" stroke="#000000" stroke-opacity="0.08"/>
+            <g id="stitches" stroke="#000000" stroke-opacity="0.14" stroke-width="1">
+              <line x1="16" x2="884" y1="21" y2="21"/><line x1="16" x2="884" y1="33.5" y2="33.5"/><line x1="16" x2="884" y1="46" y2="46"/><line x1="16" x2="884" y1="58.5" y2="58.5"/><line x1="16" x2="884" y1="71" y2="71"/>
+            </g>
+            <rect id="beltTip" x="652" y="8" width="168" height="76" fill="#17171a"/>
+            <rect x="10" y="8" width="880" height="76" rx="4" fill="url(#bsheen)"/>
+          </svg>
+          <div class="bp-row">
+            <div class="bp-names" aria-hidden="true"><div class="bp-names-in" id="beltNames"><span>Branca</span><span><em>Azul</em></span><span>Roxa</span><span><em>Marrom</em></span><span>Preta</span></div></div>
+            <span class="bp-count" id="beltCount">1 / 5</span>
+          </div>
+          <p class="bp-note">O caminho do adulto. Os graus de cada faixa são dados pelo professor, que acompanha seu treino no tatame.</p>
+        </div>
+      </div>
+      <figure class="bp-video">
+        <div class="vclip"><video data-src="img/faixa-amarrando.mp4" poster="img/faixa-poster.jpg" muted loop playsinline preload="none" aria-label="Aluno amarrando a faixa antes do treino"></video></div>
+        <figcaption>Antes de cada treino, o mesmo nó.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="quiz-sec" id="sua-turma" aria-labelledby="t-quiz">
+    <div class="wrap quiz-grid">
+      <div class="quiz-intro">
+        <p class="label">Qual turma é a sua?</p>
+        <h2 class="h2 split" id="t-quiz">Três perguntas e a gente <em>indica o caminho</em>.</h2>
+        <p class="lead">Leva menos de um minuto. No fim, você já sai com a turma e o horário escolhidos para a aula experimental.</p>
+      </div>
+      <div class="quiz" id="quiz">
+        <div class="qz-top"><span id="qzN">Pergunta 1 de 3</span><button class="qz-back" type="button" id="qzBack" hidden>Voltar</button></div>
+        <div class="qz-bar" aria-hidden="true"><i id="qzFill"></i></div>
+        <div class="qz-stage" id="qzStage" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ben-sec" aria-labelledby="t-ben">
+    <div class="wrap">
+      <div class="sec-head split2">
+        <div><p class="label">Benefícios</p><h2 class="h2 split" id="t-ben">O que muda <em>fora</em> do tatame.</h2></div>
+        <p class="lead">Benefícios que você sente no dia a dia, desde o primeiro mês.</p>
+      </div>
+      <ul class="blist" id="blist">
+        <li data-img="img/programa-familia-real.jpg"><h3>Menos estresse</h3><p>Deixe o peso do dia no tatame. O Jiu-Jitsu acalma a mente e devolve o sono.</p></li>
+        <li data-img="img/treino-tecnica.webp"><h3>Segurança de si</h3><p>Técnicas reais de defesa pessoal para você se sentir seguro em qualquer lugar.</p></li>
+        <li data-img="img/programa-feminino-real.jpg"><h3>Autoestima</h3><p>Cada aula vencida constrói uma confiança que aparece no trabalho, em casa e nos relacionamentos.</p></li>
+        <li data-img="img/jiu-jitsu-kids.webp"><h3>Foco para as crianças</h3><p>Crianças com hiperatividade ganham foco, limites e disciplina de forma leve e lúdica.</p></li>
+        <li data-img="img/programa-adulto-real.jpg"><h3>Qualidade de vida</h3><p>Mobilidade, força e fôlego sem monotonia. Seu corpo agradece desde o primeiro mês.</p></li>
+        <li data-img="img/comunidade-evolution.webp"><h3>Comunidade acolhedora</h3><p>Famílias que treinam juntas. Respeito, amizade e um ambiente sem julgamentos.</p></li>
+      </ul>
+    </div>
+    <div class="hover-img" id="hoverImg" aria-hidden="true"><img src="img/programa-familia-real.jpg" alt=""></div>
+  </section>
+
+  <section class="quote" aria-label="Depoimento de aluno">
+    <span class="qmark" id="qmark" aria-hidden="true">“</span>
+    <div class="wrap">
+      <blockquote>
+        <p id="quoteText" data-fadewords>Cheguei estressado e sem tempo. Hoje o tatame é meu momento de paz, energia e encontro com minha família.</p>
+        <cite>Guilherme M. · aluno desde 2026</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="team-sec" id="equipe" aria-labelledby="t-equipe">
+    <div class="wrap">
+      <div class="sec-head split2">
+        <div><p class="label">Equipe</p><h2 class="h2 split" id="t-equipe">Quem está no tatame <em>com você</em>.</h2></div>
+        <p class="lead">Professores presentes em todas as aulas, acompanhando cada aluno de perto, do primeiro treino à próxima faixa.</p>
+      </div>
+      <div class="team">
+        <figure class="a" data-speed="-0.15"><div class="tilt" data-tilt3d="9" data-glare data-tilt-touch data-reveal><img src="img/equipe-evolution.webp" alt="Fundadores do Studio Evolution BJJ em frente ao painel dourado da academia" loading="lazy" width="713" height="1100" style="object-position:50% 62%"></div><figcaption>À frente do Studio.</figcaption></figure>
+        <figure class="b" data-speed="0.18"><div class="tilt" data-tilt3d="7" data-glare data-tilt-touch data-reveal><img src="img/professores-evolution.webp" alt="Quatro professores do Studio Evolution BJJ lado a lado, de kimono" loading="lazy" width="1200" height="800" style="object-position:50% 45%"></div><figcaption>A equipe de professores, das faixas coloridas à preta.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="sched-sec" id="horarios" aria-labelledby="t-hor">
+    <div class="wrap sched">
+      <div>
+        <p class="label">Horários</p>
+        <h2 class="h2 split" id="t-hor">Sempre tem uma turma <em>esperando você</em>.</h2>
+        <p class="lead">Treinos de manhã, no fim da manhã e à noite. Quem já é aluno confirma a presença pelo app e garante a vaga no tatame.</p>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div>
+        <div class="day-label"><b>Segunda a sexta</b><span>Sem aulas no fim de semana</span></div>
+        <div class="ruler" id="ruler" role="img" aria-label="Aulas de segunda a sexta: Adulto às 8h, Kids às 10h, Adulto às 11h, Kids às 18h e Adulto às 19h"><span class="axis"></span></div>
+        <ol class="slist">
+          <li><span class="t">08:00</span><span class="n">Adulto</span></li>
+          <li class="kids"><span class="t">10:00</span><span class="n">Kids</span></li>
+          <li><span class="t">11:00</span><span class="n">Adulto</span></li>
+          <li class="kids"><span class="t">18:00</span><span class="n">Kids</span></li>
+          <li><span class="t">19:00</span><span class="n">Adulto</span></li>
+        </ol>
+        <div class="sched-notes">
+          <p><b>Feminino</b>Treina junto com as turmas de adulto.</p>
+          <p><b>Kids</b>Turmas para crianças de 4 a 12 anos.</p>
+          <p><b>Vagas</b>Alunos confirmam pelo app, até 10 por aula.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-sec" aria-labelledby="t-app">
+    <div class="wrap app">
+      <div>
+        <p class="label">App do aluno</p>
+        <h2 class="h2 split" id="t-app">Sua evolução, <em>no celular</em>.</h2>
+        <ul class="features">
+          <li><svg class="ic"><use href="#i-check"/></svg><div><b>Presença em um toque</b><span>Confirme a vaga na aula do dia antes de sair de casa.</span></div></li>
+          <li><svg class="ic"><use href="#i-code"/></svg><div><b>Check-in com código</b><span>O professor mostra o código e a presença conta na hora.</span></div></li>
+          <li><svg class="ic"><use href="#i-play"/></svg><div><b>Movimentos da sua faixa</b><span>Vídeos das técnicas, com quiz no fim de cada uma.</span></div></li>
+          <li><svg class="ic"><use href="#i-belt"/></svg><div><b>Faixa e graus</b><span>Frequência, sequência de semanas e conquistas.</span></div></li>
+        </ul>
+        <a class="link" href="area-do-aluno.html" data-int>Ver as telas da Área do Aluno</a>
+      </div>
+      <div class="stage" id="stage">
+        <span class="kj" aria-hidden="true">道</span>
+        <div class="chip c1" data-depth="60"><span class="ok"><svg class="ic"><use href="#i-check"/></svg></span><span>Presença confirmada<small>Adulto · hoje, 19h</small></span></div>
+        <div class="chip c2" data-depth="90"><span class="beltchip"></span><span>Faixa azul<small>2 de 4 graus</small></span></div>
+        <div class="chip c3" data-depth="40"><span style="font:400 26px/1 var(--serif)">2/3</span><span>Treinos na semana<small>meta de 3</small></span></div>
+        <div class="tiltwrap" id="tiltwrap">
+          <div class="phone" id="phone" role="img" aria-label="Tela inicial do app do aluno com a aula das 19h e o botão de confirmar presença">
+            <div class="screen">
+              <div class="sbar"><span>18:12</span><span>5G</span></div>
+              <div class="scr">
+                <p class="lb">Sexta, 16 de outubro</p>
+                <p class="hi">Boa noite, Marina.</p>
+                <div class="card">
+                  <p class="lb gold">Sua aula de hoje</p>
+                  <div class="big"><b>19h</b><span>Adulto</span></div>
+                  <p class="sub">Começa em 48 min · 7 de 10 vagas</p>
+                  <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+                  <div class="pbtn"><svg class="ic"><use href="#i-check"/></svg>Confirmar presença</div>
+                </div>
+                <p class="lb" style="margin-top:18px">Sua semana · 2 de 3</p>
+                <div class="wk"><div><span>Seg</span><b>12</b><i></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b></div></div>
+                <div class="prow" style="margin-top:10px"><span>Mensalidade de outubro</span><span>Em dia</span></div>
+              </div>
+              <div class="dock"><span class="on"><svg class="ic"><use href="#i-home"/></svg>Início</span><span><svg class="ic"><use href="#i-play"/></svg>Movimentos</span><span><svg class="ic"><use href="#i-check"/></svg>Presença</span><span><svg class="ic"><use href="#i-belt"/></svg>Perfil</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contato" aria-labelledby="t-cta">
+    <div class="cta-inner">
+      <div class="wrap cta-grid">
+        <div>
+          <p class="label">Primeira aula grátis</p>
+          <h2 class="h2 split" id="t-cta">Vista o kimono e sinta o peso do dia <em>sumir</em>.</h2>
+          <p class="lead">Agende sua aula experimental. Kimono emprestado, zero pressão e toda a atenção para quem está começando.</p>
+          <a class="btn btn-gold" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
+          <dl class="contact">
+            <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
+            <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
+            <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
+          </dl>
+        </div>
+        <figure class="cta-photo" data-tilt3d="6" data-glare><img src="img/ambiente-studio.webp" alt="Painel dourado do Studio Evolution BJJ na parede preta da academia" loading="lazy" width="1200" height="800"></figure>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
+    </div>
+    <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Proposta de redesign · versão para aprovação</span></div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener"><i aria-hidden="true"></i>WhatsApp</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$, fine = Site.fine;
+
+  /* abertura: a próxima aula de verdade, pela hora de quem está vendo (seg a sex: 8h, 10h Kids, 11h, 18h Kids, 19h) */
+  (function () {
+    var el = $("#nextClass");
+    if (!el) return;
+    var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60, txt = "", now = false;
+    var CL = [[8, "Adulto"], [10, "Kids"], [11, "Adulto"], [18, "Kids"], [19, "Adulto"]];
+    if (wd >= 1 && wd <= 5) for (var i = 0; i < CL.length; i++) if (h < CL[i][0] + 1) { now = h >= CL[i][0]; txt = (now ? "" : "Hoje · ") + CL[i][1] + " " + CL[i][0] + "h"; break; }
+    if (!txt) txt = (wd === 5 || wd === 6 ? "Segunda" : "Amanhã") + " · Adulto 8h";
+    $("span", el).textContent = now ? "Aula agora" : "Próxima aula";
+    $("b", el).textContent = txt;
+    el.classList.toggle("live", now);
+  })();
+
+  /* Régua do dia (estática, sempre visível) */
+  var ruler = $("#ruler");
+  if (ruler) {
+    var start = 6, end = 22, pct = function (h) { return ((h - start) / (end - start)) * 100; }, html = "";
+    for (var hr = start; hr <= end; hr += 2) html += '<span class="tick" style="left:' + pct(hr) + '%"></span><span class="hour" style="left:' + pct(hr) + '%">' + hr + "h</span>";
+    [[8, "Adulto", "up"], [10, "Kids", "down"], [11, "Adulto", "up"], [18, "Kids", "down"], [19, "Adulto", "up"]].forEach(function (c) {
+      var k = c[1] === "Kids" ? " kids" : "";
+      html += '<span class="pin' + k + '" style="left:' + pct(c[0]) + '%"></span><span class="cls ' + c[2] + k + '" style="left:' + pct(c[0]) + '%"><span class="t">' + String(c[0]).padStart(2, "0") + ':00</span><span class="n">' + c[1] + "</span></span>";
+    });
+    ruler.insertAdjacentHTML("beforeend", html);
+  }
+
+  /* Qual turma é a sua? Três perguntas; a resposta já abre o Agendar com a turma e o horário marcados */
+  (function () {
+    var stage = $("#qzStage"); if (!stage) return;
+    var nEl = $("#qzN"), back = $("#qzBack"), fill = $("#qzFill"), step = 1, a = {};
+    var WHO = [["eu", "Para mim", "Turma Adulto ou Feminino"], ["crianca", "Para uma criança", "De 4 a 12 anos"], ["familia", "Para mim e uma criança", "Treinar em família"]];
+    var WHEN = {
+      eu: [["8", "De manhã", "Adulto às 8h"], ["11", "No fim da manhã", "Adulto às 11h"], ["19", "À noite", "Adulto às 19h"]],
+      crianca: [["10", "De manhã", "Kids às 10h"], ["18", "No fim da tarde", "Kids às 18h"]],
+      familia: [["10", "De manhã", "Kids às 10h e Adulto às 11h"], ["18", "No fim do dia", "Kids às 18h e Adulto às 19h"]]
+    };
+    var EXP_Q = { eu: "Você já treinou jiu-jitsu?", crianca: "A criança já treinou?", familia: "Vocês já treinaram?" };
+    var EXP = [["novo", "Ainda não", "Vamos começar do zero"], ["exp", "Já, um pouco", "Tem alguma experiência"]];
+    var opts = function (list) {
+      return '<div class="qz-opts">' + list.map(function (o) {
+        return '<button class="qz-o" type="button" data-v="' + o[0] + '"><span>' + o[1] + "<small>" + o[2] + '</small></span><span class="ar" aria-hidden="true">→</span></button>';
+      }).join("") + "</div>";
+    };
+    var ask = function (legend, list) { return '<fieldset class="qz-q qz-in"><legend>' + legend + "</legend>" + opts(list) + "</fieldset>"; };
+    var result = function () {
+      var t = +a.when, title, text, href;
+      if (a.who === "eu") { title = "Adulto, às <em>" + t + "h</em>."; text = "De segunda a sexta, numa turma para todos os níveis. Para mulheres, o Feminino treina junto, nos mesmos horários."; href = "agendamento.html#adulto-" + t; }
+      else if (a.who === "crianca") { title = "<em>Kids</em>, às " + t + "h."; text = "De segunda a sexta, para crianças de 4 a 12 anos, com foco em disciplina e diversão."; href = "agendamento.html#kids-" + t; }
+      else { title = "Kids às " + t + "h e <em>Adulto às " + (t + 1) + "h</em>."; text = "Um horário logo depois do outro, de segunda a sexta. Dá para vir junto e treinar em família."; href = "agendamento.html#kids-" + t; }
+      var note = a.exp === "novo" ? "Primeira vez? Chegue alguns minutos antes. O kimono é por nossa conta." : "Já treinou antes? Conte na conversa: o professor ajusta o treino ao seu nível.";
+      return '<div class="qz-res qz-in"><p class="k">Sua turma</p><h3>' + title + "</h3><p>" + text + '</p><p class="note">' + note + '</p><div class="ctas"><a class="btn btn-ink" href="' + href + '" data-int>Agendar esse horário<svg class="ic"><use href="#i-arrow"/></svg></a><button class="qz-redo" type="button">Refazer</button></div></div>';
+    };
+    var render = function (focus) {
+      nEl.textContent = step <= 3 ? "Pergunta " + step + " de 3" : "Sua recomendação";
+      fill.style.width = (Math.min(step, 3) / 3) * 100 + "%";
+      back.hidden = step === 1;
+      stage.innerHTML = step === 1 ? ask("Para quem é a aula?", WHO) : step === 2 ? ask("Qual horário encaixa melhor?", WHEN[a.who]) : step === 3 ? ask(EXP_Q[a.who], EXP) : result();
+      if (focus) { var f = stage.querySelector("button, a"); if (f) f.focus({ preventScroll: true }); }
+    };
+    stage.addEventListener("click", function (e) {
+      var o = e.target.closest(".qz-o");
+      if (o) { a[step === 1 ? "who" : step === 2 ? "when" : "exp"] = o.dataset.v; step++; render(true); return; }
+      if (e.target.closest(".qz-redo")) { a = {}; step = 1; render(true); }
+    });
+    back.addEventListener("click", function () { if (step > 1) { step--; render(true); } });
+    render(false);
+  })();
+
+  Site.boot({
+    /* abertura: o vídeo acende do escuro e cada linha do título sobe por trás da própria máscara */
+    intro: function (S) {
+      var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
+      tl.from(".hv-v", { opacity: 0, scale: 1.18, duration: 2.6 }, 0)
+        .from(".hero-title .lni", { yPercent: 120, scaleY: 1.7, skewY: 9, duration: 1.6, stagger: 0.11 }, 0.15)
+        .from(".hero-top > *, .hb-l > *, .hb-r > *", { y: 26, opacity: 0, duration: 1.2, stagger: 0.07, ease: "power3.out" }, 0.7)
+        .from(".hero-ghost", { opacity: 0, xPercent: 18, duration: 2.4 }, 0.5)
+        .add(function () { $$(".hero .label").forEach(S.scramble); }, 0.75)
+        .from(".nav-in", { y: -30, opacity: 0, duration: 1.2 }, 0.5);
+      return tl;
+    },
+
+    /* abertura longa só na primeira visita: a logo se abre, o brilho passa, a cortina sobe */
+    loader: function (done) {
+      var loader = $("#loader"), countEl = $("#ldCount"), c = { v: 0 };
+      gsap.timeline({ onComplete: function () { loader.remove(); } })
+        .from(".ld-logo", { clipPath: "inset(0% 50% 0% 50%)", duration: 1.3, ease: "expo.inOut" })
+        .from(".ld-logo", { scale: 0.92, duration: 2, ease: "expo.out" }, 0)
+        .fromTo(".ld-logo", { backgroundPosition: "100% 0" }, { backgroundPosition: "0% 0", duration: 1.5, ease: "power2.inOut" }, 0.7)
+        .from(".ld-sub", { y: 18, opacity: 0, duration: 1, ease: "power3.out" }, 0.6)
+        .from(".ld-k", { opacity: 0, x: -20, duration: 1, ease: "power3.out" }, 0.4)
+        .to(c, { v: 100, duration: 1.9, ease: "power2.inOut", onUpdate: function () { countEl.textContent = String(Math.round(c.v)).padStart(3, "0"); } }, 0)
+        .to(".ld-bar i", { scaleX: 1, duration: 1.9, ease: "power2.inOut" }, 0)
+        .to(".ld-center, .ld-row", { y: -50, opacity: 0, duration: 0.7, ease: "power3.in" }, 2.05)
+        .to(loader, { y: function () { return -window.innerHeight * 1.24; }, duration: 1.25, ease: "expo.inOut" }, 2.3)
+        .add(done, 2.6);
+    },
+
+    setup: function (S) {
+      var lenis = S.lenis;
+
+      /* abertura: o vídeo afunda devagar enquanto as linhas do título se afastam; o mouse dá profundidade */
+      var heroST = { trigger: ".hero", start: "top top", end: "bottom top", scrub: true };
+      /* ao rolar, as linhas se afastam e esticam como um elástico; o kanji e o vídeo ficam para trás */
+      gsap.to(".ln1 .lni", { xPercent: -8, scaleX: 1.14, ease: "none", scrollTrigger: heroST });
+      gsap.to(".ln2 .lni", { xPercent: 9, ease: "none", scrollTrigger: heroST });
+      gsap.to(".ln3 .lni", { xPercent: -3, scaleX: 0.92, ease: "none", scrollTrigger: heroST });
+      gsap.to(".hv", { yPercent: 16, scale: 1.08, ease: "none", scrollTrigger: heroST });
+      gsap.to(".hero-ghost", { yPercent: -16, ease: "none", scrollTrigger: heroST });
+
+      /* fumaça de ouro em WebGL sobre o vídeo: sobe do tatame e acende onde o mouse passa (site.js) */
+      Site.smoke($("#heroGL"), $(".hero"));
+
+      /* o tatame em perspectiva: o mouse vira a câmera (para os lados e para cima), a luz acompanha o cursor
+         e, ao rolar, o chão vai se erguendo, como se a câmera descesse até ele */
+      var plane = $("#ttPlane"), light = $("#ttLight"), cam = { yaw: 0, pitch: 0, ty: 0, tp: 0, lx: 0, tl: 0, prog: 0, on: true };
+      ScrollTrigger.create({ trigger: ".hero", start: "top top", end: "bottom top", onUpdate: function (s) { cam.prog = s.progress; }, onToggle: function (s) { cam.on = s.isActive; } });
+      gsap.ticker.add(function () {
+        if (!cam.on) return;
+        cam.yaw += (cam.ty - cam.yaw) * 0.05; cam.pitch += (cam.tp - cam.pitch) * 0.05; cam.lx += (cam.tl - cam.lx) * 0.07;
+        gsap.set(plane, { rotationX: 76 - cam.prog * 20 + cam.pitch, rotationY: cam.yaw });
+        gsap.set(light, { x: cam.lx });
+      });
+      /* ao sair, o conteúdo da abertura tomba para trás, sobre o tatame */
+      gsap.set(".hero-in", { transformPerspective: 1200, transformOrigin: "50% 100%" });
+      gsap.to(".hero-in", { rotationX: 18, z: -120, ease: "none", scrollTrigger: heroST });
+      if (fine) {
+        var hx = gsap.quickTo(".hv", "x", { duration: 1.4, ease: "power3" }), hy = gsap.quickTo(".hv", "y", { duration: 1.4, ease: "power3" });
+        var tx = gsap.quickTo(".hero-title", "x", { duration: 1.6, ease: "power3" });
+        /* o título gira em 3D e as três linhas, em profundidades diferentes, se separam */
+        var trx = gsap.quickTo(".hero-title", "rotationX", { duration: 1.6, ease: "power3" }), trY = gsap.quickTo(".hero-title", "rotationY", { duration: 1.6, ease: "power3" });
+        $(".hero").addEventListener("mousemove", function (e) {
+          var mx = e.clientX / innerWidth - 0.5, my = e.clientY / innerHeight - 0.5;
+          hx(mx * -18); hy(my * -12); tx(mx * 14);
+          trY(mx * 20); trx(-my * 11);
+          cam.ty = mx * 16; cam.tp = my * 5; cam.tl = mx * innerWidth * 0.9;
+        });
+      } else {
+        /* no toque, o chão e o título balançam devagar sozinhos */
+        gsap.to(cam, { ty: 9, duration: 5, ease: "sine.inOut", yoyo: true, repeat: -1 });
+        gsap.fromTo(".hero-title", { rotationY: -8 }, { rotationY: 8, duration: 6, ease: "sine.inOut", yoyo: true, repeat: -1 });
+      }
+
+      /* as fitas cruzadas andam pelo site.js (mesmo comportamento em todas as páginas) */
+
+      /* manifesto: miniaturas que surgem na frase; números que contam */
+      gsap.from(".pill", { scale: 0.2, rotate: -12, ease: "back.out(2)", stagger: 0.15, scrollTrigger: { trigger: "#statement", start: "top 75%", end: "bottom 50%", scrub: 1 } });
+      $$(".count").forEach(function (el) {
+        var to = +el.dataset.to, o = { v: 0 };
+        if (S.inView(el, 1)) return;
+        gsap.to(o, { v: to, duration: 1.8, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%", once: true }, onUpdate: function () { el.textContent = Math.round(o.v); } });
+      });
+
+      var mm = gsap.matchMedia();
+
+      /* colagem: cada foto numa profundidade; o conjunto gira com a rolagem e as fotos deslizam com o mouse,
+         as mais próximas mais do que as do fundo */
+      mm.add("(min-width: 901px)", function () {
+        var col = $(".collage"), items = $$(".col-it", col), Z = [0, 110, 160, 80];
+        gsap.set(col, { transformPerspective: 1700 });
+        items.forEach(function (it, i) { gsap.set(it, { z: Z[i] || 0 }); });
+        gsap.fromTo(col, { rotationX: 18, rotationY: -12 }, { rotationX: -8, rotationY: 8, ease: "none", scrollTrigger: { trigger: col, start: "top bottom", end: "bottom top", scrub: true } });
+        if (fine) {
+          var qs = items.map(function (it, i) { return { f: gsap.quickTo(it, "x", { duration: 1.4, ease: "power3" }), z: Z[i] || 0 }; });
+          var onMove = function (e) { var mx = e.clientX / innerWidth - 0.5; qs.forEach(function (q) { q.f(mx * (q.z * 0.32 + 12)); }); };
+          col.parentElement.addEventListener("mousemove", onMove);
+          return function () { col.parentElement.removeEventListener("mousemove", onMove); };
+        }
+      });
+
+      /* sua primeira aula: no computador o capítulo fica preso e cada passo entra inteiro, de uma vez;
+         no celular vira uma linha do tempo em que cada foto se abre ao chegar */
+      var paSteps = $$(".pa-step"), paBars = $$(".pa-bars i"), paN = $(".pa-n"), paCount = paSteps.length;
+      var pad2 = function (n) { return (n < 10 ? "0" : "") + n; };
+      mm.add("(min-width: 1024px)", function () {
+        S.root.classList.add("pa-live");
+        var cur = -1;
+        var set = function (i) {
+          if (i === cur) return;
+          cur = i;
+          paSteps.forEach(function (s, k) { s.classList.toggle("on", k === i); });
+          paBars.forEach(function (b, k) { b.classList.toggle("on", k <= i); });
+          paN.textContent = pad2(i + 1) + " / " + pad2(paCount);
+        };
+        set(0);
+        ScrollTrigger.create({ trigger: ".pa", start: "top top", end: function () { return "+=" + Math.round(window.innerHeight * paCount * 0.62); }, pin: ".pa-pin", anticipatePin: 1, invalidateOnRefresh: true,
+          onUpdate: function (self) { set(Math.min(paCount - 1, Math.floor(self.progress * paCount))); } });
+        return function () { S.root.classList.remove("pa-live"); };
+      });
+      mm.add("(max-width: 1023px)", function () {
+        paSteps.forEach(function (s) {
+          gsap.fromTo($(".pa-ph", s), { clipPath: "inset(10% 6% 10% 6%)" }, { clipPath: "inset(0% 0% 0% 0%)", ease: "none", scrollTrigger: { trigger: s, start: "top 95%", end: "top 55%", scrub: true } });
+          gsap.from($(".pa-tx", s), { y: 36, opacity: 0, duration: 1, ease: "expo.out", scrollTrigger: { trigger: $(".pa-tx", s), start: "top 90%", once: true } });
+        });
+      });
+
+      /* programas: rolagem horizontal presa (computador) */
+      mm.add("(min-width: 1024px)", function () {
+        var hsTrack = $(".hs-track"), bar = $(".hs-bar span");
+        var dist = function () { return hsTrack.scrollWidth - window.innerWidth; };
+        var hsTween = gsap.to(hsTrack, { x: function () { return -dist(); }, ease: "none",
+          scrollTrigger: { trigger: ".hs", start: "top top", end: function () { return "+=" + dist(); }, pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1,
+            onUpdate: function (self) { gsap.set(bar, { scaleX: self.progress }); } } });
+        /* a palavra gigante do fundo vira uma parede que some em perspectiva */
+        gsap.set("#hsBg", { rotationY: -34, transformPerspective: 900, transformOrigin: "0% 50%" });
+        gsap.to("#hsBg", { xPercent: -35, ease: "none", scrollTrigger: { trigger: ".hs", start: "top top", end: function () { return "+=" + dist(); }, scrub: 1, invalidateOnRefresh: true } });
+        /* a foto se abre a partir da borda que entra primeiro na tela, então nunca aparece uma caixa vazia.
+           Enquanto atravessa a tela, cada cartão gira como numa vitrine: chega virado, fica de frente e sai virado */
+        $$(".prog").forEach(function (p) {
+          var pi = $(".p-img", p), h3 = $("h3", p);
+          gsap.set(pi, { transformPerspective: 1200 });
+          gsap.set(h3, { transformPerspective: 900, transformOrigin: "0% 50%" });
+          gsap.fromTo(pi, { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left 102%", end: "left 62%", scrub: true } });
+          gsap.fromTo(pi, { rotationY: -34 }, { rotationY: 26, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left right", end: "right left", scrub: true } });
+          gsap.fromTo($("img", p), { xPercent: -7 }, { xPercent: 7, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left right", end: "right left", scrub: true } });
+          gsap.from(h3, { yPercent: 40, opacity: 0, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left 85%", end: "left 45%", scrub: true } });
+          gsap.fromTo(h3, { rotationY: 40 }, { rotationY: -14, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left right", end: "right left", scrub: true } });
+        });
+      });
+      /* celular e tablet: o trilho das turmas vira uma vitrine; o cartão do centro fica de frente */
+      Site.coverflow($(".prog-row"), 24);
+
+      /* a faixa: a rolagem escolhe a faixa (presa no computador) e a troca acontece inteira, de uma vez:
+         o nome nunca fica cortado pela metade quando a pessoa para de rolar, nem no celular. */
+      var COLORS = ["#f3f2ed", "#2b5fd0", "#6a35b0", "#6e4326", "#1c1c20"];
+      function buildBelt(pin) {
+        var names = $("#beltNames"), countB = $("#beltCount"), cur = -1;
+        gsap.set(".belt-big", { transformPerspective: 900, transformOrigin: "50% 50%" });
+        var show = function (i) {
+          if (i === cur) return;
+          var first = cur < 0;
+          cur = i;
+          countB.textContent = (i + 1) + " / 5";
+          gsap.to(names, { yPercent: -20 * i, duration: 0.8, ease: "expo.out", overwrite: true });
+          gsap.to("#beltBase", { attr: { fill: COLORS[i] }, duration: 0.6, ease: "power2.out", overwrite: true });
+          gsap.to("#beltTip", { attr: { fill: i === 4 ? "#b3261e" : "#17171a" }, duration: 0.6, overwrite: true });
+          gsap.to("#stitches", { attr: { stroke: i === 4 ? "#ffffff" : "#000000" }, duration: 0.6, overwrite: true });
+          /* a faixa dá uma volta inteira no ar a cada troca de cor */
+          if (!first) gsap.fromTo(".belt-big", { rotationX: -180 }, { rotationX: 0, duration: 1.1, ease: "back.out(1.2)", overwrite: "auto" });
+        };
+        show(0);
+        gsap.timeline({ scrollTrigger: { trigger: ".belt-sec", start: pin ? "top top" : "top 70%", end: pin ? "+=260%" : "bottom 45%", scrub: 0.6, pin: pin,
+            onUpdate: function (self) { show(Math.min(4, Math.floor(self.progress * 5))); } } })
+          .fromTo(".bp-video .vclip", { clipPath: "inset(14% 10% 14% 10%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.3, ease: "power2.out" }, 0)
+          .fromTo(".bp-video video", { scale: 1.25 }, { scale: 1, duration: 1, ease: "none" }, 0);
+      }
+      mm.add("(min-width: 1024px)", function () { buildBelt(true); });
+      mm.add("(max-width: 1023px)", function () { buildBelt(false); });
+      /* com o mouse, a faixa e os nomes inclinam juntos, como um objeto sobre a mesa */
+      if (fine) {
+        var bs = $(".bp-stage");
+        gsap.set(bs, { transformPerspective: 1100 });
+        var bsx = gsap.quickTo(bs, "rotationX", { duration: 1.1, ease: "power3" }), bsy = gsap.quickTo(bs, "rotationY", { duration: 1.1, ease: "power3" });
+        $(".belt-sec").addEventListener("mousemove", function (e) {
+          var r = bs.getBoundingClientRect(), x = (e.clientX - (r.left + r.width / 2)) / innerWidth, y = (e.clientY - (r.top + r.height / 2)) / innerHeight;
+          bsy(x * 26); bsx(-y * 20);
+        });
+        $(".belt-sec").addEventListener("mouseleave", function () { bsx(0); bsy(0); });
+      }
+
+      /* benefícios: os fios se desenham e a foto segue o cursor */
+      $$("#blist li").forEach(function (li, i) {
+        gsap.fromTo(li, { "--sx": 0 }, { "--sx": 1, duration: 1.4, ease: "expo.inOut", delay: i * 0.06, scrollTrigger: { trigger: li, start: "top 92%", once: true } });
+        gsap.from(li, { y: 40, opacity: 0, duration: 1.1, ease: "expo.out", delay: 0.15 + i * 0.06, scrollTrigger: { trigger: li, start: "top 92%", once: true } });
+      });
+      var hov = $("#hoverImg"), hovImg = $("img", hov);
+      if (fine && window.innerWidth >= 900) {
+        gsap.set(hov, { xPercent: -50, yPercent: -50, scale: 0.6, transformPerspective: 800 });
+        var xTo = gsap.quickTo(hov, "x", { duration: 0.7, ease: "power3" }), yTo = gsap.quickTo(hov, "y", { duration: 0.7, ease: "power3" });
+        /* a foto balança em 3D na direção do movimento, como um cartão pendurado; parou, endireita */
+        var swY = gsap.quickTo(hov, "rotationY", { duration: 0.6, ease: "power3" }), swX = gsap.quickTo(hov, "rotationX", { duration: 0.6, ease: "power3" }), still = 0;
+        var lastX = -999, lastY = -999, hovOn = false;
+        var hideHov = function () { if (!hovOn) return; hovOn = false; gsap.to(hov, { opacity: 0, scale: 0.6, duration: 0.45, ease: "expo.out" }); };
+        window.addEventListener("mousemove", function (e) {
+          if (hovOn && lastX > -999) {
+            swY(Math.max(-40, Math.min(40, (e.clientX - lastX) * 1.8))); swX(Math.max(-32, Math.min(32, (lastY - e.clientY) * 1.8)));
+            clearTimeout(still); still = setTimeout(function () { swY(0); swX(0); }, 90);
+          }
+          lastX = e.clientX; lastY = e.clientY; xTo(e.clientX + 170); yTo(e.clientY);
+        });
+        $$("#blist li").forEach(function (li) {
+          li.addEventListener("mouseenter", function () { hovOn = true; hovImg.src = li.dataset.img; gsap.to(hov, { opacity: 1, scale: 1, rotate: gsap.utils.random(-7, 7), duration: 0.6, ease: "expo.out" }); });
+        });
+        $("#blist").addEventListener("mouseleave", hideHov);
+        var checkHov = function () { if (!hovOn) return; var el = document.elementFromPoint(lastX, lastY); if (!el || !el.closest("#blist")) hideHov(); };
+        if (lenis) lenis.on("scroll", checkHov); else window.addEventListener("scroll", checkHov, { passive: true });
+      }
+
+      /* depoimento: a aspa gigante gira devagar */
+      gsap.fromTo("#qmark", { y: -80, rotate: -8 }, { y: 120, rotate: 6, ease: "none", scrollTrigger: { trigger: ".quote", start: "top bottom", end: "bottom top", scrub: true } });
+
+      /* horários: a régua se desenha */
+      gsap.from("#ruler .axis", { scaleX: 0, ease: "none", scrollTrigger: { trigger: "#ruler", start: "top 85%", end: "top 45%", scrub: true } });
+      gsap.from("#ruler .pin", { scale: 0, duration: 0.8, ease: "back.out(3)", stagger: 0.12, scrollTrigger: { trigger: "#ruler", start: "top 70%", once: true } });
+      gsap.from("#ruler .cls .t, #ruler .cls .n", { y: 20, opacity: 0, duration: 0.9, ease: "expo.out", stagger: 0.06, scrollTrigger: { trigger: "#ruler", start: "top 70%", once: true } });
+
+      /* app: celular em 3D e cartões em profundidades diferentes */
+      gsap.fromTo("#phone", { rotateY: -34, rotateX: 20, rotateZ: -6, y: 140 }, { rotateY: -14, rotateX: 6, rotateZ: 0, y: 0, ease: "none", scrollTrigger: { trigger: ".app-sec", start: "top bottom", end: "center center", scrub: true } });
+      $$(".chip").forEach(function (ch) {
+        var d = +ch.dataset.depth;
+        /* cada cartão flutua numa profundidade de verdade, à frente do celular */
+        gsap.set(ch, { z: d * 2.1 });
+        gsap.fromTo(ch, { y: d * 2.2 }, { y: -d * 1.2, ease: "none", scrollTrigger: { trigger: ".app-sec", start: "top bottom", end: "bottom top", scrub: true } });
+      });
+      /* o 道 atrás do celular ganha volume e gira para o lado oposto do aparelho */
+      var kj = Site.extrude($(".stage .kj"), 5, 22);
+      if (kj) gsap.set(kj, { rotationY: 14, rotationX: -4 });
+      var stage = $("#stage"), tw = $("#tiltwrap");
+      if (fine) {
+        stage.addEventListener("mousemove", function (e) {
+          var r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+          gsap.to(tw, { rotateY: x * 22, rotateX: -y * 16, duration: 1, ease: "power3.out" });
+          if (kj) gsap.to(kj, { rotationY: 14 - x * 50, rotationX: -4 + y * 26, duration: 1.4, ease: "power3.out" });
+          $$(".chip").forEach(function (ch) { var d = +ch.dataset.depth / 60; gsap.to(ch, { x: x * 40 * d, duration: 1, ease: "power3.out" }); });
+        });
+        stage.addEventListener("mouseleave", function () { gsap.to(tw, { rotateY: 0, rotateX: 0, duration: 1.2, ease: "expo.out" }); gsap.to(".chip", { x: 0, duration: 1.2, ease: "expo.out" }); if (kj) gsap.to(kj, { rotationY: 14, rotationX: -4, duration: 1.4, ease: "expo.out" }); });
+      } else if (kj) {
+        gsap.to(kj, { rotationY: -18, duration: 6, ease: "sine.inOut", yoyo: true, repeat: -1 });
+      }
+    }
+  });
+})();
+</script>

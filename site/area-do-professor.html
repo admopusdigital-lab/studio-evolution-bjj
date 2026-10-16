@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Área do Professor · Redesign Studio Evolution</title>
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "professor");
+  try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="app.css">
+<style>
+/* Área do Professor: o painel do dia (aulas, código, chamada), alunos com ficha e mapa de presenças,
+   graduações, interessados e o modo tatame, com a TV e o celular da aluna conversando. Dados de exemplo. */
+.ar-photo { aspect-ratio: 4 / 3; }
+.ar-photo img { object-position: 50% 30%; }
+.pdemo { padding-bottom: clamp(100px, 11vw, 170px); }
+.dash-wrap { margin-top: clamp(48px, 6vw, 84px); }
+.diff { background: var(--paper-2); }
+@media (max-width: 600px) { .dash-bar span:not(.clock) { display: none; } }
+@media (max-width: 1023px) { .hc.c2 { top: 55%; } }  /* no celular, abaixo dos rostos */
+</style>
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12l6 6L20 6"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M2.5 10.5c3-1 6.5-4 9.5-6.5 3 2.5 6.5 5.5 9.5 6.5"/><path d="M5.5 10v9M18.5 10v9"/><path d="M3 20h18"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-belt" viewBox="0 0 24 24"><path d="M2 9h7M15 9h7"/><rect x="9" y="6.5" width="6" height="5" rx="1"/><path d="M10.5 11.5L7.5 21M13.5 11.5l3 9.5"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13.5h5l1.5 2.5h5l1.5-2.5h5"/><path d="M5.5 5h13l2.5 8.5V19H3v-5.5z"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z"/><path d="M10 19a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M7 12h1.5M11.25 12h1.5M15.5 12H17"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M19 6.5A9 9 0 1 0 20.5 15"/><path d="M10 8.5v7l6-3.5z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+      <a class="tagp" href="index.html" data-int title="Esta página é uma proposta de redesign"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="ar-hero cine" data-dark aria-labelledby="t-hero">
+    <div class="ar-glow" aria-hidden="true"></div>
+    <div class="wrap ar-grid">
+      <div>
+        <p class="label">Área do Professor · painel do Studio</p>
+        <h1 class="ar-title" id="t-hero">O tatame inteiro, <em>numa tela só</em>.</h1>
+        <p class="ar-lede">Abrir a aula, mostrar o código, ver quem chegou, lembrar de quem sumiu e registrar cada grau. Um painel feito para quem dá aula, não para quem vive de planilha.</p>
+        <nav class="ar-switch" aria-label="Escolher a área"><a href="area-do-aluno.html" data-int>Aluno</a><a href="area-do-professor.html" aria-current="page" data-int>Professor</a></nav>
+        <div class="ctas"><a class="btn btn-ink" href="#painel">Experimentar o painel<svg class="ic"><use href="#i-arrow"/></svg></a><a class="link" href="#tatame">Ver o modo tatame</a></div>
+      </div>
+      <div class="ar-visual" aria-hidden="true">
+        <figure class="ar-photo" data-depth="20"><img src="img/professores-evolution.webp" alt="" width="1200" height="800"></figure>
+        <div class="hc c1" data-depth="60"><span class="dot"><svg class="ic"><use href="#i-code"/></svg></span><span><small>Código da aula · 19h</small><b class="code">KTR 482</b></span></div>
+        <div class="hc c2" data-depth="100"><span><small>Adulto · 19h</small><b>8 de 10 confirmados</b></span><span class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></div>
+        <div class="hc c3" data-depth="80"><span class="dot warn"><svg class="ic"><use href="#i-bell"/></svg></span><span><small>Sem treinar há 14 dias</small><b>3 alunos</b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo pdemo" id="painel" aria-labelledby="t-painel">
+    <div class="demo-head">
+      <p class="label">Experimente</p>
+      <h2 id="t-painel">Um painel, <em>quatro perguntas</em>.</h2>
+      <p>Quem vem hoje? Quem chegou? Quem sumiu? Quem está pronto para o próximo grau? Clique à vontade: o painel funciona, com alunos de exemplo. Toque no nome de um aluno para abrir a ficha.</p>
+    </div>
+    <div class="wrap">
+      <div class="dash-wrap">
+        <div class="dash" id="dash">
+          <div class="dash-bar" aria-hidden="true"><i></i><i></i><i></i><span>Studio Evolution · Painel do professor</span><span class="clock" id="dClock">18:50</span></div>
+          <div class="dash-in">
+            <aside class="dash-side" aria-label="Menu do painel">
+              <span class="logo" role="img" aria-label="Studio Evolution BJJ"></span>
+              <button type="button" data-go="hoje" aria-current="true"><svg class="ic"><use href="#i-home"/></svg>Hoje</button>
+              <button type="button" data-go="alunos" aria-current="false"><svg class="ic"><use href="#i-users"/></svg>Alunos<span class="badge">3</span></button>
+              <button type="button" data-go="grad" aria-current="false"><svg class="ic"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad">3</span></button>
+              <button type="button" data-go="leads" aria-current="false"><svg class="ic"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads">3</span></button>
+              <div class="more"><p>Também no painel</p><ul><li>Movimentos e quizzes</li><li>Competências da faixa</li><li>Turmas e horários</li><li>Aprendizado por aluno</li><li>Cadastro rápido</li></ul></div>
+              <div class="who"><span class="av">SE</span><span>Professor<br><small>Studio Evolution</small></span></div>
+            </aside>
+            <div class="dash-main">
+
+              <!-- Hoje -->
+              <div class="dv on" data-v="hoje" aria-label="Hoje">
+                <div class="dv-h">
+                  <div><p class="dv-k">Sexta, 16 de outubro</p><h3>Boa noite. <em>Cinco aulas hoje.</em></h3></div>
+                  <p>Agora: Kids 18h · Próxima: Adulto 19h</p>
+                </div>
+                <div class="kpis">
+                  <div class="kpi"><b>58<small class="delta">+3 em outubro</small></b><span>alunos ativos</span></div>
+                  <div class="kpi"><b id="kPres">148</b><span>presenças nos últimos 7 dias</span><span class="spark" id="spark" aria-hidden="true"><i class="wk"></i><i class="wk"></i><i></i><i></i><i></i><i></i><i class="today"></i></span></div>
+                  <button class="kpi warn" type="button" data-goto="alunos" data-chip="aus"><b>3</b><span>sem treinar há 14 dias ou mais</span><span class="go-s">Ver quem<svg class="ic"><use href="#i-chev"/></svg></span></button>
+                  <button class="kpi" type="button" data-goto="leads"><b id="kLeads">3</b><span>interessados esperando retorno</span><span class="go-s">Abrir<svg class="ic"><use href="#i-chev"/></svg></span></button>
+                </div>
+                <div class="day-grid">
+                  <div class="classes" id="classes" role="group" aria-label="Aulas de hoje">
+                    <button type="button" class="past" data-c="a8" aria-pressed="false"><b>08:00</b><span>Adulto</span><small>7 vieram</small></button>
+                    <button type="button" class="past" data-c="k10" aria-pressed="false"><b>10:00</b><span>Kids</span><small>9 vieram</small></button>
+                    <button type="button" class="past" data-c="a11" aria-pressed="false"><b>11:00</b><span>Adulto</span><small>6 vieram</small></button>
+                    <button type="button" data-c="k18" aria-pressed="false"><b>18:00</b><span>Kids · agora</span><small>8 vieram</small></button>
+                    <button type="button" data-c="a19" aria-pressed="true"><b>19:00</b><span>Adulto</span><small id="c19s">8 de 10</small></button>
+                  </div>
+                  <div class="room" id="room" aria-live="polite"></div>
+                </div>
+              </div>
+
+              <!-- Alunos -->
+              <div class="dv" data-v="alunos" aria-label="Alunos">
+                <div class="dv-h"><div><p class="dv-k">58 ativos</p><h3>Alunos</h3></div><p>Ausente: 14 dias ou mais sem treinar. Toque no nome para abrir a ficha.</p></div>
+                <div class="chips" id="chips" role="group" aria-label="Filtrar alunos">
+                  <button type="button" data-f="all" aria-pressed="true">Todos</button>
+                  <button type="button" data-f="aus" aria-pressed="false">Ausentes · 3</button>
+                  <button type="button" data-f="aval" aria-pressed="false" id="chipAval">Para avaliar · 3</button>
+                </div>
+                <div class="tbl-wrap">
+                  <table class="tbl" id="tbl">
+                    <thead><tr><th>Aluno</th><th>Faixa</th><th>Última aula</th><th class="hide-s">Aulas no mês</th><th class="act">Ação</th></tr></thead>
+                    <tbody>
+                      <tr data-f="" data-id="marina"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 2 graus</span></span></td><td>quarta</td><td class="num hide-s">6</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
+                      <tr data-f="aval" data-id="thiago"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 3 graus</span></span></td><td>ontem</td><td class="num hide-s">5</td><td class="act"><button class="mini-btn" type="button" data-grad="thiago">Avaliar grau</button></td></tr>
+                      <tr data-f="aval" data-id="ana"><td><div class="nm"><span class="av">AR</span><div>Ana Beatriz Rocha<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 4 graus</span></span></td><td>hoje, 8h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="ana">Avaliar faixa</button></td></tr>
+                      <tr data-f="aval" data-id="joao"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · 9 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-cinza)"></i><span>Cinza · 3 graus</span></span></td><td>hoje, 18h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="joao">Avaliar grau</button></td></tr>
+                      <tr data-f="aus" data-id="diego"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-roxa)"></i><span>Roxa · 1 grau</span></span></td><td><span class="pill-s warn">há 16 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-wa="Diego">WhatsApp</button></td></tr>
+                      <tr data-f="aus" data-id="patricia"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 2 graus</span></span></td><td><span class="pill-s warn">há 21 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-wa="Patrícia">WhatsApp</button></td></tr>
+                      <tr data-f="aus" data-id="caio"><td><div class="nm"><span class="av">CF</span><div>Caio Fernandes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · sem grau</span></span></td><td><span class="pill-s warn">há 15 dias</span></td><td class="num hide-s">1</td><td class="act"><button class="mini-btn wa" type="button" data-wa="Caio">WhatsApp</button></td></tr>
+                      <tr data-f="" data-id="larissa"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 1 grau</span></span></td><td>ontem</td><td class="num hide-s">5</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
+                      <tr data-f="" data-id="helena"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · 7 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-amarela)"></i><span>Amarela · 2 graus</span></span></td><td>hoje, 10h</td><td class="num hide-s">6</td><td class="act"><span class="pill-s in">Veio hoje</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p class="tbl-more" id="tblMore">Mostrando 9 de 58 alunos.</p>
+                <div class="msg" id="waMsg" hidden></div>
+              </div>
+
+              <!-- Graduações -->
+              <div class="dv" data-v="grad" aria-label="Graduações">
+                <div class="dv-h"><div><p class="dv-k">Para avaliar</p><h3>Graduações</h3></div><p>Quem tem mais aulas desde o último grau. A decisão é sempre do professor.</p></div>
+                <div class="cards" id="cards">
+                  <article class="gcard" data-id="joao" data-belt="cinza" data-graus="3" data-next="grau" data-first="João Pedro" data-kid="1">
+                    <h4>João Pedro Lima</h4><p class="meta">Kids 18h · 9 anos</p>
+                    <div class="belt"></div>
+                    <dl><dt>Aulas desde o último grau</dt><dd>34</dd><dt>Competências da faixa</dt><dd>6 de 6</dd><dt>Último grau</dt><dd>14 de maio</dd></dl>
+                    <div class="space"></div>
+                    <div class="gact"><button class="ap-btn" type="button" data-ask>Registrar o 4º grau</button></div>
+                  </article>
+                  <article class="gcard" data-id="ana" data-belt="branca" data-graus="4" data-next="azul" data-first="Ana Beatriz">
+                    <h4>Ana Beatriz Rocha</h4><p class="meta">Adulto 8h · desde 2024 no Studio</p>
+                    <div class="belt"></div>
+                    <dl><dt>Aulas desde o último grau</dt><dd>41</dd><dt>Competências da faixa</dt><dd>8 de 8</dd><dt>Último grau</dt><dd>2 de abril</dd></dl>
+                    <div class="space"></div>
+                    <div class="gact"><button class="ap-btn" type="button" data-ask>Registrar a faixa azul</button></div>
+                  </article>
+                  <article class="gcard" data-id="thiago" data-belt="azul" data-graus="3" data-next="grau" data-first="Thiago">
+                    <h4>Thiago Moreira</h4><p class="meta">Adulto 19h · desde 2023 no Studio</p>
+                    <div class="belt"></div>
+                    <dl><dt>Aulas desde o último grau</dt><dd>31</dd><dt>Competências da faixa</dt><dd>6 de 8</dd><dt>Último grau</dt><dd>20 de junho</dd></dl>
+                    <div class="space"></div>
+                    <div class="gact"><button class="ap-btn" type="button" data-ask>Registrar o 4º grau</button></div>
+                  </article>
+                </div>
+                <div class="hist">
+                  <p>Últimas graduações</p>
+                  <ol id="hist">
+                    <li><i class="belt-s" style="--b:var(--b-amarela)"></i><div>Helena Prado<small>2º grau na faixa amarela · Kids 10h</small></div><time>9 de out</time></li>
+                    <li><i class="belt-s" style="--b:var(--b-azul)"></i><div>Gabriel Duarte<small>Faixa azul · Adulto 11h</small></div><time>2 de out</time></li>
+                    <li><i class="belt-s" style="--b:var(--b-cinza)"></i><div>Laura Pinto<small>4º grau na faixa cinza · Kids 10h</small></div><time>25 de set</time></li>
+                    <li><i class="belt-s" style="--b:var(--b-azul)"></i><div>Fábio Lacerda<small>4º grau na faixa azul · Adulto 11h</small></div><time>18 de set</time></li>
+                  </ol>
+                </div>
+              </div>
+
+              <!-- Interessados -->
+              <div class="dv" data-v="leads" aria-label="Interessados">
+                <div class="dv-h"><div><p class="dv-k">Pedidos pelo site</p><h3>Interessados</h3></div><p>Pedidos de aula experimental. Mude o status depois de cada contato.</p></div>
+                <div class="funnel" id="funnel" aria-label="Interessados por etapa">
+                  <div><b data-k="novo">2</b><span>Novos</span></div>
+                  <div><b data-k="atendimento">1</b><span>Em atendimento</span></div>
+                  <div><b data-k="agendado">1</b><span>Aula agendada</span></div>
+                  <div><b data-k="mat">3</b><span>Matriculados em outubro</span></div>
+                </div>
+                <div class="leads" id="leads">
+                  <div class="lead" data-first="Camila" data-turma="Adulto das 19h">
+                    <span class="av">CS</span>
+                    <div><b>Camila Souza</b><span class="pill-s gold">Retornar hoje</span><small>Adulto 19h · pediu ontem, às 21:14</small></div>
+                    <div class="acts"><select class="sel" aria-label="Status de Camila Souza"><option value="novo" selected>Novo</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-wa="Camila" data-kind="lead">WhatsApp</button></div>
+                  </div>
+                  <div class="lead" data-first="Rafael" data-turma="Adulto das 8h">
+                    <span class="av">RT</span>
+                    <div><b>Rafael Teixeira</b><span class="pill-s gold">Retornar hoje</span><small>Adulto 8h · pediu hoje, às 07:02</small></div>
+                    <div class="acts"><select class="sel" aria-label="Status de Rafael Teixeira"><option value="novo" selected>Novo</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-wa="Rafael" data-kind="lead">WhatsApp</button></div>
+                  </div>
+                  <div class="lead" data-first="Juliana" data-turma="Feminino, junto com o adulto">
+                    <span class="av">JM</span>
+                    <div><b>Juliana Martins</b><span class="pill-s warn">Retorno atrasado desde 14/10</span><small>Feminino · pediu dia 12</small></div>
+                    <div class="acts"><select class="sel" aria-label="Status de Juliana Martins"><option value="novo">Novo</option><option value="atendimento" selected>Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-wa="Juliana" data-kind="lead">WhatsApp</button></div>
+                  </div>
+                  <div class="lead" data-first="Pedro" data-turma="Kids das 18h">
+                    <span class="av">PH</span>
+                    <div><b>Pedro Henrique</b><span class="pill-s in">Aula seg, 18h</span><small>Kids 18h, para o filho Theo, de 7 anos · pediu dia 13</small></div>
+                    <div class="acts"><select class="sel" aria-label="Status de Pedro Henrique"><option value="novo">Novo</option><option value="atendimento">Em atendimento</option><option value="agendado" selected>Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-wa="Pedro" data-kind="lead">WhatsApp</button></div>
+                  </div>
+                </div>
+                <div class="msg" id="leadMsg" hidden></div>
+                <p class="leads-closed"><span>Fechados</span><span id="closedN">6</span></p>
+              </div>
+
+              <!-- ficha do aluno: abre por cima da lista -->
+              <div class="drawer-scrim" id="drScrim" aria-hidden="true"></div>
+              <aside class="drawer" id="drawer" aria-label="Ficha do aluno" aria-hidden="true" data-lenis-prevent></aside>
+            </div>
+          </div>
+          <div class="dash-toast" id="dashToast" role="status" aria-live="polite"><svg class="ic"><use href="#i-check"/></svg><span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tv-sec cine" id="tatame" data-dark aria-labelledby="t-tv">
+    <div class="wrap">
+      <div class="tv-head">
+        <div><p class="label">Modo tatame</p><h2 class="split" id="t-tv">O código da aula, <em>na TV da academia</em>.</h2></div>
+        <p>Um toque no painel e a TV mostra o código em letras grandes. A aluna digita no próprio celular, e o nome dela aparece na lista na mesma hora.</p>
+      </div>
+      <div class="tv-stage">
+        <div class="tv-col">
+          <div class="tv" id="tv">
+            <div class="tv-screen">
+              <div class="tv-in">
+                <div class="tv-l">
+                  <p class="lb">Adulto · aula das 19h</p>
+                  <h4>Código da aula</h4>
+                  <div class="tv-code" id="tvCode" aria-live="polite"><b class="off">·</b><b class="off">·</b><b class="off">·</b><i class="gap"></i><b class="off">·</b><b class="off">·</b><b class="off">·</b></div>
+                  <p class="how">Abra o app do Studio, toque em Presença e digite o código.</p>
+                  <p class="tv-time"><span id="tvUntil">Aguardando o código</span><i><span id="tvBar" style="width:0%"></span></i></p>
+                </div>
+                <div class="tv-r">
+                  <div class="hd"><span>Presentes</span><b id="tvCount">0<small> de 10</small></b></div>
+                  <ol class="tv-list" id="tvList"></ol>
+                </div>
+              </div>
+              <span class="tv-logo" aria-hidden="true"></span>
+            </div>
+            <div class="tv-stand" aria-hidden="true"></div>
+          </div>
+          <p class="tv-mob" id="tvMob">Ninguém chegou ainda.</p>
+        </div>
+        <figure class="tv-phone">
+          <div class="device" id="pDevice">
+            <div class="ap">
+              <div class="ap-sbar"><span id="pClock">18:54</span><span>5G</span></div>
+              <div class="ap-views">
+                <section class="ap-view on" aria-label="Tela Presença no celular da aluna">
+                  <p class="ap-lb">Presença</p>
+                  <p class="ap-hi">Aula das 19h</p>
+                  <p class="ap-mut" style="margin-top:4px">Adulto · sexta, 16 de outubro</p>
+                  <ol class="ap-steps">
+                    <li class="done"><span class="ap-mk"><svg class="ic"><use href="#i-check"/></svg></span><div><p class="ap-st">Vaga confirmada</p><p>Às 18:14 · 8 de 10 vagas</p></div></li>
+                    <li class="now" id="pStep2"><span class="ap-mk">2</span><div><p class="ap-st" id="pStep2h">Digite o código da aula</p><p id="pStep2t">Está na TV do tatame.</p>
+                      <div id="pCodeWrap" style="overflow:hidden"><div class="ap-code" id="pCode" aria-hidden="true"><b class="caret"></b><b></b><b></b><b></b><b></b><b></b></div>
+                      <span class="ap-btn off" id="pReg">Registrar presença</span></div></div></li>
+                    <li class="later" id="pStep3"><span class="ap-mk">3</span><div><p class="ap-st">Presença registrada</p><p>Conta para a meta da semana.</p></div></li>
+                  </ol>
+                  <div class="ap-done" id="pDone" hidden><b id="pDoneT">18:55</b><p>Presença registrada. Meta da semana batida: 3 de 3.</p><div class="ap-goal"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
+                </section>
+              </div>
+              <div class="ap-dock" aria-hidden="true">
+                <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-home"/></svg>Início</button>
+                <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-play"/></svg>Movimentos</button>
+                <button type="button" tabindex="-1" aria-current="true"><svg class="ic"><use href="#i-check"/></svg>Presença</button>
+                <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-belt"/></svg>Perfil</button>
+              </div>
+              <i class="ap-glare" aria-hidden="true"></i>
+            </div>
+          </div>
+          <figcaption>O celular da Marina, aluna da turma das 19h. Ela digita o código que aparece na TV.</figcaption>
+        </figure>
+      </div>
+      <div class="tv-ctrl">
+        <button class="btn btn-line" type="button" id="tvNew">Gerar novo código</button>
+        <button class="btn btn-ink" type="button" id="tvReplay">Ver as chegadas de novo</button>
+        <p>Um código novo substitui o anterior na hora. Ele só vale no dia da aula, pelo tempo que o professor escolher: de 15 minutos até o fim do dia.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="diff" aria-labelledby="t-diff">
+    <div class="wrap">
+      <p class="label">Antes e depois</p>
+      <h2 class="split" id="t-diff">O que muda para <em>quem dá aula</em>.</h2>
+      <ul class="diff-grid" data-rise>
+        <li><h3>O dia numa tela só</h3><p>Aulas de hoje, código, chamada e quem chegou, sem trocar de página.</p><span class="was">Antes: o Início listava as aulas, e a chamada ficava em outra página.</span></li>
+        <li><h3>Só o que é do professor</h3><p>Alunos, presenças e graus. Valores ficam com quem cuida do financeiro.</p><span class="was">Antes: o resumo mostrava R$ 0 para o professor, que não tem acesso às mensalidades.</span></li>
+        <li><h3>Código na TV</h3><p>Um toque e a turma vê o código em letras grandes, com a lista de quem chegou.</p><span class="was">Antes: o código ficava no celular do professor, com um botão para compartilhar.</span></li>
+        <li><h3>A frequência à vista</h3><p>A ficha mostra as últimas 12 semanas de cada aluno, dia por dia, e quem está perto do grau.</p><span class="was">Antes: as aulas desde o último grau só apareciam no perfil do próprio aluno.</span></li>
+        <li><h3>Grau com aviso</h3><p>Ao registrar o grau, o aluno (ou a família, no Kids) recebe a notícia no celular.</p><span class="was">Antes: o grau entrava no sistema em silêncio.</span></li>
+        <li><h3>Interessados no menu</h3><p>Os pedidos de aula do site têm lugar próprio, com status, funil do mês e mensagem pronta.</p><span class="was">Antes: para o professor, ficavam no meio do Início; a lista completa era só do administrador.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="bridge" aria-label="Área do Aluno">
+    <div class="wrap">
+      <a href="area-do-aluno.html" data-int>
+        <div><p class="label">Do outro lado do tatame</p><h2>Agora veja a <em>Área do Aluno</em>.</h2></div>
+        <span class="go"><svg class="ic"><use href="#i-arrow"/></svg></span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
+      <div><h4>App</h4><ul><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
+    </div>
+    <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
+    <div class="foot-bottom"><span>Dados de exemplo: alunos, interessados e números desta página são fictícios.</span><span>Proposta de redesign · versão para aprovação</span></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$;
+  var anim = !!window.gsap && !Site.reduce;
+  var dash = $("#dash"), main = $(".dash-main", dash), views = $$(".dv", dash), side = $$(".dash-side button[data-go]", dash);
+  var toastEl = $("#dashToast"), toastT = null;
+  function toast(msg) {
+    $("span", toastEl).textContent = msg;
+    toastEl.classList.add("on");
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { toastEl.classList.remove("on"); }, 3400);
+  }
+  function ini(n) { var p = n.split(" "); return (p[0][0] + p[p.length - 1][0]).toUpperCase(); }
+  function first(n) { return n.split(" ")[0]; }
+  function two(n) { return (n < 10 ? "0" : "") + n; }
+  function hm(m) { return two(Math.floor(m / 60)) + ":" + two(m % 60); }
+  function mins(s) { var p = s.split(":"); return +p[0] * 60 + +p[1]; }
+  var NAMES = { branca: "Branca", cinza: "Cinza", amarela: "Amarela", laranja: "Laranja", verde: "Verde", azul: "Azul", roxa: "Roxa", marrom: "Marrom", preta: "Preta" };
+  function beltTxt(b, g) { return NAMES[b] + " · " + (g ? g + (g === 1 ? " grau" : " graus") : "sem grau"); }
+  function refresh() { if (window.ScrollTrigger) ScrollTrigger.refresh(); }
+  function replayClass(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+  /* a janela do painel muda de altura com suavidade quando o conteúdo muda */
+  function morph(fn) {
+    var h0 = main.offsetHeight;
+    fn();
+    var h1 = main.offsetHeight;
+    if (anim && Math.abs(h1 - h0) > 2) gsap.fromTo(main, { height: h0 }, { height: h1, duration: 0.7, ease: "expo.inOut", clearProps: "height", onComplete: refresh });
+    else refresh();
+  }
+
+  /* ---------- menu do painel ---------- */
+  var cur = "hoje";
+  function go(name) {
+    closeDrawer();
+    if (name === cur) return;
+    cur = name;
+    morph(function () {
+      views.forEach(function (v) { v.classList.toggle("on", v.dataset.v === name); });
+      side.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
+    });
+    if (dash.getBoundingClientRect().top < 0) Site.scrollTo(dash, -90);
+  }
+  side.forEach(function (b) { b.addEventListener("click", function () { go(b.dataset.go); }); });
+  $$("[data-goto]", dash).forEach(function (b) {
+    b.addEventListener("click", function () { if (b.dataset.chip) filter(b.dataset.chip); go(b.dataset.goto); });
+  });
+
+  /* ---------- Hoje: as aulas do dia e a sala da aula das 19h ---------- */
+  var PAST = {
+    a8: { t: "Adulto · 8h", s: "Aula encerrada", p: ["Ana Beatriz Rocha|branca|4", "Rodrigo Faria|azul|2", "Vinícius Teles|branca|3", "Bianca Lopes|roxa|0", "Otávio Reis|branca|1", "Sérgio Matos|marrom|2", "Paula Dias|azul|1"] },
+    k10: { t: "Kids · 10h", s: "Aula encerrada", p: ["Helena Prado|amarela|2", "Davi Souza|cinza|1", "Alice Martins|branca|3", "Arthur Gomes|amarela|0", "Laura Pinto|cinza|4", "Gael Ribeiro|branca|2", "Cecília Araújo|laranja|1", "Benício Castro|branca|0", "Sofia Barros|cinza|2"] },
+    a11: { t: "Adulto · 11h", s: "Aula encerrada", p: ["Henrique Assis|roxa|2", "Fábio Lacerda|azul|4", "Mariana Queiroz|branca|2", "Gabriel Duarte|azul|0", "Tatiane Lins|branca|1", "Wagner Prates|preta|1"] },
+    k18: { t: "Kids · 18h", s: "Em andamento, até as 19:00", p: ["João Pedro Lima|cinza|3", "Miguel Torres|branca|2", "Lorenzo Vieira|amarela|1", "Valentina Melo|cinza|0", "Heitor Cunha|branca|4", "Manuela Freitas|laranja|2", "Bernardo Lopes|branca|1", "Isabela Rocha|amarela|3"] }
+  };
+  var CONF = [["Felipe Antunes", "azul", 1, "17:40"], ["Larissa Mendes", "branca", 1, "16:05"], ["Gustavo Lima", "roxa", 0, "18:02"], ["Thiago Moreira", "azul", 3, "12:31"],
+    ["Renata Siqueira", "branca", 3, "18:21"], ["Eduardo Prado", "marrom", 1, "09:12"], ["Marina Alves", "azul", 2, "18:14"], ["Aline Duarte", "branca", 2, "18:33"]];
+  /* a Marina chega pelo celular que aparece ao lado da TV */
+  var ARR = [["Felipe Antunes", "18:52"], ["Marina Alves", "18:55", "phone"], ["Larissa Mendes", "18:56"], ["Gustavo Lima", "18:57"], ["Thiago Moreira", "18:58"], ["Renata Siqueira", "18:59"], ["Eduardo Prado", "19:00"], ["Aline Duarte", "19:02"]];
+  var WALK = [["Leandro Pires", "azul", 0], ["Marcelo Tavares", "branca", 2]];
+  var CODES = ["KTR482", "BMX731", "FJN259", "QWD846", "HPZ513"];
+  var START = mins("18:50");
+  var SPARK = [0, 0, 31, 29, 33, 25, 30];  /* sáb a sex; hoje cresce com as chegadas */
+  var st = { code: null, ci: -1, start: START, valid: 30, arrived: {}, order: [], walk: [], idx: 0, timer: null, clock: START, mine: null };
+
+  function personLi(name, belt, g, pill) {
+    return '<li data-n="' + name + '"><span class="av">' + ini(name) + "</span><div>" + name + "<small>" + beltTxt(belt, g) + "</small></div>" + pill + "</li>";
+  }
+  function pillFor(name, confAt) {
+    if (st.arrived[name]) return st.walk.indexOf(name) > -1 ? '<span class="pill-s gold">Da turma · marcado às ' + st.arrived[name] + "</span>" : '<span class="pill-s in">Chegou ' + st.arrived[name] + "</span>";
+    return '<span class="pill-s" title="Confirmou às ' + confAt + '">Confirmou pelo app</span>';
+  }
+  function room19() {
+    return '<div class="room-h"><div><h4>Adulto · 19h</h4><p id="rCount"></p></div>' +
+      '<div class="room-tools"><label for="valSel">Vale por</label><select class="sel" id="valSel">' +
+      '<option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hora</option><option value="90">1h30</option><option value="fim">Até o fim do dia</option></select>' +
+      '<button class="ap-btn" type="button" id="genBtn"><svg class="ic"><use href="#i-code"/></svg><span>Gerar código da aula</span></button></div></div>' +
+      '<div class="cap-bar" id="capBar" aria-hidden="true">' + new Array(11).join("<i></i>") + "</div>" +
+      '<div class="codebox"><div><span class="cd hold" id="cd">O código aparece aqui</span><small id="cdNote">3 letras e 3 números. Vale só para esta aula.</small></div>' +
+      '<div class="acts" id="cdActs" hidden><button class="mini-btn" type="button" id="tvBtn">Mostrar na TV</button></div></div>' +
+      '<ul class="roster" id="roster"></ul>' +
+      '<div class="walkin"><button type="button" id="walkBtn" aria-expanded="false"><svg class="ic"><use href="#i-plus"/></svg>Veio sem confirmar? Marcar presença</button><ul id="walkList" hidden></ul></div>';
+  }
+  function paint19() {
+    var r = $("#roster");
+    if (!r) return;
+    r.innerHTML = CONF.map(function (c) { return personLi(c[0], c[1], c[2], pillFor(c[0], c[3])); }).join("") +
+      st.walk.map(function (n) { var w = WALK.filter(function (x) { return x[0] === n; })[0]; return personLi(w[0], w[1], w[2], pillFor(n)); }).join("");
+    $("#valSel").value = String(st.valid);
+    paintWalk();
+    paintCodeBox(false);
+    paintCounts();
+  }
+  function paintWalk() {
+    var list = $("#walkList"), btn = $("#walkBtn");
+    if (!list) return;
+    var left = WALK.filter(function (w) { return !st.arrived[w[0]]; });
+    list.innerHTML = left.map(function (w) { return '<li><button type="button" data-walk="' + w[0] + '">' + w[0] + " · da turma</button></li>"; }).join("");
+    btn.hidden = !left.length;
+    if (!left.length) list.hidden = true;
+  }
+  function fmt(c) { return c.slice(0, 3) + " " + c.slice(3); }
+  function untilTxt() { return st.valid === "fim" ? "até o fim do dia" : "até " + hm(st.start + st.valid); }
+  function paintCodeBox(flip) {
+    var cd = $("#cd");
+    if (!cd || !st.code) return;
+    cd.className = "cd" + (flip && anim ? " flip" : "");
+    cd.innerHTML = st.code.split("").map(function (ch, i) { return (i === 3 ? '<span class="sp"></span>' : "") + '<span style="animation-delay:' + i * 70 + 'ms">' + ch + "</span>"; }).join("");
+    $("#cdNote").textContent = "Vale " + untilTxt() + ". Um código novo substitui este.";
+    $("#cdActs").hidden = false;
+    $("span", $("#genBtn")).textContent = "Gerar novo código";
+  }
+  function paintCounts() {
+    var m = st.order.length, conf = CONF.length, taken = conf + st.walk.length;
+    var r = $("#rCount");
+    if (r) r.textContent = conf + " de 10 confirmados · " + (m === 0 ? "ninguém chegou ainda" : m === 1 ? "1 veio" : m + " vieram");
+    $$("#capBar i").forEach(function (b, i) { b.className = i < m ? "in" : i < taken ? "c" : ""; });
+    $("#c19s").textContent = m ? (m === 1 ? "1 veio" : m + " vieram") : conf + " de 10";
+    $("#kPres").textContent = 148 + m;
+    var vals = SPARK.slice();
+    vals[6] += m;
+    var max = Math.max.apply(null, vals);
+    $$("#spark i").forEach(function (b, i) { b.style.height = Math.max(2, Math.round(vals[i] / max * 26)) + "px"; });
+    $("#tvCount").innerHTML = m + "<small> de 10</small>";
+    var last = st.order[m - 1];
+    $("#tvMob").innerHTML = m ? "<b>" + m + "</b> " + (m === 1 ? "presente" : "presentes") + " · última chegada: " + first(last) + ", " + st.arrived[last] : "Ninguém chegou ainda.";
+  }
+
+  /* TV: código grande, tempo que resta e quem chegou */
+  function paintTV(flip) {
+    if (!st.code) return;
+    $("#tvCode").innerHTML = st.code.split("").map(function (ch, i) {
+      return (i === 3 ? '<i class="gap"></i>' : "") + '<b class="' + (flip && anim ? "flip" : "") + '" style="animation-delay:' + i * 90 + 'ms">' + ch + "</b>";
+    }).join("");
+    $("#tvUntil").textContent = "Vale " + untilTxt();
+    paintBar();
+  }
+  function paintBar() {
+    if (!st.code) return;
+    var left = st.valid === "fim" ? (1439 - st.clock) / Math.max(1, 1439 - st.start) : 1 - (st.clock - st.start) / st.valid;
+    $("#tvBar").style.width = Math.max(0, Math.min(1, left)) * 100 + "%";
+  }
+  function tvLi(n, isNew) {
+    var cls = ((isNew ? "new " : "") + (n === st.mine ? "me" : "")).trim();
+    return "<li" + (cls ? ' class="' + cls + '"' : "") + '><span class="av">' + ini(n) + "</span><span>" + n + "</span><small>" + st.arrived[n] + "</small></li>";
+  }
+  function paintTVList() { $("#tvList").innerHTML = st.order.slice(-7).reverse().map(function (n) { return tvLi(n, false); }).join(""); }
+
+  /* ---------- o celular da Marina, ao lado da TV: digita o código que está na tela ---------- */
+  var phone = { busy: false, t: [] };
+  function paintP(typed) {
+    $$("#pCode b").forEach(function (c, i) { c.textContent = typed[i] || ""; c.classList.toggle("caret", i === typed.length && typed.length < 6); });
+    $("#pReg").classList.toggle("off", typed.length < 6);
+  }
+  phone.clear = function () {
+    phone.t.forEach(clearTimeout);
+    phone.t = [];
+    phone.busy = false;
+    $$("#tvCode b").forEach(function (b) { b.classList.remove("hit"); });
+  };
+  phone.reset = function () {
+    phone.clear();
+    [["#pStep2", "2", "now"], ["#pStep3", "3", "later"]].forEach(function (s) { var li = $(s[0]); li.className = s[2]; $(".ap-mk", li).textContent = s[1]; });
+    $("#pStep2h").textContent = "Digite o código da aula";
+    $("#pStep2t").textContent = "Está na TV do tatame.";
+    var w = $("#pCodeWrap");
+    if (window.gsap) gsap.killTweensOf(w);
+    w.hidden = false; w.style.height = ""; w.style.opacity = "";
+    $("#pReg").classList.remove("press");
+    paintP("");
+    $("#pDone").hidden = true;
+    $("#pClock").textContent = "18:54";
+  };
+  phone.type = function (code, time, done) {
+    phone.clear();
+    phone.busy = true;
+    var cells = $$("#tvCode b"), typed = "", T = function (fn, ms) { phone.t.push(setTimeout(fn, ms)); };
+    code.split("").forEach(function (ch, i) {
+      T(function () {
+        typed += ch;
+        paintP(typed);
+        var c = cells[i];
+        if (c) { c.classList.add("hit"); T(function () { c.classList.remove("hit"); }, 650); }
+      }, 350 + i * 240);
+    });
+    var end = 350 + 6 * 240;
+    T(function () { $("#pReg").classList.add("press"); }, end + 150);
+    T(function () {
+      $("#pReg").classList.remove("press");
+      ["#pStep2", "#pStep3"].forEach(function (s) { var li = $(s); li.className = "done"; $(".ap-mk", li).innerHTML = '<svg class="ic"><use href="#i-check"/></svg>'; });
+      $("#pStep2h").textContent = "Código digitado";
+      $("#pStep2t").textContent = fmt(code) + " · às " + time;
+      var w = $("#pCodeWrap");
+      if (anim) gsap.to(w, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: function () { w.hidden = true; } });
+      else w.hidden = true;
+      $("#pClock").textContent = time;
+      $("#pDoneT").textContent = time;
+      $("#pDone").hidden = false;
+      replayClass($("#pDone .ap-goal"), "burst");
+      if (anim) gsap.from("#pDone", { y: 16, opacity: 0, duration: 0.8, ease: "expo.out" });
+      phone.busy = false;
+      done();
+    }, end + 560);
+  };
+
+  /* gerar o código: o painel e a TV mudam juntos, e os alunos começam a chegar */
+  function generate(silent) {
+    var had = !!st.code;
+    if (phone.busy) phone.reset();
+    st.ci = (st.ci + 1) % CODES.length;
+    st.code = CODES[st.ci];
+    st.start = st.clock;
+    paintCodeBox(true);
+    paintTV(true);
+    if (!silent) toast(had ? "Código novo: " + fmt(st.code) + ". O anterior deixou de valer." : "Código " + fmt(st.code) + " gerado. A turma já pode registrar a presença.");
+    startArrivals();
+  }
+  function arrive(name, time, manual, mine) {
+    st.arrived[name] = time;
+    st.order.push(name);
+    if (manual) st.walk.push(name);
+    if (mine) st.mine = name;
+    var t = mins(time);
+    if (t > st.clock) { st.clock = t; $("#dClock").textContent = time; }
+    var r = $("#roster");
+    if (r) {
+      var li = $('li[data-n="' + name + '"]', r);
+      if (!li && manual) {
+        var w = WALK.filter(function (x) { return x[0] === name; })[0];
+        r.insertAdjacentHTML("beforeend", personLi(w[0], w[1], w[2], pillFor(name)));
+        li = r.lastElementChild;
+      } else if (li) $(".pill-s", li).outerHTML = pillFor(name);
+      if (li) replayClass(li, "arrive");
+    }
+    $("#tvList").insertAdjacentHTML("afterbegin", tvLi(name, true));
+    var items = $$("#tvList li");
+    if (items.length > 7) items[items.length - 1].remove();
+    paintCounts();
+    paintBar();
+  }
+  function next() { if (st.idx < ARR.length && !st.timer) st.timer = setTimeout(step, 1250 + Math.random() * 650); }
+  function step() {
+    st.timer = null;
+    while (st.idx < ARR.length && st.arrived[ARR[st.idx][0]]) st.idx++;
+    if (st.idx >= ARR.length) return;
+    var a = ARR[st.idx];
+    if (a[2] === "phone") {
+      phone.type(st.code, a[1], function () { st.idx++; arrive(a[0], a[1], false, true); next(); });
+      return;
+    }
+    st.idx++;
+    arrive(a[0], a[1], false, false);
+    next();
+  }
+  function startArrivals() {
+    if (st.timer || phone.busy || st.idx >= ARR.length || !st.code) return;
+    st.timer = setTimeout(step, 1300);
+  }
+  function replay() {
+    clearTimeout(st.timer);
+    st.timer = null;
+    phone.reset();
+    st.arrived = {}; st.order = []; st.walk = []; st.idx = 0; st.mine = null;
+    st.clock = START; st.start = START;
+    $("#dClock").textContent = hm(START);
+    paint19();
+    paintTV(false);
+    paintTVList();
+    paintCounts();
+    if (!st.code) generate(true); else startArrivals();
+  }
+
+  var cls = $$("#classes button");
+  function renderRoom(id) {
+    var room = $("#room");
+    if (id === "a19") { room.innerHTML = room19(); paint19(); return; }
+    var c = PAST[id];
+    room.innerHTML = '<div class="room-h"><div><h4>' + c.t + "</h4><p>" + c.s + " · " + c.p.length + " vieram</p></div></div>" +
+      '<ul class="roster">' + c.p.map(function (s) { var q = s.split("|"); return personLi(q[0], q[1], +q[2], '<span class="pill-s in">Veio</span>'); }).join("") + "</ul>";
+  }
+  cls.forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (b.getAttribute("aria-pressed") === "true") return;
+      cls.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      morph(function () { renderRoom(b.dataset.c); });
+      if (anim) gsap.from($$("#room .room-h, #room .roster li"), { y: 12, opacity: 0, duration: 0.6, stagger: 0.03, ease: "expo.out" });
+    });
+  });
+  renderRoom("a19");
+
+  $("#room").addEventListener("click", function (e) {
+    var t = e.target.closest("button");
+    if (!t) return;
+    if (t.id === "genBtn") generate(false);
+    else if (t.id === "tvBtn") Site.scrollTo("#tv", -110);
+    else if (t.id === "walkBtn") {
+      var l = $("#walkList"), open = l.hidden;
+      morph(function () { l.hidden = !open; });
+      t.setAttribute("aria-expanded", open ? "true" : "false");
+    } else if (t.dataset.walk) {
+      var n = t.dataset.walk;
+      morph(function () { arrive(n, hm(st.clock), true, false); paintWalk(); });
+      toast(first(n) + " marcado como presente.");
+    }
+  });
+  $("#room").addEventListener("change", function (e) {
+    if (e.target.id !== "valSel") return;
+    st.valid = e.target.value === "fim" ? "fim" : +e.target.value;
+    if (st.code) { paintCodeBox(false); paintTV(false); }
+  });
+
+  /* ---------- Alunos: filtros, mensagem pronta e ficha de cada um ---------- */
+  var chips = $$("#chips button");
+  function filter(f) {
+    chips.forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.f === f ? "true" : "false"); });
+    var n = 0;
+    $$("#tbl tbody tr").forEach(function (tr) { var on = f === "all" || tr.dataset.f === f; tr.hidden = !on; if (on) n++; });
+    $("#tblMore").textContent = f === "all" ? "Mostrando 9 de 58 alunos." : f === "aus" ? "A mensagem de WhatsApp já vem escrita. Toque em WhatsApp para ver." : n ? "Mais aulas desde o último grau. Quem decide é o professor." : "Ninguém para avaliar agora.";
+    $("#waMsg").hidden = true;
+  }
+  chips.forEach(function (c) { c.addEventListener("click", function () { morph(function () { filter(c.dataset.f); }); }); });
+
+  /* dados de exemplo da ficha: a frequência das últimas 12 semanas sai de um sorteio fixo por aluno,
+     com a última aula e a ausência batendo com a lista */
+  var PEOPLE = {
+    marina: { n: "Marina Alves", cls: "Adulto 19h", since: "aluna desde março de 2025", belt: "azul", g: 2, total: 142, desde: 21, ult: "12 de agosto", comp: [3, 8], days: [0, 2, 4], skip: 0.12, gap: [5], last: "2026-10-14", force: ["2026-10-12"], conf: 1 },
+    thiago: { n: "Thiago Moreira", cls: "Adulto 19h", since: "aluno desde 2023", belt: "azul", g: 3, total: 312, desde: 31, ult: "20 de junho", comp: [6, 8], days: [1, 3, 4], skip: 0.35, last: "2026-10-15", conf: 1, grad: 1 },
+    ana: { n: "Ana Beatriz Rocha", cls: "Adulto 8h", since: "aluna desde 2024", belt: "branca", g: 4, total: 118, desde: 41, ult: "2 de abril", comp: [8, 8], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", grad: 1 },
+    joao: { n: "João Pedro Lima", cls: "Kids 18h", age: "9 anos", since: "no Studio desde 2024", belt: "cinza", g: 3, total: 126, desde: 34, ult: "14 de maio", comp: [6, 6], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", kid: 1, grad: 1 },
+    diego: { n: "Diego Ramos", cls: "Adulto 11h", since: "aluno desde 2022", belt: "roxa", g: 1, total: 205, desde: 17, ult: "3 de agosto", comp: [4, 10], days: [1, 2, 3], skip: 0.25, last: "2026-09-30", aus: 16 },
+    patricia: { n: "Patrícia Nunes", cls: "Adulto 8h", since: "aluna desde maio de 2026", belt: "branca", g: 2, total: 38, desde: 4, ult: "11 de setembro", comp: [2, 6], days: [1, 4], skip: 0.3, last: "2026-09-25", aus: 21 },
+    caio: { n: "Caio Fernandes", cls: "Adulto 19h", since: "aluno desde 2025", belt: "azul", g: 0, total: 64, desde: 18, ult: "1º de julho", comp: [1, 8], days: [0, 3], skip: 0.3, last: "2026-10-01", aus: 15 },
+    larissa: { n: "Larissa Mendes", cls: "Adulto 19h", since: "aluna desde junho de 2026", belt: "branca", g: 1, total: 31, desde: 10, ult: "8 de setembro", comp: [2, 6], days: [1, 3], skip: 0.1, last: "2026-10-15", conf: 1 },
+    helena: { n: "Helena Prado", cls: "Kids 10h", age: "7 anos", since: "no Studio desde 2025", belt: "amarela", g: 2, total: 88, desde: 3, ult: "9 de outubro", comp: [4, 6], days: [0, 2, 4], skip: 0.12, last: "2026-10-16", kid: 1 }
+  };
+  function rng(seed) {
+    var h = 2166136261;
+    for (var i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return function () { h += 0x6D2B79F5; var t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  var TODAY = "2026-10-16", WD = ["seg", "ter", "qua", "qui", "sex"], MON = { 1: "ago", 6: "set", 10: "out" }, HEAT = {};
+  function isoOf(w, d) { var dt = new Date(2026, 6, 27 + w * 7 + d); return dt.getFullYear() + "-" + two(dt.getMonth() + 1) + "-" + two(dt.getDate()); }
+  function dl(k) { if (k === TODAY) return "hoje"; var p = k.split("-"), dt = new Date(+p[0], +p[1] - 1, +p[2]); return WD[(dt.getDay() + 6) % 7] + ", " + p[2] + "/" + p[1]; }
+  function heat(id) {
+    if (HEAT[id]) return HEAT[id];
+    var p = PEOPLE[id], rnd = rng(id), out = [];
+    for (var w = 0; w < 12; w++) for (var d = 0; d < 5; d++) {
+      var k = isoOf(w, d), s;
+      if (k === TODAY) s = p.last === k ? "y" : p.conf ? "t" : "n";
+      else if (k > p.last) s = "n";
+      else if (k === p.last || (p.force || []).indexOf(k) > -1) s = "y";
+      else if ((p.gap || []).indexOf(w) > -1) s = "n";
+      else s = (p.days.indexOf(d) > -1 && rnd() > p.skip) || rnd() < 0.04 ? "y" : "n";
+      out.push({ k: k, s: s });
+    }
+    return (HEAT[id] = out);
+  }
+  function inOct(c) { return c.s === "y" && c.k >= "2026-10-01"; }
+  function heatHTML(cells) {
+    var h = '<span class="m"></span>';
+    for (var w = 0; w < 12; w++) h += '<span class="m">' + (MON[w] || "") + "</span>";
+    for (var d = 0; d < 5; d++) {
+      h += '<span class="d">' + WD[d] + "</span>";
+      for (var w2 = 0; w2 < 12; w2++) {
+        var c = cells[w2 * 5 + d];
+        h += '<i class="' + (c.s === "n" ? "" : c.s) + '" title="' + dl(c.k) + (c.s === "y" ? ": veio" : c.s === "t" ? ": confirmou" : "") + '"></i>';
+      }
+    }
+    return h;
+  }
+  /* o nome vira botão (dá para abrir a ficha pelo teclado) e as aulas do mês saem da mesma frequência da ficha */
+  $$("#tbl tbody tr").forEach(function (tr) {
+    var holder = $(".nm > div", tr), tn = holder.firstChild, b = document.createElement("button");
+    b.type = "button";
+    b.className = "nm-btn";
+    b.textContent = tn.textContent.trim();
+    b.setAttribute("aria-label", "Abrir a ficha de " + b.textContent);
+    holder.replaceChild(b, tn);
+    $("td.num", tr).textContent = heat(tr.dataset.id).filter(inOct).length;
+  });
+
+  var drawer = $("#drawer"), scrim = $("#drScrim"), drFrom = null;
+  function openDrawer(id, from) {
+    var p = PEOPLE[id];
+    if (!p) return;
+    drFrom = from || null;
+    var cells = heat(id), yes = cells.filter(function (c) { return c.s === "y"; });
+    var last3 = yes.slice(-3).reverse().map(function (c) { return "<li>" + dl(c.k) + "<span>" + p.cls + "</span></li>"; }).join("");
+    drawer.innerHTML =
+      '<button class="dr-close" type="button" aria-label="Fechar a ficha"><svg class="ic"><use href="#i-x"/></svg></button>' +
+      '<div class="dr-h"><span class="av">' + ini(p.n) + "</span><div><h4>" + p.n + "</h4><p>" + p.cls + (p.age ? " · " + p.age : "") + " · " + p.since + "</p></div></div>" +
+      (p.aus ? '<p class="dr-alert"><span class="pill-s warn">' + p.aus + " dias sem treinar</span>Última aula: " + dl(p.last) + ".</p>" : "") +
+      '<div class="dr-belt">' + beltSVG(p.belt, p.g) + "<p><b>" + beltTxt(p.belt, p.g) + "</b><span>último grau: " + p.ult + "</span></p></div>" +
+      '<div class="dr-trio"><div><b>' + cells.filter(inOct).length + "</b><span>aulas em outubro</span></div><div><b>" + p.total + "</b><span>presenças no total</span></div><div><b>" + p.desde + "</b><span>aulas desde o último grau</span></div></div>" +
+      '<div class="dr-sec"><p class="k">Presenças · últimas 12 semanas</p><div class="heat" role="img" aria-label="' + yes.length + ' presenças nas últimas 12 semanas">' + heatHTML(cells) + "</div>" +
+      '<p class="heat-leg"><span><i class="y"></i>veio</span><span><i></i>não veio</span>' + (p.conf ? '<span><i class="t"></i>confirmou hoje</span>' : "") + "</p></div>" +
+      '<div class="dr-sec"><p class="k">Competências da faixa</p><div class="dr-comp"><span class="bar"><i style="width:' + Math.round(p.comp[0] / p.comp[1] * 100) + '%"></i></span><span>' + p.comp[0] + " de " + p.comp[1] + "</span></div></div>" +
+      '<div class="dr-sec"><p class="k">Últimas aulas</p><ul class="dr-last">' + last3 + "</ul></div>" +
+      '<div class="dr-acts">' + (p.grad ? '<button class="ap-btn" type="button" data-grad="' + id + '">Avaliar grau</button>' : "") +
+      '<button class="mini-btn wa" type="button" data-drwa="' + id + '">WhatsApp' + (p.kid ? " da família" : "") + "</button></div>" +
+      '<div class="msg" hidden></div>';
+    drawer.scrollTop = 0;
+    drawer.classList.add("on");
+    scrim.classList.add("on");
+    drawer.setAttribute("aria-hidden", "false");
+    fitDrawer();
+    if (anim) gsap.from($$(".heat i", drawer), { scale: 0.2, opacity: 0, duration: 0.5, ease: "back.out(2)", stagger: { each: 0.01, grid: "auto", from: "start" }, delay: 0.3 });
+    setTimeout(function () { var c = $(".dr-close", drawer); if (c) c.focus({ preventScroll: true }); }, 350);
+    if (main.getBoundingClientRect().top < 0) Site.scrollTo(main, -90);
+  }
+  /* a janela do painel cresce o bastante para a ficha inteira caber, sem rolagem dentro dela */
+  function fitDrawer() {
+    var need = drawer.scrollHeight, h = main.offsetHeight;
+    if (need <= h + 1) return;
+    var done = function () { main.style.minHeight = need + "px"; main.style.height = ""; refresh(); };
+    if (anim) gsap.fromTo(main, { height: h }, { height: need, duration: 0.6, ease: "expo.inOut", onComplete: done });
+    else done();
+  }
+  function closeDrawer() {
+    if (!drawer || !drawer.classList.contains("on")) return;
+    var had = drawer.contains(document.activeElement);
+    drawer.classList.remove("on");
+    scrim.classList.remove("on");
+    drawer.setAttribute("aria-hidden", "true");
+    if (window.gsap) gsap.killTweensOf(main);
+    main.style.height = "";
+    if (main.style.minHeight) {
+      var from = main.offsetHeight;
+      main.style.minHeight = "";
+      var to = main.offsetHeight;
+      if (anim && Math.abs(from - to) > 2) gsap.fromTo(main, { height: from }, { height: to, duration: 0.6, ease: "expo.inOut", clearProps: "height", onComplete: refresh });
+      else refresh();
+    }
+    if (had && drFrom) drFrom.focus({ preventScroll: true });
+  }
+  $("#tbl tbody").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (b && !b.classList.contains("nm-btn")) return;
+    var tr = e.target.closest("tr");
+    if (tr) openDrawer(tr.dataset.id, $(".nm-btn", tr));
+  });
+  scrim.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+  drawer.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.classList.contains("dr-close")) closeDrawer();
+    else if (b.dataset.drwa) {
+      var p = PEOPLE[b.dataset.drwa], f = first(p.n), box = $(".msg", drawer);
+      var text = p.aus ? "Oi, " + f + ". Sentimos sua falta no tatame. Quer combinar a próxima aula?"
+        : p.kid ? "Oi! Aqui é do Studio Evolution BJJ. Tudo certo para o próximo treino de " + f + "?"
+        : "Oi, " + f + "! Aqui é do Studio Evolution BJJ. Tudo certo para o próximo treino?";
+      box.innerHTML = '<p class="msg-k">Mensagem para ' + (p.kid ? "a família de " + f : f) + "</p><q>" + text + '</q><div class="msg-acts"><button class="mini-btn wa" type="button" data-send="' + f + '">Abrir no WhatsApp</button><button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
+      box.hidden = false;
+      fitDrawer();
+      drawer.scrollTo({ top: drawer.scrollHeight, behavior: anim ? "smooth" : "auto" });
+    }
+  });
+
+  function openMsg(box, f, text) {
+    morph(function () {
+      box.innerHTML = '<p class="msg-k">Mensagem para ' + f + "</p><q>" + text + '</q><div class="msg-acts"><button class="mini-btn wa" type="button" data-send="' + f + '">Abrir no WhatsApp</button><button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
+      box.hidden = false;
+    });
+  }
+  function highlight(id) {
+    var card = $('.gcard[data-id="' + id + '"]');
+    if (!card) return;
+    $$(".gcard").forEach(function (c) { c.classList.remove("hl"); });
+    card.classList.add("hl");
+    setTimeout(function () { card.classList.remove("hl"); }, 2600);
+    setTimeout(function () { var r = card.getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight) Site.scrollTo(card, -120); }, 760);
+  }
+  dash.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.wa) {
+      var lead = b.dataset.kind === "lead", row = b.closest(lead ? ".lead" : "tr");
+      var text = lead
+        ? "Oi, " + b.dataset.wa + "! Aqui é do Studio Evolution BJJ. Recebemos seu pedido de aula experimental para a turma " + row.dataset.turma + ". Que dia fica bom para você vir conhecer o tatame?"
+        : "Oi, " + b.dataset.wa + ". Sentimos sua falta no tatame. Quer combinar a próxima aula?";
+      openMsg(lead ? $("#leadMsg") : $("#waMsg"), b.dataset.wa, text);
+    } else if (b.dataset.send) {
+      toast("No app, este botão abre o WhatsApp com a mensagem para " + b.dataset.send + " já escrita.");
+    } else if (b.hasAttribute("data-close")) {
+      var box = b.closest(".msg");
+      morph(function () { box.hidden = true; });
+    } else if (b.dataset.grad) {
+      go("grad");
+      highlight(b.dataset.grad);
+    }
+  });
+
+  /* ---------- Graduações: a faixa ganha o grau na frente do professor ---------- */
+  var BC = { branca: "oklch(0.96 0.004 90)", cinza: "oklch(0.66 0.012 260)", amarela: "oklch(0.85 0.15 95)", laranja: "oklch(0.72 0.16 55)", verde: "oklch(0.58 0.13 150)", azul: "oklch(0.55 0.17 258)", roxa: "oklch(0.45 0.15 305)", marrom: "oklch(0.42 0.07 50)", preta: "oklch(0.2 0.006 285)" };
+  function stripe(k) { return '<rect class="st" x="' + (196 + k * 12.5) + '" y="1.5" width="5" height="31" fill="oklch(0.97 0.003 264)"/>'; }
+  function beltSVG(b, g) {
+    var s = '<svg viewBox="0 0 264 34" role="img" aria-label="Faixa ' + NAMES[b].toLowerCase() + ", " + g + ' graus">' +
+      '<rect x=".5" y=".5" width="263" height="33" rx="2" fill="' + BC[b] + '" stroke="oklch(0 0 0 / .12)"/>' +
+      '<g class="weave" stroke="oklch(0 0 0 / .12)" stroke-width=".7"><line x1="2" x2="262" y1="7" y2="7"/><line x1="2" x2="262" y1="13" y2="13"/><line x1="2" x2="262" y1="20" y2="20"/><line x1="2" x2="262" y1="27" y2="27"/></g>' +
+      '<rect x="190" y=".5" width="58" height="33" fill="' + BC.preta + '"/>';
+    for (var k = 0; k < g; k++) s += stripe(k);
+    return s + "</svg>";
+  }
+  $$(".gcard").forEach(function (card) { $(".belt", card).innerHTML = beltSVG(card.dataset.belt, +card.dataset.graus); });
+  function gradLabel(d) { return d.next === "grau" ? "Registrar o " + (+d.graus + 1) + "º grau" : "Registrar a faixa " + d.next; }
+  function promote(card) {
+    var d = card.dataset, svg = $("svg", card), g = +d.graus, belt = d.next === "grau" ? d.belt : d.next, newG = d.next === "grau" ? g + 1 : 0, p = PEOPLE[d.id];
+    if (d.next === "grau") {
+      svg.insertAdjacentHTML("beforeend", stripe(g));
+      if (anim) gsap.fromTo(svg.lastElementChild, { scaleY: 0, transformOrigin: "50% 50%" }, { scaleY: 1, duration: 0.8, ease: "expo.out", delay: 0.1 });
+    } else {
+      var ov = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      [["x", ".5"], ["y", ".5"], ["width", "263"], ["height", "33"], ["rx", "2"], ["fill", BC[belt]]].forEach(function (a) { ov.setAttribute(a[0], a[1]); });
+      svg.insertBefore(ov, $(".weave", svg));
+      var sts = $$(".st", svg);
+      if (anim) {
+        gsap.fromTo(ov, { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 1.2, ease: "expo.inOut" });
+        gsap.to(sts, { opacity: 0, duration: 0.35, stagger: 0.05, onComplete: function () { sts.forEach(function (s) { s.remove(); }); } });
+      } else sts.forEach(function (s) { s.remove(); });
+    }
+    svg.setAttribute("aria-label", "Faixa " + belt + ", " + newG + " graus");
+    replayClass(card, "got");
+    $(".gact", card).innerHTML = '<button class="ap-btn ok" type="button" disabled>' + (d.next === "grau" ? "Grau registrado" : "Faixa registrada") + '</button><p class="note">' + (d.kid ? "A família recebe" : d.first + " recebe") + " o aviso no celular hoje.</p>";
+    /* a lista, a ficha e o histórico passam a mostrar o grau novo */
+    var tr = $('#tbl tr[data-id="' + d.id + '"]');
+    if (tr) {
+      $(".bl > span", tr).textContent = beltTxt(belt, newG);
+      $(".belt-s", tr).style.setProperty("--b", "var(--b-" + belt + ")");
+      tr.dataset.f = "";
+      $("td.act", tr).innerHTML = '<span class="pill-s in">Graduado hoje</span>';
+    }
+    if (p) { p.belt = belt; p.g = newG; p.desde = 0; p.ult = "hoje"; p.grad = 0; }
+    $("#hist").insertAdjacentHTML("afterbegin", '<li class="new"><i class="belt-s" style="--b:var(--b-' + belt + ')"></i><div>' + (p ? p.n : d.first) + "<small>" +
+      (d.next === "grau" ? newG + "º grau na faixa " + belt : "Faixa " + belt) + (p ? " · " + p.cls : "") + "</small></div><time>hoje</time></li>");
+    var hs = $$("#hist li");
+    if (hs.length > 5) hs[hs.length - 1].remove();
+    var left = $$('#tbl tr[data-f="aval"]').length, bg = $("#bGrad");
+    $("#chipAval").textContent = "Para avaliar · " + left;
+    bg.textContent = left;
+    bg.hidden = !left;
+    toast(d.next === "grau" ? g + 1 + "º grau registrado para " + d.first + "." : d.first + " agora é faixa " + belt + ".");
+  }
+  $("#cards").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b || b.disabled) return;
+    var card = b.closest(".gcard"), act = $(".gact", card), d = card.dataset, g = +d.graus;
+    if (b.hasAttribute("data-ask")) {
+      var q = d.next === "grau" ? "Dar o " + (g + 1) + "º grau na faixa " + d.belt + " para " + d.first + "?" : "Graduar " + d.first + " para a faixa " + d.next + "?";
+      act.innerHTML = '<div class="ask"><p>' + q + '</p><div class="row"><button class="ap-btn" type="button" data-yes>Confirmar</button><button class="ap-btn ghost" type="button" data-no>Voltar</button></div></div>';
+      if (anim) gsap.from(act.firstChild, { y: 10, opacity: 0, duration: 0.5, ease: "expo.out" });
+    } else if (b.hasAttribute("data-no")) {
+      act.innerHTML = '<button class="ap-btn" type="button" data-ask>' + gradLabel(d) + "</button>";
+    } else if (b.hasAttribute("data-yes")) {
+      promote(card);
+    }
+  });
+
+  /* ---------- Interessados: status, retorno e o funil do mês ---------- */
+  var closedN = 6;
+  function leadPill(v) { return v === "agendado" ? '<span class="pill-s in">Aula agendada</span>' : v === "atendimento" ? '<span class="pill-s">Em atendimento</span>' : '<span class="pill-s gold">Retornar hoje</span>'; }
+  function paintLeads() {
+    var c = { novo: 0, atendimento: 0, agendado: 0, mat: 3 };
+    $$("#leads .lead").forEach(function (l) {
+      var v = $("select", l).value;
+      if (v === "matriculado") c.mat++;
+      else if (v !== "perdido") c[v]++;
+    });
+    $$("#funnel b").forEach(function (b) {
+      var n = c[b.dataset.k];
+      if (+b.textContent === n) return;
+      b.textContent = n;
+      if (anim) replayClass(b, "bump");
+    });
+    var wait = c.novo + c.atendimento, bl = $("#bLeads");
+    $("#kLeads").textContent = wait;
+    bl.textContent = wait;
+    bl.hidden = !wait;
+  }
+  $$("#leads select").forEach(function (s) {
+    s.addEventListener("change", function () {
+      var row = s.closest(".lead"), f = row.dataset.first, v = s.value;
+      paintLeads();
+      if (v === "matriculado" || v === "perdido") {
+        row.classList.add("out");
+        setTimeout(function () { morph(function () { row.hidden = true; }); }, 620);
+        closedN++;
+        $("#closedN").textContent = closedN;
+        toast(v === "matriculado" ? f + " agora está na lista de alunos." : "Contato de " + f + " movido para Fechados.");
+        return;
+      }
+      $(".pill-s", row).outerHTML = leadPill(v);
+      if (v === "agendado") toast("Aula experimental marcada para " + f + ".");
+    });
+  });
+
+  /* ---------- Modo tatame: a TV liga quando aparece na tela ---------- */
+  var tvOn = false;
+  function powerOn() {
+    if (tvOn) return;
+    tvOn = true;
+    if (anim) gsap.fromTo(".tv-in", { scaleY: 0.006, scaleX: 0.7, opacity: 0 }, { scaleY: 1, scaleX: 1, opacity: 1, duration: 1.1, ease: "expo.out" });
+    /* se a Marina já chegou enquanto a pessoa olhava o painel, a cena recomeça para ela ver o celular digitando */
+    setTimeout(function () {
+      if (!st.code) generate(true);
+      else if (st.arrived["Marina Alves"]) replay();
+      else startArrivals();
+    }, anim ? 650 : 0);
+  }
+  if ("IntersectionObserver" in window) {
+    /* liga quando a TV e o celular estão na tela juntos (no celular, um embaixo do outro) */
+    new IntersectionObserver(function (es, ob) { if (es[0].isIntersecting) { powerOn(); ob.disconnect(); } }, { threshold: 0.45 }).observe($(".tv-stage"));
+  } else powerOn();
+  $("#tvNew").addEventListener("click", function () { generate(true); });
+  $("#tvReplay").addEventListener("click", replay);
+
+  Site.boot({
+    intro: function (S) {
+      var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
+      tl.from(S.split($(".ar-title"), "words"), { yPercent: 140, duration: 1.5, stagger: 0.07 })
+        .from(".ar-hero .label, .ar-lede, .ar-switch, .ar-hero .ctas", { y: 26, opacity: 0, duration: 1.1, stagger: 0.08, ease: "power3.out" }, 0.35)
+        .from(".ar-photo", { clipPath: "inset(100% 0% 0% 0%)", duration: 1.5, ease: "expo.inOut" }, 0.15)
+        .from(".ar-photo img", { scale: 1.35, duration: 2.1 }, 0.2)
+        .from(".hc", { y: 60, opacity: 0, duration: 1.4, stagger: 0.12 }, 0.75)
+        .from(".nav-in", { y: -30, opacity: 0, duration: 1.1 }, 0.2);
+      return tl;
+    },
+    setup: function (S) {
+      var layers = $$(".ar-visual [data-depth]");
+      layers.forEach(function (c) {
+        gsap.to(c, { y: -(+c.dataset.depth) * 1.4, ease: "none", scrollTrigger: { trigger: ".ar-hero", start: "top top", end: "bottom top", scrub: true } });
+      });
+      if (S.fine) {
+        var qs = layers.map(function (c) { return { x: gsap.quickTo(c, "x", { duration: 1.2, ease: "power3" }), d: +c.dataset.depth }; });
+        $(".ar-hero").addEventListener("mousemove", function (e) {
+          var mx = e.clientX / innerWidth - 0.5;
+          qs.forEach(function (q) { q.x(mx * q.d * 0.5); });
+        });
+      }
+      /* o painel entra inclinado, como uma tela que se abre */
+      gsap.from("#dash", { y: 100, rotateX: 14, opacity: 0, transformPerspective: 2000, transformOrigin: "50% 0%", duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: "#dash", start: "top 88%", once: true } });
+      /* a TV aparece desligada e liga quando chega na tela; o celular da aluna entra logo depois */
+      if (!tvOn) gsap.set(".tv-in", { opacity: 0 });
+      gsap.from(".tv-screen", { y: 80, scale: 0.94, opacity: 0, duration: 1.5, ease: "expo.out", scrollTrigger: { trigger: "#tv", start: "top 88%", once: true } });
+      gsap.from("#pDevice", { y: 90, rotateY: 22, opacity: 0, transformPerspective: 1600, duration: 1.6, ease: "expo.out", delay: 0.2, scrollTrigger: { trigger: "#tv", start: "top 88%", once: true } });
+    }
+  });
+})();
+</script>
+</body>
+</html>

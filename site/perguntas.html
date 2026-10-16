@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Perguntas · Redesign Studio Evolution</title>
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "perguntas");
+  try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="stylesheet" href="site.css">
+<style>
+/* Perguntas: abertura de cinema com uma interrogação em camadas que gira em 3D com o mouse, busca de vidro
+   que acende em ouro e marca as palavras encontradas, temas numerados com o número gigante ao fundo e
+   respostas que abrem com uma faixa de luz. */
+.q-hero-pic img { object-position: 50% 72%; }
+.q-mark-wrap { position: absolute; z-index: -1; right: calc(var(--gut-r) + 1vw); top: 50%; translate: 0 -54%; perspective: 1100px; pointer-events: none; user-select: none; }
+.q-mark { position: relative; display: block; transform-style: preserve-3d; will-change: transform; }
+.q-mark i { display: block; font: 400 min(66vh, 36vw)/0.82 var(--serif); font-style: normal; color: transparent; -webkit-text-stroke: 1.5px oklch(0.83 0.13 84 / var(--a, 0.5)); }
+.q-mark i + i { position: absolute; inset: 0; }
+.q-mark i:nth-child(1) { --a: 0.75; color: oklch(0.83 0.13 84 / 0.05); filter: drop-shadow(0 0 34px oklch(0.83 0.13 84 / 0.28)); }
+.q-mark i:nth-child(2) { --a: 0.36; transform: translateZ(-16px); }
+.q-mark i:nth-child(3) { --a: 0.26; transform: translateZ(-32px); }
+.q-mark i:nth-child(4) { --a: 0.18; transform: translateZ(-48px); }
+.q-mark i:nth-child(5) { --a: 0.12; transform: translateZ(-64px); }
+.q-mark i:nth-child(6) { --a: 0.07; transform: translateZ(-80px); }
+@media (max-width: 760px) { .q-mark-wrap { top: 26%; right: -4vw; } .q-mark i { font-size: 74vw; } }
+
+/* busca de vidro com sugestões */
+.q-find { position: relative; margin-top: clamp(26px, 4vh, 40px); max-width: 720px; padding-bottom: clamp(30px, 5vh, 56px); }
+.q-search { display: flex; align-items: center; gap: 14px; height: 66px; padding: 0 24px; border-radius: 999px; background: oklch(1 0 0 / 0.06); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.16); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); cursor: text; transition: box-shadow 450ms var(--ease), background-color 450ms var(--ease); }
+.q-search:focus-within { background: oklch(1 0 0 / 0.09); box-shadow: inset 0 0 0 1.5px var(--gold), 0 0 0 6px color-mix(in oklch, var(--gold) 14%, transparent), 0 0 60px -10px color-mix(in oklch, var(--gold) 55%, transparent); }
+.q-search .ic { width: 22px; height: 22px; flex-shrink: 0; color: var(--gold); }
+.q-search input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; color: var(--ink); font: 500 20px/1 var(--sans); letter-spacing: -0.01em; outline: none; -webkit-appearance: none; appearance: none; }
+.q-search input::placeholder { color: var(--ink-3); }
+.q-search input::-webkit-search-cancel-button { filter: grayscale(1) brightness(1.6); }
+.q-search output { font: 500 11px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.q-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+.q-quick > span { margin-right: 6px; font: 500 10.5px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.q-quick button { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: oklch(1 0 0 / 0.06); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.14); color: var(--ink-2); font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background-color 300ms var(--ease), color 300ms var(--ease), box-shadow 300ms var(--ease); }
+.q-quick button:hover { box-shadow: inset 0 0 0 1px var(--gold); color: var(--ink); }
+.q-quick button[aria-pressed="true"] { background: var(--gold); color: oklch(0.13 0.005 70); box-shadow: 0 0 24px -6px var(--gold); }
+@media (max-width: 520px) { .q-search { height: 58px; padding: 0 18px; gap: 10px; } .q-search input { font-size: 17px; } .q-search output { font-size: 10px; letter-spacing: 0.06em; } }
+
+/* corpo: temas à esquerda, perguntas à direita */
+.q-body { padding-block: clamp(70px, 8vw, 120px) clamp(100px, 12vw, 180px); }
+.q-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; align-items: start; }
+@media (min-width: 1000px) { .q-grid { grid-template-columns: minmax(0, 3.4fr) minmax(0, 8.6fr); gap: 6vw; } }
+.q-side { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; min-width: 0; }
+@media (min-width: 1000px) { .q-side { position: sticky; top: 120px; } }
+.q-nav { position: relative; display: grid; max-width: 100%; }
+@media (min-width: 1000px) { .q-nav { padding-left: 20px; box-shadow: inset 1px 0 0 var(--rule); } }
+.q-nav a { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: baseline; gap: 10px; padding: 13px 0; text-decoration: none; color: var(--ink-3); font: 600 13px/1.3 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; transition: color 300ms var(--ease); }
+.q-nav a em, .q-nav a span { font: 500 11px/1 var(--mono); font-style: normal; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.q-nav a:hover, .q-nav a.on { color: var(--ink); }
+.q-nav a.on em, .q-nav a.on span { color: var(--gold-text); }
+.q-ind { position: absolute; left: 0; top: 0; width: 2px; height: 24px; background: var(--gold); box-shadow: 0 0 12px var(--gold); display: none; }
+@media (min-width: 1000px) { .q-ind { display: block; } }
+@media (max-width: 999px) {
+  .q-nav { grid-auto-flow: column; grid-auto-columns: max-content; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+  .q-nav::-webkit-scrollbar { display: none; }
+  .q-nav a { grid-template-columns: auto auto; padding: 11px 16px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--rule); font-size: 12px; }
+  .q-nav a em { display: none; }
+  .q-nav a.on { box-shadow: inset 0 0 0 1px var(--gold), 0 0 22px -8px var(--gold); }
+}
+.q-help { display: none; padding: 24px; border-radius: 8px; background: var(--paper-2); box-shadow: 0 0 0 1px var(--rule); }
+@media (min-width: 1000px) { .q-help { display: grid; gap: 14px; justify-items: start; } }
+.q-help p { color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+.q-help .pill-live { flex-wrap: wrap; row-gap: 6px; max-width: 100%; white-space: normal; border-radius: 16px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); }
+.q-help .btn { width: 100%; min-height: 50px; padding: 0 20px; font-size: 12px; }
+
+.q-group { position: relative; isolation: isolate; scroll-margin-top: 110px; }
+.q-group + .q-group { margin-top: clamp(64px, 7vw, 110px); }
+.q-gnum { position: absolute; z-index: -1; right: 0; top: -0.28em; font: 400 clamp(110px, 13vw, 230px)/0.8 var(--serif); letter-spacing: -0.03em; color: transparent; -webkit-text-stroke: 1px color-mix(in oklch, var(--gold) 26%, transparent); pointer-events: none; user-select: none; will-change: transform; }
+.q-gt { position: relative; font-size: clamp(30px, 3.4vw, 56px); line-height: 0.95; letter-spacing: -0.02em; }
+.q-gt .gn { display: inline-block; vertical-align: top; margin: 0.32em 0.7em 0 0; font: 500 12px/1 var(--mono); letter-spacing: 0.1em; color: var(--gold-text); }
+.q-list { margin-top: 26px; border-top: 1px solid var(--rule); }
+.q-item { position: relative; isolation: isolate; border-bottom: 1px solid var(--rule); }
+.q-item::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, color-mix(in oklch, var(--gold) 13%, transparent), color-mix(in oklch, var(--gold) 3%, transparent) 62%, transparent); transform: scaleX(0); transform-origin: left; transition: transform 700ms var(--ease); }
+.q-item:hover::before, .q-item.open::before { transform: none; }
+.q-item::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--gold); box-shadow: 0 0 14px var(--gold); transform: scaleY(0); transform-origin: top; transition: transform 600ms var(--ease); }
+.q-item.open::after { transform: none; }
+.q-item h3 { margin: 0; font: inherit; text-transform: none; }
+.q-btn { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 16px; width: 100%; padding: 26px 0; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
+.q-btn::before { content: attr(data-n); padding-left: 18px; font: 500 12px/1 var(--mono); letter-spacing: 0.1em; color: var(--ink-3); transition: color 300ms var(--ease); }
+.q-btn:hover::before, .q-btn[aria-expanded="true"]::before { color: var(--gold-text); }
+.q-btn .qt { font: 600 clamp(19px, 1.7vw, 26px)/1.25 var(--sans); letter-spacing: -0.02em; transition: transform 600ms var(--ease), color 300ms var(--ease); }
+.q-btn:hover .qt { transform: translateX(8px); }
+.q-btn[aria-expanded="true"] .qt { color: var(--gold-text); }
+.q-btn .where { display: block; margin-top: 8px; font: 500 10.5px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-text); }
+.pm { position: relative; flex: 0 0 auto; width: 44px; height: 44px; margin-right: 16px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--rule); transition: background-color 400ms var(--ease), box-shadow 400ms var(--ease), transform 600ms var(--ease); }
+.pm::before, .pm::after { content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 1.5px; margin: -0.75px 0 0 -7px; background: var(--ink); transition: transform 500ms var(--ease), background-color 400ms; }
+.pm::after { transform: rotate(90deg); }
+.q-btn:hover .pm { box-shadow: inset 0 0 0 1px var(--gold); }
+.q-btn[aria-expanded="true"] .pm { background: var(--gold); box-shadow: 0 0 22px -4px var(--gold); transform: rotate(180deg); }
+.q-btn[aria-expanded="true"] .pm::before, .q-btn[aria-expanded="true"] .pm::after { background: oklch(0.13 0.005 70); }
+.q-btn[aria-expanded="true"] .pm::after { transform: rotate(0deg); }
+.q-ans { overflow: hidden; }
+.q-ans p { margin: 0 76px 30px 80px; max-width: 62ch; color: var(--ink-2); font-size: 18px; line-height: 1.7; }
+.q-body mark { padding: 0 2px; border-radius: 3px; background: color-mix(in oklch, var(--gold) 38%, transparent); color: inherit; box-shadow: 0 0 16px -2px color-mix(in oklch, var(--gold) 50%, transparent); }
+.q-empty { margin-top: 28px; padding: 28px; border: 1px dashed var(--rule); border-radius: 8px; color: var(--ink-2); }
+.q-empty a { color: var(--gold-text); }
+@media (max-width: 600px) {
+  .q-btn { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; padding: 22px 0; }
+  .q-btn::before { padding-left: 8px; font-size: 11px; }
+  .q-btn .qt { font-size: 18px; }
+  .pm { width: 38px; height: 38px; margin-right: 6px; }
+  .q-ans p { margin: 0 8px 26px 44px; font-size: 16.5px; }
+  .q-gnum { font-size: 34vw; }
+}
+</style>
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+      <a class="tagp" href="area-do-aluno.html" data-int title="Esta página é uma proposta de redesign. Ver também a Área do Aluno"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int aria-current="page"><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="phero cin cin-s cine q-hero" data-dark aria-labelledby="t-q">
+    <div class="cin-bg q-hero-pic" aria-hidden="true"><img src="img/comunidade-evolution.webp" alt="" width="1200" height="684"></div>
+    <div class="cin-shade" aria-hidden="true"></div>
+    <canvas class="cin-gl" aria-hidden="true"></canvas>
+    <div class="q-mark-wrap" aria-hidden="true"><span class="q-mark" id="qMark"><i>?</i><i>?</i><i>?</i><i>?</i><i>?</i><i>?</i></span></div>
+    <div class="wrap">
+      <div class="phero-top" data-in><p class="label gold">Tire suas dúvidas</p><p class="phero-meta">15 respostas em 4 temas</p></div>
+      <h1 class="phero-title" id="t-q"><span class="o">Perguntas</span> <em class="gl">frequentes.</em></h1>
+      <p class="lede" data-in>Reunimos as respostas sobre horários, idade mínima, o que o programa Kids inclui e como começar no Studio Evolution BJJ em Sorocaba.</p>
+      <div class="cin-row">
+        <a class="btn btn-ink" data-magnetic href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20tenho%20algumas%20d%C3%BAvidas.%20Poderia%20me%20ajudar%3F" target="_blank" rel="noopener">Falar no WhatsApp<svg class="ic"><use href="#i-arrow"/></svg></a>
+        <a class="link" href="agendamento.html" data-int>Agendar aula grátis</a>
+        <p class="pill-live" data-office><i aria-hidden="true"></i><span>Atendimento</span><b>Seg a sex · 8h às 21h</b></p>
+      </div>
+      <div class="q-find" data-in>
+        <label class="q-search" for="qsearch">
+          <svg class="ic"><use href="#i-search"/></svg>
+          <input id="qsearch" type="search" placeholder="Buscar uma dúvida…" autocomplete="off" enterkeyhint="search">
+          <output id="qcount" for="qsearch" aria-live="polite">15 respostas</output>
+        </label>
+        <div class="q-quick" aria-label="Buscas rápidas"><span>Buscas rápidas</span><button type="button" data-q="kimono" aria-pressed="false">Kimono</button><button type="button" data-q="idade" aria-pressed="false">Idade</button><button type="button" data-q="horário" aria-pressed="false">Horários</button><button type="button" data-q="fidelidade" aria-pressed="false">Fidelidade</button><button type="button" data-q="tatame" aria-pressed="false">Tatame</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="q-body" aria-label="Perguntas e respostas">
+    <div class="wrap q-grid">
+      <aside class="q-side">
+        <nav class="q-nav" id="qnav" aria-label="Temas">
+          <i class="q-ind" id="qind" aria-hidden="true"></i>
+          <a href="#aulas-horarios" data-g="aulas-horarios"><em>01</em>Aulas e horários <span>5</span></a>
+          <a href="#kids-familia" data-g="kids-familia"><em>02</em>Kids e família <span>4</span></a>
+          <a href="#planos" data-g="planos"><em>03</em>Planos e pagamento <span>3</span></a>
+          <a href="#local" data-g="local"><em>04</em>Local e estrutura <span>3</span></a>
+        </nav>
+        <div class="q-help" data-tilt3d="7" data-glare>
+          <p class="label">Não achou sua dúvida?</p>
+          <p>Fale com a equipe pelo WhatsApp. Atendimento de segunda a sexta, das 8h às 21h.</p>
+          <p class="pill-live" data-office><i aria-hidden="true"></i><span>Atendimento</span><b>Seg a sex · 8h às 21h</b></p>
+          <a class="btn btn-ink" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20tenho%20algumas%20d%C3%BAvidas.%20Poderia%20me%20ajudar%3F" target="_blank" rel="noopener">Perguntar no WhatsApp<svg class="ic"><use href="#i-arrow"/></svg></a>
+        </div>
+      </aside>
+      <div>
+        <section class="q-group" id="aulas-horarios" aria-labelledby="g-aulas">
+          <span class="q-gnum" aria-hidden="true">01</span>
+          <h2 class="q-gt" id="g-aulas"><span class="gn">01</span>Aulas e <em>horários</em></h2>
+          <div class="q-list">
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r1" id="q1"><span class="qt">Quais são os horários das aulas?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r1" role="region" aria-labelledby="q1" hidden><p>Adulto: segunda a sexta às 8h, 11h e 19h. Kids: segunda a sexta às 10h e 18h. O programa feminino acontece junto com as aulas adultas.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r2" id="q2"><span class="qt">Preciso ter experiência para começar?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r2" role="region" aria-labelledby="q2" hidden><p>Não. A metodologia do Studio Evolution BJJ respeita cada nível. As aulas são divididas por faixa e o professor acompanha os iniciantes com atenção individual.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r3" id="q3"><span class="qt">O que preciso levar na primeira aula?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r3" role="region" aria-labelledby="q3" hidden><p>Somente roupas leves e água. A primeira aula é gratuita e nós disponibilizamos o kimono. Depois, indicamos o melhor equipamento conforme seu comprometimento.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r4" id="q4"><span class="qt">Como é a primeira aula de jiu-jitsu?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r4" role="region" aria-labelledby="q4" hidden><p>Você chega alguns minutos antes, conhece o professor e faz o aquecimento com a turma. Depois aprende movimentos básicos no seu ritmo, sem luta pesada. A primeira aula é grátis.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r5" id="q5"><span class="qt">Posso treinar mais de uma vez ao dia?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r5" role="region" aria-labelledby="q5" hidden><p>Sim. Os planos Mensal e Anual incluem aulas ilimitadas, então você pode participar de quantos horários quiser, respeitando a capacidade das turmas.</p></div></div>
+          </div>
+        </section>
+
+        <section class="q-group" id="kids-familia" aria-labelledby="g-kids">
+          <span class="q-gnum" aria-hidden="true">02</span>
+          <h2 class="q-gt" id="g-kids"><span class="gn">02</span><em>Kids</em> e família</h2>
+          <div class="q-list">
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r6" id="q6"><span class="qt">Qual a idade mínima para as aulas infantis?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r6" role="region" aria-labelledby="q6" hidden><p>O programa Kids é indicado para crianças de 4 a 12 anos. A turma é dividida por faixa etária e desenvolvimento motor para garantir segurança e evolução.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r7" id="q7"><span class="qt">O que inclui o programa Kids?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r7" role="region" aria-labelledby="q7" hidden><p>Disciplina leve, foco, coordenação motora, técnicas de defesa pessoal infantil, trabalho em equipe, respeito e muita diversão. Também acompanhamos crianças com hiperatividade com exercícios que desenvolvem atenção e limites.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r8" id="q8"><span class="qt">Posso treinar junto com meu filho?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r8" role="region" aria-labelledby="q8" hidden><p>Sim. Muitos pais aproveitam os horários Kids &amp; Família para iniciar ou retomar a prática. Temos turmas adultas nos mesmos períodos para que toda a família evolua junto.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r9" id="q9"><span class="qt">As aulas para crianças são seguras?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r9" role="region" aria-labelledby="q9" hidden><p>Totalmente. O tatame é limpo e apropriado, as turmas têm capacidade limitada e os professores são treinados para ensinar de forma gradual e respeitosa.</p></div></div>
+          </div>
+        </section>
+
+        <section class="q-group" id="planos" aria-labelledby="g-planos">
+          <span class="q-gnum" aria-hidden="true">03</span>
+          <h2 class="q-gt" id="g-planos"><span class="gn">03</span>Planos e <em>pagamento</em></h2>
+          <div class="q-list">
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r10" id="q10"><span class="qt">Quanto custa a aula de jiu-jitsu no Studio Evolution?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r10" role="region" aria-labelledby="q10" hidden><p>Converse com a gente pelo WhatsApp para conhecer os planos e encontrar o melhor caminho para você.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r11" id="q11"><span class="qt">Existe fidelidade ou taxa de matrícula?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r11" role="region" aria-labelledby="q11" hidden><p>Não cobramos fidelidade no plano Mensal. O Anual tem compromisso anual com pagamento parcelado ou à vista. A primeira aula experimental é grátis e sem compromisso.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r12" id="q12"><span class="qt">Como funciona o app do aluno?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r12" role="region" aria-labelledby="q12" hidden><p>O app registra frequência, acompanha progresso por turma, libera a biblioteca de movimentos por faixa e permite confirmar presença nas aulas do dia.</p></div></div>
+          </div>
+        </section>
+
+        <section class="q-group" id="local" aria-labelledby="g-local">
+          <span class="q-gnum" aria-hidden="true">04</span>
+          <h2 class="q-gt" id="g-local"><span class="gn">04</span>Local e <em>estrutura</em></h2>
+          <div class="q-list">
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r13" id="q13"><span class="qt">Onde fica a academia?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r13" role="region" aria-labelledby="q13" hidden><p>Estamos na Av. Getúlio Vargas, 400, sala 3, sobreloja, no bairro Jardim São Paulo, em Sorocaba - SP, CEP 18051-480.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r14" id="q14"><span class="qt">Como faço para agendar uma aula experimental?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r14" role="region" aria-labelledby="q14" hidden><p>É só clicar no botão de WhatsApp ou acessar a página de Agendamento. Escolha o programa, o horário e a data que enviamos tudo confirmado pela conversa.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r15" id="q15"><span class="qt">O tatame é limpo?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r15" role="region" aria-labelledby="q15" hidden><p>Sim. Higienizamos o espaço diariamente, mantemos ventilação adequada e exigimos kimono limpo para garantir a saúde de todos.</p></div></div>
+          </div>
+        </section>
+        <p class="q-empty" id="qempty" hidden>Nenhuma pergunta com essa palavra. <a href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20tenho%20algumas%20d%C3%BAvidas.%20Poderia%20me%20ajudar%3F" target="_blank" rel="noopener">Pergunte direto no WhatsApp</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" aria-labelledby="t-cta">
+    <div class="cta-inner">
+      <div class="wrap cta-grid">
+        <div>
+          <p class="label">Ainda tem dúvida?</p>
+          <h2 class="h2 split" id="t-cta">Fale direto com a gente <em>no WhatsApp</em>.</h2>
+          <p class="lead">Responderemos sobre horários, turmas, planos ou qualquer outra questão. Nossa equipe atende de segunda a sexta, das 8h às 21h.</p>
+          <a class="btn btn-gold" data-magnetic href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20tenho%20algumas%20d%C3%BAvidas.%20Poderia%20me%20ajudar%3F" target="_blank" rel="noopener">Enviar mensagem<svg class="ic"><use href="#i-arrow"/></svg></a>
+          <dl class="contact">
+            <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
+            <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
+            <div><dt>Atendimento</dt><dd>Segunda a sexta<br>das 8h às 21h</dd></div>
+          </dl>
+        </div>
+        <figure class="cta-photo"><img src="img/programa-familia-real.jpg" alt="Alunos adultos de kimono em frente ao painel do Studio Evolution" loading="lazy" width="1264" height="848" style="object-position:50% 50%"></figure>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
+    </div>
+    <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Proposta de redesign · versão para aprovação</span></div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20tenho%20algumas%20d%C3%BAvidas.%20Poderia%20me%20ajudar%3F" target="_blank" rel="noopener"><i aria-hidden="true"></i>WhatsApp</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$;
+  var anim = !!window.gsap && !Site.reduce;
+  var refreshT = null;
+  function refreshSoon() { if (!window.ScrollTrigger) return; clearTimeout(refreshT); refreshT = setTimeout(function () { ScrollTrigger.refresh(); }, 120); }
+  var pad = function (n) { return String(n).padStart(2, "0"); };
+
+  /* cada pergunta recebe o seu número, que não muda durante a busca */
+  $$(".q-btn").forEach(function (b, i) { b.dataset.n = pad(i + 1); });
+
+  /* respostas que se abrem (uma por tema) */
+  function setOpen(btn, open) {
+    var panel = document.getElementById(btn.getAttribute("aria-controls"));
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    btn.closest(".q-item").classList.toggle("open", open);
+    if (!anim) { panel.hidden = !open; return; }
+    gsap.killTweensOf(panel);
+    if (open) {
+      panel.hidden = false;
+      gsap.fromTo(panel, { height: 0 }, { height: "auto", duration: 0.7, ease: "expo.out", onComplete: refreshSoon });
+      gsap.fromTo($("p", panel), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "expo.out", delay: 0.08 });
+    } else {
+      gsap.to(panel, { height: 0, duration: 0.5, ease: "expo.inOut", onComplete: function () { panel.hidden = true; panel.style.height = ""; refreshSoon(); } });
+    }
+  }
+  $$(".q-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var open = btn.getAttribute("aria-expanded") !== "true";
+      $$(".q-btn", btn.closest(".q-list")).forEach(function (o) { if (o !== btn && o.getAttribute("aria-expanded") === "true") setOpen(o, false); });
+      setOpen(btn, open);
+    });
+  });
+
+  /* busca ao vivo: ignora acentos e marca a palavra encontrada na pergunta e na resposta */
+  var norm = function (s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); };
+  var esc = function (s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  function mapNorm(s) {
+    var out = "", idx = [];
+    for (var i = 0; i < s.length; i++) { var n = norm(s[i]); for (var k = 0; k < n.length; k++) { out += n[k]; idx.push(i); } }
+    return { s: out, idx: idx };
+  }
+  function mark(text, q) {
+    if (!q) return esc(text);
+    var m = mapNorm(text), html = "", last = 0, from = 0, j;
+    while ((j = m.s.indexOf(q, from)) > -1) {
+      var a = m.idx[j], b = m.idx[j + q.length - 1] + 1;
+      html += esc(text.slice(last, a)) + "<mark>" + esc(text.slice(a, b)) + "</mark>";
+      last = b; from = j + q.length;
+    }
+    return html + esc(text.slice(last));
+  }
+  var items = $$(".q-item").map(function (it) {
+    var qt = $(".qt", it), p = $(".q-ans p", it);
+    return { el: it, qt: qt, p: p, q: qt.textContent, a: p.textContent, nq: norm(qt.textContent), na: norm(p.textContent) };
+  });
+  var input = $("#qsearch"), chips = $$(".q-quick button");
+  input.addEventListener("input", function () {
+    var q = norm(input.value.trim()), visible = 0;
+    items.forEach(function (it) {
+      var inQ = !q || it.nq.indexOf(q) > -1, inA = !!q && it.na.indexOf(q) > -1, ok = inQ || inA;
+      it.el.hidden = !ok; if (ok) visible++;
+      it.qt.innerHTML = mark(it.q, q) + (q && !inQ && inA ? '<small class="where">Encontrado na resposta</small>' : "");
+      it.p.innerHTML = mark(it.a, q);
+    });
+    $$(".q-group").forEach(function (g) {
+      var n = $$(".q-item", g).filter(function (it) { return !it.hidden; }).length;
+      g.hidden = n === 0;
+      var link = $('.q-nav a[data-g="' + g.id + '"]'); link.hidden = n === 0; $("span", link).textContent = n;
+    });
+    chips.forEach(function (c) { c.setAttribute("aria-pressed", q && norm(c.dataset.q) === q ? "true" : "false"); });
+    $("#qcount").textContent = visible === 1 ? "1 resposta" : visible + " respostas";
+    $("#qempty").hidden = visible > 0;
+    refreshSoon();
+  });
+  input.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    input.blur();
+    Site.scrollTo(".q-body", -40);
+  });
+  chips.forEach(function (c) {
+    c.addEventListener("click", function () {
+      var on = c.getAttribute("aria-pressed") === "true";
+      input.value = on ? "" : c.dataset.q;
+      input.dispatchEvent(new Event("input"));
+      if (!on) Site.scrollTo(".q-body", -40);
+    });
+  });
+
+  Site.boot({
+    setup: function (S) {
+      /* temas: o marcador acompanha a rolagem (no celular, a fileira de temas desliza até o tema da vez) */
+      var ind = $("#qind"), nav = $("#qnav");
+      $$(".q-group").forEach(function (g) {
+        ScrollTrigger.create({ trigger: g, start: "top 45%", end: "bottom 45%", onToggle: function (self) {
+          if (!self.isActive) return;
+          $$(".q-nav a").forEach(function (a) { a.classList.toggle("on", a.dataset.g === g.id); });
+          var a = $('.q-nav a[data-g="' + g.id + '"]');
+          if (!a) return;
+          gsap.to(ind, { y: a.offsetTop + 8, height: a.offsetHeight - 16, duration: 0.6, ease: "expo.out" });
+          if (nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: a.offsetLeft - 16, behavior: "smooth" });
+        } });
+      });
+      /* o número gigante de cada tema tem volume (o contorno repetido em camadas), corre devagar atrás do
+         título e gira em 3D enquanto o tema passa pela tela */
+      $$(".q-gnum").forEach(function (n) {
+        var st = { trigger: n.parentElement, start: "top bottom", end: "bottom top", scrub: true };
+        gsap.fromTo(n, { yPercent: 30 }, { yPercent: -30, ease: "none", scrollTrigger: st });
+        var box = Site.extrude(n, 6, 12);
+        if (box) gsap.fromTo(box, { rotationY: -55, rotationX: 14 }, { rotationY: 45, rotationX: -10, ease: "none", scrollTrigger: st });
+      });
+      /* perguntas sobem em sequência */
+      $$(".q-list").forEach(function (l) {
+        if (Site.inView(l, 0.95)) return;
+        gsap.from(l.children, { y: 34, opacity: 0, duration: 1, ease: "expo.out", stagger: 0.06, scrollTrigger: { trigger: l, start: "top 88%", once: true } });
+      });
+      /* a interrogação em camadas: entra girando, gira com o mouse (ou balança sozinha no toque) e tomba com a rolagem */
+      var mk = $("#qMark"), mw = $(".q-mark-wrap");
+      gsap.from(mw, { opacity: 0, scale: 0.8, duration: 2.2, ease: "expo.out", delay: 0.3 });
+      gsap.to(mw, { rotation: 14, yPercent: 16, ease: "none", scrollTrigger: { trigger: ".q-hero", start: "top top", end: "bottom top", scrub: true } });
+      gsap.set(mk, { rotationY: -24, rotationX: 6 });
+      if (S.fine) {
+        var ry = gsap.quickTo(mk, "rotationY", { duration: 1.3, ease: "power3" }), rx = gsap.quickTo(mk, "rotationX", { duration: 1.3, ease: "power3" });
+        $(".q-hero").addEventListener("mousemove", function (e) { ry((e.clientX / innerWidth - 0.5) * 80); rx((e.clientY / innerHeight - 0.5) * -34); });
+      } else {
+        gsap.to(mk, { rotationY: 28, duration: 4.5, ease: "sine.inOut", yoyo: true, repeat: -1 });
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

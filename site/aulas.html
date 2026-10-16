@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aulas · Redesign Studio Evolution</title>
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "aulas");
+  try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="stylesheet" href="site.css">
+<style>
+/* Aulas: abertura de cinema com o treino ao fundo, fitas cruzadas, benefícios com a foto fixa e números
+   gigantes em contorno, turmas em cartazes que inclinam em 3D, diferenciais em placar e o espaço do Studio em camadas. */
+.a-hero-pic img { object-position: 50% 40%; }
+
+/* benefícios com foto fixa */
+.a-ben { position: relative; background: var(--paper-2); padding-block: clamp(100px, 12vw, 180px); overflow-x: clip; }
+.ben-grid { display: grid; gap: 48px; margin-top: clamp(56px, 7vw, 100px); }
+@media (min-width: 1000px) { .ben-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 6vw; } }
+.ben-media { position: sticky; top: 14vh; height: 72vh; display: none; }
+@media (min-width: 1000px) { .ben-media { display: block; } }
+.ben-media::after { content: ""; position: absolute; inset: 0; border-radius: 6px; box-shadow: 0 0 90px -24px color-mix(in oklch, var(--gold) 40%, transparent); pointer-events: none; }
+.bm { position: absolute; inset: 0; overflow: hidden; border-radius: 6px; box-shadow: 0 0 0 1px var(--rule), var(--shadow-lg); clip-path: inset(100% 0% 0% 0%); }
+.bm:first-child { clip-path: inset(0% 0% 0% 0%); }
+.bm img { width: 100%; height: 100%; object-fit: cover; }
+.bm-count { position: absolute; left: 18px; bottom: 16px; z-index: 999; padding: 9px 14px; border-radius: 999px; background: var(--glass); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font: 500 11.5px/1 var(--mono); letter-spacing: 0.1em; color: var(--ink); }
+.bi { position: relative; isolation: isolate; display: grid; align-content: center; gap: 0; padding-block: 40px; }
+/* o número do benefício, gigante e em contorno, atrás do texto */
+.bi::before { content: attr(data-n); position: absolute; z-index: -1; right: -1vw; top: 50%; translate: 0 -50%; font: 400 clamp(150px, 19vw, 320px)/0.8 var(--serif); letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 1px color-mix(in oklch, var(--gold) 26%, transparent); pointer-events: none; }
+@media (min-width: 1000px) { .bi { min-height: 78vh; opacity: 0.28; transition: opacity 600ms var(--ease); } .bi.on { opacity: 1; } }
+.bi-sub { font: 500 11.5px/1.4 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-text); }
+.bi h3 { margin-top: 18px; font-size: clamp(40px, 4.6vw, 84px); line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; }
+.bi > p { margin-top: 20px; color: var(--ink-2); font-size: 18px; max-width: 42ch; }
+.bi-pts { margin-top: 28px; border-top: 1px solid var(--rule); }
+.bi-pts li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; padding-block: 13px; border-bottom: 1px solid var(--rule); font-size: 16px; }
+.bi-pts .ic { width: 18px; height: 18px; margin-top: 3px; color: var(--gold); stroke-width: 2; }
+.bi-photo { margin-top: 28px; aspect-ratio: 4 / 3; }
+@media (min-width: 1000px) { .bi-photo { display: none; } }
+
+/* turmas em cartazes: a foto ocupa o cartão, o texto vem por cima e o cartão inclina com o mouse */
+.a-progs { padding-block: clamp(100px, 12vw, 180px); }
+.pgrid { display: grid; gap: 22px; margin-top: clamp(56px, 7vw, 100px); }
+@media (min-width: 900px) { .pgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* celular: as turmas deslizam para o lado, cartão por cartão */
+@media (max-width: 899px) {
+  .pgrid { display: flex; gap: 14px; margin-left: calc(-1 * var(--gut)); margin-right: calc(-1 * var(--gut-r)); padding-inline: var(--gut) var(--gut-r); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gut); scrollbar-width: none; }
+  .pgrid::-webkit-scrollbar { display: none; }
+  .pgrid .pc { flex: 0 0 min(82%, 400px); scroll-snap-align: start; }
+}
+/* o cartaz é um objeto em camadas: a foto embaixo e o texto flutuando à frente dela (site.js inclina o conjunto) */
+.pc { position: relative; display: block; border-radius: 6px; text-decoration: none; }
+.pc .rimg { aspect-ratio: 3 / 4; border-radius: 6px; box-shadow: 0 0 0 1px var(--rule), var(--shadow-lg); }
+.pc .rimg img { transition: transform 1100ms var(--ease); }
+.pc:hover .rimg img { transform: scale(1.07); }
+.pc .rimg::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, oklch(0.1 0.004 70 / 0.5) 0%, transparent 26%, transparent 38%, oklch(0.1 0.004 70 / 0.94) 100%); }
+.pc-tx { position: absolute; z-index: 2; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(20px, 2vw, 28px); color: oklch(0.97 0.004 85); pointer-events: none; text-shadow: 0 2px 18px oklch(0 0 0 / 0.6); }
+.pc .meta { display: flex; justify-content: space-between; gap: 12px; font: 500 11px/1.3 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.97 0.004 85 / 0.82); }
+.pc h3 { font-size: clamp(44px, 4.2vw, 78px); line-height: 0.86; letter-spacing: -0.02em; text-transform: uppercase; transition: color 400ms var(--ease); }
+.pc h3 em { color: oklch(0.85 0.13 86); }
+.pc:hover h3 { color: oklch(0.85 0.13 86); }
+.pc p { margin-top: 12px; font-size: 15px; line-height: 1.5; color: oklch(0.97 0.004 85 / 0.8); max-width: 34ch; }
+.pc .go { display: inline-flex; align-items: center; gap: 10px; margin-top: 18px; font: 700 12px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.85 0.13 86); }
+.pc .go svg { transition: transform 400ms var(--ease); }
+.pc:hover .go svg { transform: translateX(6px); }
+
+/* diferenciais em placar */
+.a-dif { padding-bottom: clamp(100px, 12vw, 180px); }
+.dgrid { display: grid; margin-top: clamp(48px, 6vw, 90px); border-top: 1px solid var(--rule); }
+@media (min-width: 700px) { .dgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .dgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.dgrid li { position: relative; overflow: hidden; padding: 30px 28px 36px 0; border-bottom: 1px solid var(--rule); }
+@media (min-width: 700px) { .dgrid li + li { padding-left: 28px; } .dgrid li:nth-child(odd) { border-right: 1px solid var(--rule); } }
+@media (min-width: 1100px) { .dgrid li { border-right: 1px solid var(--rule); } .dgrid li:last-child { border-right: 0; } }
+.dgrid li::before { content: attr(data-n); position: absolute; right: 14px; top: 8px; font: 400 clamp(72px, 7vw, 120px)/1 var(--serif); color: transparent; -webkit-text-stroke: 1px color-mix(in oklch, var(--gold) 30%, transparent); pointer-events: none; }
+.dgrid .ic { width: 38px; height: 38px; color: var(--gold); stroke-width: 1.3; filter: drop-shadow(0 0 12px color-mix(in oklch, var(--gold) 55%, transparent)); }
+.dgrid h3 { margin-top: 30px; font-size: clamp(22px, 1.8vw, 28px); line-height: 1.02; text-transform: uppercase; }
+.dgrid p { margin-top: 10px; color: var(--ink-2); font-size: 16px; }
+
+/* o espaço: foto ao fundo, 道場 (dojo) em contorno no meio e o cartão de vidro na frente */
+.a-space { position: relative; min-height: 96vh; display: grid; align-items: end; overflow: hidden; isolation: isolate; }
+.a-space .bgimg { position: absolute; inset: -12% 0; z-index: -3; }
+.a-space .bgimg img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; filter: brightness(0.85) contrast(1.08); }
+.a-space::before { content: ""; position: absolute; inset: 0; z-index: -2; background: linear-gradient(0deg, oklch(0.1 0.004 70 / 0.9), transparent 62%), radial-gradient(ellipse at 70% 25%, transparent, oklch(0.1 0.004 70 / 0.55)); }
+.sp-ghost { position: absolute; z-index: -1; right: -3vw; top: 4vh; font: 500 min(36vw, 520px)/0.9 var(--mincho); color: transparent; -webkit-text-stroke: 1.5px oklch(0.83 0.13 84 / 0.42); pointer-events: none; user-select: none; will-change: transform; }
+.a-space .wrap { position: relative; padding-block: clamp(60px, 8vw, 120px); }
+.space-card { max-width: 560px; padding: clamp(28px, 3.4vw, 52px); border-radius: 8px; background: color-mix(in oklch, oklch(0.16 0.005 70) 72%, transparent); color: oklch(0.97 0.004 85); -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); box-shadow: 0 0 0 1px oklch(1 0 0 / 0.12), inset 0 2px 0 oklch(0.83 0.13 84), 0 60px 100px -40px oklch(0 0 0 / 0.9);
+  --ink: oklch(0.97 0.004 85); --ink-2: oklch(0.8 0.008 80); --gold-text: oklch(0.85 0.12 86); --gold: oklch(0.83 0.13 84); --btn-bg: oklch(0.83 0.13 84); --btn-fg: oklch(0.13 0.005 70); }
+.space-card .h2 { font-size: clamp(36px, 4vw, 66px); }
+.space-card p { margin-top: 18px; color: var(--ink-2); }
+.space-card .btn { margin-top: 30px; }
+</style>
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12l6 6L20 6"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-focus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" opacity="0.5"/><path d="M12 12c-2 0-4-2-4-4s2-4 4-4"/><path d="M12 12c2 0 4 2 4 4s-2 4-4 4"/></symbol>
+    <symbol id="i-growth" viewBox="0 0 24 24"><path d="M12 22V12"/><path d="M12 12c3-3 6-2 6-5"/><path d="M12 12c-3-3-6-2-6-5"/><path d="M12 7c0-3 2-5 2-5M12 7c0-3-2-5-2-5"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M2.5 10.5c3-1 6.5-4 9.5-6.5 3 2.5 6.5 5.5 9.5 6.5"/><path d="M5.5 10v9M18.5 10v9"/><path d="M3 20h18"/><path d="M9.5 20v-5h5v5" opacity="0.6"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+      <a class="tagp" href="area-do-aluno.html" data-int title="Esta página é uma proposta de redesign. Ver também a Área do Aluno"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int aria-current="page"><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="phero cin cine" data-dark aria-labelledby="t-aulas">
+    <div class="cin-bg a-hero-pic" aria-hidden="true"><img src="img/treino-tecnica.webp" alt="" width="1200" height="800"></div>
+    <div class="cin-shade" aria-hidden="true"></div>
+    <canvas class="cin-gl" aria-hidden="true"></canvas>
+    <span class="cin-ghost" aria-hidden="true">稽古</span>
+    <div class="wrap">
+      <div class="phero-top" data-in><p class="label gold">Aulas em Sorocaba</p><p class="phero-meta">Adulto, Kids e Feminino · segunda a sexta</p></div>
+      <h1 class="phero-title" id="t-aulas">Aulas que melhoram <span class="o">postura,</span> <em class="gl">confiança e saúde.</em></h1>
+      <p class="lede" data-in>No Studio Evolution BJJ, cada treino é uma oportunidade de cuidar do corpo, acalmar a mente e ganhar uma confiança que se leva para casa, para o trabalho e para a família.</p>
+      <div class="cin-row">
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
+        <a class="link" href="#beneficios">Ver benefícios</a>
+        <p class="pill-live" data-next><i aria-hidden="true"></i><span>Próxima aula</span><b>Adulto · 19h</b></p>
+      </div>
+      <div class="cin-data">
+        <div><b>Seg a sex</b><span>Treino todo dia útil</span></div>
+        <div><b>5 turmas</b><span>8h · 10h · 11h · 18h · 19h</span></div>
+        <div><b>Até 10</b><span>Alunos por aula</span></div>
+        <div><b>1ª aula</b><span>Grátis, com kimono emprestado</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bands" aria-hidden="true">
+    <div class="band b2"><div class="mq-track" data-dir="1">
+      <div class="mq-item"><span>Adulto</span><span class="k">柔</span><span class="o">Kids</span><span class="k">柔</span><span>Feminino</span><span class="k">柔</span><span class="o">Seg a sex</span><span class="k">柔</span><span>Adulto</span><span class="k">柔</span><span class="o">Kids</span><span class="k">柔</span><span>Feminino</span><span class="k">柔</span><span class="o">Seg a sex</span><span class="k">柔</span></div>
+      <div class="mq-item"><span>Adulto</span><span class="k">柔</span><span class="o">Kids</span><span class="k">柔</span><span>Feminino</span><span class="k">柔</span><span class="o">Seg a sex</span><span class="k">柔</span><span>Adulto</span><span class="k">柔</span><span class="o">Kids</span><span class="k">柔</span><span>Feminino</span><span class="k">柔</span><span class="o">Seg a sex</span><span class="k">柔</span></div>
+    </div></div>
+    <div class="band b1"><div class="mq-track" data-dir="-1">
+      <div class="mq-item"><span>Postura</span><span class="k">道</span><span>Confiança</span><span class="k">道</span><span>Saúde</span><span class="k">道</span><span>Disciplina</span><span class="k">道</span><span>Postura</span><span class="k">道</span><span>Confiança</span><span class="k">道</span><span>Saúde</span><span class="k">道</span><span>Disciplina</span><span class="k">道</span></div>
+      <div class="mq-item"><span>Postura</span><span class="k">道</span><span>Confiança</span><span class="k">道</span><span>Saúde</span><span class="k">道</span><span>Disciplina</span><span class="k">道</span><span>Postura</span><span class="k">道</span><span>Confiança</span><span class="k">道</span><span>Saúde</span><span class="k">道</span><span>Disciplina</span><span class="k">道</span></div>
+    </div></div>
+  </div>
+
+  <section class="a-ben" id="beneficios" aria-labelledby="t-ben">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Benefícios</p>
+        <h2 class="h2 split" id="t-ben">O que muda quando você <em>treina Jiu-Jitsu</em>.</h2>
+      </div>
+      <div class="ben-grid">
+        <div class="ben-media" aria-hidden="true" data-tilt3d="6" data-persp="1400">
+          <div class="bm"><img src="img/treino-tecnica.webp" alt=""></div>
+          <div class="bm"><img src="img/programa-adulto-real.jpg" alt="" style="object-position:60% 50%"></div>
+          <div class="bm"><img src="img/programa-feminino-real.jpg" alt="" style="object-position:52% 60%"></div>
+          <span class="bm-count" data-z="70"><b id="bmNum">01</b> / 03</span>
+        </div>
+        <div class="ben-items">
+          <article class="bi on" data-n="01">
+            <p class="bi-sub">Menos dor, mais presença</p>
+            <h3>Postura <em>alinhada</em></h3>
+            <p>O Jiu-Jitsu fortalece o core, alonga a coluna e corrige desvios causados por horas na frente do computador.</p>
+            <ul class="bi-pts">
+              <li><svg class="ic"><use href="#i-check"/></svg>Fortalecimento do abdômen e costas</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Mobilidade de quadril e ombros</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Consciência corporal no dia a dia</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Redução de dores na coluna</li>
+            </ul>
+            <div class="rimg bi-photo"><img src="img/treino-tecnica.webp" alt="Professor corrigindo a postura de um aluno no tatame" loading="lazy" width="1200" height="800"></div>
+          </article>
+          <article class="bi" data-n="02">
+            <p class="bi-sub">Segurança que se sente fora do tatame</p>
+            <h3>Confiança <em>de verdade</em></h3>
+            <p>Aprender a se defender gera uma calma difícil de explicar. Você passa a se mover, falar e tomar decisões com mais firmeza.</p>
+            <ul class="bi-pts">
+              <li><svg class="ic"><use href="#i-check"/></svg>Defesa pessoal para situações reais</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Controle emocional sob pressão</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Autoestima construída com prática</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Voz e postura mais seguras</li>
+            </ul>
+            <div class="rimg bi-photo"><img src="img/programa-adulto-real.jpg" alt="Alunos adultos treinando no Studio Evolution" loading="lazy" width="1264" height="848"></div>
+          </article>
+          <article class="bi" data-n="03">
+            <p class="bi-sub">Corpo e mente no mesmo ritmo</p>
+            <h3>Saúde em <em>movimento</em></h3>
+            <p>Aula dinâmica que mistura cardio, força, coordenação e respiração. O resultado é energia de sobra e estresse bem longe.</p>
+            <ul class="bi-pts">
+              <li><svg class="ic"><use href="#i-check"/></svg>Condicionamento sem monotonia</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Alívio do estresse e da ansiedade</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Melhor sono e disposição</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Coordenação motora em constante evolução</li>
+            </ul>
+            <div class="rimg bi-photo"><img src="img/programa-feminino-real.jpg" alt="Aula de jiu-jitsu feminino no Studio Evolution" loading="lazy" width="1264" height="848"></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="a-progs" id="turmas" aria-labelledby="t-turmas">
+    <div class="wrap">
+      <div class="sec-head split2">
+        <div><p class="label">Programas</p><h2 class="h2 split" id="t-turmas">Uma turma para cada <em>momento da vida</em>.</h2></div>
+        <p class="lead">Escolha a turma e já reserve a aula experimental no horário que encaixa na sua rotina.</p>
+      </div>
+      <div class="pgrid" data-rise data-swipe>
+        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#adulto" data-int data-tilt3d="10" data-glare>
+          <div class="rimg"><img src="img/programa-adulto-real.jpg" alt="Aluno adulto trabalhando a guarda no tatame" loading="lazy" width="1264" height="848" style="object-position:62% 50%"></div>
+          <div class="pc-tx" data-z="64">
+            <div class="meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h</span></div>
+            <div><h3>Adulto</h3><p>Treino progressivo que respeita seu condicionamento.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+          </div>
+        </a>
+        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#kids" data-int data-tilt3d="10" data-glare>
+          <div class="rimg"><img src="img/programa-kids-real.jpg" alt="Professor sentado no tatame com duas crianças de kimono" loading="lazy" width="768" height="1376" style="object-position:50% 70%"></div>
+          <div class="pc-tx" data-z="64">
+            <div class="meta"><span>4 a 12 anos</span><span class="tnum">10h · 18h</span></div>
+            <div><h3><em>Kids</em> &amp; Família</h3><p>Disciplina, foco e diversão para crianças de 4 a 12 anos.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+          </div>
+        </a>
+        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#feminino" data-int data-tilt3d="10" data-glare>
+          <div class="rimg"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame" loading="lazy" width="1264" height="848" style="object-position:52% 60%"></div>
+          <div class="pc-tx" data-z="64">
+            <div class="meta"><span>Junto com o adulto</span><span class="tnum">8h · 11h · 19h</span></div>
+            <div><h3>Feminino</h3><p>Integrado às aulas adultas. Espaço seguro para fortalecer corpo, voz e confiança.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="a-dif" aria-labelledby="t-dif">
+    <div class="wrap">
+      <div class="sec-head split2">
+        <div><p class="label">Por que a gente</p><h2 class="h2 split" id="t-dif">Treino de qualidade, <em>sem pressão</em>.</h2></div>
+        <p class="lead">No Jardim São Paulo, o Studio Evolution BJJ une técnica, respeito e acompanhamento. Aqui você não precisa ser atleta para começar.</p>
+      </div>
+      <ul class="dgrid">
+        <li data-n="01" data-stand="80"><svg class="ic"><use href="#i-users"/></svg><h3>Turmas pequenas</h3><p>Até 10 alunos por aula, com atenção individual para evoluir com segurança.</p></li>
+        <li data-n="02" data-stand="80"><svg class="ic"><use href="#i-focus"/></svg><h3>Metodologia clara</h3><p>Caminho de faixas com objetivos definidos, da Equipe TRUE.</p></li>
+        <li data-n="03" data-stand="80"><svg class="ic"><use href="#i-growth"/></svg><h3>Acompanhamento</h3><p>Frequência, graus e movimentos no app do aluno.</p></li>
+        <li data-n="04" data-stand="80"><svg class="ic"><use href="#i-home"/></svg><h3>Clima familiar</h3><p>Sem pressão de competir. Respeito acima de tudo.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="a-space" aria-labelledby="t-space">
+    <div class="bgimg" id="spaceImg"><img src="img/ambiente-studio.webp" alt="Painel dourado do Studio Evolution BJJ na parede preta da academia" loading="lazy" width="1200" height="800"></div>
+    <span class="sp-ghost" aria-hidden="true">道場</span>
+    <div class="wrap">
+      <div class="space-card" data-speed="0.12" data-tilt3d="6" data-glare>
+        <p class="label">Nosso espaço</p>
+        <h2 class="h2 split" id="t-space" style="margin-top:22px">Tatame limpo, seguro e <em>acolhedor</em>.</h2>
+        <p>Estrutura preparada para quem está começando ou voltando a se cuidar. Equipamentos de qualidade, higiene diária e uma equipe que te recebe pelo nome.</p>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" aria-labelledby="t-cta">
+    <div class="cta-inner">
+      <div class="wrap cta-grid">
+        <div>
+          <p class="label">Primeira aula grátis</p>
+          <h2 class="h2 split" id="t-cta">Sinta na pele o que o Jiu-Jitsu pode fazer <em>por você</em>.</h2>
+          <p class="lead">Venha conhecer o Studio Evolution BJJ no Jardim São Paulo. Kimono emprestado, atenção individual e nenhuma pressão para começar.</p>
+          <a class="btn btn-gold" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
+          <dl class="contact">
+            <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
+            <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
+            <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
+          </dl>
+        </div>
+        <figure class="cta-photo"><img src="img/equipe-evolution.webp" alt="Fundadores do Studio Evolution BJJ em frente ao painel dourado da academia" loading="lazy" width="713" height="1100" style="object-position:50% 60%"></figure>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
+    </div>
+    <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Proposta de redesign · versão para aprovação</span></div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener"><i aria-hidden="true"></i>WhatsApp</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$;
+  Site.boot({
+    setup: function (S) {
+      /* benefícios: a foto fixa troca conforme o texto ativo, e o contador acompanha */
+      var mm = gsap.matchMedia();
+      mm.add("(min-width: 1000px)", function () {
+        var media = $$(".bm"), items = $$(".bi"), num = $("#bmNum"), z = 1, current = 0;
+        function activate(k) {
+          if (k === current) return;
+          current = k;
+          items.forEach(function (it, i) { it.classList.toggle("on", i === k); });
+          num.textContent = "0" + (k + 1);
+          var m = media[k]; z += 1; m.style.zIndex = z;
+          /* a nova foto chega virando como a página de um livro, por cima da anterior */
+          gsap.fromTo(m, { clipPath: "inset(100% 0% 0% 0%)", rotationY: -38, z: 60 }, { clipPath: "inset(0% 0% 0% 0%)", rotationY: 0, z: 0, duration: 1.2, ease: "expo.inOut" });
+          gsap.fromTo($("img", m), { scale: 1.25 }, { scale: 1, duration: 1.6, ease: "expo.out" });
+        }
+        gsap.set(media, { transformOrigin: "0% 50%" });
+        items.forEach(function (it, i) {
+          ScrollTrigger.create({ trigger: it, start: "top 55%", end: "bottom 55%", onToggle: function (self) { if (self.isActive) activate(i); } });
+        });
+        return function () { items.forEach(function (it) { it.classList.add("on"); }); };
+      });
+
+      /* celular: o trilho das turmas vira uma vitrine; o cartão do centro fica de frente */
+      Site.coverflow($(".pgrid"), 24);
+
+      /* o espaço: a foto rola mais devagar que o cartão, e 道場 flutua no meio das duas camadas */
+      gsap.fromTo("#spaceImg", { yPercent: -8 }, { yPercent: 8, ease: "none", scrollTrigger: { trigger: ".a-space", start: "top bottom", end: "bottom top", scrub: true } });
+      gsap.fromTo(".sp-ghost", { yPercent: 24 }, { yPercent: -24, ease: "none", scrollTrigger: { trigger: ".a-space", start: "top bottom", end: "bottom top", scrub: true } });
+      if (S.fine) {
+        var gx = gsap.quickTo(".sp-ghost", "x", { duration: 1.6, ease: "power3" });
+        $(".a-space").addEventListener("mousemove", function (e) { gx((e.clientX / innerWidth - 0.5) * -40); });
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

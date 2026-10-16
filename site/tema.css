@@ -1,0 +1,115 @@
+/* Studio Evolution BJJ · linguagem "noite de luta", ajustes por página.
+   Carregado por último em todas as páginas, depois do estilo de cada uma: troca o que era serifado
+   por título pesado, mono ou sans, e dá profundidade (luz de ouro, contornos, camadas) às seções. */
+
+/* ---------- legendas, notas e frases longas: nada de título pesado em texto corrido ---------- */
+.col-it figcaption, .team figcaption, .bp-video figcaption, .cap, .pa-note, .hint, .p-meta, .bp-count, .pa-n, .qz-top, .qz-res .k,
+.ld-sub, .bi-sub, .pc .meta, .bm-count, .phero-meta, .ruler .hour, .ruler .cls .n, .slist .n, .day-label span {
+  font-family: var(--mono) !important; font-style: normal; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
+.col-it figcaption, .team figcaption, .bp-video figcaption, .cap, .pa-note { font-size: 11px; line-height: 1.5; color: var(--ink-3); }
+.p-meta, .pc .meta, .day-label span, .bp-count, .pa-n, .qz-top, .bm-count { font-size: 11.5px; }
+.bp-note { font: 400 15px/1.55 var(--sans); font-style: normal; color: var(--ink-3); }
+.lema cite, .quote cite { font: 500 11.5px/1.5 var(--mono); letter-spacing: 0.12em; }
+.vals span { font: 500 11px/1 var(--mono); font-style: normal; letter-spacing: 0.12em; color: var(--gold-text); }
+.vals b, .prog h3, .pa-tx h3, .blist h3, .pc h3, .bi h3, .dgrid h3, .qz-res h3, .diff-grid h3, .dv-h h3, .room-h h4, .bp-names, .qz-q legend, .features b, .sched-notes b, .day-label b { text-transform: uppercase; }
+
+/* ---------- página inicial ---------- */
+.lema p { font-size: clamp(38px, 6.4vw, 118px); line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; max-width: 15ch; }
+.lema p em { font-style: normal; }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .lema p em .wi, .lema p em:not(:has(.wi)) { background: var(--gold-metal); -webkit-background-clip: text; background-clip: text; color: transparent; }
+}
+.statement { font: 500 clamp(24px, 3vw, 50px)/1.18 var(--sans); letter-spacing: -0.035em; }
+.statement em { font-style: normal; color: var(--gold-text); }
+.pill { border-radius: 8px; box-shadow: 0 0 0 2px color-mix(in oklch, var(--gold) 40%, transparent), 0 14px 26px -12px oklch(0 0 0 / 0.6); }
+.numbers { border-top: 1px solid var(--rule); }
+.numbers div + div { border-left-color: var(--rule); }
+.numbers b { font-size: clamp(52px, 6.6vw, 120px); line-height: 0.84; letter-spacing: -0.03em; white-space: nowrap; background: var(--gold-metal); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.numbers span { font: 500 11.5px/1.5 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.manifesto, .quiz-sec, .ben-sec, .team-sec, .sched-sec, .a-progs, .a-dif { position: relative; isolation: isolate; overflow-x: clip; }
+.manifesto::before, .quiz-sec::before, .team-sec::before { content: ""; position: absolute; z-index: -1; width: 64vw; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in oklch, var(--gold) 9%, transparent), transparent 62%); }
+.manifesto::before { left: -24vw; top: 6%; }
+.quiz-sec::before { right: -22vw; top: -10%; }
+.team-sec::before { left: 30vw; top: 20%; }
+.col-it .ci, .team .tilt, .p-img, .cta-photo, .bp-video .vclip, .pa-ph { border-radius: 4px; }
+.true-sec .h2 em .wi, .true-sec .h2 em { filter: drop-shadow(0 0 24px oklch(0.83 0.13 84 / 0.25)); }
+.vals li { padding-inline: 2px; }
+.vals b { font-size: clamp(24px, 2vw, 32px); }
+.pa-t { text-shadow: 0 0 60px color-mix(in oklch, var(--gold) 45%, transparent); letter-spacing: -0.02em; }
+.pa-tx h3 { line-height: 0.95; }
+.qz-q legend { font-size: clamp(26px, 2.4vw, 38px); line-height: 1; }
+.quiz { border-top: 0; border-radius: 6px; box-shadow: 0 0 0 1px var(--rule), inset 0 2px 0 var(--gold), var(--shadow-lg); }
+.qz-o { border-radius: 4px; font-weight: 500; transition: box-shadow 300ms var(--ease), background-color 300ms var(--ease); }
+.qz-o:hover { box-shadow: inset 0 0 0 1.5px var(--gold); background: color-mix(in oklch, var(--gold) 7%, var(--paper)); }
+.qz-res h3 { line-height: 0.95; }
+.hs-bg { font: 400 21vw/0.8 var(--serif); font-style: normal; text-transform: uppercase; letter-spacing: -0.02em; color: transparent; -webkit-text-stroke: 1px color-mix(in oklch, var(--ink) 13%, transparent); }
+.prog h3 { font-size: clamp(60px, 7.4vw, 136px); line-height: 0.86; letter-spacing: -0.025em; }
+.p-img { box-shadow: 0 0 0 1px var(--rule), var(--shadow-lg); }
+.bp-names { font-size: clamp(42px, 4.6vw, 82px); letter-spacing: -0.02em; }
+.bp-names-in em { font-style: normal; }
+.blist h3 { font-size: clamp(30px, 4.2vw, 76px); line-height: 0.95; letter-spacing: -0.02em; }
+.blist li:hover h3 { text-shadow: 0 0 40px color-mix(in oklch, var(--gold) 40%, transparent); }
+.hover-img { border-radius: 6px; box-shadow: 0 0 0 1px color-mix(in oklch, var(--gold) 40%, transparent), var(--shadow-lg); }
+.quote { background: var(--cine-bg); color: var(--cine-fg); --ink: var(--cine-fg); --ink-2: var(--cine-fg-2); }
+.quote p { font: 400 clamp(28px, 3.7vw, 64px)/1.02 var(--serif); font-style: normal; letter-spacing: -0.02em; text-transform: uppercase; }
+.qmark { font: 400 min(30vw, 460px)/1 var(--serif); font-style: normal; color: transparent; -webkit-text-stroke: 1.5px oklch(0.83 0.13 84 / 0.5); top: -5vw; }
+.day-label b { font-size: 30px; }
+.ruler .cls .t { letter-spacing: -0.01em; }
+.ruler .pin { box-shadow: 0 0 0 5px var(--paper), 0 0 18px var(--ink); }
+.ruler .pin.kids { box-shadow: 0 0 0 5px var(--paper), 0 0 18px var(--gold); }
+.features b { font-size: 19px; letter-spacing: 0; }
+.app-sec { background: var(--paper-2); }
+.card .big span { font: 600 15px/1.1 var(--sans); font-style: normal; }
+.chip { border-radius: 14px; box-shadow: inset 0 0 0 1px var(--rule), var(--shadow-lg); }
+.stage .kj { color: transparent; -webkit-text-stroke: 1px color-mix(in oklch, var(--gold) 30%, transparent); }
+
+/* no celular, as palavras longas em caixa-alta pesada precisam caber inteiras na largura */
+@media (max-width: 1023px) {
+  .prog h3 { font-size: clamp(40px, 11vw, 64px); }
+}
+@media (max-width: 600px) {
+  .phero-title { font-size: 11vw; }
+  .h2 { font-size: clamp(32px, 9.4vw, 44px); }
+  .lema p { font-size: 10.4vw; }
+  .bi h3 { font-size: 10vw; }
+  .quote p { font-size: 7.4vw; }
+}
+
+/* ---------- aulas: o estilo da página está no próprio aulas.html ---------- */
+
+/* ---------- agendamento: o estilo da página está no próprio agendamento.html ---------- */
+
+/* ---------- perguntas: o estilo da página está no próprio perguntas.html ---------- */
+
+/* ---------- contato: o estilo da página está no próprio contato.html ---------- */
+
+/* ---------- área do aluno e do professor ---------- */
+.ar-title { font-size: clamp(44px, 6.4vw, 124px); line-height: 0.88; letter-spacing: -0.025em; }
+.ar-switch a { font: 600 12px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; }
+.dch h2, .demo-head h2, .tv-head h2, .diff h2, .bridge h2 { line-height: 0.92; letter-spacing: -0.02em; }
+.dch .try { font: 700 12.5px/1.2 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; }
+.diff-grid h3 { font-size: 22px; line-height: 1.05; }
+.diff-grid .was { font: italic 400 14px/1.45 var(--sans); }
+.ap-st { font: 700 14.5px/1.2 var(--sans); letter-spacing: -0.01em; }
+.ap-big span { font: 600 15px/1.1 var(--sans); font-style: normal; }
+.ap-list b { font: 700 13.5px/1.2 var(--sans); }
+.ap-quiz p { font: 700 14.5px/1.3 var(--sans); }
+.ap-quiz .fb { font: 400 12px/1.4 var(--sans); }
+.ap-ttl { font-size: 18px; text-transform: uppercase; }
+.ap-mk { font: 600 12px/1 var(--mono); }
+.ap-hi { font-size: 24px; letter-spacing: -0.01em; }
+.ap-lock .clock { letter-spacing: -0.02em; }
+.msg q { font: italic 500 16px/1.45 var(--sans); }
+.gcard .ask p { font: 600 16px/1.3 var(--sans); }
+.gcard h4, .dr-h h4 { letter-spacing: -0.01em; }
+.room-h h4 { font-size: 22px; }
+.kpi b .delta { display: block; margin: 8px 0 0; }
+.classes button { grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; }
+.classes button b { font-size: 20px; }
+.tv-l h4 { text-transform: uppercase; letter-spacing: -0.01em; }
+.tv-list li { font-family: var(--sans); font-weight: 500; }
+.hc b { letter-spacing: -0.01em; }
+.dash, .device, .tv-screen { --radius: 8px; }
+.kpi, .gcard, .funnel div, .lead, .room, .classes button, .quiz { border-radius: 6px; }
+.dash { box-shadow: 0 0 0 1px var(--rule), 0 60px 120px -50px oklch(0 0 0 / 0.8), 0 0 120px -40px color-mix(in oklch, var(--gold) 18%, transparent); }

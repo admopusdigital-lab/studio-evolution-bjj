@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contato · Redesign Studio Evolution</title>
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "contato");
+  try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="stylesheet" href="site.css">
+<style>
+/* Contato: abertura de cinema com os professores e a ficha do endereço, uma faixa dourada que corre com a
+   rolagem, as formas de contato em linhas que acendem e, ao lado, um radar com as coordenadas reais do
+   Studio, anéis que giram, varredura de luz e um pino que pulsa. */
+/* a foto sobe um pouco para que os rostos fiquem acima do título */
+.c-hero-pic img { position: relative; top: -14%; height: 118%; object-position: 50% 0%; }
+.c-hero .cin-data b { font-size: clamp(18px, 1.6vw, 26px); line-height: 1.1; }
+
+.c-body { padding-block: clamp(56px, 6vw, 96px) clamp(100px, 12vw, 180px); }
+.c-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 64px; align-items: start; }
+@media (min-width: 1000px) { .c-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 6vw; } }
+.c-list { margin-top: 40px; border-top: 1px solid var(--rule); }
+.c-row { position: relative; isolation: isolate; display: grid; gap: 14px 32px; padding: 30px 0; border-bottom: 1px solid var(--rule); }
+.c-row::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, color-mix(in oklch, var(--gold) 12%, transparent), color-mix(in oklch, var(--gold) 3%, transparent) 62%, transparent); transform: scaleX(0); transform-origin: left; transition: transform 800ms var(--ease); }
+.c-row::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--gold); box-shadow: 0 0 14px var(--gold); transform: scaleY(0); transform-origin: top; transition: transform 600ms var(--ease); }
+.c-row:hover::before, .c-row:hover::after { transform: none; }
+@media (min-width: 700px) { .c-row { grid-template-columns: 190px minmax(0, 1fr); padding-right: 16px; } }
+.c-row h3 { display: flex; align-items: baseline; gap: 12px; padding: 8px 0 0 18px; font: 500 11.5px/1.4 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
+.c-row h3 i { font-style: normal; color: var(--gold-text); }
+.c-row > div { min-width: 0; padding-left: 18px; }
+@media (min-width: 700px) { .c-row > div { padding-left: 0; } }
+.c-row .big { font: 700 clamp(20px, 1.9vw, 30px)/1.2 var(--sans); letter-spacing: -0.02em; }
+.c-row .big.tel { font: 400 clamp(30px, 3vw, 46px)/1.05 var(--serif); letter-spacing: -0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .c-row .big.tel { background: var(--gold-metal); -webkit-background-clip: text; background-clip: text; color: transparent; }
+}
+.c-row .sub { margin-top: 8px; color: var(--ink-2); }
+.c-row .pill-live { margin-top: 16px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); }
+.c-acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.chipbtn { display: inline-flex; align-items: center; gap: 10px; height: 42px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; box-shadow: inset 0 0 0 1px var(--rule); color: var(--ink); font: 500 11px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background-color 300ms var(--ease), color 300ms var(--ease), box-shadow 300ms var(--ease); }
+.chipbtn:hover { background: var(--gold); color: oklch(0.13 0.005 70); box-shadow: 0 0 26px -8px var(--gold); }
+.chipbtn .ic { width: 16px; height: 16px; color: var(--gold-text); transition: color 300ms var(--ease); }
+.chipbtn:hover .ic { color: inherit; }
+.sched { display: grid; }
+.sched div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding-block: 12px; border-bottom: 1px solid var(--rule); }
+.sched div:first-child { padding-top: 4px; }
+.sched div:last-child { border-bottom: 0; }
+.sched b { font: 400 21px/1.2 var(--serif); text-transform: uppercase; }
+.sched b em { font-style: normal; color: var(--gold-text); }
+.sched span { font: 500 11.5px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); text-align: right; }
+@media (max-width: 520px) { .sched div { flex-direction: column; gap: 4px; } .sched span { text-align: left; } }
+
+/* radar em camadas, como um holograma: o disco no fundo, a varredura de luz, os anéis, o pino e a etiqueta
+   ficam cada um numa altura. Parado, parece plano; quando inclina (mouse ou rolagem), as camadas se separam */
+.loc { position: relative; margin: 0; }
+@media (min-width: 1000px) { .loc { position: sticky; top: 110px; } }
+.loc-stage { position: relative; aspect-ratio: 1; max-width: 560px; margin-inline: auto; border-radius: 50%; transform-style: preserve-3d; will-change: transform; }
+.loc-l { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; }
+.loc-disc { background: radial-gradient(circle at 50% 50%, oklch(0.2 0.012 75) 0, var(--cine-bg) 72%); box-shadow: 0 0 0 1px oklch(0.83 0.13 84 / 0.28), 0 0 90px -24px oklch(0.83 0.13 84 / 0.4), 0 60px 100px -50px oklch(0 0 0 / 0.85), inset 0 0 60px oklch(0 0 0 / 0.7); }
+.loc-sw { overflow: hidden; transform: translateZ(14px); }
+.loc-pin { transform: translateZ(64px); }
+.loc-lab { transform: translateZ(100px); }
+.loc-glass { transform: translateZ(124px); background: radial-gradient(circle at 30% 20%, oklch(1 0 0 / 0.08), transparent 40%); box-shadow: 0 0 0 1px oklch(0.83 0.13 84 / 0.12); }
+.loc-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.rings circle { fill: none; stroke: oklch(1 0 0 / 0.12); stroke-width: 1; }
+.rings .dash { stroke: oklch(0.83 0.13 84); stroke-dasharray: 2 10; opacity: 0.75; }
+.rings .ticks { stroke: oklch(0.83 0.13 84 / 0.45); stroke-width: 8; stroke-dasharray: 1.2 15.2; }
+.rings .major { stroke: oklch(0.83 0.13 84); stroke-width: 16; stroke-dasharray: 3 292.3; stroke-dashoffset: 1.5; }
+.rings line { stroke: oklch(1 0 0 / 0.1); stroke-width: 1; }
+.rings text { fill: oklch(0.83 0.13 84 / 0.85); font: 500 11px var(--mono); letter-spacing: 0.1em; }
+.sweep { position: absolute; inset: 0; z-index: 1; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 290deg, oklch(0.83 0.13 84 / 0.05) 300deg, oklch(0.83 0.13 84 / 0.38) 360deg); }
+@media (prefers-reduced-motion: no-preference) { .sweep { animation: sweep 6s linear infinite; } }
+@keyframes sweep { to { transform: rotate(360deg); } }
+.pin { position: absolute; left: 50%; top: 50%; z-index: 3; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: oklch(0.83 0.13 84); box-shadow: 0 0 0 6px oklch(0.83 0.13 84 / 0.3), 0 0 30px oklch(0.83 0.13 84); }
+.pin::before, .pin::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid oklch(0.83 0.13 84); opacity: 0; }
+@media (prefers-reduced-motion: no-preference) { .pin::before { animation: ping 2.4s var(--ease) infinite; } .pin::after { animation: ping 2.4s var(--ease) 1.2s infinite; } }
+@keyframes ping { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(7); opacity: 0; } }
+.pin-label { position: absolute; left: 50%; top: 50%; z-index: 4; transform: translate(24px, -50%); padding: 10px 14px; border-radius: 6px; background: oklch(0.2 0.006 70 / 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px oklch(0.83 0.13 84 / 0.3), 0 20px 40px -20px oklch(0 0 0 / 0.8); color: oklch(0.97 0.004 85); font: 700 13px/1.2 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+.pin-label small { display: block; margin-top: 4px; font: 500 10.5px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: none; color: oklch(0.97 0.004 85 / 0.6); }
+.coords { display: flex; justify-content: space-between; gap: 16px; max-width: 560px; margin: 26px auto 0; }
+.coords b { display: block; font: 500 clamp(18px, 1.6vw, 24px)/1.1 var(--mono); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.coords small { display: block; margin-top: 8px; font: 500 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.coords div:last-child { text-align: right; }
+.loc .c-acts { justify-content: center; margin-top: 24px; }
+@media (max-width: 520px) { .pin-label { transform: translate(-50%, 22px); } }
+/* aviso de "número copiado": fica totalmente escondido até ser usado */
+.toast { position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); z-index: 120; transform: translate(-50%, 24px); opacity: 0; visibility: hidden; padding: 14px 20px; border-radius: 999px; background: var(--btn-bg); color: var(--btn-fg); font: 600 12.5px/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; box-shadow: var(--shadow-lg); transition: transform 500ms var(--ease), opacity 300ms ease, visibility 0s linear 500ms; }
+.toast.on { transform: translate(-50%, 0); opacity: 1; visibility: visible; transition: transform 500ms var(--ease), opacity 300ms ease, visibility 0s; }
+</style>
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></symbol>
+    <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+      <a class="tagp" href="area-do-aluno.html" data-int title="Esta página é uma proposta de redesign. Ver também a Área do Aluno"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int aria-current="page"><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="phero cin cine c-hero" data-dark aria-labelledby="t-c">
+    <div class="cin-bg c-hero-pic" aria-hidden="true"><img src="img/professores-evolution.webp" alt="" width="1200" height="800"></div>
+    <div class="cin-shade" aria-hidden="true"></div>
+    <canvas class="cin-gl" aria-hidden="true"></canvas>
+    <span class="cin-ghost" aria-hidden="true">道場</span>
+    <div class="wrap">
+      <div class="phero-top" data-in><p class="label gold">Onde estamos</p><p class="phero-meta">Jardim São Paulo · Sorocaba/SP</p></div>
+      <h1 class="phero-title" id="t-c">Venha <span class="o">conhecer o</span> <em class="gl">Studio Evolution BJJ.</em></h1>
+      <p class="lede" data-in>Estamos no Jardim São Paulo, em Sorocaba, com fácil acesso e estrutura preparada para receber você e sua família.</p>
+      <div class="cin-row">
+        <a class="btn btn-ink" data-magnetic href="https://www.google.com/maps/search/?api=1&amp;query=Av.%20Get%C3%BAlio%20Vargas%2C%20400%2C%20Jardim%20S%C3%A3o%20Paulo%2C%20Sorocaba%20SP" target="_blank" rel="noopener">Como chegar<svg class="ic"><use href="#i-arrow"/></svg></a>
+        <a class="link" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener">Falar no WhatsApp</a>
+        <p class="pill-live" data-office><i aria-hidden="true"></i><span>Atendimento</span><b>Seg a sex · 8h às 21h</b></p>
+      </div>
+      <div class="cin-data">
+        <div><b>Av. Getúlio Vargas, 400</b><span>Sala 3 · sobreloja</span></div>
+        <div><b>Jardim São Paulo</b><span>Sorocaba/SP · 18051-480</span></div>
+        <div><b>(15) 99674-1812</b><span>Telefone e WhatsApp</span></div>
+        <div><b>8h às 21h</b><span>Atendimento seg a sex</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bands one" aria-hidden="true">
+    <div class="band b1"><div class="mq-track" data-dir="-1">
+      <div class="mq-item"><span>Av. Getúlio Vargas, 400</span><span class="k">道</span><span>Jardim São Paulo</span><span class="k">道</span><span>Sorocaba</span><span class="k">道</span><span>Seg a sex</span><span class="k">道</span></div>
+      <div class="mq-item"><span>Av. Getúlio Vargas, 400</span><span class="k">道</span><span>Jardim São Paulo</span><span class="k">道</span><span>Sorocaba</span><span class="k">道</span><span>Seg a sex</span><span class="k">道</span></div>
+    </div></div>
+  </div>
+
+  <section class="c-body" aria-label="Informações de contato">
+    <div class="wrap c-grid">
+      <div>
+        <p class="label">Informações</p>
+        <h2 class="h2 split" style="margin-top:22px">Fale com <em>a gente</em>.</h2>
+        <div class="c-list">
+          <div class="c-row">
+            <h3><i>01</i>Endereço</h3>
+            <div>
+              <p class="big">Av. Getúlio Vargas, 400, sala 3, sobreloja</p>
+              <p class="sub">Jardim São Paulo · Sorocaba - SP · CEP 18051-480</p>
+              <div class="c-acts">
+                <a class="chipbtn" href="https://www.google.com/maps/search/?api=1&amp;query=Av.%20Get%C3%BAlio%20Vargas%2C%20400%2C%20Jardim%20S%C3%A3o%20Paulo%2C%20Sorocaba%20SP" target="_blank" rel="noopener"><svg class="ic"><use href="#i-pin"/></svg>Google Maps</a>
+                <a class="chipbtn" href="https://waze.com/ul?ll=-23.5230709%2C-47.4940211&amp;navigate=yes" target="_blank" rel="noopener"><svg class="ic"><use href="#i-nav"/></svg>Waze</a>
+              </div>
+            </div>
+          </div>
+          <div class="c-row">
+            <h3><i>02</i>Telefone e WhatsApp</h3>
+            <div>
+              <p class="big tel" id="phone">(15) 99674-1812</p>
+              <div class="c-acts">
+                <a class="chipbtn" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg>Abrir conversa</a>
+                <button class="chipbtn" type="button" id="copyBtn"><svg class="ic"><use href="#i-copy"/></svg>Copiar número</button>
+              </div>
+            </div>
+          </div>
+          <div class="c-row">
+            <h3><i>03</i>Horários das aulas</h3>
+            <div class="sched">
+              <div><b>Adulto</b><span>Seg a sex · 8h, 11h e 19h</span></div>
+              <div><b><em>Kids</em> · 4 a 12 anos</b><span>Seg a sex · 10h e 18h</span></div>
+              <div><b>Feminino</b><span>Junto com o adulto</span></div>
+            </div>
+          </div>
+          <div class="c-row">
+            <h3><i>04</i>Atendimento</h3>
+            <div>
+              <p class="big">Segunda a sexta, das 8h às 21h</p>
+              <p class="sub">Sem aulas no fim de semana.</p>
+              <p class="pill-live" data-office><i aria-hidden="true"></i><span>Atendimento</span><b>Seg a sex · 8h às 21h</b></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="loc" aria-label="Localização do Studio Evolution BJJ">
+        <div class="loc-stage" id="locStage">
+          <div class="loc-l loc-disc" aria-hidden="true"></div>
+          <div class="loc-l loc-sw" aria-hidden="true"><div class="sweep"></div></div>
+          <svg class="rings" id="rings" viewBox="0 0 400 400" aria-hidden="true">
+            <circle class="ticks" cx="200" cy="200" r="188"/><circle class="major" cx="200" cy="200" r="188"/>
+            <circle cx="200" cy="200" r="60"/><circle cx="200" cy="200" r="110"/><circle cx="200" cy="200" r="160"/><circle class="dash" cx="200" cy="200" r="135"/>
+            <line x1="200" y1="24" x2="200" y2="376"/><line x1="24" y1="200" x2="376" y2="200"/>
+            <text x="200" y="44" text-anchor="middle">N</text><text x="200" y="364" text-anchor="middle">S</text><text x="358" y="204" text-anchor="middle">L</text><text x="42" y="204" text-anchor="middle">O</text>
+          </svg>
+          <div class="loc-l loc-pin" aria-hidden="true"><span class="pin"></span></div>
+          <div class="loc-l loc-lab"><span class="pin-label">Studio Evolution<small>Av. Getúlio Vargas, 400</small></span></div>
+          <div class="loc-l loc-glass" aria-hidden="true"></div>
+        </div>
+        <div class="coords">
+          <div><b class="scr">23°31′23″ S</b><small>Latitude</small></div>
+          <div><b class="scr">47°29′38″ O</b><small>Longitude</small></div>
+        </div>
+        <div class="c-acts">
+          <a class="btn btn-ink" data-magnetic href="https://www.google.com/maps/search/?api=1&amp;query=Av.%20Get%C3%BAlio%20Vargas%2C%20400%2C%20Jardim%20S%C3%A3o%20Paulo%2C%20Sorocaba%20SP" target="_blank" rel="noopener">Como chegar<svg class="ic"><use href="#i-arrow"/></svg></a>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="cta" aria-labelledby="t-cta">
+    <div class="cta-inner">
+      <div class="wrap cta-grid">
+        <div>
+          <p class="label">Primeira aula grátis</p>
+          <h2 class="h2 split" id="t-cta">A gente te espera <em>no tatame</em>.</h2>
+          <p class="lead">Mande uma mensagem no WhatsApp e agende sua aula experimental. Kimono emprestado, atenção individual e zero pressão para começar.</p>
+          <a class="btn btn-gold" data-magnetic href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener">Agendar pelo WhatsApp<svg class="ic"><use href="#i-arrow"/></svg></a>
+          <dl class="contact">
+            <div><dt>Ou escolha o horário</dt><dd><a href="agendamento.html" data-int>Agendar pelo site</a></dd></div>
+            <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
+            <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
+          </dl>
+        </div>
+        <figure class="cta-photo"><img src="img/ambiente-studio.webp" alt="Painel dourado do Studio Evolution BJJ na parede preta da academia" loading="lazy" width="1200" height="800"></figure>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
+    </div>
+    <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Proposta de redesign · versão para aprovação</span></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<a class="wa-float" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener"><i aria-hidden="true"></i>WhatsApp</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$;
+
+  /* copiar o número (com plano B: seleciona o texto) */
+  var toast = $("#toast"), toastT = null;
+  function say(msg) { toast.textContent = msg; toast.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(function () { toast.classList.remove("on"); }, 2200); }
+  $("#copyBtn").addEventListener("click", function () {
+    var number = "(15) 99674-1812";
+    var fallback = function () {
+      var r = document.createRange(); r.selectNodeContents($("#phone"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      say("Número selecionado. Use Copiar no seu teclado.");
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(number).then(function () { say("Número copiado"); }, fallback);
+      else fallback();
+    } catch (e) { fallback(); }
+  });
+
+  Site.boot({
+    setup: function (S) {
+      /* formas de contato sobem em sequência */
+      gsap.from(".c-row", { y: 34, opacity: 0, duration: 1, ease: "expo.out", stagger: 0.08, scrollTrigger: { trigger: ".c-list", start: "top 88%", once: true } });
+      /* radar: entra crescendo, os anéis (numa camada própria, acima do disco) giram com a rolagem e as
+         coordenadas se embaralham até assentar */
+      gsap.set("#rings", { z: 32 });
+      gsap.to("#rings", { rotate: 60, ease: "none", transformOrigin: "50% 50%", scrollTrigger: { trigger: ".c-body", start: "top bottom", end: "bottom top", scrub: true } });
+      var st = { trigger: ".loc", start: "top 85%", once: true };
+      gsap.from(".loc-stage", { scale: 0.82, opacity: 0, duration: 1.5, ease: "expo.out", scrollTrigger: st });
+      gsap.from(".pin-label", { x: -20, opacity: 0, duration: 1, ease: "expo.out", delay: 0.6, scrollTrigger: st });
+      gsap.from(".coords > div", { y: 20, opacity: 0, duration: 1, ease: "expo.out", stagger: 0.1, delay: 0.4, scrollTrigger: st });
+      ScrollTrigger.create({ trigger: ".coords", start: "top 92%", once: true, onEnter: function () { $$(".coords .scr").forEach(function (b, i) { setTimeout(function () { Site.scramble(b); }, 500 + i * 180); }); } });
+      /* o radar inclina com o mouse e as camadas se separam; no toque, a rolagem faz o mesmo papel */
+      var stage = $("#locStage");
+      gsap.set(stage, { transformPerspective: 1000 });
+      if (S.fine) {
+        var tx = gsap.quickTo(stage, "rotationY", { duration: 1, ease: "power3" }), ty = gsap.quickTo(stage, "rotationX", { duration: 1, ease: "power3" });
+        var rx = gsap.quickTo("#rings", "x", { duration: 1.2, ease: "power3" }), ry = gsap.quickTo("#rings", "y", { duration: 1.2, ease: "power3" });
+        $(".loc").addEventListener("mousemove", function (e) {
+          var r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+          x = Math.max(-0.7, Math.min(0.7, x)); y = Math.max(-0.7, Math.min(0.7, y));
+          tx(x * 40); ty(-y * 40); rx(x * -14); ry(y * -14);
+        });
+        $(".loc").addEventListener("mouseleave", function () { tx(0); ty(0); rx(0); ry(0); });
+      } else {
+        gsap.fromTo(stage, { rotationX: 38 }, { rotationX: -14, ease: "none", scrollTrigger: { trigger: stage, start: "top bottom", end: "bottom top", scrub: true } });
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
