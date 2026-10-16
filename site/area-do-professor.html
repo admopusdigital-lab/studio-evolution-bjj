@@ -35,6 +35,36 @@
 .diff { background: var(--paper-2); }
 @media (max-width: 600px) { .dash-bar span:not(.clock) { display: none; } }
 @media (max-width: 1023px) { .hc.c2 { top: 55%; } }  /* no celular, abaixo dos rostos */
+/* Financeiro: régua de lembretes e o registro do que saiu sozinho */
+.fin-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-top: 22px; }
+.fin-box { padding: 16px; background: var(--paper-2); border-top: 1px solid var(--gold); }
+.fin-k { font: 600 10.5px/1.3 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+.rules { margin-top: 10px; }
+.rules li { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: center; padding-block: 9px; border-top: 1px solid var(--rule); }
+.rules li:first-child { border-top: 0; }
+.rl { padding: 0; border: 0; background: none; color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+.rl b { display: block; font-size: 13px; font-weight: 500; }
+.rl small { display: block; font-size: 11.5px; color: var(--ink-3); }
+.rl:hover b { color: var(--gold-text); }
+.rules li.off .rl { opacity: 0.45; }
+.tog { position: relative; width: 38px; height: 22px; padding: 0; border: 0; border-radius: 999px; background: var(--rule); cursor: pointer; transition: background-color 300ms var(--ease); }
+.tog::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); box-shadow: 0 1px 3px oklch(0 0 0 / 0.3); transition: transform 300ms var(--ease); }
+.tog[aria-pressed="true"] { background: var(--gold); }
+.tog[aria-pressed="true"]::after { transform: translateX(16px); }
+.fin-note { margin-top: 10px; font-size: 12px; color: var(--ink-3); }
+.flog { margin-top: 10px; }
+.flog li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding-block: 9px; border-top: 1px solid var(--rule); font-size: 13px; }
+.flog li:first-child { border-top: 0; }
+.flog time { font: 500 12px/1.5 var(--mono, monospace); color: var(--gold-text); font-variant-numeric: tabular-nums; }
+.flog small { display: block; font-size: 11.5px; color: var(--ink-3); }
+.flog li.new { animation: arrive 1.2s var(--ease); }
+.fin-how { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-3); }
+.fin-how b { color: var(--ink-2); font-weight: 600; }
+#finTbl tr.paid-now { animation: arrive 1.4s var(--ease); }
+.msg q .lk { font: 600 14px/1 var(--sans); font-style: normal; color: var(--gold-text); }
+@media (max-width: 860px) { .fin-grid { grid-template-columns: minmax(0, 1fr); } }
+.dv[data-v="fin"] .kpi b { white-space: nowrap; }
+@media (max-width: 600px) { .dv[data-v="fin"] .kpi b { font-size: 22px; } }
 </style>
 <link rel="stylesheet" href="tema.css">
 </head>
@@ -53,6 +83,7 @@
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M19 6.5A9 9 0 1 0 20.5 15"/><path d="M10 8.5v7l6-3.5z"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-coin" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></symbol>
   </defs>
 </svg>
 
@@ -89,7 +120,7 @@
       <div>
         <p class="label">Área do Professor · painel do Studio</p>
         <h1 class="ar-title" id="t-hero">O tatame inteiro, <em>numa tela só</em>.</h1>
-        <p class="ar-lede">Abrir a aula, mostrar o código, ver quem chegou, lembrar de quem sumiu e registrar cada grau. Um painel feito para quem dá aula, não para quem vive de planilha.</p>
+        <p class="ar-lede">Abrir a aula, mostrar o código, ver quem chegou, lembrar de quem sumiu, registrar cada grau e acompanhar as mensalidades. Um painel feito para quem dá aula, não para quem vive de planilha.</p>
         <nav class="ar-switch" aria-label="Escolher a área"><a href="area-do-aluno.html" data-int>Aluno</a><a href="area-do-professor.html" aria-current="page" data-int>Professor</a></nav>
         <div class="ctas"><a class="btn btn-ink" href="#painel">Experimentar o painel<svg class="ic"><use href="#i-arrow"/></svg></a><a class="link" href="#tatame">Ver o modo tatame</a></div>
       </div>
@@ -119,6 +150,7 @@
               <button type="button" data-go="alunos" aria-current="false"><svg class="ic"><use href="#i-users"/></svg>Alunos<span class="badge">3</span></button>
               <button type="button" data-go="grad" aria-current="false"><svg class="ic"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad">3</span></button>
               <button type="button" data-go="leads" aria-current="false"><svg class="ic"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads">3</span></button>
+              <button type="button" data-go="fin" aria-current="false"><svg class="ic"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin">2</span></button>
               <div class="more"><p>Também no painel</p><ul><li>Movimentos e quizzes</li><li>Competências da faixa</li><li>Turmas e horários</li><li>Aprendizado por aluno</li><li>Cadastro rápido</li></ul></div>
               <div class="who"><span class="av">SE</span><span>Professor<br><small>Studio Evolution</small></span></div>
             </aside>
@@ -248,6 +280,63 @@
                 <p class="leads-closed"><span>Fechados</span><span id="closedN">6</span></p>
               </div>
 
+              <!-- Financeiro: mensalidades pelo Asaas, lembretes pelo WhatsApp do Studio (Evolution API) -->
+              <div class="dv" data-v="fin" aria-label="Financeiro">
+                <div class="dv-h"><div><p class="dv-k">Outubro · valores de exemplo</p><h3>Financeiro</h3></div><p>Mensalidades por Pix, boleto ou cartão. Os lembretes saem sozinhos no WhatsApp do Studio.</p></div>
+                <div class="kpis">
+                  <div class="kpi"><b id="fRec">R$ 9.620</b><span id="fRecS">recebidos em outubro · 49 de 58 pagas</span></div>
+                  <div class="kpi"><b>R$ 1.380</b><span>a vencer até o fim do mês · 7 alunos</span></div>
+                  <button class="kpi warn" type="button" data-ff-go="late"><b id="fLate">R$ 400</b><span id="fLateS">em atraso · 2 alunos</span><span class="go-s">Ver quem<svg class="ic"><use href="#i-chev"/></svg></span></button>
+                  <div class="kpi"><b id="fSent">37</b><span>lembretes enviados no mês pelo WhatsApp</span></div>
+                </div>
+                <div class="chips" id="finChips" role="group" aria-label="Filtrar mensalidades">
+                  <button type="button" data-ff="all" aria-pressed="true">Todas</button>
+                  <button type="button" data-ff="late" aria-pressed="false" id="chipLate">Atrasadas · 2</button>
+                  <button type="button" data-ff="due" aria-pressed="false">A vencer</button>
+                  <button type="button" data-ff="paid" aria-pressed="false">Pagas</button>
+                </div>
+                <div class="tbl-wrap">
+                  <table class="tbl" id="finTbl">
+                    <thead><tr><th>Aluno</th><th>Situação</th><th>Valor</th><th class="hide-s">Forma</th><th class="act">Ação</th></tr></thead>
+                    <tbody>
+                      <tr data-st="late" data-id="diego" data-v="200"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h · venceu 10/10</small></div></div></td><td><span class="pill-s warn">Atrasada há 6 dias</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn wa" type="button" data-fin="diego">Cobrar agora</button></td></tr>
+                      <tr data-st="late" data-id="patricia" data-v="200"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h · venceu 11/10</small></div></div></td><td><span class="pill-s warn">Atrasada há 5 dias</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn wa" type="button" data-fin="patricia">Cobrar agora</button></td></tr>
+                      <tr data-st="due" data-id="larissa" data-v="200"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h · vence 16/10</small></div></div></td><td><span class="pill-s gold">Vence hoje · lembrada às 8h</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-fin="larissa">Ver lembrete</button></td></tr>
+                      <tr data-st="due" data-id="joao" data-v="180"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · vence 19/10</small></div></div></td><td><span class="pill-s">Vence em 3 dias</span></td><td class="num">R$ 180</td><td class="hide-s">Cartão automático</td><td class="act"><span class="pill-s in">Cobra sozinho</span></td></tr>
+                      <tr data-st="paid" data-id="thiago" data-v="200"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h · pago 15/10</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Pix</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Thiago">Recibo</button></td></tr>
+                      <tr data-st="paid" data-id="helena" data-v="180"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · pago 10/10</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 180</td><td class="hide-s">Boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Helena">Recibo</button></td></tr>
+                      <tr data-st="paid" data-id="marina" data-v="200"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h · pago 05/10</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Cartão automático</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Marina">Recibo</button></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p class="tbl-more">Mostrando 7 de 58 mensalidades.</p>
+                <div class="msg" id="finMsg" hidden></div>
+
+                <div class="fin-grid">
+                  <div class="fin-box">
+                    <p class="fin-k">Régua de lembretes · automática</p>
+                    <ul class="rules" id="rules">
+                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: 3 dias antes"></button><button class="rl" type="button" data-rule="d3"><b>3 dias antes</b><small>Lembrete com o link de pagamento</small></button></li>
+                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: no dia"></button><button class="rl" type="button" data-rule="d0"><b>No dia do vencimento</b><small>Pix copia e cola e o link</small></button></li>
+                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: 1 dia depois"></button><button class="rl" type="button" data-rule="a1"><b>1 dia depois</b><small>Aviso gentil, sem multa no texto</small></button></li>
+                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: 5 dias depois"></button><button class="rl" type="button" data-rule="a5"><b>5 dias depois</b><small>Último aviso e alerta para o professor</small></button></li>
+                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: pagamento confirmado"></button><button class="rl" type="button" data-rule="ok"><b>Pagamento confirmado</b><small>Agradecimento e recibo</small></button></li>
+                    </ul>
+                    <p class="fin-note">Toque numa etapa para ver a mensagem. No Kids, quem recebe é o responsável.</p>
+                  </div>
+                  <div class="fin-box">
+                    <p class="fin-k">Hoje no automático</p>
+                    <ol class="flog" id="flog">
+                      <li><time>09:12</time><div>Pix recebido de Thiago Moreira<small>Baixa automática pelo Asaas · recibo enviado no WhatsApp</small></div></li>
+                      <li><time>08:00</time><div>“Vence hoje” para Larissa Mendes<small>WhatsApp do Studio · entregue e lido</small></div></li>
+                      <li><time>08:00</time><div>“3 dias antes” para a família de João Pedro<small>WhatsApp do Studio · entregue</small></div></li>
+                      <li><time>08:00</time><div>“5 dias depois” para Patrícia Nunes<small>Alerta no painel: falar pessoalmente</small></div></li>
+                    </ol>
+                  </div>
+                </div>
+                <p class="fin-how"><b>Como funciona:</b> o Asaas gera a cobrança de cada mês e avisa o painel quando o pagamento cai. Os lembretes saem do número de WhatsApp do Studio, conectado pela Evolution API. Só o dono do Studio e quem ele autorizar veem esta aba.</p>
+              </div>
+
               <!-- ficha do aluno: abre por cima da lista -->
               <div class="drawer-scrim" id="drScrim" aria-hidden="true"></div>
               <aside class="drawer" id="drawer" aria-label="Ficha do aluno" aria-hidden="true" data-lenis-prevent></aside>
@@ -333,7 +422,7 @@
       <h2 class="split" id="t-diff">O que muda para <em>quem dá aula</em>.</h2>
       <ul class="diff-grid" data-rise>
         <li><h3>O dia numa tela só</h3><p>Aulas de hoje, código, chamada e quem chegou, sem trocar de página.</p><span class="was">Antes: o Início listava as aulas, e a chamada ficava em outra página.</span></li>
-        <li><h3>Só o que é do professor</h3><p>Alunos, presenças e graus. Valores ficam com quem cuida do financeiro.</p><span class="was">Antes: o resumo mostrava R$ 0 para o professor, que não tem acesso às mensalidades.</span></li>
+        <li><h3>Financeiro no painel</h3><p>Mensalidades cobradas pelo Asaas, com baixa automática, e lembretes que saem sozinhos no WhatsApp do Studio.</p><span class="was">Antes: o resumo mostrava R$ 0 para o professor, que não tinha acesso às mensalidades.</span></li>
         <li><h3>Código na TV</h3><p>Um toque e a turma vê o código em letras grandes, com a lista de quem chegou.</p><span class="was">Antes: o código ficava no celular do professor, com um botão para compartilhar.</span></li>
         <li><h3>A frequência à vista</h3><p>A ficha mostra as últimas 12 semanas de cada aluno, dia por dia, e quem está perto do grau.</p><span class="was">Antes: as aulas desde o último grau só apareciam no perfil do próprio aluno.</span></li>
         <li><h3>Grau com aviso</h3><p>Ao registrar o grau, o aluno (ou a família, no Kids) recebe a notícia no celular.</p><span class="was">Antes: o grau entrava no sistema em silêncio.</span></li>
@@ -859,6 +948,89 @@
     } else if (b.dataset.grad) {
       go("grad");
       highlight(b.dataset.grad);
+    }
+  });
+
+  /* ---------- Financeiro: o Asaas cobra, a Evolution API lembra pelo WhatsApp do Studio ---------- */
+  var FIN = {
+    diego: { n: "Diego Ramos", due: "10/10" }, patricia: { n: "Patrícia Nunes", due: "11/10" },
+    larissa: { n: "Larissa Mendes", due: "16/10" }, joao: { n: "João Pedro Lima", due: "19/10", kid: 1 }
+  };
+  var LINK = '<b class="lk">asaas.com/i/7kq2mz</b>';
+  var RULES = {
+    d3: function (f, d) { return "Oi, " + f + "! Passando para lembrar que a mensalidade do Studio Evolution vence em 3 dias, no dia " + d + ". Dá para pagar por Pix, boleto ou cartão neste link: " + LINK; },
+    d0: function (f) { return "Oi, " + f + "! A mensalidade do Studio Evolution vence hoje. O Pix copia e cola e as outras formas de pagamento estão neste link: " + LINK; },
+    a1: function (f) { return "Oi, " + f + ", tudo bem? Não encontramos o pagamento da mensalidade que venceu ontem. Se já pagou, pode desconsiderar. O link continua valendo: " + LINK; },
+    a5: function (f) { return "Oi, " + f + ". Sua mensalidade está em aberto há 5 dias. Precisa de outra data ou de ajuda? Responda aqui que a gente resolve. Link: " + LINK; },
+    ok: function (f) { return "Pagamento recebido, " + f + "! Obrigado. Seu recibo está aqui: " + LINK + ". Bons treinos!"; },
+    now: function (f, d) { return "Oi, " + f + ", tudo bem? A mensalidade que venceu em " + d + " ainda está em aberto. Pague por Pix, boleto ou cartão neste link: " + LINK + ". Qualquer coisa, é só responder aqui."; }
+  };
+  var RULE_T = { d3: "3 dias antes", d0: "No dia do vencimento", a1: "1 dia depois", a5: "5 dias depois", ok: "Pagamento confirmado" };
+  var finMsg = $("#finMsg"), late = { n: 2, v: 400 }, rec = { v: 9620, n: 49 }, sent = 37;
+  function brl(v) { return "R$ " + v.toLocaleString("pt-BR"); }
+  function finOpen(title, text, send) {
+    morph(function () {
+      finMsg.innerHTML = '<p class="msg-k">' + title + "</p><q>" + text + '</q><div class="msg-acts">' +
+        (send ? '<button class="mini-btn wa" type="button" data-finsend="' + send + '">Enviar pelo WhatsApp do Studio</button>' : "") +
+        '<button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
+      finMsg.hidden = false;
+    });
+  }
+  function finLog(t, h, s) {
+    $("#flog").insertAdjacentHTML("afterbegin", '<li class="new"><time>' + t + "</time><div>" + h + "<small>" + s + "</small></div></li>");
+  }
+  function finFilter(f) {
+    $$("#finChips button").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.ff === f ? "true" : "false"); });
+    morph(function () { $$("#finTbl tbody tr").forEach(function (tr) { tr.hidden = f !== "all" && tr.dataset.st !== f; }); });
+  }
+  $("#finChips").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) finFilter(b.dataset.ff); });
+  $("[data-ff-go]", dash).addEventListener("click", function () { finFilter("late"); });
+  /* o pagamento cai pelo webhook do Asaas: a linha vira paga, os números mudam e o recibo sai sozinho */
+  function finPaid(id) {
+    var tr = $('#finTbl tr[data-id="' + id + '"]'), p = FIN[id], v = +tr.dataset.v, f = first(p.n), t = $("#dClock").textContent;
+    tr.dataset.st = "paid";
+    $("td:nth-child(2)", tr).innerHTML = '<span class="pill-s in">Paga agora</span>';
+    $("td:nth-child(4)", tr).textContent = "Pix";
+    $("small", tr).textContent = $("small", tr).textContent.replace(/venceu .*/, "pago hoje");
+    $("td.act", tr).innerHTML = '<button class="mini-btn ghost" type="button" data-rcb="' + f + '">Recibo</button>';
+    replayClass(tr, "paid-now");
+    late.n--; late.v -= v; rec.v += v; rec.n++; sent++;
+    $("#fLate").textContent = brl(late.v);
+    $("#fLateS").textContent = late.n ? "em atraso · " + late.n + (late.n === 1 ? " aluno" : " alunos") : "nada em atraso";
+    $("#fRec").textContent = brl(rec.v);
+    $("#fRecS").textContent = "recebidos em outubro · " + rec.n + " de 58 pagas";
+    $("#fSent").textContent = sent;
+    $("#chipLate").textContent = "Atrasadas · " + late.n;
+    var bf = $("#bFin"); bf.textContent = late.n; bf.hidden = !late.n;
+    finLog(t, "Pix recebido de " + p.n, "Baixa automática pelo Asaas · recibo enviado no WhatsApp");
+    toast("Pix de " + f + " recebido. O Asaas deu baixa e o recibo saiu no WhatsApp.");
+  }
+  dash.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.fin) {
+      var p = FIN[b.dataset.fin], f = first(p.n);
+      if (b.dataset.fin === "larissa") finOpen("Enviado hoje às 8h para " + f + " · No dia do vencimento", RULES.d0(f));
+      else finOpen("Cobrança para " + f, RULES.now(f, p.due), b.dataset.fin);
+    } else if (b.dataset.finsend) {
+      var id = b.dataset.finsend, q = FIN[id], tr = $('#finTbl tr[data-id="' + id + '"]');
+      morph(function () { finMsg.hidden = true; });
+      $("td:nth-child(2)", tr).innerHTML = '<span class="pill-s gold">Cobrança enviada agora</span>';
+      $("td.act", tr).innerHTML = '<span class="pill-s">Aguardando</span>';
+      finLog($("#dClock").textContent, "Cobrança para " + q.n, "WhatsApp do Studio · entregue");
+      toast("Mensagem enviada para " + first(q.n) + " pelo WhatsApp do Studio.");
+      /* na demonstração, o pagamento cai alguns segundos depois */
+      setTimeout(function () { finPaid(id); }, 4200);
+    } else if (b.dataset.rule) {
+      var r = b.dataset.rule;
+      finOpen("Mensagem automática · " + RULE_T[r], RULES[r]("Larissa", "19/10"));
+    } else if (b.dataset.rcb) {
+      toast("No app, abre o recibo de " + b.dataset.rcb + " gerado pelo Asaas.");
+    } else if (b.classList.contains("tog")) {
+      var on = b.getAttribute("aria-pressed") !== "true", li = b.closest("li");
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      li.classList.toggle("off", !on);
+      toast((on ? "Ligado: " : "Desligado: ") + $(".rl b", li).textContent.toLowerCase() + ".");
     }
   });
 
