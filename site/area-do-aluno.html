@@ -67,7 +67,10 @@
 .ap-err:not(:empty) { margin-top: 8px; }
 .ap-steps .skip .ap-st { color: var(--ink-2); }
 
-/* Movimentos: o retorno do quiz fica sempre na árvore (região de status), sem espaço quando vazio */
+/* Movimentos: a tela ganha .quiz durante o quiz, e tema.css desenha o cartão .quiz do Início do site
+   (linha dourada e sombra) em qualquer .quiz; aqui a tela continua lisa */
+.ap-view.quiz { border-radius: 0; box-shadow: none; }
+/* o retorno do quiz fica sempre na árvore (região de status), sem espaço quando vazio */
 .ap-quiz .fb:empty { margin: 0; }
 .ap-list .pill-s { display: inline-block; margin-left: 6px; padding: 2px 7px; vertical-align: 1px; }
 
@@ -834,7 +837,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     if (desk()) z = Math.max(0.82, Math.min(1, (window.innerHeight - 230) / 660));
     else if (H < 500) z = Math.min(0.8, w);
     else z = Math.min(1, w, Math.max(0.86, H * 0.8 / 660));
-    dev.style.setProperty("--z", z.toFixed(3));
+    dev.style.setProperty("--z", Math.max(0.5, z).toFixed(3));  /* piso só para medidas degeneradas (caixa ainda sem largura) */
   }
   fit();
   watchChapters();

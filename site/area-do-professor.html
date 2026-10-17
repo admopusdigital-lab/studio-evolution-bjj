@@ -102,6 +102,8 @@
 .dr-top .dr-close { position: static; width: 44px; height: 44px; flex-shrink: 0; }
 .dr-body { padding: 4px 26px 24px; }
 .drawer .dr-acts { position: sticky; bottom: 0; z-index: 2; margin-top: 0; padding: 14px 26px calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--paper); border-top: 1px solid var(--rule); }
+/* o nome é h3: com a ficha aberta, a aba embaixo fica inerte, e o título dela some da ordem de títulos */
+.dr-h h3 { font: 400 28px/1.05 var(--serif); letter-spacing: -0.02em; }
 #drName { scroll-margin-top: 96px; }
 @media (max-width: 600px) { .dr-top { padding-left: 16px; } .dr-body { padding-inline: 16px; } .drawer .dr-acts { padding-inline: 16px; } }
 /* o mapa de presenças entra célula por célula só com CSS (antes, 60 tweens a cada abertura) */
@@ -119,11 +121,13 @@
 /* celular: TV e celular da aluna cabem juntos na tela (sem o pé da TV e sem o dock, que é só desenho) */
 @media (max-width: 999px) {
   .tv-stand { display: none; }
-  .tv-stage { gap: 16px; }
-  .tv-phone { gap: 10px; }
+  .tv-stage { gap: 14px; }
+  .tv-phone { gap: 6px; }
   .tv-phone .ap { height: 480px; --dock-h: 0px; --dock-b: 0px; }
   .tv-phone .ap-dock { display: none; }
-  .tv-mob { margin-top: 12px; }
+  .tv-phone figcaption { max-width: 38ch; font-size: 12.5px; line-height: 1.3; }  /* duas linhas em vez de três */
+  .tv-mob { margin-top: 16px; font-size: 14px; line-height: 1.25; }  /* abaixo da moldura da TV (10 px de sombra) */
+  .tv-mob b { font-size: 17px; }
 }
 </style>
 <link rel="stylesheet" href="tema.css">
@@ -1198,7 +1202,7 @@
     drawer.dataset.id = id;
     var cells = heat(id);
     drawer.innerHTML =
-      '<div class="dr-top"><div class="dr-h"><span class="av">' + ini(p.n) + '</span><div><h4 id="drName" tabindex="-1">' + p.n + "</h4><p>" + p.cls + (p.age ? " · " + p.age : "") + " · " + p.since + "</p></div></div>" +
+      '<div class="dr-top"><div class="dr-h"><span class="av">' + ini(p.n) + '</span><div><h3 id="drName" tabindex="-1">' + p.n + "</h3><p>" + p.cls + (p.age ? " · " + p.age : "") + " · " + p.since + "</p></div></div>" +
       '<button class="dr-close" type="button" aria-label="Fechar a ficha"><svg class="ic"><use href="#i-x"/></svg></button></div>' +
       '<div class="dr-body">' +
       (p.aus ? '<p class="dr-alert"><span class="pill-s warn">' + p.aus + " dias sem treinar</span>Última aula: " + dl(p.last) + ".</p>" : "") +

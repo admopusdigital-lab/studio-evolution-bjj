@@ -219,6 +219,71 @@
 
   var saveData = !!(navigator.connection && navigator.connection.saveData);
 
+  /* ---------- trilha: tenta tocar ao abrir; quando o navegador bloqueia som automático, começa no primeiro
+     toque, clique ou tecla. O botão no canto liga e desliga, a escolha fica guardada, e a música continua
+     do mesmo ponto ao trocar de página. Com economia de dados, só toca se a pessoa pedir. ---------- */
+  Site.music = function (src) {
+    if (!src || $(".snd")) return;
+    var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+    var sess = function (k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } };
+    var a = new Audio(), VOL = 0.5, fadeT = 0, wanted = store("evo-som") !== "off" && !saveData, loaded = false;
+    a.loop = true; a.preload = "none";
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "snd";
+    btn.innerHTML = '<span class="snd-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="snd-txt">Som</span>';
+    document.body.appendChild(btn);
+    function paint(on) {
+      btn.classList.toggle("on", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.setAttribute("aria-label", on ? "Desligar a música" : "Ligar a música");
+    }
+    function fade(to, ms, done) {
+      clearInterval(fadeT);
+      var from = a.volume, t0 = performance.now();
+      fadeT = setInterval(function () {
+        var k = Math.min(1, (performance.now() - t0) / ms);
+        a.volume = Math.max(0, Math.min(1, from + (to - from) * k));
+        if (k >= 1) { clearInterval(fadeT); if (done) done(); }
+      }, 40);
+    }
+    function load() {
+      if (loaded) return;
+      loaded = true; a.src = src;
+      var t = parseFloat(sess("evo-som-t"));
+      if (t > 0) a.addEventListener("loadedmetadata", function () { try { a.currentTime = t % (a.duration || 1e9); } catch (e) {} }, { once: true });
+    }
+    function play() {
+      load();
+      a.volume = 0;
+      var p = a.play();
+      if (p && p.then) return p.then(function () { paint(true); fade(VOL, 2500); return true; }, function () { paint(false); return false; });
+      paint(true); fade(VOL, 2500); return Promise.resolve(true);
+    }
+    function stop() { paint(false); fade(0, 600, function () { a.pause(); }); }
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (btn.classList.contains("on")) { wanted = false; store("evo-som", "off"); stop(); }
+      else { wanted = true; store("evo-som", "on"); play(); }
+    });
+    /* o primeiro gesto da pessoa libera o som, se ela não tiver desligado */
+    function firstGesture(e) {
+      if (e && e.target && e.target.closest && e.target.closest(".snd")) return;
+      ["pointerdown", "keydown", "touchend"].forEach(function (n) { window.removeEventListener(n, firstGesture, true); });
+      if (wanted && a.paused) play();
+    }
+    paint(false);
+    if (wanted) play().then(function (ok) {
+      if (!ok) { btn.classList.add("ask"); ["pointerdown", "keydown", "touchend"].forEach(function (n) { window.addEventListener(n, firstGesture, true); }); }
+    });
+    /* guarda o ponto da música para a próxima página; pausa com a aba escondida */
+    window.addEventListener("pagehide", function () { if (!a.paused) sess("evo-som-t", String(a.currentTime)); });
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) { if (!a.paused) { a.pause(); a.dataset.resume = "1"; } }
+      else if (a.dataset.resume) { delete a.dataset.resume; a.play().catch(function () {}); }
+    });
+    a.addEventListener("playing", function () { btn.classList.remove("ask"); });
+  };
+
   /* ---------- selos ao vivo: a próxima aula e o atendimento, pela hora de quem está vendo ---------- */
   Site.nextClass = function () {
     var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60;
@@ -384,6 +449,7 @@
     toTop();
     window.addEventListener("load", toTop);
     whatsapp(); swipers(); videos();
+    Site.music(opts.music === undefined ? "audio/trilha.mp3" : opts.music);
     /* depois que a primeira tela carrega, as outras fotos já baixam em segundo plano:
        assim nenhuma caixa aparece vazia quando a pessoa rola rápido (exceto no modo de economia de dados) */
     if (!saveData) window.addEventListener("load", function () {

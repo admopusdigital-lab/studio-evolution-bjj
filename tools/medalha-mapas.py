@@ -1,8 +1,9 @@
 """Gera os mapas das duas faces da medalha 3D (site/medalha3d.js).
 
-Para cada face sai um par de imagens 1024x1024:
-- medalha-<face>-orm.webp: R = altura do relevo, G = rugosidade, B = metalicidade (canais que o Three.js lê)
-- medalha-<face>-normal.webp: normal map calculado da altura
+Para cada face saem três imagens, em 2048 (sufixo -2k, computador) e 1024 (celular):
+- medalha-<face>-orm: R = altura do relevo, G = rugosidade (com marcas de dedo e riscos finos), B = metalicidade
+- medalha-<face>-normal: normal map calculado da altura
+- medalha-<face>-ao: oclusão nas cavidades do relevo
 
 Frente: a logo da Equipe TRUE (monograma e "BJJ" recortados do PNG oficial em logo_true.png,
 textos do anel compostos aqui). Verso: a logo do Studio Evolution (img/logo-evolution-refinada.png).
@@ -16,7 +17,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 TRUE_PNG, EVO_PNG, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
-S = 2048                      # desenha em 2x e reduz no fim (bordas lisas)
+S = 2048                      # desenha em 2048 (sai em 2048 para o computador e 1024 para o celular)
 C = S / 2
 FONT_BLACK = "/usr/share/fonts/opentype/inter/Inter-Black.otf"
 FONT_SEMI = "/usr/share/fonts/opentype/inter/Inter-SemiBold.otf"
@@ -112,18 +113,41 @@ def build(elements, enamel_on):
     return height, rough, metal
 
 
-def save(name, height, rough, metal):
-    small = lambda a: np.array(Image.fromarray(np.clip(a * 255, 0, 255).astype(np.uint8)).resize((1024, 1024), Image.LANCZOS)).astype(np.float32) / 255
-    h, r, m = small(height), small(rough), small(metal)
-    orm = np.stack([h, r, m], -1)
-    Image.fromarray((orm * 255).astype(np.uint8)).save(os.path.join(OUT, f"medalha-{name}-orm.webp"), lossless=True, quality=100, method=6)
-    k = 9.0
-    hx = (np.roll(h, -1, 1) - np.roll(h, 1, 1)) * 0.5
-    hy = (np.roll(h, -1, 0) - np.roll(h, 1, 0)) * 0.5
-    nx, ny, nz = -hx * k, hy * k, np.ones_like(h)
-    l = np.sqrt(nx * nx + ny * ny + nz * nz)
-    nm = np.stack([nx / l * 0.5 + 0.5, ny / l * 0.5 + 0.5, nz / l * 0.5 + 0.5], -1)
-    Image.fromarray((nm * 255).astype(np.uint8)).save(os.path.join(OUT, f"medalha-{name}-normal.webp"), quality=92, method=6)
+def wear(seed):
+    """marcas de uso: manchas suaves de dedo e riscos finos, que mudam a rugosidade e um pouco o relevo"""
+    rng = np.random.default_rng(seed)
+    smear = np.array(Image.fromarray((rng.random((24, 24)) * 255).astype(np.uint8)).resize((S, S), Image.BICUBIC)).astype(np.float32) / 255
+    sc = Image.new("L", (S, S), 0)
+    d = ImageDraw.Draw(sc)
+    for _ in range(140):
+        x0, y0 = rng.uniform(0, S, 2)
+        a = rng.uniform(0, math.pi)
+        ln = rng.uniform(20, 260)
+        d.line([(x0, y0), (x0 + math.cos(a) * ln, y0 + math.sin(a) * ln)], fill=int(rng.uniform(60, 200)), width=1)
+    scr = np.array(sc).astype(np.float32) / 255
+    return smear, scr
+
+
+def save(name, height, rough, metal, seed=5):
+    smear, scr = wear(seed)
+    rough = np.clip(rough + (smear - 0.5) * 0.025 - scr * 0.06, 0.04, 1)
+    height = np.clip(height - scr * 0.002, 0, 1)
+    # oclusão nas cavidades: onde o entorno é mais alto que o ponto, escurece
+    blur = smooth((np.clip(height, 0, 1) * 255).astype(np.uint8), 10.0)
+    ao = np.clip(1 - np.clip(blur - height, 0, 1) * 3.2, 0.35, 1)
+    for size, suf in ((2048, "-2k"), (1024, "")):
+        rs = lambda a: np.array(Image.fromarray(np.clip(a * 255, 0, 255).astype(np.uint8)).resize((size, size), Image.LANCZOS)).astype(np.float32) / 255
+        h, r, m, o = rs(height), rs(rough), rs(metal), rs(ao)
+        orm = np.stack([h, r, m], -1)
+        Image.fromarray((orm * 255).astype(np.uint8)).save(os.path.join(OUT, f"medalha-{name}-orm{suf}.webp"), lossless=True, quality=100, method=6)
+        Image.fromarray((o * 255).astype(np.uint8), "L").save(os.path.join(OUT, f"medalha-{name}-ao{suf}.webp"), quality=88, method=6)
+        k = 9.0 * size / 1024
+        hx = (np.roll(h, -1, 1) - np.roll(h, 1, 1)) * 0.5
+        hy = (np.roll(h, -1, 0) - np.roll(h, 1, 0)) * 0.5
+        nx, ny, nz = -hx * k, hy * k, np.ones_like(h)
+        l = np.sqrt(nx * nx + ny * ny + nz * nz)
+        nm = np.stack([nx / l * 0.5 + 0.5, ny / l * 0.5 + 0.5, nz / l * 0.5 + 0.5], -1)
+        Image.fromarray((nm * 255).astype(np.uint8)).save(os.path.join(OUT, f"medalha-{name}-normal{suf}.webp"), quality=92, method=6)
 
 
 # ---------- frente: Equipe TRUE ----------
@@ -142,5 +166,5 @@ back = blank()
 alpha_logo(back, EVO_PNG, int(1.42 * C), (C, C))
 arc_text(back, "EQUIPE TRUE", ImageFont.truetype(FONT_SEMI, 92), 0.78 * C, 0, 22)
 arc_text(back, "JARDIM SÃO PAULO · SOROCABA", ImageFont.truetype(FONT_SEMI, 76), 0.8 * C, 180, 14, outward=False)
-save("verso", *build(back, False))
+save("verso", *build(back, False), seed=9)
 print("ok")

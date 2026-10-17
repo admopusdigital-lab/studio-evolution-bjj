@@ -40,11 +40,14 @@ html.seen #loader { display: none; }
 .ld-bar i { display: block; height: 100%; background: var(--gold); transform: scaleX(0); transform-origin: left; }
 .ld-tail { position: absolute; left: -5%; right: -5%; top: 100%; height: 22vh; background: var(--paper); border-radius: 0 0 50% 50% / 0 0 100% 100%; }
 
-/* abertura: o vídeo da faixa ao fundo, o tatame em perspectiva com a luz que segue o mouse, um kanji gigante
+/* abertura: o treino do Studio ao fundo, em três colunas verticais (uma só no celular), um kanji gigante
    em contorno e o título em três camadas: sólido, contornado e em ouro metálico */
 .hero { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; overflow: hidden; isolation: isolate; }
 .hv { position: absolute; inset: 0; z-index: -4; overflow: hidden; background: var(--cine-bg); will-change: transform; }
-.hv-v { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; filter: grayscale(0.3) sepia(0.28) contrast(1.12) brightness(0.9); }
+/* três takes verticais da ZV-E10 lado a lado, na resolução original; em tela em pé, uma cena só, em tela cheia */
+.hv-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; height: 100%; }
+.hv-v { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0.66; filter: contrast(1.06) brightness(0.88) saturate(0.95); background: var(--cine-bg); }
+@media (max-aspect-ratio: 4/5) { .hv-cols { grid-template-columns: minmax(0, 1fr); } .hv-v.c1, .hv-v.c3 { display: none; } }
 .hv-shade { position: absolute; inset: 0; z-index: -3; pointer-events: none;
   background: radial-gradient(ellipse 110% 85% at 72% 28%, transparent 0%, color-mix(in oklch, var(--cine-bg) 50%, transparent) 58%, var(--cine-bg) 100%),
               linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 70%, transparent) 0%, transparent 28%, transparent 46%, var(--cine-bg) 100%); }
@@ -59,13 +62,6 @@ html.seen #loader { display: none; }
 .hero-title .ln { display: block; overflow: hidden; padding: 0.06em 0.12em 0.05em 0.02em; margin: -0.06em -0.12em -0.05em -0.02em; }
 .hero-title .ln2 { transform: translateZ(34px); }
 .hero-title .ln3 { transform: translateZ(76px); }
-/* o tatame em perspectiva: placas de EVA com o encaixe em zigue-zague, sob uma luz que segue o mouse */
-.tatame { position: absolute; left: 0; right: 0; bottom: 0; height: 60%; z-index: -3; overflow: hidden; pointer-events: none; perspective: 560px; perspective-origin: 50% 0%;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 44%); mask-image: linear-gradient(180deg, transparent 0%, #000 44%); }
-.tt-plane { position: absolute; left: -50%; right: -50%; bottom: -2%; height: 270%; transform-origin: 50% 100%; transform: rotateX(76deg); will-change: transform; overflow: hidden;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cg fill='none' stroke='%23e2bd66' stroke-opacity='.38' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M0 3l7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5'/%3E%3Cpath d='M3 0l5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5 5 7.5-5 7.5'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 150px 150px; }
-.tt-light { position: absolute; left: 50%; bottom: 0; width: 1100px; height: 900px; margin-left: -550px; border-radius: 50%; background: radial-gradient(closest-side, oklch(0.83 0.13 84 / 0.34), oklch(0.83 0.13 84 / 0.08) 55%, transparent); will-change: transform; }
-@media (max-width: 900px) { .tatame { height: 46%; opacity: 0.55; } }
 .hero-title .lni { display: inline-block; white-space: nowrap; transform-origin: 0% 100%; will-change: transform; }
 .hero-title .ln2 { padding-left: 0.62em; }
 .hero-title .o { color: transparent; -webkit-text-stroke: 0.022em var(--ink); }
@@ -160,7 +156,9 @@ html.seen #loader { display: none; }
 /* a medalha 3D (medalha3d.js) toma o lugar da foto quando o WebGL está disponível; arrastar gira */
 .medal-gl { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 900ms var(--ease); touch-action: pan-y; cursor: grab; }
 .medal-gl:active { cursor: grabbing; }
-.true-ph.gl { overflow: visible; -webkit-mask-image: none; mask-image: none; }
+.true-ph.gl { overflow: visible; aspect-ratio: auto; height: min(78vh, 760px); -webkit-mask-image: none; mask-image: none; }
+.true-ph.gl .medal-gl { left: -8%; top: 0; width: 116%; height: 100%; }
+@media (max-width: 999px) { .true-ph.gl { height: min(64vh, 520px); } }
 .true-ph.gl img { opacity: 0; transition: opacity 600ms var(--ease); }
 .true-ph.gl .medal-gl { opacity: 1; }
 .medal-hint { position: absolute; left: 0; right: 0; bottom: 2%; text-align: center; font: 500 11px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); opacity: 0; transition: opacity 600ms var(--ease) 1.2s; pointer-events: none; }
@@ -495,9 +493,26 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 
 <main id="top">
   <section class="hero cine" data-dark aria-labelledby="t-hero">
-    <div class="hv" aria-hidden="true"><video class="hv-v" data-src="img/faixa-amarrando.mp4" poster="img/faixa-hero.jpg" data-ambient data-eager muted loop playsinline preload="none"></video></div>
+    <div class="hv" aria-hidden="true"><div class="hv-cols">
+      <video class="hv-v c1" data-col="abertura-1" data-ambient data-eager muted loop playsinline preload="none"></video>
+      <video class="hv-v c2" data-col="abertura-2" data-mobile="abertura-celular" data-ambient data-eager muted loop playsinline preload="none"></video>
+      <video class="hv-v c3" data-col="abertura-3" data-ambient data-eager muted loop playsinline preload="none"></video>
+    </div></div>
+    <script>
+    /* escolhe as fontes da abertura antes do site.js carregar: três colunas no computador, a cena vertical em tela em pé;
+       MP4 (H.264) onde o navegador toca, senão WebM */
+    (function () {
+      var t = document.createElement("video"), ext = t.canPlayType('video/mp4; codecs="avc1.640028"') ? ".mp4" : ".webm";
+      var tall = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
+      [].forEach.call(document.querySelectorAll(".hv-v"), function (v) {
+        var name = tall ? v.getAttribute("data-mobile") : v.getAttribute("data-col");
+        if (!name) return;
+        v.setAttribute("poster", "img/takes/" + name + ".jpg");
+        v.setAttribute("data-src", "img/takes/" + name + ext);
+      });
+    })();
+    </script>
     <div class="hv-shade" aria-hidden="true"></div>
-    <div class="tatame" aria-hidden="true"><div class="tt-plane" id="ttPlane"><i class="tt-light" id="ttLight"></i></div></div>
     <span class="hero-ghost" aria-hidden="true">柔術</span>
     <div class="wrap hero-in">
       <div class="hero-top">
@@ -592,7 +607,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       </div>
       <ol class="pa-steps">
         <li class="pa-step on">
-          <figure class="pa-ph v"><img src="img/takes/chega.jpg" alt="Professor do Studio Evolution conversando com um aluno no tatame" loading="lazy" width="720" height="900" style="object-position:60% 40%"><video class="take" data-take="img/takes/chega" poster="img/takes/chega.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:60% 40%"></video></figure>
+          <figure class="pa-ph v"><img src="img/takes/chega.jpg" alt="Professor do Studio Evolution conversando com um aluno no tatame" loading="lazy" width="1080" height="1350" style="object-position:60% 40%"><video class="take" data-take="img/takes/chega" poster="img/takes/chega.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:60% 40%"></video></figure>
           <div class="pa-tx"><span class="pa-t">18:50</span><h3>Você chega.</h3><p>Alguns minutos antes da aula. Tira o tênis, veste o kimono emprestado e conhece o professor, que te recebe pelo nome.</p></div>
         </li>
         <li class="pa-step">
@@ -600,19 +615,19 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           <div class="pa-tx"><span class="pa-t">19:00</span><h3>A turma se alinha.</h3><p>Todo mundo no tatame, um cumprimento ao professor e a aula começa. Aqui, cada um respeita o ritmo do outro.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph v"><img src="img/takes/aquecimento.jpg" alt="Professor demonstrando um rolamento no tatame" loading="lazy" width="720" height="900" style="object-position:50% 50%"><video class="take" data-take="img/takes/aquecimento" poster="img/takes/aquecimento.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
+          <figure class="pa-ph v"><img src="img/takes/aquecimento.jpg" alt="Aluno de kimono preto passando a guarda de um colega de kimono branco" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/aquecimento" poster="img/takes/aquecimento.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:05</span><h3>Aquecimento.</h3><p>Você aquece junto com a turma, com movimentos do próprio jiu-jitsu. Quem está começando faz a versão mais leve.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph v"><img src="img/takes/tecnica.jpg" alt="Dois alunos repetindo uma passagem de guarda no tatame" loading="lazy" width="720" height="900" style="object-position:50% 50%"><video class="take" data-take="img/takes/tecnica" poster="img/takes/tecnica.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
+          <figure class="pa-ph v"><img src="img/takes/tecnica.jpg" alt="Dois alunos repetindo uma passagem de guarda no tatame" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/tecnica" poster="img/takes/tecnica.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:20</span><h3>Movimentos básicos.</h3><p>O professor mostra uma posição passo a passo e você repete com um parceiro, devagar, até ficar natural.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph v"><img src="img/takes/guarda.jpg" alt="Dois alunos treinando a guarda com calma, sem luta pesada" loading="lazy" width="720" height="900" style="object-position:50% 50%"><video class="take" data-take="img/takes/guarda" poster="img/takes/guarda.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
+          <figure class="pa-ph v"><img src="img/takes/guarda.jpg" alt="Dois alunos treinando a guarda com calma, sem luta pesada" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/guarda" poster="img/takes/guarda.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:40</span><h3>Sem luta pesada.</h3><p>No primeiro dia, ninguém te coloca numa luta. Você aprende, repete e entende o jogo. O resto vem com o tempo.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph v"><img src="img/takes/resenha.jpg" alt="Dois alunos rindo e conversando sentados no tatame depois do treino" loading="lazy" width="720" height="900" style="object-position:50% 45%"><video class="take" data-take="img/takes/resenha" poster="img/takes/resenha.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 45%"></video></figure>
+          <figure class="pa-ph v"><img src="img/takes/resenha.jpg" alt="Dois alunos rindo e conversando sentados no tatame depois do treino" loading="lazy" width="1080" height="1350" style="object-position:50% 45%"><video class="take" data-take="img/takes/resenha" poster="img/takes/resenha.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 45%"></video></figure>
           <div class="pa-tx"><span class="pa-t">Fim</span><h3>Você sai mais leve.</h3><p>Cansado, com a cabeça leve e com vontade de voltar. A primeira aula é por nossa conta.</p><a class="btn btn-ink" href="agendamento.html" data-int>Agendar minha primeira aula<svg class="ic"><use href="#i-arrow"/></svg></a></div>
         </li>
       </ol>
@@ -633,7 +648,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         </div>
         <div class="prog-row" data-swipe>
         <article class="prog" data-vt-card data-cursor="Ver turma">
-          <div class="p-img"><img src="img/takes/rolagem.jpg" alt="Dois alunos adultos treinando no tatame, em frente ao letreiro do Studio Evolution" width="720" height="900"><video class="take" data-take="img/takes/rolagem" poster="img/takes/rolagem.jpg" muted loop playsinline preload="none" aria-hidden="true"></video></div>
+          <div class="p-img"><img src="img/takes/adulto.jpg" alt="Dois alunos adultos treinando no tatame enquanto a turma assiste" width="1080" height="1350"><video class="take" data-take="img/takes/adulto" poster="img/takes/adulto.jpg" muted loop playsinline preload="none" aria-hidden="true"></video></div>
           <div>
             <div class="p-meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h</span></div>
             <h3>Adulto</h3>
@@ -949,7 +964,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     /* abertura: o vídeo acende do escuro e cada linha do título sobe por trás da própria máscara */
     intro: function (S) {
       var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
-      tl.from(".hv-v", { opacity: 0, scale: 1.18, duration: 2.6 }, 0)
+      tl.from(".hv-v", { opacity: 0, scale: 1.18, duration: 2.6, stagger: 0.18 }, 0)
         .from(".hero-title .lni", { yPercent: 120, scaleY: 1.7, skewY: 9, duration: 1.6, stagger: 0.11 }, 0.15)
         .from(".hero-top > *, .hb-l > *, .hb-r > *", { y: 26, opacity: 0, duration: 1.2, stagger: 0.07, ease: "power3.out" }, 0.7)
         .from(".hero-ghost", { opacity: 0, xPercent: 18, duration: 2.4 }, 0.5)
@@ -987,17 +1002,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       gsap.to(".hero-ghost", { yPercent: -16, ease: "none", scrollTrigger: heroST });
 
 
-      /* o tatame em perspectiva: o mouse vira a câmera (para os lados e para cima), a luz acompanha o cursor
-         e, ao rolar, o chão vai se erguendo, como se a câmera descesse até ele */
-      var plane = $("#ttPlane"), light = $("#ttLight"), cam = { yaw: 0, pitch: 0, ty: 0, tp: 0, lx: 0, tl: 0, prog: 0, on: true };
-      ScrollTrigger.create({ trigger: ".hero", start: "top top", end: "bottom top", onUpdate: function (s) { cam.prog = s.progress; }, onToggle: function (s) { cam.on = s.isActive; } });
-      gsap.ticker.add(function () {
-        if (!cam.on) return;
-        cam.yaw += (cam.ty - cam.yaw) * 0.05; cam.pitch += (cam.tp - cam.pitch) * 0.05; cam.lx += (cam.tl - cam.lx) * 0.07;
-        gsap.set(plane, { rotationX: 76 - cam.prog * 20 + cam.pitch, rotationY: cam.yaw });
-        gsap.set(light, { x: cam.lx });
-      });
-      /* ao sair, o conteúdo da abertura tomba para trás, sobre o tatame */
+      /* ao sair, o conteúdo da abertura tomba para trás */
       gsap.set(".hero-in", { transformPerspective: 1200, transformOrigin: "50% 100%" });
       gsap.to(".hero-in", { rotationX: 18, z: -120, ease: "none", scrollTrigger: heroST });
       if (fine) {
@@ -1009,11 +1014,9 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           var mx = e.clientX / innerWidth - 0.5, my = e.clientY / innerHeight - 0.5;
           hx(mx * -18); hy(my * -12); tx(mx * 14);
           trY(mx * 20); trx(-my * 11);
-          cam.ty = mx * 16; cam.tp = my * 5; cam.tl = mx * innerWidth * 0.9;
         });
       } else {
-        /* no toque, o chão e o título balançam devagar sozinhos */
-        gsap.to(cam, { ty: 9, duration: 5, ease: "sine.inOut", yoyo: true, repeat: -1 });
+        /* no toque, o título balança devagar sozinho */
         gsap.fromTo(".hero-title", { rotationY: -8 }, { rotationY: 8, duration: 6, ease: "sine.inOut", yoyo: true, repeat: -1 });
       }
 
@@ -1133,8 +1136,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           if (!es[0].isIntersecting) return;
           io.disconnect();
           Medalha3D.mount(cv, {
-            front: { orm: "img/medalha-frente-orm.webp", normal: "img/medalha-frente-normal.webp" },
-            back: { orm: "img/medalha-verso-orm.webp", normal: "img/medalha-verso-normal.webp" },
+            front: { base: "img/medalha-frente" }, back: { base: "img/medalha-verso" },
             small: !fine || window.innerWidth < 900, reduce: Site.reduce, fine: fine, hover: $(".true-sec")
           }, function (api) {
             if (!api) return;
