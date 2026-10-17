@@ -60,6 +60,10 @@
 #apCode b.caret { border-color: var(--ink); }
 .ap-codef:focus-within #apCode b.caret { border-color: var(--gold-text); }
 .ap-codef.bad #apCode b { border-color: var(--warn); }
+/* o campo esconde a própria seleção e o cursor; as caixas mostram os dois: o trecho selecionado ganha o dourado
+   (a próxima tecla o substitui) e a caixa cheia onde está o cursor, contorno e traço dourados embaixo */
+.ap-codef:focus-within #apCode b.hl { background: color-mix(in oklch, var(--gold) 30%, var(--field)); }
+.ap-codef:focus-within #apCode b.at { border-color: var(--gold-text); box-shadow: inset 0 -3px 0 var(--gold-text); }
 #apCodeIn { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 0; -webkit-appearance: none; appearance: none; background: transparent; color: transparent; -webkit-text-fill-color: transparent; caret-color: transparent; font: 400 24px/1 var(--serif); cursor: text; }
 #apCodeIn::selection { background: transparent; color: transparent; -webkit-text-fill-color: transparent; }
 #apCodeWrap { margin-inline: -5px; padding-inline: 5px; }  /* o anel de foco do campo (3 + 2 px) cabe dentro do recorte que recolhe o bloco */
@@ -429,7 +433,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
       <p class="label">Antes e depois</p>
       <h2 class="split" id="t-diff">O que mudou no app <em>e por quê</em>.</h2>
       <ul class="diff-grid" data-rise>
-        <li><h3>Só a turma do aluno</h3><p>A tela inicial destaca a aula do aluno e resume os outros horários numa linha.</p><span class="was">Antes: todas as turmas do dia, Kids incluído, cada uma com um botão.</span></li>
+        <li><h3>Só a turma do aluno</h3><p>A tela inicial destaca a aula do aluno e mostra o próximo treino numa linha.</p><span class="was">Antes: todas as turmas do dia, Kids incluído, cada uma com um botão.</span></li>
         <li><h3>Vagas de verdade</h3><p>O contador soma as reservas de todos os alunos da turma.</p><span class="was">Antes: o aluno só enxergava a própria reserva, e a turma parecia sempre vazia.</span></li>
         <li><h3>Mensalidade como status</h3><p>Uma linha diz se está em dia. Um toque mostra o plano, a próxima cobrança e o recibo.</p><span class="was">Antes: valores em aberto e em atraso no meio do resumo de treino.</span></li>
         <li><h3>Presença numa tela</h3><p>Confirmar a vaga, digitar o código e registrar, nessa ordem.</p><span class="was">Antes: “Presença do dia” e “Check-in” em itens separados do menu.</span></li>
@@ -490,9 +494,12 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     rail.forEach(function (r) { r.setAttribute("aria-current", r.dataset.view === name ? "true" : "false"); });
     chs.forEach(function (c) { c.classList.toggle("on", c.dataset.view === name); });
     tabInView($('#demoTabs button[data-view="' + name + '"]'));
+    missed = null;  /* qualquer troca de tela vale mais do que o capítulo que passou sem trocar (watchChapters) */
     if (name === current) return;
-    /* a tela que sai fica inerte: quem estava com o foco nela (ou na folha) segue para a tela nova, não para o body */
-    var had = screenOf(current).contains(document.activeElement) || $("#apSheet").contains(document.activeElement);
+    /* a tela que sai fica inerte (e o dock, na tela bloqueada): quem estava com o foco nela, na folha ou no dock que some
+       segue para a tela nova, não para o body */
+    var a = document.activeElement;
+    var had = screenOf(current).contains(a) || $("#apSheet").contains(a) || (name === "avisos" && dock.contains(a));
     closeSheet(false);
     current = name;
     views.forEach(function (v) { v.classList.toggle("on", v.dataset.view === name); });
@@ -642,10 +649,19 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
   $("#apTalk").addEventListener("click", function () { toast("No app, abre o WhatsApp do Studio com a mensagem pronta."); });
 
   /* ---------- Presença: o código tem 3 letras e 3 números, digitado num campo de verdade ---------- */
-  var CODE = "KTR482", typed = "", typing = false, errT = null;
+  var CODE = "KTR482", typed = "", settled = "", typing = false, errT = null, edit = null, ime = false;
   var inp = $("#apCodeIn"), codeF = $(".ap-codef"), cells = $$("#apCode b"), regBtn = $("#apRegister"), errEl = $("#apCodeErr");
+  function clean(s) { return s.replace(/[^a-z0-9]/gi, "").toUpperCase(); }
+  /* as caixas mostram o que o campo transparente esconde: com o foco nele, o trecho selecionado e a caixa do cursor;
+     sem o foco, a próxima caixa vazia */
   function paintCode() {
-    cells.forEach(function (c, i) { c.textContent = typed[i] || ""; c.classList.toggle("caret", i === typed.length && typed.length < 6); });
+    var f = document.activeElement === inp, a = f ? inp.selectionStart : typed.length, b = f ? inp.selectionEnd : a;
+    cells.forEach(function (c, i) {
+      c.textContent = typed[i] || "";
+      c.classList.toggle("caret", a === b && i === a && i === typed.length);
+      c.classList.toggle("at", a === b && i === a && i < typed.length);
+      c.classList.toggle("hl", i >= a && i < b);
+    });
     var full = typed.length === 6;
     regBtn.classList.toggle("off", !full);
     regBtn.setAttribute("aria-disabled", full ? "false" : "true");
@@ -658,15 +674,36 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     if (bad) inp.setAttribute("aria-invalid", "true"); else inp.removeAttribute("aria-invalid");
     if (msg) errT = later(function () { errEl.textContent = msg; into(errEl); }, 60);
   }
+  /* onde estava o cursor e o que o campo tinha antes da tecla (ou da composição do teclado) */
+  function mark() { edit = { a: inp.selectionStart, b: inp.selectionEnd, base: inp.value }; }
+  inp.addEventListener("beforeinput", function (e) { if (!e.isComposing) mark(); });
+  inp.addEventListener("compositionstart", function () { ime = true; mark(); });
   /* fica só com letras e números, em maiúsculas, até 6: colar 'ktr-482' ou 'KTR 482' vale.
+     Passou de 6, vale o que acabou de entrar (antes, a letra nova era cortada): um código inteiro colado ocupa o campo;
+     com o campo cheio e o cursor no fim, a digitação recomeça; no meio, a letra nova toma o lugar da caixa à direita.
      Durante a composição do teclado (Android), só desenha; o valor do campo é ajustado no fim */
   function onCode(e) {
-    var composing = !!(e && e.isComposing), v = inp.value.replace(/[^a-z0-9]/gi, "").toUpperCase().slice(0, 6);
-    if (!composing && inp.value !== v) inp.value = v;
+    var composing = !!(e && e.isComposing), raw = inp.value, end = inp.selectionStart || 0;
+    var v = clean(raw), pos = clean(raw.slice(0, end)).length;
+    if (e && edit && v.length > 6 && end >= edit.a) {
+      var ins = clean(raw.slice(edit.a, end)), pre = clean(edit.base.slice(0, edit.a)), post = clean(edit.base.slice(edit.b));
+      if (ins.length >= 6 || (ins && pre.length >= 6)) { v = ins; pos = ins.length; }
+      else if (ins) { v = pre + ins + post.slice(pre.length + ins.length + post.length - 6); pos = pre.length + ins.length; }
+    }
+    v = v.slice(0, 6);
+    pos = Math.min(pos, v.length);
+    if (!composing) {
+      edit = null;
+      if (raw !== v) { inp.value = v; if (document.activeElement === inp) inp.setSelectionRange(pos, pos); }
+    }
     if (v !== typed) { setErr(""); $("#apCode").classList.remove("pulse"); }
     typed = v;
     paintCode();
-    if (v.length === 6 && !typing && !composing) submit();
+    if (composing) return;
+    /* com 6, envia sozinho; uma tecla que não muda o código não o envia de novo */
+    var changed = v !== settled;
+    settled = v;
+    if (v.length === 6 && changed && !typing) submit();
   }
   function submit() {
     if (registered || typing) return;
@@ -684,10 +721,44 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     register();
   }
   inp.addEventListener("input", onCode);
-  inp.addEventListener("compositionend", onCode);
+  inp.addEventListener("compositionend", function (e) { ime = false; onCode(e); });
   /* depois de um código errado, voltar ao campo seleciona tudo: digitar já substitui */
   inp.addEventListener("focus", function () { if (inp.getAttribute("aria-invalid") === "true") inp.select(); });
+  /* o clique vale pela caixa clicada (as letras do campo não ficam sobre as caixas): o cursor vai para ela,
+     ou para o fim do que foi digitado. Com o código errado no campo, o clique seleciona tudo de novo.
+     O navegador só desfaz a seleção depois do evento de clique: a escolha vem logo em seguida, ou já na primeira tecla
+     (o teclado passa na frente do timer: quem clica e digita de uma vez perdia a primeira letra para o fim do código) */
+  var caretFn = null, caretT = null;
+  function caretNow() {
+    var fn = caretFn;
+    clearTimeout(caretT);
+    caretFn = null;
+    if (fn) fn();
+  }
+  inp.addEventListener("click", function (e) {
+    var x = e.clientX, real = e.detail, val = inp.value;
+    caretFn = function () {
+      /* algo já entrou no campo (ditado, teclado sem keydown): o cursor fica onde a digitação o deixou */
+      if (document.activeElement !== inp || inp.value !== val) return;
+      if (inp.getAttribute("aria-invalid") === "true") inp.select();
+      else if (real && inp.selectionStart === inp.selectionEnd) {
+        var i = 0;
+        while (i < 5 && x > cells[i].getBoundingClientRect().right) i++;
+        i = Math.min(i, typed.length);
+        inp.setSelectionRange(i, i);
+      }
+      paintCode();
+    };
+    clearTimeout(caretT);
+    caretT = later(caretNow, 0);
+  });
+  inp.addEventListener("keydown", caretNow);
+  /* setas, Home, End, Tab e seleção mudam o cursor sem mudar o texto: as caixas acompanham */
+  ["keyup", "select", "selectionchange", "focus", "blur"].forEach(function (t) { inp.addEventListener(t, paintCode); });
   regBtn.addEventListener("click", submit);
+  /* com uma palavra ainda em composição (teclado do Android), o toque no botão não tira o foco do campo:
+     sem isso, a composição fechava no meio da troca de foco, registrava, e o navegador terminava focando o botão que some */
+  regBtn.addEventListener("mousedown", function (e) { if (ime) e.preventDefault(); });
   function register() {
     if (registered) return;
     registered = true;
@@ -699,9 +770,16 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     /* o campo do código se recolhe numa linha, abrindo espaço para a confirmação */
     $("#apStep2h").textContent = "Código digitado";
     $("#apCodeHelp").textContent = CODE.slice(0, 3) + " " + CODE.slice(3) + " · às " + regAt;
-    if (anim) gsap.to(wrap, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: function () { wrap.hidden = true; } });
-    else wrap.hidden = true;
     done.hidden = false;
+    /* se o foco ainda entrou no bloco que se recolhe (um Tab no meio da composição, por exemplo), ele passa para a confirmação.
+       Sem animação, o bloco some na tarefa seguinte: antes, a troca de foco em curso ia para o botão já escondido e caía no body */
+    function fold() {
+      var lost = wrap.contains(document.activeElement);
+      wrap.hidden = true;
+      if (lost) Site.focusSoft(done, { preventScroll: true });
+    }
+    if (anim) gsap.to(wrap, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: fold });
+    else later(fold, 0);
     /* a presença de hoje conta em tudo que depende dela: a meta da semana, o ponto de hoje e as aulas desde o grau */
     $("#apWeek").textContent = "3 de 3";
     $("#apToday").hidden = false;
@@ -760,6 +838,8 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     var quiz = $("#apQuiz"), line = $("#apQdone"), had = quiz.contains(document.activeElement);
     quiz.hidden = true;
     line.hidden = false;
+    /* "quiz liberado" deixou de ser verdade: sob o vídeo fica só o quanto foi assistido, e a linha diz o resto */
+    $("#apProgTxt").textContent = "90% assistido";
     $("#apStudied").hidden = false;
     $("#apNext").hidden = false;
     $("#apList").hidden = false;
@@ -870,23 +950,38 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
   });
 
   /* no computador, o capítulo que passa pelo meio da tela escolhe a tela do celular */
-  var io = null;
-  /* com o teclado dentro do celular, a página rola sozinha para mostrar o item focado; isso não pode trocar a tela
-     debaixo de quem está digitando (o clique do mouse não conta: ele não deixa :focus-visible) */
-  function kbdInPhone() {
-    var a = document.activeElement;
-    if (!a || !ap.contains(a)) return false;
-    try { return a.matches(":focus-visible"); } catch (e) { return false; }
-  }
+  var io = null, phoneAt = 0, scrollAt = 0, ownFocus = false, missed = null;
+  /* com o foco no celular, a página pode rolar sozinha (o navegador mostra o item focado pelo Tab ou o cursor do campo);
+     essa rolagem não troca a tela debaixo de quem usa o celular, só a que vem de um gesto de rolar (roda, dedo, teclas).
+     Antes a regra era :focus-visible, que todo campo de texto tem: com o código digitado, a rolagem parava de trocar a tela */
+  ap.addEventListener("focusin", function () { if (!ownFocus) phoneAt = Date.now(); });
+  ap.addEventListener("input", function () { phoneAt = Date.now(); });
+  function scrolled() { scrollAt = Date.now(); }
+  window.addEventListener("wheel", scrolled, { passive: true });
+  window.addEventListener("touchmove", scrolled, { passive: true });
+  /* num campo, setas, Home, End e Espaço andam no texto; PageUp e PageDown, num campo de uma linha, rolam a página */
+  window.addEventListener("keydown", function (e) {
+    var t = e.target.tagName;
+    if (/^Page(Up|Down)$/.test(e.key) ? !/^(TEXTAREA|SELECT)$/.test(t) : /^(ArrowUp|ArrowDown|Home|End| )$/.test(e.key) && !/^(INPUT|TEXTAREA|SELECT)$/.test(t)) scrolled();
+  });
+  function autoScroll() { return phoneAt > scrollAt && ap.contains(document.activeElement); }
+  /* show() leva para a tela nova o foco que estava no celular: esse foco não é de quem navega */
+  function follow(name) { ownFocus = true; show(name); ownFocus = false; }
   function watchChapters() {
     if (io) { io.disconnect(); io = null; }
     if (!desk() || !("IntersectionObserver" in window)) return;
     io = new IntersectionObserver(function (es) {
-      if (jumping || kbdInPhone()) return;
-      es.forEach(function (e) { if (e.isIntersecting) show(e.target.dataset.view); });
+      if (jumping) return;
+      /* o capítulo que passou durante a rolagem automática fica guardado: a próxima rolagem da pessoa o mostra */
+      var skip = autoScroll();
+      es.forEach(function (e) { if (e.isIntersecting) { if (skip) missed = e.target.dataset.view; else follow(e.target.dataset.view); } });
     }, { rootMargin: "-48% 0px -48% 0px" });
     chs.forEach(function (c) { io.observe(c); });
   }
+  window.addEventListener("scroll", function () {
+    if (!missed || jumping || autoScroll() || !desk()) return;
+    follow(missed);
+  }, { passive: true });
 
   /* o celular cabe na área dele sem ficar pequeno demais para ler.
      Computador: pela altura, descontada a barra fixa, entre 0,82 e 1.

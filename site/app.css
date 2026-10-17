@@ -705,7 +705,7 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 
 /* reduzir movimento: as regras de troca de tela (.on) e as animações novas vencem sem depender da ordem */
 @media (prefers-reduced-motion: reduce) {
-  .ap-view, .ap-view.on, .dv, .dv.on, .drawer, .drawer.on, .drawer-scrim, .drawer-scrim.on { transition: none !important; }
+  .ap-view, .ap-view.on, .dv, .dv.on, .drawer, .drawer.on, .drawer-scrim, .drawer-scrim.on, .ap-toast { transition: none !important; }
   .msg, .dch.on, .gcard.got, .lead.out, .drawer.on .heat i { animation: none !important; }
   .ap .pulse, .heat i.t, .ap-goal.burst i, .hist li.new, .funnel b.bump { animation: none !important; }
 }

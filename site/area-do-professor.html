@@ -20,9 +20,8 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
-<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="app.css">
 <style>
@@ -51,8 +50,11 @@
 .rules li.off .rl { opacity: 0.45; }
 .tog { position: relative; width: 38px; height: 22px; padding: 0; border: 0; border-radius: 999px; background: var(--rule); cursor: pointer; transition: background-color 300ms var(--ease); }
 .tog::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); box-shadow: 0 1px 3px oklch(0 0 0 / 0.3); transition: transform 300ms var(--ease); }
-.tog[aria-pressed="true"] { background: var(--gold); }
-.tog[aria-pressed="true"]::after { transform: translateX(16px); }
+/* desligada: o trilho ganha contorno (antes, 1,35:1 contra o fundo); no Claro, ligada usa o ouro de texto (o ouro claro dava 2:1) */
+.tog[aria-checked="false"] { box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.tog[aria-checked="true"] { background: var(--gold); }
+:root:not([data-look="black"]) .tog[aria-checked="true"] { background: var(--gold-text); }
+.tog[aria-checked="true"]::after { transform: translateX(16px); }
 .fin-note { margin-top: 10px; font-size: 12px; color: var(--ink-3); }
 .flog { margin-top: 10px; }
 .flog li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding-block: 9px; border-top: 1px solid var(--rule); font-size: 13px; }
@@ -65,7 +67,14 @@
 #finTbl tr.paid-now { animation: arrive 1.4s var(--ease); }
 .msg q .lk { font: 600 14px/1 var(--sans); font-style: normal; color: var(--gold-text); }
 @media (max-width: 860px) { .fin-grid { grid-template-columns: minmax(0, 1fr); } }
-.dv[data-v="fin"] .kpi b { white-space: nowrap; }
+/* tablet e notebook pequeno: o valor encolhe com a tela em vez de invadir o cartão vizinho, e a forma de
+   pagamento sai da tabela para a linha de baixo do nome (.fm), para os botões caberem numa linha */
+.dv[data-v="fin"] .kpi b { white-space: nowrap; font-size: clamp(22px, 2.4vw, 34px); }
+.mini-btn { white-space: nowrap; }
+#finTbl .fm { display: none; }
+@media (max-width: 1180px) { #finTbl .hide-s { display: none; } #finTbl .fm { display: inline; } }
+/* até 1000 px, ao lado do menu vertical, quatro cartões não cabem "R$ 9.440" com folga: dois por linha */
+@media (min-width: 861px) and (max-width: 1000px) { .dv[data-v="fin"] .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* o selo do WhatsApp de avisos no topo da aba (fica vermelho se a conexão cair) */
 .fin-hd { display: grid; justify-items: start; gap: 6px; max-width: 46ch; }
 /* sem treinar e em atraso: a segunda pílula fica embaixo da primeira */
@@ -109,7 +118,6 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
 /* reconhecimento na chamada (só no painel, nunca na TV): uma etiqueta por aluno, com contorno dourado */
 .pill-s.rec { display: inline-block; margin-left: 6px; padding: 2px 8px; background: none; box-shadow: inset 0 0 0 1px var(--gold-text); color: var(--gold-text); font-size: 10.5px; vertical-align: 1px; }
 .room-h .rec-n { margin-top: 2px; color: var(--gold-text); font-weight: 600; }
-@media (max-width: 600px) { .dv[data-v="fin"] .kpi b { font-size: 22px; } }
 
 /* chamada: cada linha tem a pílula de presença e um único botão de ação */
 .roster li.r4 { grid-template-columns: 30px minmax(0, 1fr) auto auto; }
@@ -135,10 +143,15 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   .roster li.r4 > div { grid-area: nm; }
   .roster li.r4 > .pill-s { grid-area: st; justify-self: start; }
   .roster li.r4 > .r-act { grid-area: ac; }
-  .pill-s .pl { display: none; }
-  .pill-s .ps { display: inline; }
+  /* a pílula curta é só da chamada; em Alunos, a mesma pílula cabe inteira ("Chegou 18:55") */
+  .roster .pill-s .pl { display: none; }
+  .roster .pill-s .ps { display: inline; }
   .tbl tbody tr.empty { display: block; }
+  /* com a ficha aberta, o botão de música (fixo no canto) sai de cena: ele cobria o começo das ações da ficha */
+  body:has(#drawer.on) .snd { opacity: 0; visibility: hidden; }
 }
+/* celular estreito: o status e "Confirmar seg, 19h" não cabem lado a lado (o select vazava do cartão); cada um na sua linha */
+@media (max-width: 374px) { .lead .acts { flex-wrap: wrap; } .lead .acts > * { flex: 1 1 100%; } }
 
 /* ficha: rola por dentro, com o nome e o X sempre no alto e as ações sempre embaixo */
 .drawer { padding: 0; max-height: min(100%, calc(100svh - 120px)); }
@@ -173,6 +186,62 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   .tv-phone figcaption { max-width: 38ch; font-size: 12.5px; line-height: 1.3; }  /* duas linhas em vez de três */
   .tv-mob { margin-top: 16px; font-size: 14px; line-height: 1.25; }  /* abaixo da moldura da TV (10 px de sombra) */
   .tv-mob b { font-size: 17px; }
+}
+/* o título da TV é h3 (vinha depois de um h2 como h4): as medidas de antes, agora no h3 */
+.tv-l h3 { margin-top: 1.4cqi; font: 400 4.8cqi/1 var(--serif); letter-spacing: -0.01em; text-transform: uppercase; }
+@media (max-width: 860px) { .tv-l h3 { font-size: 6cqi; } }
+/* h4 sem a margem padrão do navegador (1,33em: o nome da aula e o do aluno ficavam a 29 px da linha de baixo).
+   O texto da aula ocupa o espaço que sobra, e "Gerar código" fica à direita no computador */
+.room-h h4, .gcard h4 { margin: 0; }
+.room-h > div:first-child { flex: 1 1 260px; min-width: 0; }
+.room-h p { margin-top: 4px; }
+/* modo cartão: o rótulo "Última aula" fica em letra de rótulo, acima do valor */
+.tbl small.cl { font: 600 9.5px/1.3 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* celular: no Hoje, a aula (com "Gerar código") vem antes dos números do mês */
+@media (max-width: 860px) {
+  .dv[data-v="hoje"] { display: flex; flex-direction: column; }
+  .dv[data-v="hoje"] .day-grid { order: 1; }
+  .dv[data-v="hoje"] .kpis { order: 2; }
+  /* o menu rola para o lado: encaixa no item e esmaece na borda enquanto houver mais itens à direita */
+  .dash-side { scroll-snap-type: x proximity; scroll-padding-left: 16px; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent); }
+  .dash-side.at-end { -webkit-mask-image: none; mask-image: none; }
+  .dash-side button { scroll-snap-align: start; }
+}
+.classes .ck { display: none; }
+@media (max-width: 600px) {
+  /* título da aba e código da aula cabem inteiros em 320 px ("Interessados" saía cortado; "KTR 482" quebrava o 2) */
+  .dv-h h3 { font-size: clamp(26px, 8.4vw, 34px); }
+  .codebox .cd:not(.hold) { font-size: clamp(28px, 9.5vw, 40px); white-space: nowrap; }
+  /* as cinco aulas numa linha de chips com a hora. Turma e contagem continuam no nome do botão (só para leitor
+     de tela); na tela, a aula de agora ganha fundo dourado e um ponto, e as que já acabaram, um check */
+  .dv[data-v="hoje"] .classes { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .classes button { position: relative; display: flex; justify-content: center; align-items: center; min-height: 48px; padding: 0 2px; }
+  .dv .classes button b { font-size: 17px; }
+  .classes button span, .classes button small { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  .classes button.now { background: color-mix(in oklch, var(--gold) 16%, var(--paper-2)); }
+  .classes button.now::after { content: ""; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold-text); }
+  .classes button.past .ck { display: block; position: absolute; top: 5px; right: 5px; width: 11px; height: 11px; stroke-width: 2.4; color: var(--ink-3); }
+  .classes button[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px var(--gold-text); }
+}
+/* celular: o aviso do painel começa depois do botão de música (fixo no canto esquerdo, 48 px), que cobria o começo da frase */
+@media (max-width: 600px) { .dash-toast { left: calc(80px + env(safe-area-inset-left, 0px)); } }
+/* no toque não há pausa pelo mouse: o aviso deixa o toque passar para o botão que estiver embaixo dele */
+@media (hover: none) { .dash-toast.on { pointer-events: none; } }
+/* o aviso não cobre o foco: com ele no pé da tela (ex.: a última linha da chamada), o aviso aparece no alto,
+   abaixo do menu fixo, e entra de cima. A página não rola por causa do aviso */
+.dash-toast.up { top: calc(92px + env(safe-area-inset-top, 0px)); bottom: auto; transform: translateY(calc(-100% - 120px)); }
+.dash-toast.up.on { transform: none; }
+@media (max-width: 600px) { .dash-toast.up { left: 16px; } }
+/* toque: alvos de 44 px onde o toque é a ação (o nome que abre a ficha fica como está: a linha inteira abre) */
+@media (pointer: coarse) {
+  .mini-btn, .sel, .chips button, .walkin > button, .walkin li button, .dash-side button, .room .ap-btn, .dr-acts .ap-btn, .rl, button.leads-closed { min-height: 44px; }
+  .ar-switch a { min-height: 44px; display: inline-flex; align-items: center; padding-block: 15px; }
+  .tog { width: 48px; height: 28px; }
+  .tog::before { content: ""; position: absolute; inset: -8px; }
+  .tog::after { width: 22px; height: 22px; }
+  .tog[aria-checked="true"]::after { transform: translateX(20px); }
+  .rules li { grid-template-columns: 48px minmax(0, 1fr); }
 }
 </style>
 <link rel="stylesheet" href="tema.css">
@@ -213,7 +282,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
     </nav>
     <div class="nav-right">
-      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
       <div class="nav-cta">
         <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
@@ -231,13 +300,13 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
         <h1 class="ar-title" id="t-hero">O tatame inteiro, <em>numa tela só</em>.</h1>
         <p class="ar-lede">Abrir a aula, mostrar o código, ver quem chegou, lembrar de quem sumiu, registrar cada grau e acompanhar as mensalidades. Um painel feito para quem dá aula, não para quem vive de planilha.</p>
         <nav class="ar-switch" aria-label="Escolher a área"><a href="area-do-aluno.html" data-int>Aluno</a><a href="area-do-professor.html" aria-current="page" data-int>Professor</a></nav>
-        <div class="ctas"><a class="btn btn-ink" href="#painel">Experimentar o painel<svg class="ic"><use href="#i-arrow"/></svg></a><a class="link" href="#tatame">Ver o modo tatame</a></div>
+        <div class="ctas"><a class="btn btn-ink" href="#painel">Experimentar o painel<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a><a class="link" href="#tatame">Ver o modo tatame</a></div>
       </div>
       <div class="ar-visual" aria-hidden="true">
         <figure class="ar-photo" data-depth="20"><img src="img/professores-evolution.webp" alt="" width="1200" height="800"></figure>
-        <div class="hc c1" data-depth="60"><span class="dot"><svg class="ic"><use href="#i-code"/></svg></span><span><small>Código da aula · 19h</small><b class="code">KTR 482</b></span></div>
+        <div class="hc c1" data-depth="60"><span class="dot"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-code"/></svg></span><span><small>Código da aula · 19h</small><b class="code">KTR 482</b></span></div>
         <div class="hc c2" data-depth="100"><span><small>Adulto · 19h</small><b>8 de 10 <span class="vc">vagas confirmadas</span></b></span><span class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></div>
-        <div class="hc c3" data-depth="80"><span class="dot warn"><svg class="ic"><use href="#i-bell"/></svg></span><span><small>Sem treinar há 14 dias ou mais</small><b>3 alunos</b></span></div>
+        <div class="hc c3" data-depth="80"><span class="dot warn"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-bell"/></svg></span><span><small>Sem treinar há 14 dias ou mais</small><b>3 alunos</b></span></div>
       </div>
     </div>
   </section>
@@ -253,45 +322,45 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
         <div class="dash" id="dash">
           <div class="dash-bar" aria-hidden="true"><i></i><i></i><i></i><span>Studio Evolution · Painel do professor</span><span class="clock" id="dClock">18:50</span></div>
           <div class="dash-in">
-            <aside class="dash-side" aria-label="Menu do painel">
+            <nav class="dash-side" aria-label="Menu do painel">
               <span class="logo" role="img" aria-label="Studio Evolution BJJ"></span>
-              <button type="button" data-go="hoje" aria-current="true"><svg class="ic"><use href="#i-home"/></svg>Hoje</button>
-              <button type="button" data-go="alunos" aria-current="false"><svg class="ic"><use href="#i-users"/></svg>Alunos<span class="badge">3</span></button>
-              <button type="button" data-go="grad" aria-current="false"><svg class="ic"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad">3</span></button>
-              <button type="button" data-go="leads" aria-current="false"><svg class="ic"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads">3</span></button>
-              <button type="button" data-go="fin" aria-current="false"><svg class="ic"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin">2</span></button>
+              <button type="button" data-go="hoje" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Hoje</button>
+              <button type="button" data-go="alunos" aria-current="false" aria-label="Alunos, 3 ausentes"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-users"/></svg>Alunos<span class="badge">3</span></button>
+              <button type="button" data-go="grad" aria-current="false" aria-label="Graduações, 3 para avaliar"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad">3</span></button>
+              <button type="button" data-go="leads" aria-current="false" aria-label="Interessados, 3 esperando retorno"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads">3</span></button>
+              <button type="button" data-go="fin" aria-current="false" aria-label="Financeiro, 2 em atraso"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin">2</span></button>
               <div class="more"><p>Também no painel</p><ul><li>Movimentos e quizzes</li><li>Competências da faixa</li><li>Turmas e horários</li><li>Aprendizado por aluno</li><li>Cadastro rápido</li></ul></div>
               <div class="who"><span class="av">SE</span><span>Professor · dono<br><small>Studio Evolution</small></span></div>
-            </aside>
+            </nav>
             <div class="dash-main">
 
               <!-- Hoje -->
-              <div class="dv on" data-v="hoje" aria-label="Hoje">
+              <section class="dv on" data-v="hoje" aria-labelledby="t-hoje">
                 <div class="dv-h">
-                  <div><p class="dv-k">Sexta, 16 de outubro</p><h3>Boa noite. <em>Cinco aulas hoje.</em></h3></div>
+                  <div><p class="dv-k">Sexta, 16 de outubro</p><h3 id="t-hoje">Boa noite. <em>Cinco aulas hoje.</em></h3></div>
                   <p id="dNow">Agora: Kids 18h · Próxima: Adulto 19h</p>
                 </div>
                 <div class="kpis">
                   <div class="kpi"><b>58<small class="delta" id="kNew">+3 em outubro</small></b><span>alunos ativos</span></div>
                   <div class="kpi"><b id="kPres">146</b><span>presenças nos últimos 7 dias</span><span class="spark" id="spark" aria-hidden="true"><i class="wk"></i><i class="wk"></i><i></i><i></i><i></i><i></i><i class="today"></i></span></div>
-                  <button class="kpi warn" type="button" data-goto="alunos" data-chip="aus"><b>3</b><span>sem treinar há 14 dias ou mais</span><span class="go-s">Ver quem<svg class="ic"><use href="#i-chev"/></svg></span></button>
-                  <button class="kpi" type="button" data-goto="leads"><b id="kLeads">3</b><span>interessados esperando retorno</span><span class="go-s">Abrir<svg class="ic"><use href="#i-chev"/></svg></span></button>
+                  <button class="kpi warn" type="button" data-goto="alunos" data-chip="aus"><b>3</b><span>sem treinar há 14 dias ou mais</span><span class="go-s">Ver quem<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+                  <button class="kpi" type="button" data-goto="leads"><b id="kLeads">3</b><span>interessados esperando retorno</span><span class="go-s">Abrir<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
                 </div>
                 <div class="day-grid">
                   <div class="classes" id="classes" role="group" aria-label="Aulas de hoje">
-                    <button type="button" class="past" data-c="a8" aria-pressed="false"><b>8h</b><span>Adulto</span><small>7 vieram</small></button>
-                    <button type="button" class="past" data-c="k10" aria-pressed="false"><b>10h</b><span>Kids</span><small>9 vieram</small></button>
-                    <button type="button" class="past" data-c="a11" aria-pressed="false"><b>11h</b><span>Adulto</span><small>6 vieram</small></button>
-                    <button type="button" data-c="k18" aria-pressed="false"><b>18h</b><span>Kids · agora</span><small id="c18s">6 de 8 marcadas</small></button>
-                    <button type="button" data-c="a19" aria-pressed="true"><b>19h</b><span>Adulto</span><small id="c19s">8 de 10</small></button>
+                    <button type="button" class="past" data-c="a8" aria-pressed="false"><b>8h</b> <span>Adulto</span> <small>7 vieram</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
+                    <button type="button" class="past" data-c="k10" aria-pressed="false"><b>10h</b> <span>Kids</span> <small>9 vieram</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
+                    <button type="button" class="past" data-c="a11" aria-pressed="false"><b>11h</b> <span>Adulto</span> <small>6 vieram</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
+                    <button type="button" class="now" data-c="k18" aria-pressed="false"><b>18h</b> <span>Kids · agora</span> <small id="c18s">6 de 8 marcadas</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
+                    <button type="button" data-c="a19" aria-pressed="true"><b>19h</b> <span>Adulto</span> <small id="c19s">8 de 10</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
                   </div>
                   <div class="room" id="room"></div>
                 </div>
-              </div>
+              </section>
 
               <!-- Alunos -->
-              <div class="dv" data-v="alunos" aria-label="Alunos">
-                <div class="dv-h"><div><p class="dv-k">58 ativos</p><h3>Alunos</h3></div><p>Ausente: 14 dias ou mais sem treinar. Toque no nome para abrir a ficha.</p></div>
+              <section class="dv" data-v="alunos" aria-labelledby="t-alunos">
+                <div class="dv-h"><div><p class="dv-k">58 ativos</p><h3 id="t-alunos">Alunos</h3></div><p>Ausente: 14 dias ou mais sem treinar. Toque no nome para abrir a ficha.</p></div>
                 <div class="chips" id="chips" role="group" aria-label="Filtrar alunos">
                   <button type="button" data-f="all" aria-pressed="true">Todos</button>
                   <button type="button" data-f="aus" aria-pressed="false">Ausentes · 3</button>
@@ -301,25 +370,25 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
                   <table class="tbl" id="tbl">
                     <thead><tr><th>Aluno</th><th>Faixa</th><th>Última aula</th><th class="hide-s">Aulas no mês</th><th class="act">Ação</th></tr></thead>
                     <tbody>
-                      <tr data-f="" data-id="marina"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 2 graus</span></span></td><td>quarta</td><td class="num hide-s">6</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
-                      <tr data-f="aval" data-id="thiago"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 3 graus</span></span></td><td>ontem</td><td class="num hide-s">5</td><td class="act"><button class="mini-btn" type="button" data-grad="thiago">Avaliar grau</button></td></tr>
-                      <tr data-f="aval" data-id="ana"><td><div class="nm"><span class="av">AR</span><div>Ana Beatriz Rocha<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 4 graus</span></span></td><td>hoje, 8h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="ana">Avaliar faixa</button></td></tr>
-                      <tr data-f="aval" data-id="joao"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · 9 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-cinza)"></i><span>Cinza · 3 graus</span></span></td><td>hoje, 18h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="joao">Avaliar grau</button></td></tr>
-                      <tr data-f="aus" data-id="diego"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-roxa)"></i><span>Roxa · 1 grau</span></span></td><td><span class="pill-s warn">há 16 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-care="diego">WhatsApp</button></td></tr>
-                      <tr data-f="aus" data-id="patricia"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 2 graus</span></span></td><td><span class="pill-s warn">há 21 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-care="patricia">WhatsApp</button></td></tr>
-                      <tr data-f="aus" data-id="caio"><td><div class="nm"><span class="av">CF</span><div>Caio Fernandes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · sem grau</span></span></td><td><span class="pill-s warn">há 15 dias</span></td><td class="num hide-s">1</td><td class="act"><button class="mini-btn wa" type="button" data-care="caio">WhatsApp</button></td></tr>
-                      <tr data-f="" data-id="larissa"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 1 grau</span></span></td><td>ontem</td><td class="num hide-s">5</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
-                      <tr data-f="" data-id="helena"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · 7 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-amarela)"></i><span>Amarela · 2 graus</span></span></td><td>hoje, 10h</td><td class="num hide-s">6</td><td class="act"><span class="pill-s in">Veio hoje</span></td></tr>
+                      <tr data-f="" data-id="marina"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 2 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>quarta</td><td class="num hide-s">6</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
+                      <tr data-f="aval" data-id="thiago"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 3 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>ontem</td><td class="num hide-s">5</td><td class="act"><button class="mini-btn" type="button" data-grad="thiago">Avaliar grau</button></td></tr>
+                      <tr data-f="aval" data-id="ana"><td><div class="nm"><span class="av">AR</span><div>Ana Beatriz Rocha<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 4 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>hoje, 8h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="ana">Avaliar faixa</button></td></tr>
+                      <tr data-f="aval" data-id="joao"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · 9 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-cinza)"></i><span>Cinza · 3 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>hoje, 18h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="joao">Avaliar grau</button></td></tr>
+                      <tr data-f="aus" data-id="diego"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-roxa)"></i><span>Roxa · 1 grau</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small><span class="pill-s warn">há 16 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-care="diego">WhatsApp</button></td></tr>
+                      <tr data-f="aus" data-id="patricia"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 2 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small><span class="pill-s warn">há 21 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-care="patricia">WhatsApp</button></td></tr>
+                      <tr data-f="aus" data-id="caio"><td><div class="nm"><span class="av">CF</span><div>Caio Fernandes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · sem grau</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small><span class="pill-s warn">há 15 dias</span></td><td class="num hide-s">1</td><td class="act"><button class="mini-btn wa" type="button" data-care="caio">WhatsApp</button></td></tr>
+                      <tr data-f="" data-id="larissa"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 1 grau</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>ontem</td><td class="num hide-s">5</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
+                      <tr data-f="" data-id="helena"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · 7 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-amarela)"></i><span>Amarela · 2 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>hoje, 10h</td><td class="num hide-s">6</td><td class="act"><span class="pill-s in">Veio hoje</span></td></tr>
                     </tbody>
                   </table>
                 </div>
                 <p class="tbl-more" id="tblMore">Mostrando 9 de 58 alunos.</p>
                 <div class="msg" id="waMsg" hidden></div>
-              </div>
+              </section>
 
               <!-- Graduações -->
-              <div class="dv" data-v="grad" aria-label="Graduações">
-                <div class="dv-h"><div><p class="dv-k">Para avaliar</p><h3>Graduações</h3></div><p>Quem tem mais aulas desde o último grau. A decisão é sempre do professor.</p></div>
+              <section class="dv" data-v="grad" aria-labelledby="t-grad">
+                <div class="dv-h"><div><p class="dv-k">Para avaliar</p><h3 id="t-grad">Graduações</h3></div><p>Quem tem mais aulas desde o último grau. A decisão é sempre do professor.</p></div>
                 <div class="cards" id="cards">
                   <article class="gcard" data-id="joao" data-belt="cinza" data-graus="3" data-next="grau" data-first="João Pedro" data-kid="1">
                     <h4>João Pedro Lima</h4><p class="meta">Kids 18h · 9 anos</p>
@@ -352,11 +421,11 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
                     <li><i class="belt-s" style="--b:var(--b-azul)"></i><div>Fábio Lacerda<small>4º grau na faixa azul · Adulto 11h</small></div><time>18 de set</time></li>
                   </ol>
                 </div>
-              </div>
+              </section>
 
               <!-- Interessados -->
-              <div class="dv" data-v="leads" aria-label="Interessados">
-                <div class="dv-h"><div><p class="dv-k">Pedidos pelo site</p><h3>Interessados</h3></div><p>Pedidos de aula experimental. Mude o status depois de cada contato.</p></div>
+              <section class="dv" data-v="leads" aria-labelledby="t-leads">
+                <div class="dv-h"><div><p class="dv-k">Pedidos pelo site</p><h3 id="t-leads">Interessados</h3></div><p>Pedidos de aula experimental. Mude o status depois de cada contato.</p></div>
                 <div class="funnel" id="funnel" aria-label="Interessados por etapa">
                   <div><b data-k="novo">2</b><span>Novos</span></div>
                   <div><b data-k="atendimento">1</b><span>Em atendimento</span></div>
@@ -389,16 +458,16 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
                 <div class="msg" id="leadMsg" hidden></div>
                 <button class="leads-closed" type="button" id="closedBtn" aria-expanded="false" aria-controls="closedBox"><span>Fechados</span><span><span id="closedN">6</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
                 <div class="closed-box" id="closedBox" hidden><ul id="closedList"></ul><p id="closedNote">Os 6 contatos fechados são de antes de hoje.</p></div>
-              </div>
+              </section>
 
               <!-- Financeiro: mensalidades pelo Asaas, lembretes por um número de WhatsApp só de avisos (Evolution API) -->
-              <div class="dv" data-v="fin" aria-label="Financeiro">
-                <div class="dv-h"><div><p class="dv-k">Outubro · valores de exemplo</p><h3>Financeiro</h3></div><div class="fin-hd"><span class="pill-s in">WhatsApp de avisos · conectado</span><p>Mensalidades por Pix, boleto ou cartão, com lembretes automáticos pelo WhatsApp.</p></div></div>
+              <section class="dv" data-v="fin" aria-labelledby="t-fin">
+                <div class="dv-h"><div><p class="dv-k">Outubro · valores de exemplo</p><h3 id="t-fin">Financeiro</h3></div><div class="fin-hd"><span class="pill-s in">WhatsApp de avisos · conectado</span><p>Mensalidades por Pix, boleto ou cartão, com lembretes automáticos pelo WhatsApp.</p></div></div>
                 <!-- 31 adultos e 18 Kids pagos (R$ 200 e R$ 180), 5 adultos e 2 Kids a vencer, 2 adultos em atraso: 58 mensalidades -->
                 <div class="kpis">
                   <div class="kpi"><b id="fRec">R$ 9.440</b><span id="fRecS">recebidos em outubro · 49 de 58 mensalidades pagas</span></div>
                   <div class="kpi"><b>R$ 1.360</b><span>a vencer até o fim do mês · 7 mensalidades</span></div>
-                  <button class="kpi warn" type="button" data-ff-go="late"><b id="fLate">R$ 400</b><span id="fLateS">em atraso · 2 mensalidades</span><span class="go-s">Ver quem<svg class="ic"><use href="#i-chev"/></svg></span></button>
+                  <button class="kpi warn" type="button" data-ff-go="late"><b id="fLate">R$ 400</b><span id="fLateS">em atraso · 2 mensalidades</span><span class="go-s">Ver quem<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
                   <!-- já vencidas: as 49 pagas e as 2 atrasadas. Quem paga atrasado não muda a conta, só sai de "em atraso" -->
                   <div class="kpi"><b id="fOnTime">90%</b><span>pagas até o vencimento · 46 das 51 já vencidas</span></div>
                 </div>
@@ -413,13 +482,13 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
                     <thead><tr><th>Aluno</th><th>Situação</th><th>Valor</th><th class="hide-s">Forma</th><th class="act">Ação</th></tr></thead>
                     <tbody>
                       <!-- sem treinar e em atraso: a ação principal é conversar; cobrar fica ao lado -->
-                      <tr data-st="late" data-id="diego" data-v="200"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h · venceu 10/10 · lembretes pausados</small></div></div></td><td><span class="pill-s warn">Atrasada há 6 dias</span> <span class="pill-s warn aus">16 dias sem treinar</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act two"><button class="mini-btn wa" type="button" data-care="diego">Conversar</button> <button class="mini-btn ghost" type="button" data-fin="diego">Cobrar</button></td></tr>
-                      <tr data-st="late" data-id="patricia" data-v="200"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h · venceu 11/10 · último lembrete 12/10</small></div></div></td><td><span class="pill-s warn">Atrasada há 5 dias</span> <span class="pill-s warn aus">21 dias sem treinar</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act two"><button class="mini-btn wa" type="button" data-care="patricia">Conversar</button> <button class="mini-btn ghost" type="button" data-fin="patricia">Cobrar</button></td></tr>
-                      <tr data-st="due" data-id="larissa" data-v="200"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h · vence 16/10</small></div></div></td><td><span class="pill-s gold">Vence hoje · lembrada às 8h</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-fin="larissa">Ver lembrete</button></td></tr>
-                      <tr data-st="due" data-id="joao" data-v="180"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · vence 19/10</small></div></div></td><td><span class="pill-s">Vence em 3 dias</span></td><td class="num">R$ 180</td><td class="hide-s">Cartão automático</td><td class="act"><span class="pill-s in">Cobra sozinho</span></td></tr>
-                      <tr data-st="paid" data-id="thiago" data-v="200"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h · pago hoje, 09:12</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Pix</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Thiago">Recibo</button></td></tr>
-                      <tr data-st="paid" data-id="helena" data-v="180"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · pago 10/10</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 180</td><td class="hide-s">Boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Helena">Recibo</button></td></tr>
-                      <tr data-st="paid" data-id="marina" data-v="200"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h · pago 05/10</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Cartão automático</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Marina">Recibo</button></td></tr>
+                      <tr data-st="late" data-id="diego" data-v="200"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h · venceu 10/10 · lembretes pausados<span class="fm"> · Pix ou boleto</span></small></div></div></td><td><span class="pill-s warn">Atrasada há 6 dias</span> <span class="pill-s warn aus">16 dias sem treinar</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act two"><button class="mini-btn wa" type="button" data-care="diego">Conversar</button> <button class="mini-btn ghost" type="button" data-fin="diego">Cobrar</button></td></tr>
+                      <tr data-st="late" data-id="patricia" data-v="200"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h · venceu 11/10 · último lembrete 12/10<span class="fm"> · Pix ou boleto</span></small></div></div></td><td><span class="pill-s warn">Atrasada há 5 dias</span> <span class="pill-s warn aus">21 dias sem treinar</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act two"><button class="mini-btn wa" type="button" data-care="patricia">Conversar</button> <button class="mini-btn ghost" type="button" data-fin="patricia">Cobrar</button></td></tr>
+                      <tr data-st="due" data-id="larissa" data-v="200"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h · vence 16/10<span class="fm"> · Pix ou boleto</span></small></div></div></td><td><span class="pill-s gold">Vence hoje · lembrada às 8h</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-fin="larissa">Ver lembrete</button></td></tr>
+                      <tr data-st="due" data-id="joao" data-v="180"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · vence 19/10<span class="fm"> · Cartão automático</span></small></div></div></td><td><span class="pill-s">Vence em 3 dias</span></td><td class="num">R$ 180</td><td class="hide-s">Cartão automático</td><td class="act"><span class="pill-s in">Cobra sozinho</span></td></tr>
+                      <tr data-st="paid" data-id="thiago" data-v="200"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h · pago hoje, 09:12<span class="fm"> · Pix</span></small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Pix</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Thiago">Recibo</button></td></tr>
+                      <tr data-st="paid" data-id="helena" data-v="180"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · pago 10/10<span class="fm"> · Boleto</span></small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 180</td><td class="hide-s">Boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Helena">Recibo</button></td></tr>
+                      <tr data-st="paid" data-id="marina" data-v="200"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h · pago 05/10<span class="fm"> · Cartão automático</span></small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Cartão automático</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Marina">Recibo</button></td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -430,11 +499,11 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
                   <div class="fin-box">
                     <p class="fin-k">Lembretes automáticos</p>
                     <ul class="rules" id="rules">
-                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: 3 dias antes"></button><button class="rl" type="button" data-rule="d3"><b>3 dias antes</b><small>Lembrete com o link de pagamento</small></button></li>
-                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: no dia"></button><button class="rl" type="button" data-rule="d0"><b>No dia do vencimento</b><small>Pix copia e cola e o link</small></button></li>
-                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: 1 dia depois"></button><button class="rl" type="button" data-rule="a1"><b>1 dia depois</b><small>Aviso gentil, sem multa no texto</small></button></li>
-                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: 5 dias depois"></button><button class="rl" type="button" data-rule="a5"><b>5 dias depois</b><small>Último aviso e alerta para o professor</small></button></li>
-                      <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: pagamento confirmado"></button><button class="rl" type="button" data-rule="ok"><b>Pagamento confirmado</b><small>Agradecimento e recibo</small></button></li>
+                      <li><button class="tog" type="button" role="switch" aria-checked="true" aria-label="Lembrete 3 dias antes"></button><button class="rl" type="button" data-rule="d3"><b>3 dias antes</b><small>Lembrete com o link de pagamento</small></button></li>
+                      <li><button class="tog" type="button" role="switch" aria-checked="true" aria-label="Lembrete no dia do vencimento"></button><button class="rl" type="button" data-rule="d0"><b>No dia do vencimento</b><small>Pix copia e cola e o link</small></button></li>
+                      <li><button class="tog" type="button" role="switch" aria-checked="true" aria-label="Lembrete 1 dia depois"></button><button class="rl" type="button" data-rule="a1"><b>1 dia depois</b><small>Aviso gentil, sem multa no texto</small></button></li>
+                      <li><button class="tog" type="button" role="switch" aria-checked="true" aria-label="Lembrete 5 dias depois"></button><button class="rl" type="button" data-rule="a5"><b>5 dias depois</b><small>Último aviso e alerta para o professor</small></button></li>
+                      <li><button class="tog" type="button" role="switch" aria-checked="true" aria-label="Recibo do pagamento confirmado"></button><button class="rl" type="button" data-rule="ok"><b>Pagamento confirmado</b><small>Agradecimento e recibo</small></button></li>
                     </ul>
                     <p class="fin-note">Toque numa etapa para ver a mensagem. No Kids, quem recebe é o responsável. Quem paga no cartão automático não recebe lembrete com link.</p>
                   </div>
@@ -450,7 +519,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
                 </div>
                 <!-- o canal técnico (Evolution API, número só de avisos) fica só neste comentário: na tela, "WhatsApp de avisos" -->
                 <p class="fin-how"><b>Como funciona:</b> o Asaas, serviço de cobrança, gera a mensalidade de cada mês e avisa o painel quando o pagamento cai. Os lembretes saem de um número de WhatsApp só para avisos, separado do atendimento do Studio. Se a conexão cair, o selo no topo fica vermelho e os lembretes esperam. Só o dono do Studio e quem ele autorizar veem esta aba.</p>
-              </div>
+              </section>
 
               <!-- ficha do aluno: um diálogo por cima da lista, com rolagem própria (sem aria-modal: o resto da página continua clicável) -->
               <div class="drawer-scrim" id="drScrim" aria-hidden="true"></div>
@@ -458,7 +527,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
             </div>
           </div>
           <!-- o script leva o aviso para o fim do <body>, preso à janela -->
-          <div class="dash-toast" id="dashToast" role="status" aria-live="polite"><svg class="ic"><use href="#i-check"/></svg><span></span></div>
+          <div class="dash-toast" id="dashToast" role="status" aria-live="polite"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span></span></div>
           <p class="sr-only" id="srLive" aria-live="polite"></p>
         </div>
       </div>
@@ -478,8 +547,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
               <div class="tv-in">
                 <div class="tv-l">
                   <p class="lb">Adulto · aula das 19h</p>
-                  <h4>Código da aula</h4>
-                  <div class="tv-code" id="tvCode" aria-live="polite"><b class="off">·</b><b class="off">·</b><b class="off">·</b><i class="gap"></i><b class="off">·</b><b class="off">·</b><b class="off">·</b></div>
+                  <h3>Código da aula</h3>
+                  <div class="tv-code" id="tvCode" role="img" aria-label="Aguardando o código da aula"><b class="off">·</b><b class="off">·</b><b class="off">·</b><i class="gap"></i><b class="off">·</b><b class="off">·</b><b class="off">·</b></div>
                   <p class="how">Abra o app do Studio, toque em Presença e digite o código.</p>
                   <p class="tv-time"><span id="tvUntil">Aguardando o código</span><i><span id="tvBar" style="width:0%"></span></i></p>
                 </div>
@@ -497,14 +566,14 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
         <figure class="tv-phone">
           <div class="device" id="pDevice">
             <div class="ap">
-              <div class="ap-sbar"><span id="pClock">18:54</span><span>5G</span></div>
+              <div class="ap-sbar" aria-hidden="true"><span id="pClock">18:54</span><span>5G</span></div>
               <div class="ap-views">
                 <section class="ap-view on" aria-label="Tela Presença no celular da aluna">
                   <p class="ap-lb">Presença</p>
                   <p class="ap-hi">Aula das 19h</p>
                   <p class="ap-mut" style="margin-top:4px">Adulto · sexta, 16 de outubro</p>
                   <ol class="ap-steps">
-                    <li class="done"><span class="ap-mk"><svg class="ic"><use href="#i-check"/></svg></span><div><p class="ap-st">Vaga confirmada</p><p>Às 18:14 · 8 de 10 vagas</p></div></li>
+                    <li class="done"><span class="ap-mk"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><div><p class="ap-st">Vaga confirmada</p><p>Às 18:14 · 8 de 10 vagas</p></div></li>
                     <li class="now" id="pStep2"><span class="ap-mk">2</span><div><p class="ap-st" id="pStep2h">Digite o código da aula</p><p id="pStep2t">Está na TV do tatame.</p>
                       <div id="pCodeWrap" style="overflow:hidden"><div class="ap-code" id="pCode" aria-hidden="true"><b class="caret"></b><b></b><b></b><b></b><b></b><b></b></div>
                       <span class="ap-btn off" id="pReg">Registrar presença</span></div></div></li>
@@ -514,10 +583,10 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
                 </section>
               </div>
               <div class="ap-dock" aria-hidden="true">
-                <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-home"/></svg>Início</button>
-                <button type="button" tabindex="-1" aria-current="true"><svg class="ic"><use href="#i-check"/></svg>Presença</button>
-                <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-play"/></svg>Movimentos</button>
-                <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-belt"/></svg>Perfil</button>
+                <button type="button" tabindex="-1" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Início</button>
+                <button type="button" tabindex="-1" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Presença</button>
+                <button type="button" tabindex="-1" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
+                <button type="button" tabindex="-1" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Perfil</button>
               </div>
               <i class="ap-glare" aria-hidden="true"></i>
             </div>
@@ -552,7 +621,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     <div class="wrap">
       <a href="area-do-aluno.html" data-int>
         <div><p class="label">Do outro lado do tatame</p><h2>Agora veja a <em>Área do Aluno</em>.</h2></div>
-        <span class="go"><svg class="ic"><use href="#i-arrow"/></svg></span>
+        <span class="go"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></span>
       </a>
     </div>
   </section>
@@ -562,9 +631,9 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   <div class="wrap">
     <div class="foot-grid">
       <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
-      <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>App</h4><ul><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
-      <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
+      <div><p class="foot-h">Site</p><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
+      <div><p class="foot-h">App</p><ul><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><p class="foot-h">Contato</p><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
     <div class="foot-bottom"><span>Dados de exemplo: alunos, interessados e números desta página são fictícios.</span><span>Proposta de redesign · versão para aprovação</span></div>
@@ -584,17 +653,37 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
      que interrompia a rolagem nativa no meio e deixava a mensagem abaixo da tela */
   var tweenH = anim && Site.fine, MORPH_MS = tweenH ? 720 : 320;
   var dash = $("#dash"), main = $(".dash-main", dash), views = $$(".dv", dash), side = $$(".dash-side button[data-go]", dash);
-  var drawer = $("#drawer"), scrim = $("#drScrim"), drFrom = null;
+  var drawer = $("#drawer"), scrim = $("#drScrim"), drFrom = null, drAt = null;
 
   /* aviso do painel: mora no <body>, preso à janela (o painel passa da altura da tela), e só aparece com o
      painel à vista. Fica o tempo de ler (55 ms por letra, no mínimo 3,4 s) e espera o mouse ou o foco saírem */
   var toastEl = $("#dashToast"), toastT = null, toastMs = 3400, dashInView = true;
   document.body.appendChild(toastEl);
   function toastArm() { clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove("on"); }, toastMs); }
+  /* o aviso não cobre o foco (o que acabou de mudar): medido no pé da tela, se ali ele cobriria o foco, vai para o
+     alto. Na ficha, o alto é do nome e do X: ali ele sobe só até acima da barra de ações. Com a página ainda rolando
+     até o foco (focusIn), vale o lugar onde o foco vai parar (dy). A troca de lugar é sem transição, para o aviso
+     entrar pelo lado certo (de baixo ou de cima) */
+  function toastSpot() {
+    var a = document.activeElement, r = a && a !== document.body && a !== document.documentElement ? a.getBoundingClientRect() : null;
+    toastEl.style.transition = "none";
+    toastEl.classList.remove("up");
+    toastEl.style.bottom = "";
+    if (r && r.height) {
+      var dy = rolling && aim && aim.el === a ? aim.dy : 0, t = toastEl.offsetTop, l = toastEl.offsetLeft, bar = a.closest(".dr-acts");
+      if (r.bottom - dy > t - 8 && r.top - dy < t + toastEl.offsetHeight && r.right > l && r.left < l + toastEl.offsetWidth) {
+        if (bar) toastEl.style.bottom = Math.round(innerHeight - bar.getBoundingClientRect().top + dy + 8) + "px";
+        else toastEl.classList.add("up");
+      }
+    }
+    void toastEl.offsetWidth;
+    toastEl.style.transition = "";
+  }
   /* anywhere: o aviso nasce fora do painel (ex.: no Modo tatame) e aparece mesmo assim */
   function toast(msg, anywhere) {
     if (!dashInView && !anywhere) return;
     $("span", toastEl).textContent = msg;
+    toastSpot();
     toastEl.classList.add("on");
     toastMs = Math.max(3400, 55 * msg.length);
     toastArm();
@@ -615,15 +704,33 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   function norm(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
   var NAMES = { branca: "Branca", cinza: "Cinza", amarela: "Amarela", laranja: "Laranja", verde: "Verde", azul: "Azul", roxa: "Roxa", marrom: "Marrom", preta: "Preta" };
   function beltTxt(b, g) { return NAMES[b] + " · " + (g ? g + (g === 1 ? " grau" : " graus") : "sem grau"); }
-  /* um ScrollTrigger.refresh só, quando as mudanças assentam */
-  var rT;
-  function refresh() { clearTimeout(rT); rT = setTimeout(function () { if (window.ScrollTrigger) ScrollTrigger.refresh(); }, 250); }
+  function beltLabel(b, g) { return "Faixa " + beltTxt(b, g).toLowerCase().replace(" · ", ", "); }
+  /* um ScrollTrigger.refresh só, quando as mudanças assentam. Ele devolve a página ao y daquele instante: no toque,
+     isso cortava no meio a rolagem nativa suave do script (o foco e o painel paravam fora da tela). Então, com uma
+     rolagem do script em curso, ele espera o fim dela */
+  var rT, rolling = 0, rLate = false;
+  function refresh() {
+    clearTimeout(rT);
+    rT = setTimeout(function () { if (rolling) { rLate = true; return; } if (window.ScrollTrigger) ScrollTrigger.refresh(); }, 250);
+  }
+  /* toda rolagem suave da página feita por este script passa por aqui */
+  function scrollPage(el, off) {
+    rolling++;
+    Site.scrollTo(el, off, function () { rolling--; if (!rolling && rLate) { rLate = false; refresh(); } });
+  }
   function replayClass(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
-  /* foco sem cair no body; se o lugar novo estiver fora da tela, a página rola até ele */
+  /* foco sem cair no body; se o lugar novo estiver fora da tela, a página rola até ele: vindo de cima, até 160 px do
+     topo; vindo de baixo, só o que falta para ele aparecer inteiro (subir até o alto tirava da tela o resultado logo
+     acima, como a faixa do grau). Dentro da tela, mesmo no pé dela, nada rola: quem sai da frente é o aviso
+     (toastSpot). Rolar ali passava outra linha sob o dedo, e o 2º toque de um toque duplo marcava outro aluno.
+     aim: onde o foco vai parar, para o aviso decidir o lugar dele enquanto a página rola */
+  var aim = null;
   function focusIn(el) {
     if (!el || !focusSoft(el, { preventScroll: true })) return;
-    var r = el.getBoundingClientRect();
-    if (r.top < 80 || r.bottom > innerHeight) Site.scrollTo(el, -160);
+    var r = el.getBoundingClientRect(), to = r.top < 80 ? 160 : r.bottom > innerHeight ? Math.max(160, innerHeight - 24 - r.height) : null;
+    if (to === null) return;
+    aim = { el: el, dy: r.top - to };
+    scrollPage(el, -to);
   }
 
   /* a janela do painel muda de altura com suavidade quando o conteúdo muda. A altura de partida é a da tela
@@ -681,6 +788,21 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   /* o mesmo, logo depois da próxima pintura: trocar inert junto com a aba atrasava o quadro do toque (~25 ms
      num celular simples). Nesse intervalo, a aba que sai já não recebe toque (pointer-events, em app.css) */
   function syncInertSoon() { requestAnimationFrame(function () { setTimeout(syncInert, 0); }); }
+  /* celular: o menu é uma faixa que rola para o lado. O item ativo (ou o focado) que estiver fora da vista, ou sob a
+     borda esmaecida, vai para o começo da faixa. Só o menu rola, nunca a página (por isso, nada de scrollIntoView) */
+  var sideBox = $(".dash-side", dash);
+  function sideTo(b) {
+    if (!b || sideBox.scrollWidth <= sideBox.clientWidth + 1) return;
+    var r = b.getBoundingClientRect(), c = sideBox.getBoundingClientRect();
+    if (r.left >= c.left && r.right <= c.right - 48) return;
+    sideBox.scrollTo({ left: r.left - c.left + sideBox.scrollLeft - 16, behavior: Site.reduce ? "auto" : "smooth" });
+  }
+  /* no fim da faixa, a borda deixa de esmaecer (não há mais nada à direita) */
+  function sideEnd() { sideBox.classList.toggle("at-end", sideBox.scrollLeft + sideBox.clientWidth >= sideBox.scrollWidth - 2); }
+  sideBox.addEventListener("scroll", sideEnd, { passive: true });
+  sideBox.addEventListener("focusin", function (e) { if (e.target.dataset.go) sideTo(e.target); });
+  window.addEventListener("resize", sideEnd);
+  sideEnd();
   /* focus: a troca veio de um atalho (KPI), e o foco vai para o título da aba. Clique no menu não move o foco */
   function go(name, focus) {
     closeDrawer(true);
@@ -693,13 +815,24 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
         side.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
         if (name === "alunos" && needF) { needF = false; filter(curF); }
       });
+      sideTo(side.filter(function (b) { return b.dataset.go === name; })[0]);
       /* com o foco indo para a aba nova, o inert sai antes; senão, depois da pintura */
       if (focus) syncInert(); else syncInertSoon();
-      if (dash.getBoundingClientRect().top < 0) Site.scrollTo(dash, -90);
+      /* a aba nova começa no alto do painel. No toque, a página vai direto: a troca acabou de encolher o painel
+         acima da tela (os atalhos do Hoje ficam abaixo da aula), e a rolagem suave passaria pelo Modo tatame e o ligaria */
+      var dTop = dash.getBoundingClientRect().top;
+      if (dTop < 0) { if (Site.lenis) scrollPage(dash, -90); else window.scrollTo(0, dTop + scrollY - 90); }
     }
     if (focus) focusSoft(viewH(name), { preventScroll: true });
   }
   side.forEach(function (b) { b.addEventListener("click", function () { go(b.dataset.go); }); });
+  /* selo do menu: o número muda junto com o nome do botão, que diz o que ele conta ("Graduações, 3 para avaliar") */
+  function badge(el, n, what) {
+    var b = el.parentNode, lb = b.getAttribute("aria-label").split(",")[0];
+    el.textContent = n;
+    el.hidden = !n;
+    b.setAttribute("aria-label", n ? lb + ", " + n + " " + what : lb);
+  }
   $$("[data-goto]", dash).forEach(function (b) {
     b.addEventListener("click", function () { if (b.dataset.chip) filter(b.dataset.chip); go(b.dataset.goto, true); });
   });
@@ -709,7 +842,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     a8: { t: "Adulto · 8h", s: "Aula encerrada", p: ["Ana Beatriz Rocha|branca|4", "Rodrigo Faria|azul|2", "Vinícius Teles|branca|3", "Bianca Lopes|roxa|0", "Otávio Reis|branca|1", "Sérgio Matos|marrom|2", "Paula Dias|azul|1"] },
     k10: { t: "Kids · 10h", s: "Aula encerrada", p: ["Helena Prado|amarela|2", "Davi Souza|cinza|1", "Alice Martins|branca|3", "Arthur Gomes|amarela|0", "Laura Pinto|cinza|4", "Gael Ribeiro|branca|2", "Cecília Araújo|laranja|1", "Benício Castro|branca|0", "Sofia Barros|cinza|2"] },
     a11: { t: "Adulto · 11h", s: "Aula encerrada", p: ["Henrique Assis|roxa|2", "Fábio Lacerda|azul|4", "Mariana Queiroz|branca|2", "Gabriel Duarte|azul|0", "Tatiane Lins|branca|1", "Wagner Prates|preta|1"] },
-    k18: { t: "Kids · 18h", s: "Em andamento, até as 19:00", p: ["João Pedro Lima|cinza|3", "Miguel Torres|branca|2", "Lorenzo Vieira|amarela|1", "Valentina Melo|cinza|0", "Heitor Cunha|branca|4", "Manuela Freitas|laranja|2", "Bernardo Lopes|branca|1", "Isabela Rocha|amarela|3"] }
+    k18: { t: "Kids · 18h", s: "Agora, até as 19:00", p: ["João Pedro Lima|cinza|3", "Miguel Torres|branca|2", "Lorenzo Vieira|amarela|1", "Valentina Melo|cinza|0", "Heitor Cunha|branca|4", "Manuela Freitas|laranja|2", "Bernardo Lopes|branca|1", "Isabela Rocha|amarela|3"] }
   };
   /* no Kids, a chamada é do professor: no Kids 18h, 6 crianças já foram marcadas e 2 ainda não */
   var KIDS_LEFT = ["Bernardo Lopes", "Isabela Rocha"];
@@ -786,12 +919,12 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     return '<div class="room-h"><div><h4>Adulto · 19h</h4><p id="rCount"></p><p class="rec-n" id="rRec" hidden></p></div>' +
       '<div class="room-tools"><label for="valSel">Vale por</label><select class="sel" id="valSel">' +
       '<option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hora</option><option value="90">1h30</option></select>' +
-      '<button class="ap-btn" type="button" id="genBtn"><svg class="ic"><use href="#i-code"/></svg><span>Gerar código da aula</span></button></div></div>' +
+      '<button class="ap-btn" type="button" id="genBtn"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-code"/></svg><span>Gerar código da aula</span></button></div></div>' +
       '<div class="cap-bar" id="capBar" aria-hidden="true">' + new Array(11).join("<i></i>") + "</div>" +
       '<div class="codebox"><div><span class="cd hold" id="cd">O código aparece aqui</span><small id="cdNote">3 letras e 3 números. Vale só para esta aula.</small></div>' +
       '<div class="acts" id="cdActs" hidden><button class="mini-btn" type="button" id="tvBtn">Mostrar na TV</button><button class="mini-btn ghost" type="button" id="noTvBtn" hidden>Seguir sem a TV</button></div></div>' +
       '<ul class="roster" id="roster"></ul>' +
-      '<div class="walkin"><button type="button" id="walkBtn" aria-expanded="false" aria-controls="walkBox"><svg class="ic"><use href="#i-plus"/></svg>Marcar quem veio sem confirmar</button>' +
+      '<div class="walkin"><button type="button" id="walkBtn" aria-expanded="false" aria-controls="walkBox"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Marcar quem veio sem confirmar</button>' +
       '<div id="walkBox" hidden><input class="sel" type="search" id="walkQ" aria-label="Buscar aluno" placeholder="Buscar aluno" autocomplete="off" spellcheck="false">' +
       '<ul id="walkList"></ul><p class="walk-none" id="walkNone" hidden>Ninguém com esse nome entre os alunos de exemplo.</p></div></div>';
   }
@@ -812,6 +945,9 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     if (!list) return;
     var left = WALK.filter(function (w) { return !st.arrived[w[0]]; }), q = norm(st.q.trim());
     var shown = left.filter(function (w) { return !q || norm(w[0]).indexOf(q) > -1; });
+    /* uma chegada pelo app também redesenha a lista: quem estava num botão dela continua no mesmo botão (ia para o body) */
+    var f = document.activeElement, fk = list.contains(f) ? ["walk", "walkyes", "walkno"].filter(function (k) { return f.dataset[k]; })[0] : null;
+    if (fk) fk = "[data-" + fk + '="' + f.dataset[fk] + '"]';
     list.innerHTML = shown.map(function (w) {
       if (st.ask === w[0]) return '<li class="ask"><span>Turma cheia (' + st.order.length + " de 10). Marcar " + first(w[0]) + ' mesmo assim?</span><button class="mini-btn" type="button" data-walkyes="' + w[0] + '">Marcar</button><button class="mini-btn ghost" type="button" data-walkno="' + w[0] + '">Cancelar</button></li>';
       return '<li><button type="button" data-walk="' + w[0] + '">' + w[0] + " · " + w[3] + "</button></li>";
@@ -819,6 +955,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     $("#walkNone").hidden = !!shown.length || !left.length;
     btn.hidden = !left.length;
     if (!left.length) { $("#walkBox").hidden = true; btn.setAttribute("aria-expanded", "false"); }
+    if (fk && $(fk, list)) focusSoft($(fk, list), { preventScroll: true });
   }
   function fmt(c) { return c.slice(0, 3) + " " + c.slice(3); }
   function untilTxt() { return "até " + hm(st.start + st.valid); }
@@ -838,7 +975,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     var m = st.order.length, conf = CONF.length, taken = conf + st.walk.length;
     var prof = st.order.filter(function (n) { return st.by[n] === "prof"; }).length;
     var r = $("#rCount");
-    if (r) r.textContent = conf + " de 10 vagas confirmadas · " + (m ? m + " no tatame" + (prof ? " (" + (m > prof ? m - prof + " pelo app, " : "") + prof + " pelo professor)" : "") : "ninguém chegou ainda");
+    /* o cabeçalho diz se a aula é a próxima ou a de agora (no celular, o chip da aula mostra só a hora) */
+    if (r) r.textContent = (st.clock >= END18 ? "Agora · " : "Próxima aula · ") + conf + " de 10 vagas confirmadas · " + (m ? m + " no tatame" + (prof ? " (" + (m > prof ? m - prof + " pelo app, " : "") + prof + " pelo professor)" : "") : "ninguém chegou ainda");
     $$("#capBar i").forEach(function (b, i) { b.className = i < m ? "in" : i < taken ? "c" : ""; });
     $("#c19s").innerHTML = conf + " de 10" + (m ? "<br>" + m + " no tatame" : "");
     /* presenças da semana: cada adulto que chega e cada criança marcada agora */
@@ -855,9 +993,12 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   /* às 19:00 a aula das 18h acaba e a das 19h vira o "agora" (o relógio anda com as chegadas) */
   function paintNow() {
     var after = st.clock >= END18, k = $('#classes [data-c="k18"]'), a = $('#classes [data-c="a19"]');
-    PAST.k18.s = after ? "Aula encerrada" : "Em andamento, até as 19:00";
+    PAST.k18.s = after ? "Aula encerrada" : "Agora, até as 19:00";
     $("#dNow").textContent = after ? "Agora: Adulto 19h" : "Agora: Kids 18h · Próxima: Adulto 19h";
     k.classList.toggle("past", after);
+    /* .now: no celular, o chip da aula de agora ganha fundo dourado e um ponto */
+    k.classList.toggle("now", !after);
+    a.classList.toggle("now", after);
     $("span", k).textContent = after ? "Kids" : "Kids · agora";
     $("span", a).textContent = after ? "Adulto · agora" : "Adulto";
     $("#c18s").innerHTML = kidsTxt(true);
@@ -870,6 +1011,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     $("#tvCode").innerHTML = st.code.split("").map(function (ch, i) {
       return (i === 3 ? '<i class="gap"></i>' : "") + '<b class="' + (flip && anim ? "flip" : "") + '" style="animation-delay:' + i * 90 + 'ms">' + ch + "</b>";
     }).join("");
+    $("#tvCode").setAttribute("aria-label", "Código da aula: " + fmt(st.code));
     $("#tvUntil").textContent = "Vale " + untilTxt();
     paintBar();
   }
@@ -918,7 +1060,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   /* estado final sem a animação: a Marina registrou pelo app longe da TV, ou o professor marcou a presença dela */
   phone.done = function (t, by) {
     phone.clear();
-    ["#pStep2", "#pStep3"].forEach(function (s) { var li = $(s); li.className = "done"; $(".ap-mk", li).innerHTML = '<svg class="ic"><use href="#i-check"/></svg>'; });
+    ["#pStep2", "#pStep3"].forEach(function (s) { var li = $(s); li.className = "done"; $(".ap-mk", li).innerHTML = '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>'; });
     $("#pStep2h").textContent = by === "prof" ? "Presença marcada pelo professor" : "Código digitado";
     $("#pStep2t").textContent = by === "prof" ? "Às " + t + ", na chamada do painel." : (st.code ? fmt(st.code) + " · " : "") + "às " + t;
     var w = $("#pCodeWrap");
@@ -945,7 +1087,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     T(function () { $("#pReg").classList.add("press"); }, end + 150);
     T(function () {
       $("#pReg").classList.remove("press");
-      ["#pStep2", "#pStep3"].forEach(function (s) { var li = $(s); li.className = "done"; $(".ap-mk", li).innerHTML = '<svg class="ic"><use href="#i-check"/></svg>'; });
+      ["#pStep2", "#pStep3"].forEach(function (s) { var li = $(s); li.className = "done"; $(".ap-mk", li).innerHTML = '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>'; });
       $("#pStep2h").textContent = "Código digitado";
       $("#pStep2t").textContent = fmt(code) + " · às " + time;
       var w = $("#pCodeWrap");
@@ -1024,9 +1166,14 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     var r = $("#roster");
     if (!r) return null;
     var li = $('li[data-n="' + name + '"]', r), c = confOf(name), w = walkOf(name), html = c ? confLi(c) : w && st.arrived[name] ? walkLi(w) : "";
+    var had = !!li && li.contains(document.activeElement);
     if (!html) { if (li) li.remove(); return null; }
     if (li) li.outerHTML = html; else r.insertAdjacentHTML("beforeend", html);
-    return $('li[data-n="' + name + '"]', r);
+    li = $('li[data-n="' + name + '"]', r);
+    /* o foco estava nessa linha (ex.: no "Marcar chegada" de quem acabou de chegar pelo app): vai para a linha refeita,
+       não para o botão novo, que agora desfaz */
+    if (had) focusSoft(li, { preventScroll: true });
+    return li;
   }
   /* Kids 18h: o professor marca cada criança (ou desfaz); depois das 19:00, a marcação diz "depois da aula" */
   function setKid(name, t) {
@@ -1037,8 +1184,13 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     return li;
   }
 
-  /* fila de chegadas da demonstração */
-  function next() { if (st.code && st.idx < ARR.length && !st.timer && !phone.busy && !st.waitTV) st.timer = setTimeout(step, 1250 + Math.random() * 650); }
+  /* fila de chegadas da demonstração. Com movimento reduzido não há cronômetro: as chegadas saem de uma vez */
+  var batch = false;
+  function next() {
+    if (!st.code || st.idx >= ARR.length || st.timer || phone.busy || st.waitTV) return;
+    if (Site.reduce) { if (!batch) arriveAll(); return; }
+    st.timer = setTimeout(step, 1250 + Math.random() * 650);
+  }
   function step() {
     st.timer = null;
     while (st.idx < ARR.length && st.arrived[ARR[st.idx][0]]) st.idx++;
@@ -1056,7 +1208,24 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   function startArrivals() {
     if (st.waitTV && tvOn) { st.waitTV = false; paintCodeBox(false); }
     if (st.timer || phone.busy || st.waitTV || st.idx >= ARR.length || !st.code) return;
-    st.timer = setTimeout(step, 1300);
+    if (Site.reduce) arriveAll(); else st.timer = setTimeout(step, 1300);
+  }
+  /* movimento reduzido: todos chegam juntos, e o celular da Marina vai direto ao fim, sem a digitação. Com a TV
+     desligada, a fila para na Marina, como no modo normal. O leitor de tela ouve um resumo só, não sete frases */
+  function arriveAll() {
+    var got = [];
+    batch = true;
+    while (st.idx < ARR.length) {
+      var a = ARR[st.idx];
+      if (st.arrived[a[0]]) { st.idx++; continue; }
+      if (a[2] === "phone" && !tvOn) { st.waitTV = true; paintCodeBox(false); break; }
+      st.idx++;
+      setPresence(a[0], a[1], { mine: a[2] === "phone", quiet: true });
+      got.push(a[0]);
+    }
+    batch = false;
+    if (got.length) srSay((got.length === 1 ? got[0] + " chegou. " : "Chegaram " + got.slice(0, -1).join(", ") + " e " + got[got.length - 1] + ". ") +
+      st.order.length + " no tatame, de " + CONF.length + " vagas confirmadas.");
   }
   /* "Recomeçar a demonstração": a única coisa que zera a chamada (painel, TV, celular e Kids) e volta o relógio */
   function replay() {
@@ -1095,10 +1264,13 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   });
   renderRoom("a19");
 
-  /* "Mostrar na TV" só rola: quem liga a TV é ela aparecer na tela. O foco vai para o título do Modo tatame */
+  /* "Mostrar na TV" só rola: quem liga a TV é ela aparecer na tela. O foco vai para o título do Modo tatame.
+     Na tela baixa (celular deitado), título e meia TV não cabem juntos: a TV vai para logo abaixo da barra e o foco,
+     para o título dentro dela */
   function showTV() {
-    focusSoft($("#t-tv"), { preventScroll: true });
-    Site.scrollTo("#t-tv", -100);
+    var tv = $("#tv"), h = $("#t-tv"), low = 100 + tv.getBoundingClientRect().top - h.getBoundingClientRect().top + tv.offsetHeight / 2 > innerHeight;
+    focusSoft(low ? $(".tv-l h3") : h, { preventScroll: true });
+    scrollPage(low ? tv : h, low ? -90 : -100);
   }
   /* "Seguir sem a TV": a Marina registra pelo app às 18:55, sem a cena do celular, e a fila continua */
   function noTV() {
@@ -1108,10 +1280,27 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     focusIn($('#roster li[data-n="' + a[0] + '"]'));
     toast(first(a[0]) + " registrou a presença pelo app às " + t + ".");
   }
+  /* um toque duplo sem querer (mão suada no tatame) vale um toque só. O 2º toque chega de 100 a 300 ms depois, no
+     mesmo ponto da tela, e ali já pode estar outra coisa: o "Desfazer" no lugar do "Marcar chegada", ou outro nome,
+     quando a lista anda (quem veio sem confirmar entra na chamada e empurra a busca para baixo). Por 0,4 s, não vale
+     um toque no mesmo ponto nem na mesma linha (o teclado não tem ponto: vale a linha). k: a linha ou o botão */
+  var hit = { k: null, x: -99, y: -99, t: 0 };
+  function again(x, y) { return Date.now() - hit.t < 400 && Math.abs(x - hit.x) < 24 && Math.abs(y - hit.y) < 24; }
+  function tooSoon(e, k) {
+    var pt = e.detail > 0 && (e.clientX || e.clientY);
+    if ((pt && again(e.clientX, e.clientY)) || (k && k === hit.k && Date.now() - hit.t < 400)) return true;
+    hit = { k: k, x: pt ? e.clientX : -99, y: pt ? e.clientY : -99, t: Date.now() };
+    return false;
+  }
+  /* o 2º toque barrado também não mexe no foco: o navegador o levaria ao botão (ou ao fundo) que passou sob o dedo */
+  dash.addEventListener("touchend", function (e) { var t = e.changedTouches[0]; if (t && again(t.clientX, t.clientY)) e.preventDefault(); });
+  dash.addEventListener("mousedown", function (e) { if (again(e.clientX, e.clientY)) e.preventDefault(); });
   $("#room").addEventListener("click", function (e) {
     var t = e.target.closest("button");
     if (!t) return;
-    var d = t.dataset, n, li;
+    var d = t.dataset, n, li, row = d.mark || d.undo || d.markkid || d.undokid;
+    /* barrado aqui, o toque também não abre a ficha (o nome é um botão da linha, tratado no painel) */
+    if (tooSoon(e, row || t.id)) { e.stopPropagation(); return; }
     if (t.id === "genBtn") generate(false);
     else if (t.id === "tvBtn") showTV();
     else if (t.id === "noTvBtn") noTV();
@@ -1170,9 +1359,15 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   function emptyRow(tb, txt) {
     var e = $("tr.empty", tb);
     if (!txt) { if (e) e.remove(); return; }
-    if (!e) { tb.insertAdjacentHTML("beforeend", '<tr class="empty"><td colspan="5"></td></tr>'); e = $("tr.empty", tb); }
+    if (!e) { tb.insertAdjacentHTML("beforeend", '<tr class="empty" role="row"><td colspan="5" role="cell"></td></tr>'); e = $("tr.empty", tb); }
     $("td", e).textContent = txt;
   }
+  /* papéis de tabela declarados: no celular a linha vira cartão (display grid), e o Safari deixaria de ler como tabela */
+  function tblRoles(t) {
+    t.setAttribute("role", "table");
+    [["thead, tbody", "rowgroup"], ["tr", "row"], ["th", "columnheader"], ["td", "cell"]].forEach(function (r) { $$(r[0], t).forEach(function (el) { el.setAttribute("role", r[1]); }); });
+  }
+  $$("#tbl, #finTbl").forEach(tblRoles);
   function filter(f) {
     curF = f;
     chips.forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.f === f ? "true" : "false"); });
@@ -1190,9 +1385,10 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     for (var i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
     return function () { h += 0x6D2B79F5; var t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   }
-  var TODAY = "2026-10-16", WD = ["seg", "ter", "qua", "qui", "sex"], MON = { 1: "ago", 6: "set", 10: "out" }, HEAT = {};
+  var TODAY = "2026-10-16", WD = ["seg", "ter", "qua", "qui", "sex"], WDL = ["segunda", "terça", "quarta", "quinta", "sexta"], MON = { 1: "ago", 6: "set", 10: "out" }, HEAT = {};
   function isoOf(w, d) { var dt = new Date(2026, 6, 27 + w * 7 + d); return dt.getFullYear() + "-" + two(dt.getMonth() + 1) + "-" + two(dt.getDate()); }
-  function dl(k) { if (k === TODAY) return "hoje"; var p = k.split("-"), dt = new Date(+p[0], +p[1] - 1, +p[2]); return WD[(dt.getDay() + 6) % 7] + ", " + p[2] + "/" + p[1]; }
+  /* long: o dia por extenso ("quarta, 14/10"), para o leitor de tela */
+  function dl(k, long) { if (k === TODAY) return "hoje"; var p = k.split("-"), dt = new Date(+p[0], +p[1] - 1, +p[2]); return (long ? WDL : WD)[(dt.getDay() + 6) % 7] + ", " + p[2] + "/" + p[1]; }
   /* p.came: a hora em que o aluno chegou hoje (setPresence); o dia de hoje vira "veio" */
   function heat(id) {
     if (HEAT[id]) return HEAT[id];
@@ -1264,7 +1460,9 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   }
 
   function trioHTML(p, cells) {
-    return "<div><b>" + cells.filter(inOct).length + "</b><span>aulas em outubro</span></div><div><b>" + p.total + "</b><span>presenças no total</span></div><div><b>" + p.desde + "</b><span>aulas desde o último grau</span></div>";
+    var oct = cells.filter(inOct).length, pl = function (n, one, many) { return "<b>" + n + "</b><span>" + (n === 1 ? one : many) + "</span>"; };
+    return "<div>" + pl(oct, "aula em outubro", "aulas em outubro") + "</div><div>" + pl(p.total, "presença no total", "presenças no total") + "</div><div>" +
+      pl(p.desde, "aula desde o último grau", "aulas desde o último grau") + "</div>";
   }
   function legHTML(cells) {
     return '<span><i class="y"></i>veio</span><span><i></i>não veio</span>' + (cells.some(function (c) { return c.s === "t"; }) ? '<span><i class="t"></i>confirmou hoje</span>' : "");
@@ -1272,7 +1470,13 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   function lastHTML(p, cells) {
     return cells.filter(function (c) { return c.s === "y"; }).slice(-3).reverse().map(function (c) { return "<li>" + dl(c.k) + "<span>" + p.cls + "</span></li>"; }).join("");
   }
-  function heatLabel(cells) { return cells.filter(function (c) { return c.s === "y"; }).length + " presenças nas últimas 12 semanas"; }
+  /* o mapa para o leitor de tela: total, média por semana, a última aula e a reserva de hoje (o detalhe dia a dia
+     está nas "Últimas aulas") */
+  function heatLabel(cells) {
+    var ys = cells.filter(function (c) { return c.s === "y"; }), n = ys.length, last = ys[n - 1];
+    return n + (n === 1 ? " presença" : " presenças") + " em 12 semanas; média " + (n / 12).toFixed(1).replace(".", ",") + " por semana" +
+      (last ? "; última aula " + dl(last.k, true) : "") + (cells.some(function (c) { return c.s === "t"; }) ? "; confirmou a aula de hoje" : "");
+  }
   /* na vitrine, o professor é o dono: a ficha mostra a mensalidade (sem valores) e o último contato, de qualquer canal */
   function infoHTML(p) {
     var fee = p.fee || "em dia", c = p.contact;
@@ -1294,11 +1498,13 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     var p = PEOPLE[id];
     if (!p) return;
     drFrom = from || null;
+    /* onde o nome que abriu a ficha estava na tela: ao fechar, a página volta para esse ponto da lista */
+    drAt = from ? from.getBoundingClientRect().top : null;
     drawer.dataset.id = id;
     var cells = heat(id);
     drawer.innerHTML =
       '<div class="dr-top"><div class="dr-h"><span class="av">' + ini(p.n) + '</span><div><h3 id="drName" tabindex="-1">' + p.n + "</h3><p>" + p.cls + (p.age ? " · " + p.age : "") + " · " + p.since + "</p></div></div>" +
-      '<button class="dr-close" type="button" aria-label="Fechar a ficha"><svg class="ic"><use href="#i-x"/></svg></button></div>' +
+      '<button class="dr-close" type="button" aria-label="Fechar a ficha"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-x"/></svg></button></div>' +
       '<div class="dr-body">' +
       (p.aus ? '<p class="dr-alert"><span class="pill-s warn">' + p.aus + " dias sem treinar</span>Última aula: " + dl(p.last) + ".</p>" : "") +
       '<div class="dr-belt">' + beltSVG(p.belt, p.g) + "<p><b>" + beltTxt(p.belt, p.g) + "</b><span>último grau: " + p.ult + "</span></p></div>" +
@@ -1317,21 +1523,27 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     syncInert();
     /* a ficha nasce no alto do painel: se ela não estiver inteira na tela, a página rola até ela */
     var r = drawer.getBoundingClientRect();
-    if (r.top < 80 || r.bottom > innerHeight) Site.scrollTo(drawer, -96);
+    if (r.top < 80 || r.bottom > innerHeight) scrollPage(drawer, -96);
     focusSoft($("#drName"), { preventScroll: true });
   }
-  /* silent: quem fechou (go) cuida do foco. Senão, o foco volta ao nome que abriu a ficha, ou ao título da aba */
+  /* silent: quem fechou (go) cuida do foco. Senão, o foco volta ao nome que abriu a ficha, ou ao título da aba.
+     O toque fora da ficha (no véu) deixa o foco no body: conta como se viesse da ficha */
   function closeDrawer(silent) {
     if (!drawer.classList.contains("on")) return;
-    var had = drawer.contains(document.activeElement);
+    var a = document.activeElement, had = drawer.contains(a) || !a || a === document.body;
     drawer.classList.remove("on");
     scrim.classList.remove("on");
     syncInert();
     if (!had || silent) return;
     /* a linha da chamada pode ter sido refeita (uma chegada) enquanto a ficha estava aberta: vale o botão novo */
     var back = drFrom && drFrom.isConnected ? drFrom : $('.dv.on .nm-btn[data-person="' + drawer.dataset.id + '"]', dash);
-    if (back && back.closest(".dv.on")) focusSoft(back, { preventScroll: true });
-    else focusSoft(viewH(cur), { preventScroll: true });
+    if (!back || !back.closest(".dv.on")) { focusSoft(viewH(cur), { preventScroll: true }); return; }
+    focusSoft(back, { preventScroll: true });
+    /* a página subiu até a ficha (no alto do painel): volta ao ponto da lista onde a pessoa estava, com o nome no
+       mesmo lugar da tela (entre a barra fixa e o pé da tela) */
+    if (drAt === null) return;
+    var r = back.getBoundingClientRect(), y = Math.max(96, Math.min(drAt, innerHeight - 120 - r.height));
+    if (Math.abs(r.top - y) > 24) scrollPage(back, -y);
   }
   $("#tbl tbody").addEventListener("click", function (e) {
     var b = e.target.closest("button");
@@ -1363,7 +1575,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       var want = box.offsetTop + box.offsetHeight - (drawer.clientHeight - $(".dr-acts", drawer).offsetHeight) + 16;
       if (want > drawer.scrollTop) drawer.scrollTo({ top: want, behavior: anim ? "smooth" : "auto" });
       var r = drawer.getBoundingClientRect();
-      if (r.top < 0 || r.bottom > innerHeight) Site.scrollTo(drawer, -96);
+      if (r.top < 0 || r.bottom > innerHeight) scrollPage(drawer, -96);
     }
   });
 
@@ -1427,7 +1639,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     setTimeout(function () {
       if (box.hidden) return;
       var r = box.getBoundingClientRect();
-      if (r.bottom > innerHeight || r.top < 70) Site.scrollTo(box, -120);
+      if (r.bottom > innerHeight || r.top < 70) scrollPage(box, -120);
     }, MORPH_MS);
   }
   function closeMsg(box) {
@@ -1441,7 +1653,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     $$(".gcard").forEach(function (c) { c.classList.remove("hl"); });
     card.classList.add("hl");
     setTimeout(function () { card.classList.remove("hl"); }, 2600);
-    setTimeout(function () { var r = card.getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight) Site.scrollTo(card, -120); }, 760);
+    setTimeout(function () { var r = card.getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight) scrollPage(card, -120); }, 760);
   }
   dash.addEventListener("click", function (e) {
     var b = e.target.closest("button");
@@ -1541,7 +1753,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     tr.dataset.st = "paid";
     setSit(tr, '<span class="pill-s in">Paga agora</span>');
     $("td:nth-child(4)", tr).textContent = "Pix";
-    $(".nm small", tr).textContent = $(".nm small", tr).textContent.replace(/venceu .*/, "pago hoje, " + t);
+    var sm = $(".nm small", tr);
+    sm.innerHTML = sm.firstChild.textContent.replace(/venceu .*/, "pago hoje, " + t) + '<span class="fm"> · Pix</span>';
     $("td.act", tr).innerHTML = '<button class="mini-btn ghost" type="button" data-rcb="' + f + '">Recibo</button>';
     replayClass(tr, "paid-now");
     /* pagou depois do vencimento: sai de "em atraso"; o "pagas até o vencimento" (46 das 51 já vencidas) não muda */
@@ -1551,7 +1764,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     $("#fRec").textContent = brl(rec.v);
     $("#fRecS").textContent = "recebidos em outubro · " + rec.n + " de 58 mensalidades pagas";
     $("#chipLate").textContent = "Atrasadas · " + late.n;
-    var bf = $("#bFin"); bf.textContent = late.n; bf.hidden = !late.n;
+    badge($("#bFin"), late.n, "em atraso");
     /* sem atraso, o KPI perde a cor de alerta e o "Ver quem" */
     if (!late.n) { kLate.classList.remove("warn"); $(".go-s", kLate).hidden = true; }
     /* a ficha acompanha: mensalidade em dia e, se o recibo saiu, ele é o último contato */
@@ -1596,8 +1809,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     } else if (b.dataset.rcb) {
       toast("No app, abre o recibo de " + b.dataset.rcb + " gerado pelo Asaas.");
     } else if (b.classList.contains("tog")) {
-      var on = b.getAttribute("aria-pressed") !== "true", li = b.closest("li"), off = $(".rl-off", li);
-      b.setAttribute("aria-pressed", on ? "true" : "false");
+      var on = b.getAttribute("aria-checked") !== "true", li = b.closest("li"), off = $(".rl-off", li);
+      b.setAttribute("aria-checked", on ? "true" : "false");
       li.classList.toggle("off", !on);
       /* desligada, a etapa diz na própria linha que não sai para ninguém */
       if (!on && !off) li.insertAdjacentHTML("beforeend", '<p class="rl-off">Desligado: este lembrete não sai para ninguém.</p>');
@@ -1610,7 +1823,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   var BC = { branca: "oklch(0.96 0.004 90)", cinza: "oklch(0.66 0.012 260)", amarela: "oklch(0.85 0.15 95)", laranja: "oklch(0.72 0.16 55)", verde: "oklch(0.58 0.13 150)", azul: "oklch(0.55 0.17 258)", roxa: "oklch(0.45 0.15 305)", marrom: "oklch(0.42 0.07 50)", preta: "oklch(0.2 0.006 285)" };
   function stripe(k) { return '<rect class="st" x="' + (196 + k * 12.5) + '" y="1.5" width="5" height="31" fill="oklch(0.97 0.003 264)"/>'; }
   function beltSVG(b, g) {
-    var s = '<svg viewBox="0 0 264 34" role="img" aria-label="Faixa ' + NAMES[b].toLowerCase() + ", " + g + ' graus">' +
+    var s = '<svg viewBox="0 0 264 34" role="img" aria-label="' + beltLabel(b, g) + '">' +
       '<rect x=".5" y=".5" width="263" height="33" rx="2" fill="' + BC[b] + '" stroke="oklch(0 0 0 / .12)"/>' +
       '<g class="weave" stroke="oklch(0 0 0 / .12)" stroke-width=".7"><line x1="2" x2="262" y1="7" y2="7"/><line x1="2" x2="262" y1="13" y2="13"/><line x1="2" x2="262" y1="20" y2="20"/><line x1="2" x2="262" y1="27" y2="27"/></g>' +
       '<rect x="190" y=".5" width="58" height="33" fill="' + BC.preta + '"/>';
@@ -1638,7 +1851,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
         gsap.to(sts, { opacity: 0, duration: 0.35, stagger: 0.05, onComplete: function () { sts.forEach(function (s) { s.remove(); }); } });
       } else sts.forEach(function (s) { s.remove(); });
     }
-    svg.setAttribute("aria-label", "Faixa " + belt + ", " + newG + " graus");
+    svg.setAttribute("aria-label", beltLabel(belt, newG));
     replayClass(card, "got");
     $(".gact", card).innerHTML = '<button class="ap-btn ok" type="button" disabled>' + (d.next === "grau" ? "Grau registrado" : "Faixa registrada") + '</button><p class="note">' +
       (notify ? (d.kid ? "A família recebe" : d.first + " recebe") + " o aviso no celular depois da aula." : "O aviso fica guardado até você entregar. Dá para avisar em Últimas graduações.") + "</p>";
@@ -1669,10 +1882,9 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       (notify ? "" : '<button class="mini-btn ghost" type="button" data-notify="' + d.id + '" aria-label="Avisar agora: ' + (p ? p.n : d.first) + '">Avisar agora</button>') + "</div><time>hoje</time></li>");
     var hs = $$("#hist li");
     if (hs.length > 5) hs[hs.length - 1].remove();
-    var left = $$('#tbl tr[data-f="aval"]').length, bg = $("#bGrad");
+    var left = $$('#tbl tr[data-f="aval"]').length;
     $("#chipAval").textContent = "Para avaliar · " + left;
-    bg.textContent = left;
-    bg.hidden = !left;
+    badge($("#bGrad"), left, "para avaliar");
     /* o botão que tinha o foco virou "Grau registrado" (desabilitado): o foco vai para a nota */
     focusIn($(".note", card));
     toast((d.next === "grau" ? "O " + (g + 1) + "º grau de " + d.first + " foi registrado." : "A faixa " + belt + " de " + d.first + " foi registrada.") +
@@ -1735,8 +1947,23 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     wa.setAttribute("aria-label", d.st === "novo" && d.req ? wa.textContent + ", aula de " + nm : "WhatsApp para " + nm);
     undo.setAttribute("aria-label", "Desfazer o status de " + nm);
   }
-  function setLead(row, v) {
+  /* a linha que está saindo (os 0,6 s da animação) volta: sai de Fechados, e o funil e o mês voltam junto */
+  function leadBack(row) {
     var d = row.dataset;
+    if (!d.closed || row.hidden) return false;
+    clearTimeout(row._h);
+    /* volta do ponto da saída em que estava (opacidade e deslize andam juntos na animação lead-out) */
+    var o = +getComputedStyle(row).opacity;
+    row.classList.remove("out");
+    if (anim) gsap.fromTo(row, { opacity: o, x: 40 * (1 - o) }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out", clearProps: "opacity,transform" });
+    closedT.splice(closedT.indexOf(row), 1);
+    delete d.closed;
+    paintClosed();
+    return true;
+  }
+  /* devolve true se a linha estava saindo e voltou */
+  function setLead(row, v) {
+    var d = row.dataset, back = leadBack(row);
     clearTimeout(row._t);
     $("select", row).value = v;
     if (v === "matriculado" || v === "perdido") d.pend = v;
@@ -1749,6 +1976,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     paintLead(row);
     paintLeads();
     armOut(row);
+    return back;
   }
   /* o status final só vale depois de 8 s sem foco na linha, ou ao trocar de aba; até lá, a linha mostra "Desfazer" */
   function armOut(row) {
@@ -1768,7 +1996,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     closedT.push(row);
     var hide = function () { row.hidden = true; row.classList.remove("out"); };
     if (now) hide();
-    else if (anim) { row.classList.add("out"); setTimeout(function () { morph(hide); }, 620); }
+    /* durante a saída (0,6 s), o "Desfazer" ainda aparece e ainda vale (leadBack cancela este tempo) */
+    else if (anim) { row.classList.add("out"); row._h = setTimeout(function () { morph(hide); }, 620); }
     else morph(hide);
     paintLeads();
     paintClosed();
@@ -1799,10 +2028,9 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     });
     /* matrícula: só o "+N em outubro" do Hoje muda; os 58 ativos não (o cadastro se completa em Alunos) */
     $("#kNew").textContent = "+" + c.mat + " em outubro";
-    var wait = c.novo + c.atendimento, bl = $("#bLeads");
+    var wait = c.novo + c.atendimento;
     $("#kLeads").textContent = wait;
-    bl.textContent = wait;
-    bl.hidden = !wait;
+    badge($("#bLeads"), wait, "esperando retorno");
   }
   /* "Fechados": os desta visita (com "Reabrir") e os de antes de hoje */
   function paintClosed() {
@@ -1847,7 +2075,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     s.addEventListener("change", function () {
       if (s.value === "agendado" && !d.slot && !d.req) { pick(row, false); return; }
       closePick(row);
-      setLead(row, s.value);
+      if (setLead(row, s.value)) toast("Desfeito: " + d.first + " continua na lista.");
     });
   });
   /* foco dentro da linha segura o status final; ao sair, os 8 s recomeçam */
@@ -1881,8 +2109,10 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       $("select", row).value = row.dataset.pend || row.dataset.st;
       focusSoft($("select", row), { preventScroll: true });
     } else if (d.leadUndo !== undefined) {
-      setLead(row, row.dataset.st);
+      /* tocado durante a saída da linha, quando o aviso de Fechados já saiu: outro aviso diz que ela ficou */
+      var back = setLead(row, row.dataset.st);
       focusSoft($("select", row), { preventScroll: true });
+      if (back) toast("Desfeito: " + row.dataset.first + " continua na lista.");
     } else if (b.id === "closedBtn") {
       var cb = $("#closedBox"), open = cb.hidden;
       morph(function () { cb.hidden = !open; }, cb);
@@ -1890,8 +2120,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     } else if (d.reopen) {
       /* "Reabrir": a linha volta como Em atendimento, no mesmo lugar */
       r2 = leads[+d.reopen];
-      closedT.splice(closedT.indexOf(r2), 1);
-      delete r2.dataset.closed;
+      /* a linha pode ainda estar saindo: leadBack cancela a saída */
+      if (!leadBack(r2)) { closedT.splice(closedT.indexOf(r2), 1); delete r2.dataset.closed; }
       morph(function () { r2.hidden = false; setLead(r2, "atendimento"); paintClosed(); }, r2);
       focusIn($("select", r2));
       toast(r2.dataset.first + " voltou para Em atendimento.");
