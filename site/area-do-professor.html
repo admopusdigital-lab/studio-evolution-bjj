@@ -522,130 +522,244 @@
 <script src="site.js"></script>
 <script>
 (function () {
-  var $ = Site.$, $$ = Site.$$;
+  var $ = Site.$, $$ = Site.$$, focusSoft = Site.focusSoft;
   var anim = !!window.gsap && !Site.reduce;
+  /* a altura do painel só anima com mouse: no toque, animar height força o layout a cada quadro (INP ruim) */
+  var tweenH = anim && Site.fine, MORPH_MS = tweenH ? 720 : 60;
   var dash = $("#dash"), main = $(".dash-main", dash), views = $$(".dv", dash), side = $$(".dash-side button[data-go]", dash);
-  var toastEl = $("#dashToast"), toastT = null;
-  function toast(msg) {
+  var drawer = $("#drawer"), scrim = $("#drScrim"), drFrom = null;
+
+  /* aviso do painel: mora no <body>, preso à janela (o painel passa da altura da tela), e só aparece com o
+     painel à vista. Fica o tempo de ler (55 ms por letra, no mínimo 3,4 s) e espera o mouse ou o foco saírem */
+  var toastEl = $("#dashToast"), toastT = null, toastMs = 3400, dashInView = true;
+  document.body.appendChild(toastEl);
+  function toastArm() { clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove("on"); }, toastMs); }
+  /* anywhere: o aviso nasce fora do painel (ex.: no Modo tatame) e aparece mesmo assim */
+  function toast(msg, anywhere) {
+    if (!dashInView && !anywhere) return;
     $("span", toastEl).textContent = msg;
     toastEl.classList.add("on");
-    clearTimeout(toastT);
-    toastT = setTimeout(function () { toastEl.classList.remove("on"); }, 3400);
+    toastMs = Math.max(3400, 55 * msg.length);
+    toastArm();
   }
+  ["mouseenter", "focusin"].forEach(function (ev) { toastEl.addEventListener(ev, function () { clearTimeout(toastT); }); });
+  ["mouseleave", "focusout"].forEach(function (ev) { toastEl.addEventListener(ev, function () { if (toastEl.classList.contains("on")) toastArm(); }); });
+  if ("IntersectionObserver" in window) new IntersectionObserver(function (es) { dashInView = es[0].isIntersecting; }).observe(dash);
+  /* leitor de tela: uma frase por chegada (antes, a sala inteira era anunciada a cada mudança) */
+  function srSay(msg) { $("#srLive").textContent = msg; }
+
   function ini(n) { var p = n.split(" "); return (p[0][0] + p[p.length - 1][0]).toUpperCase(); }
   function first(n) { return n.split(" ")[0]; }
+  /* a TV é pública: primeiro nome e inicial ("Marina A."); o painel mantém o nome completo */
+  function tvName(n) { var p = n.split(" "); return p.length > 1 ? p[0] + " " + p[p.length - 1][0] + "." : n; }
   function two(n) { return (n < 10 ? "0" : "") + n; }
   function hm(m) { return two(Math.floor(m / 60)) + ":" + two(m % 60); }
   function mins(s) { var p = s.split(":"); return +p[0] * 60 + +p[1]; }
+  function norm(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
   var NAMES = { branca: "Branca", cinza: "Cinza", amarela: "Amarela", laranja: "Laranja", verde: "Verde", azul: "Azul", roxa: "Roxa", marrom: "Marrom", preta: "Preta" };
   function beltTxt(b, g) { return NAMES[b] + " · " + (g ? g + (g === 1 ? " grau" : " graus") : "sem grau"); }
-  function refresh() { if (window.ScrollTrigger) ScrollTrigger.refresh(); }
+  /* um ScrollTrigger.refresh só, quando as mudanças assentam */
+  var rT;
+  function refresh() { clearTimeout(rT); rT = setTimeout(function () { if (window.ScrollTrigger) ScrollTrigger.refresh(); }, 250); }
   function replayClass(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+  /* foco sem cair no body; se o lugar novo estiver fora da tela, a página rola até ele */
+  function focusIn(el) {
+    if (!el || !focusSoft(el, { preventScroll: true })) return;
+    var r = el.getBoundingClientRect();
+    if (r.top < 80 || r.bottom > innerHeight) Site.scrollTo(el, -160);
+  }
 
-  /* a janela do painel muda de altura com suavidade quando o conteúdo muda */
-  function morph(fn) {
+  /* a janela do painel muda de altura com suavidade quando o conteúdo muda. A altura de partida é a da tela
+     (mesmo no meio de outra transição): o tween anterior morre antes de medir a nova, então nada fica cortado
+     nem salta no fim. No toque ou com movimento reduzido, a altura muda direto e só o conteúdo novo (el) aparece */
+  function morph(fn, el) {
     var h0 = main.offsetHeight;
+    if (window.gsap) gsap.killTweensOf(main, "height");
+    main.style.height = "";
+    if (!drawer.classList.contains("on")) main.style.minHeight = "";
     fn();
     var h1 = main.offsetHeight;
-    if (anim && Math.abs(h1 - h0) > 2) gsap.fromTo(main, { height: h0 }, { height: h1, duration: 0.7, ease: "expo.inOut", clearProps: "height", onComplete: refresh });
-    else refresh();
+    if (tweenH && Math.abs(h1 - h0) > 2) gsap.fromTo(main, { height: h0 }, { height: h1, duration: 0.7, ease: "expo.inOut", clearProps: "height", onComplete: refresh });
+    else {
+      if (anim && el && !el.hidden) gsap.from(el, { opacity: 0, y: 8, duration: 0.45, ease: "power2.out", clearProps: "opacity,transform" });
+      refresh();
+    }
   }
 
   /* ---------- menu do painel ---------- */
   var cur = "hoje";
-  function go(name) {
-    closeDrawer();
-    if (name === cur) return;
-    cur = name;
-    morph(function () {
-      views.forEach(function (v) { v.classList.toggle("on", v.dataset.v === name); });
-      side.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
-    });
-    if (dash.getBoundingClientRect().top < 0) Site.scrollTo(dash, -90);
+  function viewH(name) { return $('.dv[data-v="' + name + '"] h3', dash); }
+  /* só a tela aberta recebe Tab e leitor de tela; com a ficha aberta, a tela embaixo dela também sai.
+     Roda no fim de go(), openDrawer() e closeDrawer(): o foco só se move depois dela */
+  function syncInert() {
+    var open = drawer.classList.contains("on");
+    views.forEach(function (v) { v.inert = !(v.classList.contains("on") && !open); });
+    drawer.inert = !open;
+  }
+  /* focus: a troca veio de um atalho (KPI), e o foco vai para o título da aba. Clique no menu não move o foco */
+  function go(name, focus) {
+    closeDrawer(true);
+    if (name !== cur) {
+      cur = name;
+      morph(function () {
+        views.forEach(function (v) { v.classList.toggle("on", v.dataset.v === name); });
+        side.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
+        if (name === "alunos" && needF) { needF = false; filter(curF); }
+      });
+      syncInert();
+      if (dash.getBoundingClientRect().top < 0) Site.scrollTo(dash, -90);
+    }
+    if (focus) focusSoft(viewH(name), { preventScroll: true });
   }
   side.forEach(function (b) { b.addEventListener("click", function () { go(b.dataset.go); }); });
   $$("[data-goto]", dash).forEach(function (b) {
-    b.addEventListener("click", function () { if (b.dataset.chip) filter(b.dataset.chip); go(b.dataset.goto); });
+    b.addEventListener("click", function () { if (b.dataset.chip) filter(b.dataset.chip); go(b.dataset.goto, true); });
   });
 
-  /* ---------- Hoje: as aulas do dia e a sala da aula das 19h ---------- */
+  /* ---------- Hoje: as aulas do dia, a chamada da aula das 19h e o Kids por chamada ---------- */
   var PAST = {
     a8: { t: "Adulto · 8h", s: "Aula encerrada", p: ["Ana Beatriz Rocha|branca|4", "Rodrigo Faria|azul|2", "Vinícius Teles|branca|3", "Bianca Lopes|roxa|0", "Otávio Reis|branca|1", "Sérgio Matos|marrom|2", "Paula Dias|azul|1"] },
     k10: { t: "Kids · 10h", s: "Aula encerrada", p: ["Helena Prado|amarela|2", "Davi Souza|cinza|1", "Alice Martins|branca|3", "Arthur Gomes|amarela|0", "Laura Pinto|cinza|4", "Gael Ribeiro|branca|2", "Cecília Araújo|laranja|1", "Benício Castro|branca|0", "Sofia Barros|cinza|2"] },
     a11: { t: "Adulto · 11h", s: "Aula encerrada", p: ["Henrique Assis|roxa|2", "Fábio Lacerda|azul|4", "Mariana Queiroz|branca|2", "Gabriel Duarte|azul|0", "Tatiane Lins|branca|1", "Wagner Prates|preta|1"] },
     k18: { t: "Kids · 18h", s: "Em andamento, até as 19:00", p: ["João Pedro Lima|cinza|3", "Miguel Torres|branca|2", "Lorenzo Vieira|amarela|1", "Valentina Melo|cinza|0", "Heitor Cunha|branca|4", "Manuela Freitas|laranja|2", "Bernardo Lopes|branca|1", "Isabela Rocha|amarela|3"] }
   };
-  var CONF = [["Felipe Antunes", "azul", 1, "17:40"], ["Larissa Mendes", "branca", 1, "16:05"], ["Gustavo Lima", "roxa", 0, "18:02"], ["Thiago Moreira", "azul", 3, "12:31"],
-    ["Renata Siqueira", "branca", 3, "18:21"], ["Eduardo Prado", "marrom", 1, "09:12"], ["Marina Alves", "azul", 2, "18:14"], ["Aline Duarte", "branca", 2, "18:33"]];
+  /* no Kids, a chamada é do professor: no Kids 18h, 6 crianças já foram marcadas e 2 ainda não */
+  var KIDS_LEFT = ["Bernardo Lopes", "Isabela Rocha"];
+  /* 7 reservas até as 18:00 (o app da aluna diz "ainda há 3 vagas"); a Marina é a 8ª, às 18:14 */
+  var CONF = [["Felipe Antunes", "azul", 1, "17:40"], ["Larissa Mendes", "branca", 1, "16:05"], ["Gustavo Lima", "roxa", 0, "17:52"], ["Thiago Moreira", "azul", 3, "12:31"],
+    ["Renata Siqueira", "branca", 3, "17:21"], ["Eduardo Prado", "marrom", 1, "09:12"], ["Marina Alves", "azul", 2, "18:14"], ["Aline Duarte", "branca", 2, "17:33"]];
   /* a Marina chega pelo celular que aparece ao lado da TV */
   var ARR = [["Felipe Antunes", "18:52"], ["Marina Alves", "18:55", "phone"], ["Larissa Mendes", "18:56"], ["Gustavo Lima", "18:57"], ["Thiago Moreira", "18:58"], ["Renata Siqueira", "18:59"], ["Eduardo Prado", "19:00"], ["Aline Duarte", "19:02"]];
-  var WALK = [["Leandro Pires", "azul", 0], ["Marcelo Tavares", "branca", 2]];
+  var PHONE_N = "Marina Alves";
+  /* quem veio sem confirmar: 2 da turma e 2 de outros horários (a busca da demonstração tem só estes 4) */
+  var WALK = [["Leandro Pires", "azul", 0, "da turma"], ["Marcelo Tavares", "branca", 2, "da turma"], ["Bianca Lopes", "roxa", 0, "Adulto 8h"], ["Fábio Lacerda", "azul", 4, "Adulto 11h"]];
   var CODES = ["KTR482", "BMX731", "FJN259", "QWD846", "HPZ513"];
-  var START = mins("18:50");
-  var SPARK = [0, 0, 31, 29, 33, 25, 30];  /* sáb a sex; hoje cresce com as chegadas */
-  var st = { code: null, ci: -1, start: START, valid: 30, arrived: {}, order: [], walk: [], idx: 0, timer: null, clock: START, mine: null };
+  var START = mins("18:50"), END18 = mins("19:00");
+  /* sáb a sex; o 28 de hoje cresce com cada chegada e com as crianças do Kids 18h que faltam marcar */
+  var SPARK = [0, 0, 31, 29, 33, 25, 28], PRES0 = 146;
+  /* arrived: hora de cada adulto presente; by: 'app' ou 'prof'; order: ordem de chegada; walk: quem veio sem confirmar;
+     kids: hora das crianças marcadas agora; waitTV: a fila espera a TV ligar para a Marina digitar no celular */
+  var st = { code: null, ci: -1, start: START, valid: 30, arrived: {}, by: {}, order: [], walk: [], kids: {}, idx: 0, timer: null, clock: START, mine: null, waitTV: false, fresh: null, ask: null, q: "" };
 
-  function personLi(name, belt, g, pill) {
-    return '<li data-n="' + name + '"><span class="av">' + ini(name) + "</span><div>" + name + "<small>" + beltTxt(belt, g) + "</small></div>" + pill + "</li>";
+  function confOf(n) { return CONF.filter(function (c) { return c[0] === n; })[0]; }
+  function walkOf(n) { return WALK.filter(function (w) { return w[0] === n; })[0]; }
+  function personLi(name, belt, g, pill, note, act) {
+    return '<li data-n="' + name + '"' + (act ? ' class="r4"' : "") + '><span class="av">' + ini(name) + "</span><div>" + name + "<small>" + beltTxt(belt, g) + (note ? " · " + note : "") + "</small></div>" + pill + (act || "") + "</li>";
   }
-  function pillFor(name, confAt) {
-    if (st.arrived[name]) return st.walk.indexOf(name) > -1 ? '<span class="pill-s gold">Da turma · marcado às ' + st.arrived[name] + "</span>" : '<span class="pill-s in">Chegou ' + st.arrived[name] + "</span>";
-    return '<span class="pill-s" title="Confirmou às ' + confAt + '">Confirmou pelo app</span>';
+  /* pílula com o texto longo no computador e o curto no celular, onde a linha da chamada vira duas */
+  function pill(cls, lg, sm) { return '<span class="pill-s' + (cls ? " " + cls : "") + '"><span class="pl">' + lg + '</span><span class="ps">' + sm + "</span></span>"; }
+  function pillFor(name) {
+    var t = st.arrived[name];
+    if (!t) return pill("", "Confirmou pelo app", "Confirmou");
+    return st.by[name] === "prof" ? pill("gold", "Marcado pelo professor às " + t, "Professor · " + t) : pill("in", "Chegou " + t, "App · " + t);
   }
+  /* um único botão por linha: marcar a chegada ou desfazer a presença (kind "kid" no Kids) */
+  function actBtn(name, done, kind) {
+    return done
+      ? '<button class="mini-btn ghost r-act" type="button" data-undo' + kind + '="' + name + '" aria-label="Desfazer a presença de ' + name + '">Desfazer</button>'
+      : '<button class="mini-btn r-act" type="button" data-mark' + kind + '="' + name + '" aria-label="Marcar chegada de ' + name + '">Marcar chegada</button>';
+  }
+  function confLi(c) { return personLi(c[0], c[1], c[2], pillFor(c[0]), "confirmou às " + c[3], actBtn(c[0], !!st.arrived[c[0]], "")); }
+  function walkLi(w) { return personLi(w[0], w[1], w[2], pillFor(w[0]), w[3] + ", sem confirmar", actBtn(w[0], true, "")); }
+  function pastLi(s) { var q = s.split("|"); return personLi(q[0], q[1], +q[2], '<span class="pill-s in">Veio</span>'); }
+  function kidPill(n) {
+    var t = st.kids[n];
+    if (!t) return pill("", "Ainda não marcada", "Não marcada");
+    return mins(t) >= END18 ? pill("gold", "Marcada depois da aula · " + t, "Depois da aula · " + t) : pill("gold", "Marcada às " + t, "Marcada · " + t);
+  }
+  function kidLi(s) {
+    var q = s.split("|");
+    if (KIDS_LEFT.indexOf(q[0]) < 0) return pastLi(s);
+    return personLi(q[0], q[1], +q[2], kidPill(q[0]), "", actBtn(q[0], !!st.kids[q[0]], "kid"));
+  }
+  function kidsMarked() { return KIDS_LEFT.filter(function (n) { return st.kids[n]; }).length; }
+  /* "6 de 8 marcadas" durante a aula. Às 19:00 ela acaba: "8 vieram" ou "6 vieram · 2 sem marcar" */
+  function kidsTxt(br) {
+    var all = PAST.k18.p.length, n = all - KIDS_LEFT.length + kidsMarked(), left = all - n;
+    if (!left) return all + " vieram";
+    return st.clock >= END18 ? n + " vieram" + (br ? "<br>" : " · ") + left + " sem marcar" : n + " de " + all + " marcadas";
+  }
+  function roomSub(id) { var c = PAST[id]; return c.s + " · " + (id === "k18" ? kidsTxt() : c.p.length + " vieram"); }
+
   function room19() {
     return '<div class="room-h"><div><h4>Adulto · 19h</h4><p id="rCount"></p></div>' +
       '<div class="room-tools"><label for="valSel">Vale por</label><select class="sel" id="valSel">' +
-      '<option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hora</option><option value="90">1h30</option><option value="fim">Até o fim do dia</option></select>' +
+      '<option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hora</option><option value="90">1h30</option></select>' +
       '<button class="ap-btn" type="button" id="genBtn"><svg class="ic"><use href="#i-code"/></svg><span>Gerar código da aula</span></button></div></div>' +
       '<div class="cap-bar" id="capBar" aria-hidden="true">' + new Array(11).join("<i></i>") + "</div>" +
       '<div class="codebox"><div><span class="cd hold" id="cd">O código aparece aqui</span><small id="cdNote">3 letras e 3 números. Vale só para esta aula.</small></div>' +
-      '<div class="acts" id="cdActs" hidden><button class="mini-btn" type="button" id="tvBtn">Mostrar na TV</button></div></div>' +
+      '<div class="acts" id="cdActs" hidden><button class="mini-btn" type="button" id="tvBtn">Mostrar na TV</button><button class="mini-btn ghost" type="button" id="noTvBtn" hidden>Seguir sem a TV</button></div></div>' +
       '<ul class="roster" id="roster"></ul>' +
-      '<div class="walkin"><button type="button" id="walkBtn" aria-expanded="false"><svg class="ic"><use href="#i-plus"/></svg>Veio sem confirmar? Marcar presença</button><ul id="walkList" hidden></ul></div>';
+      '<div class="walkin"><button type="button" id="walkBtn" aria-expanded="false" aria-controls="walkBox"><svg class="ic"><use href="#i-plus"/></svg>Marcar quem veio sem confirmar</button>' +
+      '<div id="walkBox" hidden><input class="sel" type="search" id="walkQ" aria-label="Buscar aluno" placeholder="Buscar aluno" autocomplete="off" spellcheck="false">' +
+      '<ul id="walkList"></ul><p class="walk-none" id="walkNone" hidden>Ninguém com esse nome entre os alunos de exemplo.</p></div></div>';
   }
   function paint19() {
     var r = $("#roster");
     if (!r) return;
-    r.innerHTML = CONF.map(function (c) { return personLi(c[0], c[1], c[2], pillFor(c[0], c[3])); }).join("") +
-      st.walk.map(function (n) { var w = WALK.filter(function (x) { return x[0] === n; })[0]; return personLi(w[0], w[1], w[2], pillFor(n)); }).join("");
+    r.innerHTML = CONF.map(confLi).join("") + st.walk.map(function (n) { return walkLi(walkOf(n)); }).join("");
     $("#valSel").value = String(st.valid);
+    $("#walkQ").value = st.q;
     paintWalk();
     paintCodeBox(false);
     paintCounts();
   }
+  /* "Marcar quem veio sem confirmar": a busca filtra os nomes; com 10 no tatame, o professor confirma antes */
   function paintWalk() {
     var list = $("#walkList"), btn = $("#walkBtn");
     if (!list) return;
-    var left = WALK.filter(function (w) { return !st.arrived[w[0]]; });
-    list.innerHTML = left.map(function (w) { return '<li><button type="button" data-walk="' + w[0] + '">' + w[0] + " · da turma</button></li>"; }).join("");
+    var left = WALK.filter(function (w) { return !st.arrived[w[0]]; }), q = norm(st.q.trim());
+    var shown = left.filter(function (w) { return !q || norm(w[0]).indexOf(q) > -1; });
+    list.innerHTML = shown.map(function (w) {
+      if (st.ask === w[0]) return '<li class="ask"><span>Turma cheia (' + st.order.length + " de 10). Marcar " + first(w[0]) + ' mesmo assim?</span><button class="mini-btn" type="button" data-walkyes="' + w[0] + '">Marcar</button><button class="mini-btn ghost" type="button" data-walkno="' + w[0] + '">Cancelar</button></li>';
+      return '<li><button type="button" data-walk="' + w[0] + '">' + w[0] + " · " + w[3] + "</button></li>";
+    }).join("");
+    $("#walkNone").hidden = !!shown.length || !left.length;
     btn.hidden = !left.length;
-    if (!left.length) list.hidden = true;
+    if (!left.length) { $("#walkBox").hidden = true; btn.setAttribute("aria-expanded", "false"); }
   }
   function fmt(c) { return c.slice(0, 3) + " " + c.slice(3); }
-  function untilTxt() { return st.valid === "fim" ? "até o fim do dia" : "até " + hm(st.start + st.valid); }
+  function untilTxt() { return "até " + hm(st.start + st.valid); }
   function paintCodeBox(flip) {
     var cd = $("#cd");
     if (!cd || !st.code) return;
     cd.className = "cd" + (flip && anim ? " flip" : "");
     cd.innerHTML = st.code.split("").map(function (ch, i) { return (i === 3 ? '<span class="sp"></span>' : "") + '<span style="animation-delay:' + i * 70 + 'ms">' + ch + "</span>"; }).join("");
-    $("#cdNote").textContent = "Vale " + untilTxt() + ". Um código novo substitui este.";
+    var note = $("#cdNote");
+    note.textContent = st.waitTV ? "A Marina vai digitar o código no celular ao lado da TV. Desça até o Modo tatame." : "Vale " + untilTxt() + ". Um código novo substitui este.";
+    note.classList.toggle("wait", st.waitTV);
+    $("#noTvBtn").hidden = !st.waitTV;
     $("#cdActs").hidden = false;
     $("span", $("#genBtn")).textContent = "Gerar novo código";
   }
   function paintCounts() {
     var m = st.order.length, conf = CONF.length, taken = conf + st.walk.length;
+    var prof = st.order.filter(function (n) { return st.by[n] === "prof"; }).length;
     var r = $("#rCount");
-    if (r) r.textContent = conf + " de 10 confirmados · " + (m === 0 ? "ninguém chegou ainda" : m === 1 ? "1 veio" : m + " vieram");
+    if (r) r.textContent = conf + " de 10 vagas confirmadas · " + (m ? m + " no tatame" + (prof ? " (" + (m - prof) + " pelo app, " + prof + " pelo professor)" : "") : "ninguém chegou ainda");
     $$("#capBar i").forEach(function (b, i) { b.className = i < m ? "in" : i < taken ? "c" : ""; });
-    $("#c19s").textContent = m ? (m === 1 ? "1 veio" : m + " vieram") : conf + " de 10";
-    $("#kPres").textContent = 148 + m;
-    var vals = SPARK.slice();
-    vals[6] += m;
+    $("#c19s").innerHTML = conf + " de 10" + (m ? "<br>" + m + " no tatame" : "");
+    /* presenças da semana: cada adulto que chega e cada criança marcada agora */
+    var extra = m + kidsMarked(), vals = SPARK.slice();
+    $("#kPres").textContent = PRES0 + extra;
+    vals[6] += extra;
     var max = Math.max.apply(null, vals);
     $$("#spark i").forEach(function (b, i) { b.style.height = Math.max(2, Math.round(vals[i] / max * 26)) + "px"; });
     $("#tvCount").innerHTML = m + "<small> de 10</small>";
     var last = st.order[m - 1];
-    $("#tvMob").innerHTML = m ? "<b>" + m + "</b> " + (m === 1 ? "presente" : "presentes") + " · última chegada: " + first(last) + ", " + st.arrived[last] : "Ninguém chegou ainda.";
+    $("#tvMob").innerHTML = m ? "<b>" + m + "</b> " + (m === 1 ? "presente" : "presentes") + " · última chegada: " + tvName(last) + ", " + st.arrived[last] : "Ninguém chegou ainda.";
+    paintNow();
+  }
+  /* às 19:00 a aula das 18h acaba e a das 19h vira o "agora" (o relógio anda com as chegadas) */
+  function paintNow() {
+    var after = st.clock >= END18, k = $('#classes [data-c="k18"]'), a = $('#classes [data-c="a19"]');
+    PAST.k18.s = after ? "Aula encerrada" : "Em andamento, até as 19:00";
+    $("#dNow").textContent = after ? "Agora: Adulto 19h" : "Agora: Kids 18h · Próxima: Adulto 19h";
+    k.classList.toggle("past", after);
+    $("span", k).textContent = after ? "Kids" : "Kids · agora";
+    $("span", a).textContent = after ? "Adulto · agora" : "Adulto";
+    $("#c18s").innerHTML = kidsTxt(true);
+    if (k.getAttribute("aria-pressed") === "true") $("#room .room-h p").textContent = roomSub("k18");
   }
 
   /* TV: código grande, tempo que resta e quem chegou */
@@ -659,14 +773,20 @@
   }
   function paintBar() {
     if (!st.code) return;
-    var left = st.valid === "fim" ? (1439 - st.clock) / Math.max(1, 1439 - st.start) : 1 - (st.clock - st.start) / st.valid;
+    var left = 1 - (st.clock - st.start) / st.valid;
     $("#tvBar").style.width = Math.max(0, Math.min(1, left)) * 100 + "%";
   }
-  function tvLi(n, isNew) {
-    var cls = ((isNew ? "new " : "") + (n === st.mine ? "me" : "")).trim();
-    return "<li" + (cls ? ' class="' + cls + '"' : "") + '><span class="av">' + ini(n) + "</span><span>" + n + "</span><small>" + st.arrived[n] + "</small></li>";
+  function tvLi(n) {
+    var cls = ((n === st.fresh ? "new " : "") + (n === st.mine ? "me" : "")).trim();
+    return "<li" + (cls ? ' class="' + cls + '"' : "") + '><span class="av">' + ini(n) + "</span><span>" + tvName(n) + "</span><small>" + st.arrived[n] + "</small></li>";
   }
-  function paintTVList() { $("#tvList").innerHTML = st.order.slice(-7).reverse().map(function (n) { return tvLi(n, false); }).join(""); }
+  /* a turma inteira, da chegada mais nova para a mais antiga; a partir de 7, duas colunas; acima de 10, "+N" */
+  function paintTVList() {
+    var o = st.order.slice().reverse(), more = o.length > 10 ? o.length - 9 : 0, list = $("#tvList");
+    if (more) o = o.slice(0, 9);
+    list.classList.toggle("two", st.order.length > 6);
+    list.innerHTML = o.map(tvLi).join("") + (more ? '<li class="more">+' + more + "</li>" : "");
+  }
 
   /* ---------- o celular da Marina, ao lado da TV: digita o código que está na tela ---------- */
   var phone = { busy: false, t: [] };
@@ -693,15 +813,29 @@
     $("#pDone").hidden = true;
     $("#pClock").textContent = "18:54";
   };
+  /* estado final sem a animação: a Marina registrou pelo app longe da TV, ou o professor marcou a presença dela */
+  phone.done = function (t, by) {
+    phone.clear();
+    ["#pStep2", "#pStep3"].forEach(function (s) { var li = $(s); li.className = "done"; $(".ap-mk", li).innerHTML = '<svg class="ic"><use href="#i-check"/></svg>'; });
+    $("#pStep2h").textContent = by === "prof" ? "Presença marcada pelo professor" : "Código digitado";
+    $("#pStep2t").textContent = by === "prof" ? "Às " + t + ", na chamada do painel." : (st.code ? fmt(st.code) + " · " : "") + "às " + t;
+    var w = $("#pCodeWrap");
+    if (window.gsap) gsap.killTweensOf(w);
+    w.hidden = true;
+    $("#pClock").textContent = hm(Math.max(mins("18:54"), mins(t)));
+    $("#pDoneT").textContent = t;
+    $("#pDone").hidden = false;
+  };
   phone.type = function (code, time, done) {
     phone.clear();
     phone.busy = true;
-    var cells = $$("#tvCode b"), typed = "", T = function (fn, ms) { phone.t.push(setTimeout(fn, ms)); };
+    var typed = "", T = function (fn, ms) { phone.t.push(setTimeout(fn, ms)); };
     code.split("").forEach(function (ch, i) {
       T(function () {
         typed += ch;
         paintP(typed);
-        var c = cells[i];
+        /* a célula é buscada a cada tecla: trocar "Vale por" no meio redesenha a TV */
+        var c = $$("#tvCode b")[i];
         if (c) { c.classList.add("hit"); T(function () { c.classList.remove("hit"); }, 650); }
       }, 350 + i * 240);
     });
@@ -737,58 +871,106 @@
     if (!silent) toast(had ? "Código novo: " + fmt(st.code) + ". O anterior deixou de valer." : "Código " + fmt(st.code) + " gerado. A turma já pode registrar a presença.");
     startArrivals();
   }
-  function arrive(name, time, manual, mine) {
-    st.arrived[name] = time;
-    st.order.push(name);
-    if (manual) st.walk.push(name);
-    if (mine) st.mine = name;
-    var t = mins(time);
-    if (t > st.clock) { st.clock = t; $("#dClock").textContent = time; }
-    var r = $("#roster");
-    if (r) {
-      var li = $('li[data-n="' + name + '"]', r);
-      if (!li && manual) {
-        var w = WALK.filter(function (x) { return x[0] === name; })[0];
-        r.insertAdjacentHTML("beforeend", personLi(w[0], w[1], w[2], pillFor(name)));
-        li = r.lastElementChild;
-      } else if (li) $(".pill-s", li).outerHTML = pillFor(name);
-      if (li) replayClass(li, "arrive");
+
+  /* a única função que grava a presença de um adulto da aula das 19h: chegada pelo app, marcação do professor
+     (o: { by: 'prof' }) ou desfazer (t = null). Ela repinta tudo o que depende disso: chamada, TV, contagens,
+     leitor de tela, a linha de Alunos, a ficha (PEOPLE e o mapa) e o celular da Marina ao lado da TV.
+     o.walk: veio sem confirmar; o.mine: a Marina; o.typed: o celular já mostrou a digitação; o.quiet: há um aviso na tela */
+  var freshT = null;
+  function setPresence(name, t, o) {
+    o = o || {};
+    if (!t === !st.arrived[name]) return;
+    if (t) {
+      st.arrived[name] = t;
+      st.by[name] = o.by || "app";
+      st.order.push(name);
+      if (o.walk && st.walk.indexOf(name) < 0) st.walk.push(name);
+      if (o.mine) st.mine = name;
+      if (mins(t) > st.clock) { st.clock = mins(t); $("#dClock").textContent = t; }
+      /* a chegada mais nova fica destacada na TV por 4 s */
+      st.fresh = name;
+      clearTimeout(freshT);
+      freshT = setTimeout(function () { st.fresh = null; var li = $("#tvList li.new"); if (li) li.classList.remove("new"); }, 4000);
+    } else {
+      delete st.arrived[name];
+      delete st.by[name];
+      st.order.splice(st.order.indexOf(name), 1);
+      if (st.walk.indexOf(name) > -1) st.walk.splice(st.walk.indexOf(name), 1);
+      if (st.mine === name) st.mine = null;
+      if (st.fresh === name) st.fresh = null;
     }
-    $("#tvList").insertAdjacentHTML("afterbegin", tvLi(name, true));
-    var items = $$("#tvList li");
-    if (items.length > 7) items[items.length - 1].remove();
+    if (name === PHONE_N) {
+      if (!o.typed) { if (t) phone.done(t, st.by[name]); else phone.reset(); }
+      if (t) st.waitTV = false;
+      paintCodeBox(false);
+    }
+    var li = paintRow(name);
+    if (li && t) replayClass(li, "arrive");
+    paintWalk();
+    paintTVList();
     paintCounts();
     paintBar();
+    paintPerson(name, t);
+    var tally = st.order.length + " no tatame, de " + CONF.length + " vagas confirmadas.";
+    if (!o.quiet) srSay(t ? (st.by[name] === "prof" ? "Presença de " + name + " marcada pelo professor às " + t + ". " : name + " chegou às " + t + ". ") + tally
+      : "Presença de " + name + " desfeita. " + tally);
+    /* a fila de chegadas segue (ou volta a seguir, se esperava a Marina) */
+    next();
   }
-  function next() { if (st.idx < ARR.length && !st.timer) st.timer = setTimeout(step, 1250 + Math.random() * 650); }
+  /* a linha da chamada desse aluno: refeita a partir do estado, criada (veio sem confirmar) ou removida */
+  function paintRow(name) {
+    var r = $("#roster");
+    if (!r) return null;
+    var li = $('li[data-n="' + name + '"]', r), c = confOf(name), w = walkOf(name), html = c ? confLi(c) : w && st.arrived[name] ? walkLi(w) : "";
+    if (!html) { if (li) li.remove(); return null; }
+    if (li) li.outerHTML = html; else r.insertAdjacentHTML("beforeend", html);
+    return $('li[data-n="' + name + '"]', r);
+  }
+  /* Kids 18h: o professor marca cada criança (ou desfaz); depois das 19:00, a marcação diz "depois da aula" */
+  function setKid(name, t) {
+    if (t) st.kids[name] = t; else delete st.kids[name];
+    var li = $('#room li[data-n="' + name + '"]'), s = PAST.k18.p.filter(function (x) { return x.split("|")[0] === name; })[0];
+    if (li && s) { li.outerHTML = kidLi(s); li = $('#room li[data-n="' + name + '"]'); if (t) replayClass(li, "arrive"); }
+    paintCounts();
+    return li;
+  }
+
+  /* fila de chegadas da demonstração */
+  function next() { if (st.code && st.idx < ARR.length && !st.timer && !phone.busy && !st.waitTV) st.timer = setTimeout(step, 1250 + Math.random() * 650); }
   function step() {
     st.timer = null;
     while (st.idx < ARR.length && st.arrived[ARR[st.idx][0]]) st.idx++;
     if (st.idx >= ARR.length) return;
     var a = ARR[st.idx];
     if (a[2] === "phone") {
-      phone.type(st.code, a[1], function () { st.idx++; arrive(a[0], a[1], false, true); next(); });
+      /* a Marina digita no celular ao lado da TV: com a TV desligada, a fila espera por ela (ou pelo "Seguir sem a TV") */
+      if (!tvOn) { st.waitTV = true; paintCodeBox(false); return; }
+      phone.type(st.code, a[1], function () { st.idx++; setPresence(a[0], a[1], { mine: true, typed: true }); });
       return;
     }
     st.idx++;
-    arrive(a[0], a[1], false, false);
-    next();
+    setPresence(a[0], a[1]);
   }
   function startArrivals() {
-    if (st.timer || phone.busy || st.idx >= ARR.length || !st.code) return;
+    if (st.waitTV && tvOn) { st.waitTV = false; paintCodeBox(false); }
+    if (st.timer || phone.busy || st.waitTV || st.idx >= ARR.length || !st.code) return;
     st.timer = setTimeout(step, 1300);
   }
+  /* "Recomeçar a demonstração": a única coisa que zera a chamada (painel, TV, celular e Kids) e volta o relógio */
   function replay() {
     clearTimeout(st.timer);
     st.timer = null;
+    st.order.slice().forEach(function (n) { delete st.arrived[n]; paintPerson(n, null); });
     phone.reset();
-    st.arrived = {}; st.order = []; st.walk = []; st.idx = 0; st.mine = null;
+    st.arrived = {}; st.by = {}; st.order = []; st.walk = []; st.kids = {}; st.idx = 0; st.mine = null;
+    st.waitTV = false; st.fresh = null; st.ask = null; st.q = "";
     st.clock = START; st.start = START;
     $("#dClock").textContent = hm(START);
-    paint19();
+    var on = $('#classes [aria-pressed="true"]');
+    morph(function () { renderRoom(on ? on.dataset.c : "a19"); paintCounts(); });
     paintTV(false);
     paintTVList();
-    paintCounts();
+    toast("A chamada do painel também voltou para 18:50.", true);
     if (!st.code) generate(true); else startArrivals();
   }
 
@@ -797,8 +979,9 @@
     var room = $("#room");
     if (id === "a19") { room.innerHTML = room19(); paint19(); return; }
     var c = PAST[id];
-    room.innerHTML = '<div class="room-h"><div><h4>' + c.t + "</h4><p>" + c.s + " · " + c.p.length + " vieram</p></div></div>" +
-      '<ul class="roster">' + c.p.map(function (s) { var q = s.split("|"); return personLi(q[0], q[1], +q[2], '<span class="pill-s in">Veio</span>'); }).join("") + "</ul>";
+    room.innerHTML = '<div class="room-h"><div><h4>' + c.t + "</h4><p>" + roomSub(id) + "</p></div></div>" +
+      (id === "k18" ? '<p class="kids-note">No Kids, a chamada é do professor: um toque por criança.</p>' : "") +
+      '<ul class="roster">' + c.p.map(id === "k18" ? kidLi : pastLi).join("") + "</ul>";
   }
   cls.forEach(function (b) {
     b.addEventListener("click", function () {
@@ -810,34 +993,92 @@
   });
   renderRoom("a19");
 
+  /* "Mostrar na TV" só rola: quem liga a TV é ela aparecer na tela. O foco vai para o título do Modo tatame */
+  function showTV() {
+    focusSoft($("#t-tv"), { preventScroll: true });
+    Site.scrollTo("#t-tv", -100);
+  }
+  /* "Seguir sem a TV": a Marina registra pelo app às 18:55, sem a cena do celular, e a fila continua */
+  function noTV() {
+    var a = ARR.filter(function (x) { return x[2] === "phone"; })[0];
+    var t = mins(a[1]) > st.clock ? a[1] : hm(st.clock);
+    setPresence(a[0], t, { mine: true, quiet: true });
+    focusIn($('#roster li[data-n="' + a[0] + '"]'));
+    toast(first(a[0]) + " registrou a presença pelo app às " + t + ".");
+  }
   $("#room").addEventListener("click", function (e) {
     var t = e.target.closest("button");
     if (!t) return;
+    var d = t.dataset, n, li;
     if (t.id === "genBtn") generate(false);
-    else if (t.id === "tvBtn") Site.scrollTo("#tv", -110);
+    else if (t.id === "tvBtn") showTV();
+    else if (t.id === "noTvBtn") noTV();
     else if (t.id === "walkBtn") {
-      var l = $("#walkList"), open = l.hidden;
-      morph(function () { l.hidden = !open; });
+      var box = $("#walkBox"), open = box.hidden;
+      morph(function () { box.hidden = !open; }, box);
       t.setAttribute("aria-expanded", open ? "true" : "false");
-    } else if (t.dataset.walk) {
-      var n = t.dataset.walk;
-      morph(function () { arrive(n, hm(st.clock), true, false); paintWalk(); });
-      toast(first(n) + " marcado como presente.");
+    } else if (d.mark) {
+      n = d.mark;
+      setPresence(n, hm(st.clock), { by: "prof", quiet: true });
+      focusIn($('#roster li[data-n="' + n + '"]'));
+      toast("Presença de " + first(n) + " marcada pelo professor às " + st.arrived[n] + ".");
+    } else if (d.undo) {
+      n = d.undo;
+      var walked = st.walk.indexOf(n) > -1;
+      morph(function () { setPresence(n, null, { quiet: true }); });
+      /* quem veio sem confirmar volta para a lista da busca; quem confirmou volta a "Confirmou pelo app" */
+      focusIn(walked ? $("#walkBtn") : $('#roster li[data-n="' + n + '"]'));
+      toast("Presença de " + first(n) + " desfeita." + (walked ? " O nome voltou para a busca." : ""));
+    } else if (d.walk || d.walkyes) {
+      n = d.walk || d.walkyes;
+      /* turma cheia: o professor confirma na própria linha antes de passar de 10 */
+      if (d.walk && st.order.length >= 10) { st.ask = n; paintWalk(); focusSoft($("[data-walkyes]", $("#walkList")), { preventScroll: true }); return; }
+      st.ask = null;
+      var pos = $$("#walkList li").indexOf(t.closest("li"));
+      morph(function () { setPresence(n, hm(st.clock), { by: "prof", walk: true, quiet: true }); });
+      var rest = $$("#walkList button[data-walk]");
+      focusIn(rest[Math.min(pos, rest.length - 1)] || $('#roster li[data-n="' + n + '"]'));
+      toast("Presença de " + first(n) + " marcada pelo professor às " + st.arrived[n] + ".");
+    } else if (d.walkno) {
+      st.ask = null;
+      paintWalk();
+      focusSoft($('#walkList [data-walk="' + d.walkno + '"]') || $("#walkQ"), { preventScroll: true });
+    } else if (d.markkid || d.undokid) {
+      n = d.markkid || d.undokid;
+      li = setKid(n, d.markkid ? hm(st.clock) : null);
+      focusIn(li);
+      toast(d.markkid ? "Presença de " + first(n) + " marcada" + (st.clock >= END18 ? " depois da aula." : ".") : "Presença de " + first(n) + " desfeita.");
     }
+  });
+  $("#room").addEventListener("input", function (e) {
+    if (e.target.id !== "walkQ") return;
+    st.q = e.target.value;
+    st.ask = null;
+    morph(paintWalk);
   });
   $("#room").addEventListener("change", function (e) {
     if (e.target.id !== "valSel") return;
-    st.valid = e.target.value === "fim" ? "fim" : +e.target.value;
+    st.valid = +e.target.value;
     if (st.code) { paintCodeBox(false); paintTV(false); }
   });
 
   /* ---------- Alunos: filtros, mensagem pronta e ficha de cada um ---------- */
-  var chips = $$("#chips button");
+  var chips = $$("#chips button"), curF = "all", needF = false;
+  /* linha de aviso quando o filtro fica sem ninguém */
+  function emptyRow(tb, txt) {
+    var e = $("tr.empty", tb);
+    if (!txt) { if (e) e.remove(); return; }
+    if (!e) { tb.insertAdjacentHTML("beforeend", '<tr class="empty"><td colspan="5"></td></tr>'); e = $("tr.empty", tb); }
+    $("td", e).textContent = txt;
+  }
   function filter(f) {
+    curF = f;
     chips.forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.f === f ? "true" : "false"); });
-    var n = 0;
-    $$("#tbl tbody tr").forEach(function (tr) { var on = f === "all" || tr.dataset.f === f; tr.hidden = !on; if (on) n++; });
-    $("#tblMore").textContent = f === "all" ? "Mostrando 9 de 58 alunos." : f === "aus" ? "A mensagem de WhatsApp já vem escrita. Toque em WhatsApp para ver." : n ? "Mais aulas desde o último grau. Quem decide é o professor." : "Ninguém para avaliar agora.";
+    var n = 0, tb = $("#tbl tbody");
+    $$("tr[data-id]", tb).forEach(function (tr) { var on = f === "all" || tr.dataset.f === f; tr.hidden = !on; if (on) n++; });
+    emptyRow(tb, n ? "" : f === "aval" ? "Ninguém para avaliar agora." : "Ninguém sem treinar há 14 dias ou mais.");
+    var who = n === 1 ? "1 aluno" : n + " alunos";
+    $("#tblMore").textContent = f === "all" ? "Mostrando " + n + " de 58 alunos." : !n ? "" : f === "aus" ? who + " sem treinar há 14 dias ou mais. A mensagem de WhatsApp já vem escrita: toque em WhatsApp para ver." : who + " com mais aulas desde o último grau. Quem decide é o professor.";
     $("#waMsg").hidden = true;
   }
   chips.forEach(function (c) { c.addEventListener("click", function () { morph(function () { filter(c.dataset.f); }); }); });
@@ -855,6 +1096,7 @@
     larissa: { n: "Larissa Mendes", cls: "Adulto 19h", since: "aluna desde junho de 2026", belt: "branca", g: 1, total: 31, desde: 10, ult: "8 de setembro", comp: [2, 6], days: [1, 3], skip: 0.1, last: "2026-10-15", conf: 1 },
     helena: { n: "Helena Prado", cls: "Kids 10h", age: "7 anos", since: "no Studio desde 2025", belt: "amarela", g: 2, total: 88, desde: 3, ult: "9 de outubro", comp: [4, 6], days: [0, 2, 4], skip: 0.12, last: "2026-10-16", kid: 1 }
   };
+  function pid(name) { for (var id in PEOPLE) if (PEOPLE[id].n === name) return id; return null; }
   function rng(seed) {
     var h = 2166136261;
     for (var i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -863,12 +1105,13 @@
   var TODAY = "2026-10-16", WD = ["seg", "ter", "qua", "qui", "sex"], MON = { 1: "ago", 6: "set", 10: "out" }, HEAT = {};
   function isoOf(w, d) { var dt = new Date(2026, 6, 27 + w * 7 + d); return dt.getFullYear() + "-" + two(dt.getMonth() + 1) + "-" + two(dt.getDate()); }
   function dl(k) { if (k === TODAY) return "hoje"; var p = k.split("-"), dt = new Date(+p[0], +p[1] - 1, +p[2]); return WD[(dt.getDay() + 6) % 7] + ", " + p[2] + "/" + p[1]; }
+  /* p.came: a hora em que o aluno chegou hoje (setPresence); o dia de hoje vira "veio" */
   function heat(id) {
     if (HEAT[id]) return HEAT[id];
     var p = PEOPLE[id], rnd = rng(id), out = [];
     for (var w = 0; w < 12; w++) for (var d = 0; d < 5; d++) {
       var k = isoOf(w, d), s;
-      if (k === TODAY) s = p.last === k ? "y" : p.conf ? "t" : "n";
+      if (k === TODAY) s = p.last === k || p.came ? "y" : p.conf ? "t" : "n";
       else if (k > p.last) s = "n";
       else if (k === p.last || (p.force || []).indexOf(k) > -1) s = "y";
       else if ((p.gap || []).indexOf(w) > -1) s = "n";
@@ -878,6 +1121,7 @@
     return (HEAT[id] = out);
   }
   function inOct(c) { return c.s === "y" && c.k >= "2026-10-01"; }
+  function cellTitle(c) { return dl(c.k) + (c.s === "y" ? ": veio" : c.s === "t" ? ": confirmou" : ""); }
   function heatHTML(cells) {
     var h = '<span class="m"></span>';
     for (var w = 0; w < 12; w++) h += '<span class="m">' + (MON[w] || "") + "</span>";
@@ -885,12 +1129,15 @@
       h += '<span class="d">' + WD[d] + "</span>";
       for (var w2 = 0; w2 < 12; w2++) {
         var c = cells[w2 * 5 + d];
-        h += '<i class="' + (c.s === "n" ? "" : c.s) + '" title="' + dl(c.k) + (c.s === "y" ? ": veio" : c.s === "t" ? ": confirmou" : "") + '"></i>';
+        /* --i: ordem de entrada da célula (semana a semana) na animação de abrir */
+        h += '<i class="' + (c.s === "n" ? "" : c.s) + '" style="--i:' + (w2 * 5 + d) + '"' + (c.k === TODAY ? " data-today" : "") + ' title="' + cellTitle(c) + '"></i>';
       }
     }
     return h;
   }
-  /* o nome vira botão (dá para abrir a ficha pelo teclado) e as aulas do mês saem da mesma frequência da ficha */
+  /* o nome vira botão (dá para abrir a ficha pelo teclado) e as aulas do mês saem da mesma frequência da ficha.
+     ORIG guarda "Última aula" e a ação de cada linha, para o desfazer da chamada */
+  var ORIG = {};
   $$("#tbl tbody tr").forEach(function (tr) {
     var holder = $(".nm > div", tr), tn = holder.firstChild, b = document.createElement("button");
     b.type = "button";
@@ -899,61 +1146,90 @@
     b.setAttribute("aria-label", "Abrir a ficha de " + b.textContent);
     holder.replaceChild(b, tn);
     $("td.num", tr).textContent = heat(tr.dataset.id).filter(inOct).length;
+    var last = $("td:nth-child(3)", tr).cloneNode(true), act = $("td.act", tr), cl = $("small.cl", last);
+    if (cl) cl.remove();
+    ORIG[tr.dataset.id] = { last: last.innerHTML, act: act.innerHTML, pres: /Confirmou hoje/.test(act.textContent) };
   });
+  /* troca o conteúdo de uma célula sem perder o rótulo do modo cartão (small.cl), se houver */
+  function setCell(td, html) { var cl = $("small.cl", td); td.innerHTML = html; if (cl) td.insertBefore(cl, td.firstChild); }
+  /* a chegada (ou o desfazer) também muda a linha de Alunos, a ficha e o card de Graduações */
+  function paintPerson(name, t) {
+    var id = pid(name), p = PEOPLE[id];
+    if (!p || !t === !p.came) return;
+    var d = t ? 1 : -1;
+    p.came = t || null;
+    p.desde = Math.max(0, p.desde + d);
+    p.total += d;
+    delete HEAT[id];
+    var tr = $('#tbl tr[data-id="' + id + '"]'), o = ORIG[id];
+    if (tr) {
+      setCell($("td:nth-child(3)", tr), t ? "hoje, 19h" : o.last);
+      if (o.pres) $("td.act", tr).innerHTML = t ? pillFor(name) : o.act;
+      $("td.num", tr).textContent = heat(id).filter(inOct).length;
+    }
+    var dd = $('.gcard[data-id="' + id + '"] dd');
+    if (dd) dd.textContent = p.desde;
+    if (drawer.classList.contains("on") && drawer.dataset.id === id) refreshDrawer(id);
+  }
 
-  var drawer = $("#drawer"), scrim = $("#drScrim"), drFrom = null;
+  function trioHTML(p, cells) {
+    return "<div><b>" + cells.filter(inOct).length + "</b><span>aulas em outubro</span></div><div><b>" + p.total + "</b><span>presenças no total</span></div><div><b>" + p.desde + "</b><span>aulas desde o último grau</span></div>";
+  }
+  function legHTML(cells) {
+    return '<span><i class="y"></i>veio</span><span><i></i>não veio</span>' + (cells.some(function (c) { return c.s === "t"; }) ? '<span><i class="t"></i>confirmou hoje</span>' : "");
+  }
+  function lastHTML(p, cells) {
+    return cells.filter(function (c) { return c.s === "y"; }).slice(-3).reverse().map(function (c) { return "<li>" + dl(c.k) + "<span>" + p.cls + "</span></li>"; }).join("");
+  }
+  function heatLabel(cells) { return cells.filter(function (c) { return c.s === "y"; }).length + " presenças nas últimas 12 semanas"; }
+  /* ficha aberta quando o aluno chega: só os números, o dia de hoje e as últimas aulas mudam (o mapa não reanima) */
+  function refreshDrawer(id) {
+    var p = PEOPLE[id], cells = heat(id), map = $(".heat", drawer), ti = $("i[data-today]", map), tc = cells.filter(function (c) { return c.k === TODAY; })[0];
+    $(".dr-trio", drawer).innerHTML = trioHTML(p, cells);
+    map.setAttribute("aria-label", heatLabel(cells));
+    if (ti && tc) { ti.className = tc.s === "n" ? "" : tc.s; ti.title = cellTitle(tc); }
+    $(".heat-leg", drawer).innerHTML = legHTML(cells);
+    $(".dr-last", drawer).innerHTML = lastHTML(p, cells);
+  }
   function openDrawer(id, from) {
     var p = PEOPLE[id];
     if (!p) return;
     drFrom = from || null;
-    var cells = heat(id), yes = cells.filter(function (c) { return c.s === "y"; });
-    var last3 = yes.slice(-3).reverse().map(function (c) { return "<li>" + dl(c.k) + "<span>" + p.cls + "</span></li>"; }).join("");
+    drawer.dataset.id = id;
+    var cells = heat(id);
     drawer.innerHTML =
-      '<button class="dr-close" type="button" aria-label="Fechar a ficha"><svg class="ic"><use href="#i-x"/></svg></button>' +
-      '<div class="dr-h"><span class="av">' + ini(p.n) + "</span><div><h4>" + p.n + "</h4><p>" + p.cls + (p.age ? " · " + p.age : "") + " · " + p.since + "</p></div></div>" +
+      '<div class="dr-top"><div class="dr-h"><span class="av">' + ini(p.n) + '</span><div><h4 id="drName" tabindex="-1">' + p.n + "</h4><p>" + p.cls + (p.age ? " · " + p.age : "") + " · " + p.since + "</p></div></div>" +
+      '<button class="dr-close" type="button" aria-label="Fechar a ficha"><svg class="ic"><use href="#i-x"/></svg></button></div>' +
+      '<div class="dr-body">' +
       (p.aus ? '<p class="dr-alert"><span class="pill-s warn">' + p.aus + " dias sem treinar</span>Última aula: " + dl(p.last) + ".</p>" : "") +
       '<div class="dr-belt">' + beltSVG(p.belt, p.g) + "<p><b>" + beltTxt(p.belt, p.g) + "</b><span>último grau: " + p.ult + "</span></p></div>" +
-      '<div class="dr-trio"><div><b>' + cells.filter(inOct).length + "</b><span>aulas em outubro</span></div><div><b>" + p.total + "</b><span>presenças no total</span></div><div><b>" + p.desde + "</b><span>aulas desde o último grau</span></div></div>" +
-      '<div class="dr-sec"><p class="k">Presenças · últimas 12 semanas</p><div class="heat" role="img" aria-label="' + yes.length + ' presenças nas últimas 12 semanas">' + heatHTML(cells) + "</div>" +
-      '<p class="heat-leg"><span><i class="y"></i>veio</span><span><i></i>não veio</span>' + (p.conf ? '<span><i class="t"></i>confirmou hoje</span>' : "") + "</p></div>" +
+      '<div class="dr-trio">' + trioHTML(p, cells) + "</div>" +
+      '<div class="dr-sec"><p class="k">Presenças · últimas 12 semanas</p><div class="heat" role="img" aria-label="' + heatLabel(cells) + '">' + heatHTML(cells) + "</div>" +
+      '<p class="heat-leg">' + legHTML(cells) + "</p></div>" +
       '<div class="dr-sec"><p class="k">Competências da faixa</p><div class="dr-comp"><span class="bar"><i style="width:' + Math.round(p.comp[0] / p.comp[1] * 100) + '%"></i></span><span>' + p.comp[0] + " de " + p.comp[1] + "</span></div></div>" +
-      '<div class="dr-sec"><p class="k">Últimas aulas</p><ul class="dr-last">' + last3 + "</ul></div>" +
+      '<div class="dr-sec"><p class="k">Últimas aulas</p><ul class="dr-last">' + lastHTML(p, cells) + "</ul></div>" +
+      '<div class="msg" hidden></div></div>' +
       '<div class="dr-acts">' + (p.grad ? '<button class="ap-btn" type="button" data-grad="' + id + '">Avaliar grau</button>' : "") +
-      '<button class="mini-btn wa" type="button" data-drwa="' + id + '">WhatsApp' + (p.kid ? " da família" : "") + "</button></div>" +
-      '<div class="msg" hidden></div>';
+      '<button class="mini-btn wa" type="button" data-drwa="' + id + '">WhatsApp' + (p.kid ? " da família" : "") + "</button></div>";
     drawer.scrollTop = 0;
     drawer.classList.add("on");
     scrim.classList.add("on");
-    drawer.setAttribute("aria-hidden", "false");
-    fitDrawer();
-    if (anim) gsap.from($$(".heat i", drawer), { scale: 0.2, opacity: 0, duration: 0.5, ease: "back.out(2)", stagger: { each: 0.01, grid: "auto", from: "start" }, delay: 0.3 });
-    setTimeout(function () { var c = $(".dr-close", drawer); if (c) c.focus({ preventScroll: true }); }, 350);
-    if (main.getBoundingClientRect().top < 0) Site.scrollTo(main, -90);
+    syncInert();
+    /* a ficha nasce no alto do painel: se ela não estiver inteira na tela, a página rola até ela */
+    var r = drawer.getBoundingClientRect();
+    if (r.top < 80 || r.bottom > innerHeight) Site.scrollTo(drawer, -96);
+    focusSoft($("#drName"), { preventScroll: true });
   }
-  /* a janela do painel cresce o bastante para a ficha inteira caber, sem rolagem dentro dela */
-  function fitDrawer() {
-    var need = drawer.scrollHeight, h = main.offsetHeight;
-    if (need <= h + 1) return;
-    var done = function () { main.style.minHeight = need + "px"; main.style.height = ""; refresh(); };
-    if (anim) gsap.fromTo(main, { height: h }, { height: need, duration: 0.6, ease: "expo.inOut", onComplete: done });
-    else done();
-  }
-  function closeDrawer() {
-    if (!drawer || !drawer.classList.contains("on")) return;
+  /* silent: quem fechou (go) cuida do foco. Senão, o foco volta ao nome que abriu a ficha, ou ao título da aba */
+  function closeDrawer(silent) {
+    if (!drawer.classList.contains("on")) return;
     var had = drawer.contains(document.activeElement);
     drawer.classList.remove("on");
     scrim.classList.remove("on");
-    drawer.setAttribute("aria-hidden", "true");
-    if (window.gsap) gsap.killTweensOf(main);
-    main.style.height = "";
-    if (main.style.minHeight) {
-      var from = main.offsetHeight;
-      main.style.minHeight = "";
-      var to = main.offsetHeight;
-      if (anim && Math.abs(from - to) > 2) gsap.fromTo(main, { height: from }, { height: to, duration: 0.6, ease: "expo.inOut", clearProps: "height", onComplete: refresh });
-      else refresh();
-    }
-    if (had && drFrom) drFrom.focus({ preventScroll: true });
+    syncInert();
+    if (!had || silent) return;
+    if (drFrom && drFrom.isConnected && drFrom.closest(".dv.on")) focusSoft(drFrom, { preventScroll: true });
+    else focusSoft(viewH(cur), { preventScroll: true });
   }
   $("#tbl tbody").addEventListener("click", function (e) {
     var b = e.target.closest("button");
@@ -961,8 +1237,17 @@
     var tr = e.target.closest("tr");
     if (tr) openDrawer(tr.dataset.id, $(".nm-btn", tr));
   });
-  scrim.addEventListener("click", closeDrawer);
+  scrim.addEventListener("click", function () { closeDrawer(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+  /* Tab e Shift+Tab circulam dentro da ficha aberta */
+  drawer.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab") return;
+    var f = $$("button, [href], input, select, textarea", drawer).filter(function (el) { return !el.disabled && el.offsetParent !== null; });
+    if (!f.length) return;
+    var i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+  });
   drawer.addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;
@@ -974,16 +1259,36 @@
         : "Oi, " + f + "! Aqui é do Studio Evolution BJJ. Tudo certo para o próximo treino?";
       box.innerHTML = '<p class="msg-k">Mensagem para ' + (p.kid ? "a família de " + f : f) + "</p><q>" + text + '</q><div class="msg-acts"><button class="mini-btn wa" type="button" data-send="' + f + '">Abrir no WhatsApp</button><button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
       box.hidden = false;
-      fitDrawer();
-      drawer.scrollTo({ top: drawer.scrollHeight, behavior: anim ? "smooth" : "auto" });
+      box._from = b;
+      /* a mensagem aparece inteira dentro da ficha, acima das ações fixas; se a ficha saiu da tela, a página volta até ela */
+      var want = box.offsetTop + box.offsetHeight - (drawer.clientHeight - $(".dr-acts", drawer).offsetHeight) + 16;
+      if (want > drawer.scrollTop) drawer.scrollTo({ top: want, behavior: anim ? "smooth" : "auto" });
+      var r = drawer.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight) Site.scrollTo(drawer, -96);
     }
   });
 
-  function openMsg(box, f, text) {
+  /* mensagens prontas: from é o botão que abriu a caixa (o foco volta para ele ao fechar) */
+  function openMsg(box, f, text, from) {
+    box._from = from || null;
     morph(function () {
       box.innerHTML = '<p class="msg-k">Mensagem para ' + f + "</p><q>" + text + '</q><div class="msg-acts"><button class="mini-btn wa" type="button" data-send="' + f + '">Abrir no WhatsApp</button><button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
       box.hidden = false;
-    });
+    }, box);
+    showBox(box);
+  }
+  /* depois da transição de altura, a caixa precisa estar inteira na tela */
+  function showBox(box) {
+    setTimeout(function () {
+      if (box.hidden) return;
+      var r = box.getBoundingClientRect();
+      if (r.bottom > innerHeight || r.top < 70) Site.scrollTo(box, -120);
+    }, MORPH_MS);
+  }
+  function closeMsg(box) {
+    var back = box._from;
+    morph(function () { box.hidden = true; });
+    focusIn(back && back.isConnected && back.offsetParent !== null ? back : viewH(cur));
   }
   function highlight(id) {
     var card = $('.gcard[data-id="' + id + '"]');
@@ -1001,15 +1306,17 @@
       var text = lead
         ? "Oi, " + b.dataset.wa + "! Aqui é do Studio Evolution BJJ. Recebemos seu pedido de aula experimental para a turma " + row.dataset.turma + ". Que dia fica bom para você vir conhecer o tatame?"
         : "Oi, " + b.dataset.wa + ". Sentimos sua falta no tatame. Quer combinar a próxima aula?";
-      openMsg(lead ? $("#leadMsg") : $("#waMsg"), b.dataset.wa, text);
+      openMsg(lead ? $("#leadMsg") : $("#waMsg"), b.dataset.wa, text, b);
     } else if (b.dataset.send) {
       toast("No app, este botão abre o WhatsApp com a mensagem para " + b.dataset.send + " já escrita.");
     } else if (b.hasAttribute("data-close")) {
-      var box = b.closest(".msg");
-      morph(function () { box.hidden = true; });
+      closeMsg(b.closest(".msg"));
     } else if (b.dataset.grad) {
+      /* "Avaliar grau" (na lista ou na ficha): a aba Graduações abre com o card em destaque e o foco no botão dele */
+      var gid = b.dataset.grad;
       go("grad");
-      highlight(b.dataset.grad);
+      highlight(gid);
+      focusSoft($('.gcard[data-id="' + gid + '"] [data-ask]') || viewH("grad"), { preventScroll: true });
     }
   });
 
@@ -1028,25 +1335,48 @@
     now: function (f, d) { return "Oi, " + f + ", tudo bem? A mensalidade que venceu em " + d + " ainda está em aberto. Pague por Pix, boleto ou cartão neste link: " + LINK + ". Qualquer coisa, é só responder aqui."; }
   };
   var RULE_T = { d3: "3 dias antes", d0: "No dia do vencimento", a1: "1 dia depois", a5: "5 dias depois", ok: "Pagamento confirmado" };
-  var finMsg = $("#finMsg"), late = { n: 2, v: 400 }, rec = { v: 9620, n: 49 }, sent = 37;
+  var finMsg = $("#finMsg"), late = { n: 2, v: 400 }, rec = { v: 9620, n: 49 }, sent = 37, curFF = "all", kLate = $("[data-ff-go]", dash);
   function brl(v) { return "R$ " + v.toLocaleString("pt-BR"); }
-  function finOpen(title, text, send) {
+  function finOpen(title, text, send, from) {
+    finMsg._from = from || null;
     morph(function () {
       finMsg.innerHTML = '<p class="msg-k">' + title + "</p><q>" + text + '</q><div class="msg-acts">' +
         (send ? '<button class="mini-btn wa" type="button" data-finsend="' + send + '">Enviar pelo WhatsApp do Studio</button>' : "") +
         '<button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
       finMsg.hidden = false;
-    });
+    }, finMsg);
+    showBox(finMsg);
   }
   function finLog(t, h, s) {
     $("#flog").insertAdjacentHTML("afterbegin", '<li class="new"><time>' + t + "</time><div>" + h + "<small>" + s + "</small></div></li>");
   }
+  /* a contagem abaixo da tabela acompanha o filtro e os pagamentos */
+  function paintFinMore(n) {
+    var el = $("#finMore");
+    el.textContent = curFF === "all" ? "Mostrando " + n + " de 58 mensalidades."
+      : curFF === "late" ? (late.n > 1 ? "As " + late.n + " mensalidades atrasadas." : late.n ? "A única mensalidade atrasada." : "")
+      : curFF === "due" ? n + " das 7 a vencer." : n + " das " + rec.n + " pagas.";
+    el.hidden = !el.textContent;
+  }
   function finFilter(f) {
+    curFF = f;
     $$("#finChips button").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.ff === f ? "true" : "false"); });
-    morph(function () { $$("#finTbl tbody tr").forEach(function (tr) { tr.hidden = f !== "all" && tr.dataset.st !== f; }); });
+    var tb = $("#finTbl tbody"), had = document.activeElement;
+    morph(function () {
+      var n = 0;
+      $$("tr[data-st]", tb).forEach(function (tr) { var on = f === "all" || tr.dataset.st === f; tr.hidden = !on; if (on) n++; });
+      emptyRow(tb, n ? "" : f === "late" ? "Nenhuma mensalidade atrasada. O Asaas avisa quando cair um pagamento." : "Nenhuma mensalidade nesta lista.");
+      paintFinMore(n);
+    });
+    /* o foco estava numa linha que saiu da lista: vai para a primeira que ficou (ou para o aviso de lista vazia) */
+    var tr = had && tb.contains(had) ? had.closest("tr") : null;
+    if (tr && tr.hidden) {
+      var keep = $("tr:not([hidden])", tb);
+      focusIn(keep ? $(keep.classList.contains("empty") ? "td" : "td:nth-child(2)", keep) : $('#finChips [aria-pressed="true"]'));
+    }
   }
   $("#finChips").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) finFilter(b.dataset.ff); });
-  $("[data-ff-go]", dash).addEventListener("click", function () { finFilter("late"); });
+  kLate.addEventListener("click", function () { finFilter("late"); });
   /* o pagamento cai pelo webhook do Asaas: a linha vira paga, os números mudam e o recibo sai sozinho */
   function finPaid(id) {
     var tr = $('#finTbl tr[data-id="' + id + '"]'), p = FIN[id], v = +tr.dataset.v, f = first(p.n), t = $("#dClock").textContent;
@@ -1064,28 +1394,34 @@
     $("#fSent").textContent = sent;
     $("#chipLate").textContent = "Atrasadas · " + late.n;
     var bf = $("#bFin"); bf.textContent = late.n; bf.hidden = !late.n;
+    /* sem atraso, o KPI perde a cor de alerta e o "Ver quem" */
+    if (!late.n) { kLate.classList.remove("warn"); $(".go-s", kLate).hidden = true; }
     finLog(t, "Pix recebido de " + p.n, "Baixa automática pelo Asaas · recibo enviado no WhatsApp");
     toast("Pix de " + f + " recebido. O Asaas deu baixa e o recibo saiu no WhatsApp.");
+    /* depois do destaque (.paid-now, 1,4 s), a lista se refaz: a linha paga sai de "Atrasadas" */
+    setTimeout(function () { finFilter(curFF); }, 1400);
   }
   dash.addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;
     if (b.dataset.fin) {
       var p = FIN[b.dataset.fin], f = first(p.n);
-      if (b.dataset.fin === "larissa") finOpen("Enviado hoje às 8h para " + f + " · No dia do vencimento", RULES.d0(f));
-      else finOpen("Cobrança para " + f, RULES.now(f, p.due), b.dataset.fin);
+      if (b.dataset.fin === "larissa") finOpen("Enviado hoje às 8h para " + f + " · No dia do vencimento", RULES.d0(f), null, b);
+      else finOpen("Cobrança para " + f, RULES.now(f, p.due), b.dataset.fin, b);
     } else if (b.dataset.finsend) {
       var id = b.dataset.finsend, q = FIN[id], tr = $('#finTbl tr[data-id="' + id + '"]');
       morph(function () { finMsg.hidden = true; });
       $("td:nth-child(2)", tr).innerHTML = '<span class="pill-s gold">Cobrança enviada agora</span>';
       $("td.act", tr).innerHTML = '<span class="pill-s">Aguardando</span>';
+      /* o botão sumiu com a caixa: o foco vai para a situação da linha, que acabou de mudar */
+      focusIn($("td:nth-child(2)", tr));
       finLog($("#dClock").textContent, "Cobrança para " + q.n, "WhatsApp do Studio · entregue");
       toast("Mensagem enviada para " + first(q.n) + " pelo WhatsApp do Studio.");
       /* na demonstração, o pagamento cai alguns segundos depois */
       setTimeout(function () { finPaid(id); }, 4200);
     } else if (b.dataset.rule) {
       var r = b.dataset.rule;
-      finOpen("Mensagem automática · " + RULE_T[r], RULES[r]("Larissa", "19/10"));
+      finOpen("Mensagem automática · " + RULE_T[r], RULES[r]("Larissa", "19/10"), null, b);
     } else if (b.dataset.rcb) {
       toast("No app, abre o recibo de " + b.dataset.rcb + " gerado pelo Asaas.");
     } else if (b.classList.contains("tog")) {
@@ -1127,15 +1463,28 @@
     svg.setAttribute("aria-label", "Faixa " + belt + ", " + newG + " graus");
     replayClass(card, "got");
     $(".gact", card).innerHTML = '<button class="ap-btn ok" type="button" disabled>' + (d.next === "grau" ? "Grau registrado" : "Faixa registrada") + '</button><p class="note">' + (d.kid ? "A família recebe" : d.first + " recebe") + " o aviso no celular hoje.</p>";
-    /* a lista, a ficha e o histórico passam a mostrar o grau novo */
+    /* o próprio card: aulas desde o último grau voltam a 0, e o último grau é hoje */
+    var dds = $$("dd", card);
+    dds[0].textContent = "0";
+    dds[2].textContent = "hoje";
+    /* a lista, a ficha, as aulas de hoje e o histórico passam a mostrar o grau novo */
     var tr = $('#tbl tr[data-id="' + d.id + '"]');
     if (tr) {
       $(".bl > span", tr).textContent = beltTxt(belt, newG);
       $(".belt-s", tr).style.setProperty("--b", "var(--b-" + belt + ")");
       tr.dataset.f = "";
       $("td.act", tr).innerHTML = '<span class="pill-s in">Graduado hoje</span>';
+      needF = true;
     }
-    if (p) { p.belt = belt; p.g = newG; p.desde = 0; p.ult = "hoje"; p.grad = 0; }
+    if (p) {
+      p.belt = belt; p.g = newG; p.desde = 0; p.ult = "hoje"; p.grad = 0;
+      CONF.forEach(function (c) { if (c[0] === p.n) { c[1] = belt; c[2] = newG; } });
+      Object.keys(PAST).forEach(function (k) {
+        PAST[k].p = PAST[k].p.map(function (s) { return s.split("|")[0] === p.n ? p.n + "|" + belt + "|" + newG : s; });
+      });
+      var on = $('#classes [aria-pressed="true"]');
+      if (on && on.dataset.c === "a19") paint19(); else if (on) renderRoom(on.dataset.c);
+    }
     $("#hist").insertAdjacentHTML("afterbegin", '<li class="new"><i class="belt-s" style="--b:var(--b-' + belt + ')"></i><div>' + (p ? p.n : d.first) + "<small>" +
       (d.next === "grau" ? newG + "º grau na faixa " + belt : "Faixa " + belt) + (p ? " · " + p.cls : "") + "</small></div><time>hoje</time></li>");
     var hs = $$("#hist li");
@@ -1144,6 +1493,8 @@
     $("#chipAval").textContent = "Para avaliar · " + left;
     bg.textContent = left;
     bg.hidden = !left;
+    /* o botão que tinha o foco virou "Grau registrado" (desabilitado): o foco vai para a nota */
+    focusIn($(".note", card));
     toast(d.next === "grau" ? g + 1 + "º grau registrado para " + d.first + "." : d.first + " agora é faixa " + belt + ".");
   }
   $("#cards").addEventListener("click", function (e) {
@@ -1154,8 +1505,10 @@
       var q = d.next === "grau" ? "Dar o " + (g + 1) + "º grau na faixa " + d.belt + " para " + d.first + "?" : "Graduar " + d.first + " para a faixa " + d.next + "?";
       act.innerHTML = '<div class="ask"><p>' + q + '</p><div class="row"><button class="ap-btn" type="button" data-yes>Confirmar</button><button class="ap-btn ghost" type="button" data-no>Voltar</button></div></div>';
       if (anim) gsap.from(act.firstChild, { y: 10, opacity: 0, duration: 0.5, ease: "expo.out" });
+      focusIn($("[data-yes]", act));
     } else if (b.hasAttribute("data-no")) {
       act.innerHTML = '<button class="ap-btn" type="button" data-ask>' + gradLabel(d) + "</button>";
+      focusIn($("[data-ask]", act));
     } else if (b.hasAttribute("data-yes")) {
       promote(card);
     }
@@ -1205,19 +1558,22 @@
     if (tvOn) return;
     tvOn = true;
     if (anim) gsap.fromTo(".tv-in", { scaleY: 0.006, scaleX: 0.7, opacity: 0 }, { scaleY: 1, scaleX: 1, opacity: 1, duration: 1.1, ease: "expo.out" });
-    /* se a Marina já chegou enquanto a pessoa olhava o painel, a cena recomeça para ela ver o celular digitando */
-    setTimeout(function () {
-      if (!st.code) generate(true);
-      else if (st.arrived["Marina Alves"]) replay();
-      else startArrivals();
-    }, anim ? 650 : 0);
+    /* sem código, a TV gera um; com código, a fila anda (e a Marina, se esperava a TV, digita agora).
+       Ligar a TV nunca zera a chamada: isso é só o "Recomeçar a demonstração" */
+    setTimeout(function () { if (!st.code) generate(true); else startArrivals(); }, anim ? 650 : 0);
   }
   if ("IntersectionObserver" in window) {
-    /* liga quando a TV e o celular estão na tela juntos (no celular, um embaixo do outro) */
-    new IntersectionObserver(function (es, ob) { if (es[0].isIntersecting) { powerOn(); ob.disconnect(); } }, { threshold: 0.45 }).observe($(".tv-stage"));
+    /* liga com metade da TV na tela (ou meia tela ocupada por ela, quando a TV é maior que a janela) */
+    new IntersectionObserver(function (es, ob) {
+      var e = es[0];
+      if (e.isIntersecting && (e.intersectionRatio >= 0.5 || e.intersectionRect.height >= innerHeight * 0.5)) { powerOn(); ob.disconnect(); }
+    }, { threshold: [0, 0.25, 0.35, 0.5] }).observe($("#tv"));
   } else powerOn();
-  $("#tvNew").addEventListener("click", function () { generate(true); });
-  $("#tvReplay").addEventListener("click", replay);
+  $("#tvNew").addEventListener("click", function () { powerOn(); generate(true); });
+  $("#tvReplay").addEventListener("click", function () { powerOn(); replay(); });
+
+  /* telas escondidas já nascem fora do Tab e do leitor de tela */
+  syncInert();
 
   Site.boot({
     intro: function (S) {

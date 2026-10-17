@@ -44,7 +44,10 @@
 .ap-rowbtn { width: 100%; border: 0; border-top: 1px solid var(--rule); background: none; color: inherit; font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; }
 .ap-rowbtn .r .ic { transition: transform 300ms var(--ease); }
 .ap-rowbtn:hover .r .ic { transform: translateX(2px); }
-/* liberar a vaga: a pergunta aparece dentro do cartão, no lugar do botão */
+/* liberar a vaga: o link fica na linha do botão (cerca de 222 px); o botão perde a folga interna do navegador
+   para "Vaga confirmada" caber numa linha só. A pergunta aparece dentro do cartão, no lugar dos dois */
+#apBtnRow { gap: 10px; }
+#apBtnRow .ap-btn { gap: 6px; padding: 0 2px; }
 .ap-ask { margin-top: 14px; }
 .ap-ask p { font: 400 16px/1.25 var(--serif); }
 .ap-ask .ap-btnrow { gap: 8px; margin-top: 10px; }
