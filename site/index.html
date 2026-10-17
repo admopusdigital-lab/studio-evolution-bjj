@@ -974,7 +974,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       if (a.who === "eu") { title = "Adulto, às <em>" + t + "h</em>."; text = "De segunda a sexta, numa turma para todos os níveis. Para mulheres, o Feminino treina junto, nos mesmos horários."; href = "agendamento.html#adulto-" + t; }
       else if (a.who === "crianca") { title = "<em>Kids</em>, às " + t + "h."; text = "De segunda a sexta, para crianças de 4 a 12 anos, com foco em disciplina e diversão."; href = "agendamento.html#kids-" + t; }
       else { title = "Kids às " + t + "h e <em>Adulto às " + (t + 1) + "h</em>."; text = "Um horário logo depois do outro, de segunda a sexta. Dá para vir junto e treinar em família."; href = "agendamento.html#kids-" + t; }
-      var note = a.exp === "novo" ? "Primeira vez? Chegue alguns minutos antes. O kimono é por nossa conta." : "Já treinou antes? Conte na conversa: o professor ajusta o treino ao seu nível.";
+      var note = a.exp === "novo" ? "Primeira vez? Chegue alguns minutos antes. A gente empresta o kimono para a aula." : "Já treinou antes? Conte na conversa: o professor ajusta o treino ao seu nível.";
       return '<div class="qz-res qz-in"><p class="k">Sua turma</p><h3>' + title + "</h3><p>" + text + '</p><p class="note">' + note + '</p><div class="ctas"><a class="btn btn-ink" href="' + href + '" data-int>Agendar esse horário<svg class="ic"><use href="#i-arrow"/></svg></a><button class="qz-redo" type="button">Refazer</button></div></div>';
     };
     var render = function (focus) {
