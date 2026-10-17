@@ -692,7 +692,7 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 
 /* utilitários do celular simulado, para caber mais sem rolar */
 /* link de texto (ex.: liberar a vaga), com 44 px de toque */
-.ap-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; border: 0; background: none; color: var(--ink-2); font: 500 12.5px/1.2 var(--sans); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; cursor: pointer; }
+.ap-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; border: 0; background: none; color: var(--ink-2); font: 500 12.5px/1.2 var(--sans); text-decoration: underline; text-decoration-color: color-mix(in oklch, var(--ink-2) 55%, transparent); text-underline-offset: 3px; cursor: pointer; }
 .ap-link:hover { color: var(--ink); text-decoration-color: var(--gold); }
 /* botão e link na mesma linha: o botão ocupa o resto */
 .ap-btnrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
