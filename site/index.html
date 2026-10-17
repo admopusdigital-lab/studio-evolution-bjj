@@ -142,27 +142,20 @@ html.seen #loader { display: none; }
   .c-main, .c-c { grid-column: 1 / -1; }
 }
 
-/* Equipe TRUE: o medalhão da equipe na parede do Studio, que se dissolve no escuro */
+/* Equipe TRUE: o símbolo da equipe ao lado do texto, desenhado pela rolagem */
 .true-sec { position: relative; padding-block: clamp(110px, 13vw, 200px); overflow: hidden; }
 .true-grid { display: grid; gap: 48px; align-items: start; }
 @media (min-width: 1000px) {
   .true-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 5vw; }
   .true-ph { position: sticky; top: 14vh; }
 }
-.true-ph { position: relative; margin: 0; aspect-ratio: 4 / 3; overflow: hidden;
-  -webkit-mask-image: radial-gradient(ellipse 74% 72% at 50% 42%, #000 50%, transparent 100%); mask-image: radial-gradient(ellipse 74% 72% at 50% 42%, #000 50%, transparent 100%); }
-/* um leve zoom tira da foto a faixa clara do teto e deixa o medalhão no centro da atenção */
-.true-ph img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; transform: scale(1.18); transform-origin: 50% 72%; }
-/* a medalha 3D (medalha3d.js) toma o lugar da foto quando o WebGL está disponível; arrastar gira */
-.medal-gl { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 900ms var(--ease); touch-action: pan-y; cursor: grab; }
-.medal-gl:active { cursor: grabbing; }
-.true-ph.gl { overflow: visible; aspect-ratio: auto; height: min(78vh, 760px); -webkit-mask-image: none; mask-image: none; }
-.true-ph.gl .medal-gl { left: -8%; top: 0; width: 116%; height: 100%; }
-@media (max-width: 999px) { .true-ph.gl { height: min(64vh, 520px); } }
-.true-ph.gl img { opacity: 0; transition: opacity 600ms var(--ease); }
-.true-ph.gl .medal-gl { opacity: 1; }
-.medal-hint { position: absolute; left: 0; right: 0; bottom: 2%; text-align: center; font: 500 11px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); opacity: 0; transition: opacity 600ms var(--ease) 1.2s; pointer-events: none; }
-.true-ph.gl .medal-hint { opacity: 1; }
+.true-ph { position: relative; margin: 0; display: grid; place-items: center; height: min(74vh, 640px); }
+/* o símbolo da TRUE em 2D, vetorizado da logo oficial (tools/simbolo-true.py); a rolagem desenha o contorno,
+   enche de ouro de baixo para cima e passa um reflexo (sem animação, aparece pronto) */
+.sym { position: relative; height: 92%; width: auto; max-width: 100%; overflow: visible; }
+.sym-glow { position: absolute; inset: 8% 14%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in oklch, var(--gold) 22%, transparent), transparent 72%); filter: blur(30px); opacity: 0.6; pointer-events: none; }
+.sym .sym-line { fill: none; stroke: var(--gold); stroke-width: 1.4; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+@media (max-width: 999px) { .true-ph { height: min(56vh, 460px); } }
 .true-tx .h2 { margin-top: 26px; font-size: clamp(40px, 4.4vw, 76px); }
 .true-tx .lead { margin-top: 26px; }
 .vals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin-top: 44px; border-top: 1px solid var(--rule); }
@@ -574,7 +567,25 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 
   <section class="true-sec cine" id="equipe-true" data-dark aria-labelledby="t-true">
     <div class="wrap true-grid">
-      <figure class="true-ph"><img src="img/ambiente-studio.webp" alt="Medalhão dourado da Equipe TRUE acima do painel do Studio Evolution BJJ, na parede preta da academia" loading="lazy" width="1200" height="800"><canvas class="medal-gl" role="img" aria-label="Medalha dourada da Equipe TRUE em 3D: na frente, a logo da TRUE; no verso, a do Studio Evolution"></canvas><p class="medal-hint" aria-hidden="true">Arraste para girar</p></figure>
+      <figure class="true-ph">
+        <span class="sym-glow" aria-hidden="true"></span>
+        <svg class="sym" viewBox="0 0 410 545" role="img" aria-label="Símbolo da Equipe TRUE">
+          <defs>
+            <linearGradient id="symGold" x1="0" y1="0" x2="0.35" y2="1">
+              <stop offset="0" stop-color="#f6dc95"/><stop offset="0.28" stop-color="#d8a94a"/><stop offset="0.55" stop-color="#9c6f22"/><stop offset="0.78" stop-color="#e2b75a"/><stop offset="1" stop-color="#7a5418"/>
+            </linearGradient>
+            <linearGradient id="symShine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#fff6dc" stop-opacity="0"/><stop offset="0.5" stop-color="#fff6dc" stop-opacity="0.85"/><stop offset="1" stop-color="#fff6dc" stop-opacity="0"/>
+            </linearGradient>
+            <clipPath id="symShape"><path d="M169.00 17.65 L169.00 18.40 L173.67 24.48 L176.67 29.73 L178.67 34.67 L179.72 38.67 L180.26 45.00 L180.27 82.67 L179.00 83.30 L91.95 83.33 L91.91 84.33 L95.67 89.14 L99.67 96.00 L102.63 105.00 L103.26 139.00 L103.67 139.99 L151.67 140.25 L152.44 139.00 L152.80 114.33 L153.00 113.42 L153.67 113.02 L180.05 113.33 L180.52 114.67 L180.55 139.00 L181.33 140.36 L226.67 140.23 L227.21 139.00 L227.27 114.33 L227.67 113.41 L228.67 113.07 L256.74 113.33 L257.16 114.67 L257.30 139.00 L258.00 140.27 L303.00 140.38 L303.81 140.00 L304.00 112.67 L304.99 104.67 L308.00 95.34 L311.00 90.05 L315.51 84.33 L315.42 83.33 L228.00 83.17 L227.35 82.00 L227.50 44.67 L227.95 39.00 L229.00 34.87 L231.00 29.89 L235.00 23.11 L238.67 18.50 L238.73 17.67 Z M6.00 149.30 L6.20 150.33 L12.67 159.10 L15.67 165.34 L17.60 173.00 L18.33 180.40 L66.33 208.73 L67.18 208.00 L67.17 180.67 L67.38 179.67 L68.00 179.20 L179.82 179.33 L180.44 180.67 L180.52 255.00 L181.00 255.98 L182.00 255.76 L226.94 229.33 L227.33 228.00 L227.31 180.67 L228.00 179.18 L339.33 179.21 L340.14 180.67 L340.61 208.00 L341.33 208.76 L389.33 180.53 L389.97 171.67 L391.99 164.67 L395.00 158.61 L401.49 149.33 Z M303.00 187.99 L257.81 188.33 L257.26 189.67 L257.22 221.00 L256.66 222.33 L152.33 283.57 L151.69 283.33 L151.56 282.67 L151.60 188.33 L151.00 188.01 L104.67 188.16 L103.77 188.33 L103.29 189.00 L103.22 370.67 L102.65 376.67 L99.72 386.00 L96.67 391.46 L92.05 397.33 L92.67 397.78 L150.33 397.58 L150.65 397.00 L151.04 319.33 L255.67 257.88 L256.67 257.76 L257.10 258.67 L257.12 481.67 L257.28 482.33 L258.00 482.66 L314.00 482.69 L315.22 482.33 L310.00 474.87 L306.98 469.00 L304.96 462.67 L304.26 456.67 L304.35 264.67 L303.00 263.11 L276.33 247.55 L275.72 246.67 L276.03 246.00 L302.33 230.62 L304.30 229.00 L304.19 189.00 L303.97 188.33 Z M225.67 285.94 L182.33 311.13 L180.99 312.00 L180.53 313.00 L180.49 494.00 L181.10 495.67 L203.33 529.13 L204.49 528.33 L226.56 495.00 L227.43 493.00 L227.22 286.67 L227.00 285.84 Z" clip-rule="evenodd"/></clipPath>
+          </defs>
+          <g clip-path="url(#symShape)">
+            <rect class="sym-fill" x="-10" y="0" width="430" height="545" fill="url(#symGold)"/>
+            <rect class="sym-shine" x="-160" y="-40" width="110" height="640" fill="url(#symShine)" transform="skewX(-18)"/>
+          </g>
+          <path class="sym-line" d="M169.00 17.65 L169.00 18.40 L173.67 24.48 L176.67 29.73 L178.67 34.67 L179.72 38.67 L180.26 45.00 L180.27 82.67 L179.00 83.30 L91.95 83.33 L91.91 84.33 L95.67 89.14 L99.67 96.00 L102.63 105.00 L103.26 139.00 L103.67 139.99 L151.67 140.25 L152.44 139.00 L152.80 114.33 L153.00 113.42 L153.67 113.02 L180.05 113.33 L180.52 114.67 L180.55 139.00 L181.33 140.36 L226.67 140.23 L227.21 139.00 L227.27 114.33 L227.67 113.41 L228.67 113.07 L256.74 113.33 L257.16 114.67 L257.30 139.00 L258.00 140.27 L303.00 140.38 L303.81 140.00 L304.00 112.67 L304.99 104.67 L308.00 95.34 L311.00 90.05 L315.51 84.33 L315.42 83.33 L228.00 83.17 L227.35 82.00 L227.50 44.67 L227.95 39.00 L229.00 34.87 L231.00 29.89 L235.00 23.11 L238.67 18.50 L238.73 17.67 Z M6.00 149.30 L6.20 150.33 L12.67 159.10 L15.67 165.34 L17.60 173.00 L18.33 180.40 L66.33 208.73 L67.18 208.00 L67.17 180.67 L67.38 179.67 L68.00 179.20 L179.82 179.33 L180.44 180.67 L180.52 255.00 L181.00 255.98 L182.00 255.76 L226.94 229.33 L227.33 228.00 L227.31 180.67 L228.00 179.18 L339.33 179.21 L340.14 180.67 L340.61 208.00 L341.33 208.76 L389.33 180.53 L389.97 171.67 L391.99 164.67 L395.00 158.61 L401.49 149.33 Z M303.00 187.99 L257.81 188.33 L257.26 189.67 L257.22 221.00 L256.66 222.33 L152.33 283.57 L151.69 283.33 L151.56 282.67 L151.60 188.33 L151.00 188.01 L104.67 188.16 L103.77 188.33 L103.29 189.00 L103.22 370.67 L102.65 376.67 L99.72 386.00 L96.67 391.46 L92.05 397.33 L92.67 397.78 L150.33 397.58 L150.65 397.00 L151.04 319.33 L255.67 257.88 L256.67 257.76 L257.10 258.67 L257.12 481.67 L257.28 482.33 L258.00 482.66 L314.00 482.69 L315.22 482.33 L310.00 474.87 L306.98 469.00 L304.96 462.67 L304.26 456.67 L304.35 264.67 L303.00 263.11 L276.33 247.55 L275.72 246.67 L276.03 246.00 L302.33 230.62 L304.30 229.00 L304.19 189.00 L303.97 188.33 Z M225.67 285.94 L182.33 311.13 L180.99 312.00 L180.53 313.00 L180.49 494.00 L181.10 495.67 L203.33 529.13 L204.49 528.33 L226.56 495.00 L227.43 493.00 L227.22 286.67 L227.00 285.84 Z" fill-rule="evenodd"/>
+        </svg>
+      </figure>
       <div class="true-tx">
         <p class="label">Equipe TRUE BJJ</p>
         <h2 class="h2 split" id="t-true">Uma academia. <em>Uma equipe inteira</em> por trás.</h2>
@@ -888,7 +899,6 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="site.js"></script>
 <script src="faixa3d.js"></script>
-<script src="medalha3d.js"></script>
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$, fine = Site.fine;
@@ -1128,24 +1138,22 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 
       /* a faixa: a rolagem escolhe a faixa (presa no computador) e a troca acontece inteira, de uma vez:
          o nome nunca fica cortado pela metade quando a pessoa para de rolar, nem no celular. */
-      /* a medalha da Equipe TRUE em 3D: carrega perto da seção; o giro acompanha a rolagem */
+      /* o símbolo da TRUE: a rolagem desenha o contorno, enche de ouro de baixo para cima e passa um reflexo */
       (function () {
-        var fig = $(".true-ph"), cv = $(".medal-gl");
-        if (!fig || !cv || !window.Medalha3D || !Medalha3D.supported() || !("IntersectionObserver" in window)) return;
-        var io = new IntersectionObserver(function (es) {
-          if (!es[0].isIntersecting) return;
-          io.disconnect();
-          Medalha3D.mount(cv, {
-            front: { base: "img/medalha-frente" }, back: { base: "img/medalha-verso" },
-            small: !fine || window.innerWidth < 900, reduce: Site.reduce, fine: fine, hover: $(".true-sec")
-          }, function (api) {
-            if (!api) return;
-            fig.classList.add("gl");
-            $("img", fig).setAttribute("aria-hidden", "true");
-            ScrollTrigger.create({ trigger: ".true-sec", start: "top bottom", end: "bottom top", onUpdate: function (st) { api.scroll(st.progress); } });
-          });
-        }, { rootMargin: "800px 0px" });
-        io.observe(fig);
+        var line = $(".sym-line"), fill = $(".sym-fill"), shine = $(".sym-shine");
+        if (!line || !fill) return;
+        var len = line.getTotalLength();
+        gsap.set(line, { strokeDasharray: len, strokeDashoffset: len, opacity: 1 });
+        gsap.set(fill, { attr: { y: 545 } });
+        /* no computador o símbolo fica preso ao lado do texto e acompanha a seção inteira; no celular, só a própria figura */
+        var wide = window.matchMedia("(min-width: 1000px)").matches;
+        gsap.timeline({ scrollTrigger: wide ? { trigger: ".true-sec", start: "top 78%", end: "bottom 55%", scrub: 0.8 } : { trigger: ".true-ph", start: "top 88%", end: "bottom 38%", scrub: 0.8 } })
+          .fromTo(".sym", { scale: 0.88, y: 30 }, { scale: 1, y: 0, duration: 1, ease: "none" }, 0)
+          .to(line, { strokeDashoffset: 0, duration: 0.45, ease: "none" }, 0)
+          .to(fill, { attr: { y: 0 }, duration: 0.35, ease: "power1.inOut" }, 0.38)
+          .to(line, { opacity: 0.25, duration: 0.2, ease: "none" }, 0.6)
+          .fromTo(shine, { x: -40 }, { x: 640, duration: 0.3, ease: "power1.inOut" }, 0.68)
+          .fromTo(".sym-glow", { opacity: 0.15, scale: 0.8 }, { opacity: 0.75, scale: 1.05, duration: 1, ease: "none" }, 0);
       })();
 
       var COLORS = ["#f3f2ed", "#2b5fd0", "#6a35b0", "#6e4326", "#1c1c20"];

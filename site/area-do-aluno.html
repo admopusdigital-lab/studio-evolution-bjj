@@ -174,13 +174,13 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
         <h1 class="ar-title" id="t-hero">Seu treino, <em>na palma da mão</em>.</h1>
         <p class="ar-lede">Confirmar a vaga, registrar a presença com o código da aula, assistir aos movimentos da sua faixa e acompanhar cada grau. Role a página e use o celular: ele funciona.</p>
         <nav class="ar-switch" aria-label="Escolher a área"><a href="area-do-aluno.html" aria-current="page" data-int>Aluno</a><a href="area-do-professor.html" data-int>Professor</a></nav>
-        <div class="ctas"><a class="btn btn-ink" href="#demo">Experimentar o app<svg class="ic"><use href="#i-arrow"/></svg></a></div>
+        <div class="ctas"><a class="btn btn-ink" href="#demo">Experimentar o app<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a></div>
       </div>
       <div class="ar-visual" aria-hidden="true">
         <figure class="ar-photo" data-depth="20"><img src="img/programa-feminino-real.jpg" alt="" width="1264" height="848"></figure>
-        <div class="hc c1" data-depth="60"><span class="dot"><svg class="ic"><use href="#i-check"/></svg></span><span><small>Hoje, 19h · Adulto</small><b>Vaga confirmada</b></span></div>
+        <div class="hc c1" data-depth="60"><span class="dot"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><span><small>Hoje, 19h · Adulto</small><b>Vaga confirmada</b></span></div>
         <div class="hc c2" data-depth="100"><span><small>Faixa azul</small><b>2 de 4 graus</b></span><span class="beltm"></span></div>
-        <div class="hc c3" data-depth="80"><span class="dot"><svg class="ic"><use href="#i-play"/></svg></span><span><small>Raspagem de gancho</small><b>Quiz liberado</b></span></div>
+        <div class="hc c3" data-depth="80"><span class="dot"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></span><span><small>Raspagem de gancho</small><b>Quiz liberado</b></span></div>
       </div>
     </div>
   </section>
@@ -190,7 +190,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
       <p class="label">Experimente</p>
       <h2 id="t-demo">Quatro abas e os avisos. <em>Uma pergunta</em> em cada.</h2>
       <p>Cada parte do app responde a uma pergunta da aluna. Toque nos botões do celular como se fosse o seu.</p>
-      <!-- botões que escolhem a tela (como o trilho do computador), não abas: o painel não fica logo abaixo -->
+      <!-- botões com aria-current, como o trilho do computador: o papel de aba prometia setas e painel que eles não têm -->
       <div class="demo-tabs" id="demoTabs" role="group" aria-label="Partes do app">
         <button type="button" data-view="inicio" aria-current="true">Início</button>
         <button type="button" data-view="presenca" aria-current="false">Presença</button>
@@ -203,8 +203,8 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
       <div class="demo-dev">
         <div class="device" id="device">
           <div class="ap" id="ap">
-            <div class="ap-sbar"><span id="apClock">18:12</span><span>5G</span></div>
-            <div class="ap-toast" id="apToast" role="status" aria-live="polite"><svg class="ic"><use href="#i-check"/></svg><span></span></div>
+            <div class="ap-sbar" aria-hidden="true"><span id="apClock">18:12</span><span>5G</span></div>
+            <div class="ap-toast" id="apToast" role="status" aria-live="polite"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span></span></div>
             <div class="ap-views">
               <!-- Início -->
               <section class="ap-view on" data-view="inicio" aria-label="Tela Início">
@@ -216,7 +216,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
                   <p class="ap-sub" id="apVagas">Começa em 48 min · 7 de 10 vagas ocupadas</p>
                   <div class="ap-dots" id="apDots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
                   <div class="ap-btnrow" id="apBtnRow">
-                    <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic"><use href="#i-check"/></svg><span>Confirmar vaga</span></button>
+                    <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span>Confirmar vaga</span></button>
                     <button class="ap-link" type="button" id="apRelease" hidden>Liberar a vaga</button>
                   </div>
                   <div class="ap-ask" id="apAsk" hidden>
@@ -225,9 +225,10 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
                   </div>
                 </div>
                 <div class="ap-wkh"><p class="ap-lb">Semana · <span id="apWeek">2 de 3</span> treinos</p><button class="ap-wkb" type="button" id="apGoal" aria-label="Mudar a meta da semana">mudar</button></div>
-                <div class="ap-wk"><div><span>Seg</span><b>12</b><i></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><i id="apToday" hidden></i></div></div>
+                <!-- o ponto de quem treinou leva o texto para o leitor de tela; o de hoje só aparece depois da presença -->
+                <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
                 <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r">segunda, 19 de outubro, 19h</span></div>
-                <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic"><use href="#i-chev"/></svg></span></button>
+                <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
               </section>
 
               <!-- Presença -->
@@ -255,12 +256,12 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
 
               <!-- Movimentos -->
               <section class="ap-view" data-view="movimentos" aria-label="Tela Movimentos">
-                <p class="ap-lb">Faixa azul · <span id="apMov">5</span> de 12</p>
+                <p class="ap-lb">Faixa azul · <span id="apMov">5</span> de 12 movimentos</p>
                 <p class="ap-hi">Movimentos</p>
                 <p class="ap-lb gold hide-q" style="margin-top:16px">Continue assistindo</p>
                 <button class="ap-cover pulse" type="button" id="apPlay" aria-label="Continuar o vídeo Raspagem de gancho">
                   <img src="img/programa-adulto-real.jpg" alt="" style="object-position:60% 50%">
-                  <span class="play"><svg viewBox="0 0 24 24"><use href="#i-tri"/></svg></span>
+                  <span class="play"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-tri"/></svg></span>
                   <span class="dur">6:40</span>
                   <span class="pg"><span id="apProg" style="width:62%"></span></span>
                 </button>
@@ -272,7 +273,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
                   <div id="apQa"></div>
                   <p class="fb" id="apFb" role="status"></p>
                 </div>
-                <p class="ap-doneline" id="apQdone" hidden><svg class="ic"><use href="#i-check"/></svg><span><b>Quiz feito</b> · movimento estudado</span></p>
+                <p class="ap-doneline" id="apQdone" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span><b>Quiz feito</b> · movimento estudado</span></p>
                 <div id="apList">
                   <p class="ap-lb" style="margin-top:16px;margin-bottom:6px">Para sua faixa</p>
                   <ul class="ap-list">
@@ -297,16 +298,21 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
                 </svg>
                 <div class="ap-row" style="border-top:0;padding-bottom:0"><span style="font:400 19px/1 var(--serif)">Faixa azul</span><span class="r">2 de 4 graus</span></div>
                 <div class="ap-degs"><i class="on"></i><i class="on"></i><i></i><i></i></div>
-                <div class="ap-trio"><div><b>21</b><span>aulas desde o último grau</span></div><div><b>6</b><span>semanas seguidas · recorde 9</span></div><div><b id="apMov2">5/12</b><span>movimentos da faixa</span></div></div>
-                <button class="ap-row pulse" type="button" id="apCompBtn" aria-expanded="false" style="width:100%;margin-top:12px;border-left:0;border-right:0;border-bottom:0;background:none;color:inherit;font:inherit;cursor:pointer"><span>Competências para graduar</span><span class="r">3 de 8<svg class="ic"><use href="#i-chev"/></svg></span></button>
-                <ul class="ap-comp" id="apComp" hidden>
-                  <li class="got"><svg class="ic"><use href="#i-check"/></svg>Fuga de montada</li>
-                  <li class="got"><svg class="ic"><use href="#i-check"/></svg>Raspagem de gancho</li>
-                  <li class="got"><svg class="ic"><use href="#i-check"/></svg>Passagem toreando</li>
-                  <li><svg class="ic"><use href="#i-check"/></svg>Armlock da guarda fechada</li>
-                  <li><svg class="ic"><use href="#i-check"/></svg>Triângulo da guarda</li>
+                <!-- "aulas desde o último grau" conta as presenças registradas: a de hoje leva 21 a 22 (register) -->
+                <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b>6</b><span>semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
+                <button class="ap-row pulse" type="button" id="apCompBtn" aria-expanded="false" aria-controls="apComp" style="width:100%;margin-top:12px;border-left:0;border-right:0;border-bottom:0;background:none;color:inherit;font:inherit;cursor:pointer"><span>Competências da faixa</span><span class="r">3 de 8<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+                <!-- as 8 da faixa azul: 3 conquistadas e 5 a conquistar (as três últimas são exemplo) -->
+                <ul class="ap-comp" id="apComp" aria-label="3 de 8 competências conquistadas" hidden>
+                  <li class="got"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-done"/></svg>Fuga de montada<span class="sr-only"> · conquistada</span></li>
+                  <li class="got"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-done"/></svg>Raspagem de gancho<span class="sr-only"> · conquistada</span></li>
+                  <li class="got"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-done"/></svg>Passagem toreando<span class="sr-only"> · conquistada</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Armlock da guarda fechada<span class="sr-only"> · a conquistar</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Triângulo da guarda<span class="sr-only"> · a conquistar</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Defesa do estrangulamento<span class="sr-only"> · a conquistar</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Raspagem tesoura<span class="sr-only"> · a conquistar</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Fuga de lateral<span class="sr-only"> · a conquistar</span></li>
                 </ul>
-                <p class="ap-mut" id="apNote" style="font:italic 400 13px/1.4 var(--sans);margin-top:12px">O próximo grau é decisão do professor, olhando seu treino no tatame.</p>
+                <p class="ap-mut" id="apNote" style="font:italic 400 13px/1.4 var(--sans);margin-top:12px">Competência é o que o professor vê no tatame; o vídeo é para estudar. O próximo grau é decisão do professor.</p>
               </section>
 
               <!-- Avisos -->
@@ -325,7 +331,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
             <!-- mensalidade: a folha que abre ao tocar na linha do Início (valores de exemplo, iguais aos da Marina no Financeiro) -->
             <div class="ap-scrim" id="apScrim" aria-hidden="true"></div>
             <div class="ap-sheet" id="apSheet" role="dialog" aria-labelledby="apSheetT">
-              <div class="ap-sheet-h"><p class="ap-lb">Mensalidade</p><button class="ap-x" type="button" id="apSheetX" aria-label="Fechar"><svg class="ic"><use href="#i-x"/></svg></button></div>
+              <div class="ap-sheet-h"><p class="ap-lb">Mensalidade</p><button class="ap-x" type="button" id="apSheetX" aria-label="Fechar"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-x"/></svg></button></div>
               <p class="ap-hi" id="apSheetT">Plano Mensal</p>
               <p class="ap-mut" style="margin-top:4px">Cartão automático · valores de exemplo</p>
               <div class="ap-row" style="margin-top:12px"><span>Próxima cobrança</span><span class="r">05/11 · R$ 200</span></div>
@@ -333,11 +339,12 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
               <button class="ap-btn" type="button" id="apReceipt">Recibo de outubro</button>
               <button class="ap-btn ghost" type="button" id="apTalk">Falar sobre meu plano</button>
             </div>
+            <!-- na ordem dos capítulos: rolando a página, o destaque anda da esquerda para a direita -->
             <nav class="ap-dock" id="apDock" aria-label="Abas do app">
-              <button type="button" data-go="inicio" aria-current="true"><svg class="ic"><use href="#i-home"/></svg>Início</button>
-              <button type="button" data-go="movimentos" aria-current="false"><svg class="ic"><use href="#i-play"/></svg>Movimentos</button>
-              <button type="button" data-go="presenca" aria-current="false"><svg class="ic"><use href="#i-check"/></svg>Presença</button>
-              <button type="button" data-go="perfil" aria-current="false"><svg class="ic"><use href="#i-belt"/></svg>Perfil</button>
+              <button type="button" data-go="inicio" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Início</button>
+              <button type="button" data-go="presenca" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Presença</button>
+              <button type="button" data-go="movimentos" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
+              <button type="button" data-go="perfil" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Perfil</button>
             </nav>
             <i class="ap-glare" aria-hidden="true"></i>
           </div>
@@ -355,61 +362,61 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
         <article class="dch on" data-view="inicio">
           <p class="label">01 · Início</p>
           <h2>Uma pergunta: <em>vou treinar hoje?</em></h2>
-          <p>A aula da turma da aluna aparece em destaque, com quanto falta e quantas vagas restam. Confirmar leva um toque.</p>
+          <p>A aula da turma da aluna aparece em destaque, com quanto falta e quantas vagas restam. Confirmar a vaga leva um toque.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>Só a turma dela, sem as aulas Kids no meio</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Vagas contadas com todo mundo, até 10 por aula</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>A semana à vista, com a meta que ela escolheu</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Só a turma dela, sem as aulas Kids no meio</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Vagas da turma inteira, até 10 por aula</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>A semana à vista, com a meta que ela escolheu</li>
           </ul>
-          <button class="try" type="button" data-act="confirm"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Confirmar a presença no celular</span></button>
+          <button class="try" type="button" data-act="confirm"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Confirmar a vaga no celular</span></button>
         </article>
         <article class="dch" data-view="presenca">
           <p class="label">02 · Presença</p>
           <h2>Três passos, <em>uma tela só</em>.</h2>
           <p>No tatame, o professor mostra o código da aula na TV: três letras e três números. A aluna digita, e a presença entra na hora, contando para a meta da semana. Na TV de hoje, o código é <b>KTR 482</b>.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>O botão só acende com o código completo</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>O código vale só para aquela aula, pelo tempo que o professor escolher</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Cada passo mostra o horário em que aconteceu</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>O botão só acende com o código completo</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>O código vale só para aquela aula, pelo tempo que o professor escolher</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Cada passo mostra o horário em que aconteceu</li>
           </ul>
-          <button class="try" type="button" data-act="checkin"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Digitar o código e registrar</span></button>
+          <button class="try" type="button" data-act="checkin"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Digitar o código e registrar</span></button>
         </article>
         <article class="dch" data-view="movimentos">
           <p class="label">03 · Movimentos</p>
           <h2>Continue <em>de onde parou</em>.</h2>
           <p>O vídeo em andamento vem primeiro. Aos 90%, abre um quiz curto; respondendo certo, o movimento conta como estudado.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>Só os movimentos da faixa dela</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Capas com fotos reais do Studio</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Errou? Tente de novo, quantas vezes quiser</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Só os movimentos da faixa dela</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Capas com fotos reais do Studio</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Errou? Tente de novo, quantas vezes quiser</li>
           </ul>
-          <button class="try" type="button" data-act="watch"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Assistir até os 90% e abrir o quiz</span></button>
+          <button class="try" type="button" data-act="watch"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Assistir até os 90% e abrir o quiz</span></button>
         </article>
         <article class="dch" data-view="perfil">
           <p class="label">04 · Perfil</p>
           <h2>A faixa <em>em primeiro lugar</em>.</h2>
           <p>A faixa com os graus de verdade, três números que importam e o caminho até o próximo grau, sem prometer datas: quem decide é o professor.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>Aulas desde o último grau</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Semanas seguidas de treino, com o recorde</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Competências que o professor observa</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Aulas desde o último grau</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Semanas seguidas com pelo menos um treino, com o recorde</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Competências que o professor observa</li>
           </ul>
-          <button class="try" type="button" data-act="comps"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Ver as competências da faixa</span></button>
+          <button class="try" type="button" data-act="comps"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Ver as competências da faixa</span></button>
         </article>
         <article class="dch" data-view="avisos">
           <p class="label">05 · Avisos</p>
           <h2>O app <em>lembra por você</em>.</h2>
-          <p>Um aviso uma hora antes da aula, um lembrete para fechar a meta da semana e os movimentos novos da faixa. Quando o professor registra um grau, a notícia chega no mesmo dia.</p>
+          <p>Um aviso uma hora antes da aula, um lembrete para fechar a meta da semana e os movimentos novos da faixa. Quando o professor registra um grau, a notícia chega no celular depois da aula ou na entrega, como o professor preferir.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>Lembrete da aula com as vagas que restam</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Um lembrete, só quando ainda dá para fechar a meta da semana</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>O grau novo chega no celular no mesmo dia</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Lembrete da aula com as vagas que restam</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Um lembrete, só quando ainda dá para fechar a meta da semana</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>O grau novo chega no celular na hora que o professor escolher</li>
           </ul>
           <figure class="note-ex">
             <figcaption class="label">Exemplo do aviso de grau</figcaption>
             <div class="ap-note"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>Grau novo!</b><span class="tx">Seu 3º grau na faixa azul foi registrado. O professor destacou: “passagem com pressão, sem pressa”.</span></span></div>
           </figure>
-          <button class="try" type="button" data-act="notes"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Mostrar os avisos</span></button>
+          <button class="try" type="button" data-act="notes"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Mostrar os avisos</span></button>
         </article>
       </div>
     </div>
@@ -423,7 +430,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
         <li><h3>Só a turma do aluno</h3><p>A tela inicial destaca a aula do aluno e resume os outros horários numa linha.</p><span class="was">Antes: todas as turmas do dia, Kids incluído, cada uma com um botão.</span></li>
         <li><h3>Vagas de verdade</h3><p>O contador soma as reservas de todos os alunos da turma.</p><span class="was">Antes: o aluno só enxergava a própria reserva, e a turma parecia sempre vazia.</span></li>
         <li><h3>Mensalidade como status</h3><p>Uma linha diz se está em dia. Um toque mostra o plano, a próxima cobrança e o recibo.</p><span class="was">Antes: valores em aberto e em atraso no meio do resumo de treino.</span></li>
-        <li><h3>Presença numa tela</h3><p>Confirmar, digitar o código e registrar, nessa ordem.</p><span class="was">Antes: “Presença do dia” e “Check-in” em itens separados do menu.</span></li>
+        <li><h3>Presença numa tela</h3><p>Confirmar a vaga, digitar o código e registrar, nessa ordem.</p><span class="was">Antes: “Presença do dia” e “Check-in” em itens separados do menu.</span></li>
         <li><h3>Uma faixa só</h3><p>O mesmo desenho no Perfil do aluno e na ficha e nas Graduações do professor.</p><span class="was">Antes: uma barra no Início e uma faixa em 3D no Perfil, cada uma de um jeito.</span></li>
         <li><h3>Avisos que ajudam</h3><p>Lembrete da aula, um toque para fechar a meta da semana, movimento novo e grau novo. Nada além disso.</p><span class="was">Antes: sem avisos; era preciso abrir o app para saber de tudo.</span></li>
       </ul>
@@ -434,7 +441,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     <div class="wrap">
       <a href="area-do-professor.html" data-int>
         <div><p class="label">Do outro lado do tatame</p><h2>Agora veja a <em>Área do Professor</em>.</h2></div>
-        <span class="go"><svg class="ic"><use href="#i-arrow"/></svg></span>
+        <span class="go"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></span>
       </a>
     </div>
   </section>
@@ -444,9 +451,9 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
   <div class="wrap">
     <div class="foot-grid">
       <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
-      <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>App</h4><ul><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
-      <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
+      <div><p class="foot-h">Site</p><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
+      <div><p class="foot-h">App</p><ul><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><p class="foot-h">Contato</p><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
     <div class="foot-bottom"><span>Dados de exemplo: Marina Alves é uma aluna fictícia, e os nomes dos vídeos são ilustrativos.</span><span>Proposta de redesign · versão para aprovação</span></div>
@@ -463,7 +470,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
   var ap = $("#ap"), views = $$(".ap-view", ap), dock = $("#apDock"), dockBtns = $$("button", dock), toastEl = $("#apToast"), toastT = null;
   var tabs = $$("#demoTabs button"), chs = $$(".dch"), rail = $$("#demoRail button");
   var anim = !!window.gsap && !Site.reduce;
-  var CHECK = '<svg class="ic"><use href="#i-check"/></svg>';
+  var CHECK = '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>';
   function later(fn, ms) { return setTimeout(fn, ms); }
   function desk() { return window.innerWidth >= 1024; }
   function screenOf(name) { return $('.ap-view[data-view="' + name + '"]', ap); }
@@ -477,10 +484,13 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     dock.inert = sheetOn || current === "avisos";
   }
   function show(name) {
-    tabs.forEach(function (t) { t.setAttribute("aria-selected", t.dataset.view === name ? "true" : "false"); });
+    tabs.forEach(function (t) { t.setAttribute("aria-current", t.dataset.view === name ? "true" : "false"); });
     rail.forEach(function (r) { r.setAttribute("aria-current", r.dataset.view === name ? "true" : "false"); });
     chs.forEach(function (c) { c.classList.toggle("on", c.dataset.view === name); });
+    tabInView($('#demoTabs button[data-view="' + name + '"]'));
     if (name === current) return;
+    /* a tela que sai fica inerte: quem estava com o foco nela (ou na folha) segue para a tela nova, não para o body */
+    var had = screenOf(current).contains(document.activeElement) || $("#apSheet").contains(document.activeElement);
     closeSheet(false);
     current = name;
     views.forEach(function (v) { v.classList.toggle("on", v.dataset.view === name); });
@@ -488,7 +498,24 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     ap.classList.toggle("is-lock", name === "avisos");
     syncInert();
     if (name === "avisos") notes();
+    if (had) Site.focusSoft($(".ap-hi", screenOf(name)) || $("#apLockClock"), { preventScroll: true });
   }
+  /* abas no celular: a faixa rola de lado (nunca a página) até a aba ativa ou focada aparecer inteira,
+     fora da ponta esmaecida; no fim da faixa, a ponta perde o esmaecido */
+  var tabBar = $("#demoTabs");
+  function tabEnd() { tabBar.classList.toggle("at-end", tabBar.scrollLeft + tabBar.clientWidth >= tabBar.scrollWidth - 2); }
+  function tabInView(b) {
+    if (!b || !tabBar.clientWidth || tabBar.scrollWidth <= tabBar.clientWidth) return;
+    var bar = tabBar.getBoundingClientRect(), r = b.getBoundingClientRect(), pad = parseFloat(getComputedStyle(tabBar).paddingLeft) || 16;
+    var clear = tabBar.classList.contains("at-end") ? bar.right : bar.left + bar.width * 0.85;
+    if (r.left >= bar.left + pad - 1 && r.right <= clear) return;
+    tabBar.scrollTo({ left: tabBar.scrollLeft + r.left - bar.left - pad, behavior: Site.reduce ? "auto" : "smooth" });
+  }
+  tabBar.addEventListener("scroll", tabEnd, { passive: true });
+  tabBar.addEventListener("focusin", function (e) { tabInView(e.target.closest("button")); });
+  window.addEventListener("resize", tabEnd);
+  tabEnd();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(tabEnd);
   syncInert();
   dockBtns.forEach(function (b) { b.addEventListener("click", function () { show(b.dataset.go); }); });
   tabs.forEach(function (t) { t.addEventListener("click", function () { show(t.dataset.view); }); });
@@ -673,8 +700,10 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     if (anim) gsap.to(wrap, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: function () { wrap.hidden = true; } });
     else wrap.hidden = true;
     done.hidden = false;
+    /* a presença de hoje conta em tudo que depende dela: a meta da semana, o ponto de hoje e as aulas desde o grau */
     $("#apWeek").textContent = "3 de 3";
     $("#apToday").hidden = false;
+    $("#apSince").textContent = "22";
     /* as três barras da meta acendem em sequência */
     var goal = $(".ap-goal", done);
     goal.classList.remove("burst"); void goal.offsetWidth; goal.classList.add("burst");
@@ -772,7 +801,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
       /* o texto final diz a verdade: "de primeira" só quando não houve nenhum erro */
       fb.textContent = (qErr ? "Pronto!" : "Você acertou as " + QUIZ.length + " de primeira.") + " Movimento estudado: agora são 6 de 12 da faixa azul.";
       $("#apMov").textContent = "6";
-      $("#apMov2").textContent = "6/12";
+      $("#apMov2").innerHTML = "6<small> de 12</small>";
       toast("Movimento estudado.");
       later(finishQuiz, 2600);
     } else {
@@ -791,8 +820,9 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     if (open === !list.hidden) return;
     $("#apCompBtn").classList.remove("pulse");
     list.hidden = !open;
-    $("#apNote").hidden = open;
     $("#apCompBtn").setAttribute("aria-expanded", open ? "true" : "false");
+    /* a nota explica a lista e fica logo abaixo dela; a tela do celular rola até as 8 aparecerem */
+    if (open) into(list);
     if (open && anim) gsap.from($$("#apComp li"), { x: -10, opacity: 0, duration: 0.6, stagger: 0.05, ease: "expo.out" });
   }
   $("#apCompBtn").addEventListener("click", function () { toggleComps(); });
@@ -802,15 +832,17 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
   function notes() {
     var ns = $$(".ap-note", lockV);
     noteT.forEach(clearTimeout);
+    /* com menos movimento, os três já estão lá */
+    if (Site.reduce) { ns.forEach(function (n) { n.classList.add("on"); }); return; }
     ns.forEach(function (n) { n.classList.remove("on"); });
     noteT = ns.map(function (n, i) { return later(function () { n.classList.add("on"); }, 400 + i * 480); });
   }
-  /* a tela bloqueada fica inerte ao sair: quem estava com o foco nela continua na tela nova */
+  /* a tela bloqueada fica inerte ao sair: show() leva o foco ao título da tela nova; focusEl, quando vem, é mais preciso */
   function leaveLock(name, then, focusEl) {
     var had = lockV.contains(document.activeElement);
     show(name);
     if (then) then();
-    if (had) Site.focusSoft(focusEl || $(".ap-hi", screenOf(name)), { preventScroll: true });
+    if (had && focusEl) Site.focusSoft(focusEl, { preventScroll: true });
   }
   var NOTE = {
     aula: function () { leaveLock("inicio", confirmSpot, confBtn); },
