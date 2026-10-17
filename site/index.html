@@ -53,8 +53,6 @@ html.seen #loader { display: none; }
               linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 70%, transparent) 0%, transparent 28%, transparent 46%, var(--cine-bg) 100%); }
 .hero-ghost { position: absolute; z-index: -1; right: -3vw; top: 50%; translate: 0 -50%; writing-mode: vertical-rl; font: 500 min(70vh, 44vw)/0.9 var(--mincho); color: transparent; -webkit-text-stroke: 1px oklch(0.83 0.13 84 / 0.2); pointer-events: none; user-select: none; will-change: transform; }
 .hero-in { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; padding-top: clamp(108px, 14vh, 150px); padding-bottom: clamp(30px, 5vh, 60px); }
-.hero-top { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
-.hero-coord { font: 500 11px/1.4 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); text-shadow: 0 1px 12px oklch(0 0 0 / 0.9); }
 .hero-main { margin-top: auto; padding-top: 28px; perspective: 1300px; perspective-origin: 26% 50%; }
 /* o tamanho também depende da altura da tela, para o botão caber sempre na primeira dobra.
    As três linhas ficam em profundidades diferentes: quando o título gira com o mouse, elas se separam */
@@ -156,6 +154,24 @@ html.seen #loader { display: none; }
 .sym-glow { position: absolute; inset: 8% 14%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in oklch, var(--gold) 22%, transparent), transparent 72%); filter: blur(30px); opacity: 0.6; pointer-events: none; }
 .sym .sym-line { fill: none; stroke: var(--gold); stroke-width: 1.4; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 @media (max-width: 999px) { .true-ph { height: min(56vh, 460px); } }
+/* convite final: o mapa do Google com o endereço (escurecido no tema Black); se a página bloquear o mapa
+   incorporado, fica o cartão com o endereço por baixo */
+.cta-map { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 4px; background: var(--paper-2); box-shadow: 0 50px 90px -40px oklch(0.13 0.005 70 / 0.8), 0 0 0 6px oklch(0.13 0.005 70); }
+.cta-map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: grayscale(0.2) invert(0.92) hue-rotate(180deg) contrast(0.92) brightness(0.95); }
+html[data-look="light"] .cta-map iframe { filter: none; }
+.cta-map.off iframe { display: none; }
+.map-card { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 8px; padding: 24px 24px 120px; text-align: center; color: var(--ink-2); font-size: 15px; }
+.map-card .ic { width: 42px; height: 42px; color: var(--gold-text); stroke-width: 1.4; }
+.map-card b { font: 400 clamp(22px, 2.2vw, 30px)/1.1 var(--serif); color: var(--ink); }
+.cta-map figcaption { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 30px 18px 16px; background: linear-gradient(180deg, transparent, oklch(0.14 0.006 75 / 0.94) 34%); font-size: 13px; color: oklch(0.86 0.01 85); }
+.cta-map figcaption b { color: oklch(0.97 0.005 85); font-weight: 600; }
+html[data-look="light"] .cta-map figcaption { background: linear-gradient(180deg, transparent, oklch(0.98 0.005 85 / 0.95) 34%); color: oklch(0.35 0.01 75); }
+html[data-look="light"] .cta-map figcaption b { color: oklch(0.16 0.006 75); }
+.map-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.map-acts a { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 14px; border-radius: 19px; background: oklch(0.83 0.13 84); color: oklch(0.16 0.006 75); font: 600 12px/1 var(--sans); text-decoration: none; }
+.map-acts a + a { background: transparent; color: inherit; box-shadow: inset 0 0 0 1px currentColor; }
+.map-acts .ic { width: 14px; height: 14px; }
+@media (max-width: 600px) { .cta-map { aspect-ratio: 4 / 4.6; } }
 .true-tx .h2 { margin-top: 26px; font-size: clamp(40px, 4.4vw, 76px); }
 .true-tx .lead { margin-top: 26px; }
 .vals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin-top: 44px; border-top: 1px solid var(--rule); }
@@ -440,6 +456,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12l6 6L20 6"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M2.5 10.5c3-1 6.5-4 9.5-6.5 3 2.5 6.5 5.5 9.5 6.5"/><path d="M5.5 10v9M18.5 10v9"/><path d="M3 20h18"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M19 6.5A9 9 0 1 0 20.5 15"/><path d="M10 8.5v7l6-3.5z"/></symbol>
@@ -508,10 +525,6 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     <div class="hv-shade" aria-hidden="true"></div>
     <span class="hero-ghost" aria-hidden="true">柔術</span>
     <div class="wrap hero-in">
-      <div class="hero-top">
-        <p class="label gold">Jiu-Jitsu · Equipe TRUE</p>
-        <p class="hero-coord">23°31′S · 47°29′W · Sorocaba/SP</p>
-      </div>
       <div class="hero-main">
         <h1 class="hero-title" id="t-hero">
           <span class="ln ln1"><span class="lni">Jiu-Jitsu</span></span>
@@ -873,7 +886,17 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
             <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
           </dl>
         </div>
-        <figure class="cta-photo" data-tilt3d="6" data-glare><img src="img/ambiente-studio.webp" alt="Painel dourado do Studio Evolution BJJ na parede preta da academia" loading="lazy" width="1200" height="800"></figure>
+        <figure class="cta-map">
+          <div class="map-card" aria-hidden="true"><svg class="ic"><use href="#i-pin"/></svg><b>Av. Getúlio Vargas, 400</b><span>Sala 3, sobreloja · Jardim São Paulo<br>Sorocaba/SP · 18051-480</span></div>
+          <iframe src="https://www.google.com/maps?q=Av.+Get%C3%BAlio+Vargas,+400+-+Jardim+S%C3%A3o+Paulo,+Sorocaba+-+SP,+18051-480&amp;z=16&amp;hl=pt-BR&amp;output=embed" title="Mapa com o endereço do Studio Evolution BJJ: Av. Getúlio Vargas, 400, Jardim São Paulo, Sorocaba" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+          <figcaption><span><b>Av. Getúlio Vargas, 400</b> · sala 3, sobreloja · Jardim São Paulo</span><span class="map-acts"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Av.%20Get%C3%BAlio%20Vargas%2C%20400%2C%20Jardim%20S%C3%A3o%20Paulo%2C%20Sorocaba%20SP" target="_blank" rel="noopener">Como chegar<svg class="ic"><use href="#i-arrow"/></svg></a><a href="https://www.google.com/maps/search/?api=1&amp;query=Av.%20Get%C3%BAlio%20Vargas%2C%20400%2C%20Jardim%20S%C3%A3o%20Paulo%2C%20Sorocaba%20SP" target="_blank" rel="noopener">Abrir no Google Maps</a></span></figcaption>
+        </figure>
+        <script>
+        /* se a página bloquear o mapa incorporado (como numa pré-visualização), fica o cartão com o endereço */
+        document.addEventListener("securitypolicyviolation", function (e) {
+          if (/google\./.test(e.blockedURI || "")) { var m = document.querySelector(".cta-map"); if (m) m.classList.add("off"); }
+        });
+        </script>
       </div>
     </div>
   </section>
@@ -976,7 +999,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
       tl.from(".hv-v", { opacity: 0, scale: 1.18, duration: 2.6, stagger: 0.18 }, 0)
         .from(".hero-title .lni", { yPercent: 120, scaleY: 1.7, skewY: 9, duration: 1.6, stagger: 0.11 }, 0.15)
-        .from(".hero-top > *, .hb-l > *, .hb-r > *", { y: 26, opacity: 0, duration: 1.2, stagger: 0.07, ease: "power3.out" }, 0.7)
+        .from(".hb-l > *, .hb-r > *", { y: 26, opacity: 0, duration: 1.2, stagger: 0.07, ease: "power3.out" }, 0.7)
         .from(".hero-ghost", { opacity: 0, xPercent: 18, duration: 2.4 }, 0.5)
         .add(function () { $$(".hero .label").forEach(S.scramble); }, 0.75)
         .from(".nav-in", { y: -30, opacity: 0, duration: 1.2 }, 0.5);
