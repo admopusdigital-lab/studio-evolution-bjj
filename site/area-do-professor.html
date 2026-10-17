@@ -35,6 +35,8 @@
 .diff { background: var(--paper-2); }
 @media (max-width: 600px) { .dash-bar span:not(.clock) { display: none; } }
 @media (max-width: 1023px) { .hc.c2 { top: 55%; } }  /* no celular, abaixo dos rostos */
+/* no celular, "vagas confirmadas" desce para uma linha menor, e o cartão cabe na tela */
+@media (max-width: 600px) { .hc.c2 b .vc { display: block; margin-top: 3px; font: 600 12px/1.2 var(--sans); letter-spacing: 0; } }
 /* Financeiro: régua de lembretes e o registro do que saiu sozinho */
 .fin-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-top: 22px; }
 .fin-box { padding: 16px; background: var(--paper-2); border-top: 1px solid var(--gold); }
@@ -64,6 +66,49 @@
 .msg q .lk { font: 600 14px/1 var(--sans); font-style: normal; color: var(--gold-text); }
 @media (max-width: 860px) { .fin-grid { grid-template-columns: minmax(0, 1fr); } }
 .dv[data-v="fin"] .kpi b { white-space: nowrap; }
+/* o selo do WhatsApp de avisos no topo da aba (fica vermelho se a conexão cair) */
+.fin-hd { display: grid; justify-items: start; gap: 6px; max-width: 46ch; }
+/* sem treinar e em atraso: a segunda pílula fica embaixo da primeira */
+#finTbl td .pill-s.aus { display: block; width: fit-content; margin-top: 5px; }
+.tbl td .nm .av { flex-shrink: 0; }  /* o avatar não encolhe quando a linha de baixo é longa */
+/* celular: com duas ações (conversar e cobrar), elas descem para uma linha própria e as pílulas ficam inteiras */
+@media (max-width: 600px) { #finTbl td.act.two { grid-column: 1 / -1; grid-row: 3; padding-left: 40px; } }
+.rules li .rl-off { grid-column: 2; margin-top: -4px; font-size: 11.5px; color: var(--ink-2); }
+/* prévias: o que muda de aluno para aluno (nome, data) aparece sublinhado; o Pix vai num segundo balão */
+.msg q .var { text-decoration: underline dotted var(--gold-text); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.msg q.mono { margin-top: 8px; padding: 8px 10px; background: var(--paper); font: 500 13px/1.4 var(--mono, monospace); font-style: normal; color: var(--ink-2); quotes: none; }
+/* ficha: mensalidade e último contato, logo depois do mapa */
+.dr-info { margin-top: 16px; }
+.dr-info div { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding-block: 9px; border-top: 1px solid var(--rule); font-size: 13px; }
+.dr-info dt { flex-shrink: 0; color: var(--ink-3); }
+.dr-info dd { text-align: right; color: var(--ink); }
+.dr-info dd.warn { color: var(--warn); }
+
+/* Interessados: o .lead de site.css (parágrafo de abertura, 18 px e 44ch) vazava para o cartão e o espremia na metade */
+.leads .lead { max-width: none; font-size: inherit; color: var(--ink); }
+/* escolher dia e turma (só em "outro dia"), o status final com desfazer e os fechados reabríveis */
+.lead-pick { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.lead-pick small { flex-basis: 100%; font-size: 12px; color: var(--ink-3); }
+button.leads-closed { width: 100%; border: 0; border-top: 1px solid var(--rule); background: none; color: var(--ink-2); font: 500 13px/1.3 var(--sans); text-align: left; cursor: pointer; }
+button.leads-closed:hover { color: var(--ink); }
+button.leads-closed > span:last-child { display: inline-flex; align-items: center; gap: 6px; }
+button.leads-closed .ic { width: 14px; height: 14px; transition: transform 300ms var(--ease); }
+button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
+.closed-box { padding: 0 14px 6px; font-size: 13px; }
+.closed-box li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-block: 8px; border-top: 1px solid var(--rule); }
+.closed-box li > span:first-child { flex: 1; min-width: 0; }
+.closed-box p { padding-block: 8px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-3); }
+@media (max-width: 860px) { .lead-pick { grid-column: 1 / -1; } }
+
+/* Graduações: o aviso do grau (depois da aula ou guardado) e o "Avisar agora" no histórico */
+.gcard .ask .notify { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; font-size: 12.5px; line-height: 1.35; color: var(--ink-2); cursor: pointer; }
+.gcard .ask .notify input { width: 16px; height: 16px; margin: 1px 0 0; flex-shrink: 0; accent-color: var(--gold); }
+.hist li .mini-btn { display: block; height: 28px; margin-top: 6px; }
+.gcard h4 .nm-btn { text-align: left; }
+
+/* reconhecimento na chamada (só no painel, nunca na TV): uma etiqueta por aluno, com contorno dourado */
+.pill-s.rec { display: inline-block; margin-left: 6px; padding: 2px 8px; background: none; box-shadow: inset 0 0 0 1px var(--gold-text); color: var(--gold-text); font-size: 10.5px; vertical-align: 1px; }
+.room-h .rec-n { margin-top: 2px; color: var(--gold-text); font-weight: 600; }
 @media (max-width: 600px) { .dv[data-v="fin"] .kpi b { font-size: 22px; } }
 
 /* chamada: cada linha tem a pílula de presença e um único botão de ação */
@@ -191,8 +236,8 @@
       <div class="ar-visual" aria-hidden="true">
         <figure class="ar-photo" data-depth="20"><img src="img/professores-evolution.webp" alt="" width="1200" height="800"></figure>
         <div class="hc c1" data-depth="60"><span class="dot"><svg class="ic"><use href="#i-code"/></svg></span><span><small>Código da aula · 19h</small><b class="code">KTR 482</b></span></div>
-        <div class="hc c2" data-depth="100"><span><small>Adulto · 19h</small><b>8 de 10 confirmados</b></span><span class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></div>
-        <div class="hc c3" data-depth="80"><span class="dot warn"><svg class="ic"><use href="#i-bell"/></svg></span><span><small>Sem treinar há 14 dias</small><b>3 alunos</b></span></div>
+        <div class="hc c2" data-depth="100"><span><small>Adulto · 19h</small><b>8 de 10 <span class="vc">vagas confirmadas</span></b></span><span class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></div>
+        <div class="hc c3" data-depth="80"><span class="dot warn"><svg class="ic"><use href="#i-bell"/></svg></span><span><small>Sem treinar há 14 dias ou mais</small><b>3 alunos</b></span></div>
       </div>
     </div>
   </section>
@@ -200,8 +245,8 @@
   <section class="demo pdemo" id="painel" aria-labelledby="t-painel">
     <div class="demo-head">
       <p class="label">Experimente</p>
-      <h2 id="t-painel">Um painel, <em>quatro perguntas</em>.</h2>
-      <p>Quem vem hoje? Quem chegou? Quem sumiu? Quem está pronto para o próximo grau? Clique à vontade: o painel funciona, com alunos de exemplo. Toque no nome de um aluno para abrir a ficha.</p>
+      <h2 id="t-painel">Um painel, <em>cinco perguntas</em>.</h2>
+      <p>Quem vem hoje? Quem sumiu? Quem está pronto para o grau? Quem quer começar? Quem já pagou? Clique ou toque à vontade: os alunos são de exemplo. Toque no nome de um aluno em Alunos, Graduações, Financeiro ou nas aulas de hoje para abrir a ficha.</p>
     </div>
     <div class="wrap">
       <div class="dash-wrap">
@@ -216,7 +261,7 @@
               <button type="button" data-go="leads" aria-current="false"><svg class="ic"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads">3</span></button>
               <button type="button" data-go="fin" aria-current="false"><svg class="ic"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin">2</span></button>
               <div class="more"><p>Também no painel</p><ul><li>Movimentos e quizzes</li><li>Competências da faixa</li><li>Turmas e horários</li><li>Aprendizado por aluno</li><li>Cadastro rápido</li></ul></div>
-              <div class="who"><span class="av">SE</span><span>Professor<br><small>Studio Evolution</small></span></div>
+              <div class="who"><span class="av">SE</span><span>Professor · dono<br><small>Studio Evolution</small></span></div>
             </aside>
             <div class="dash-main">
 
@@ -227,18 +272,18 @@
                   <p id="dNow">Agora: Kids 18h · Próxima: Adulto 19h</p>
                 </div>
                 <div class="kpis">
-                  <div class="kpi"><b>58<small class="delta">+3 em outubro</small></b><span>alunos ativos</span></div>
+                  <div class="kpi"><b>58<small class="delta" id="kNew">+3 em outubro</small></b><span>alunos ativos</span></div>
                   <div class="kpi"><b id="kPres">146</b><span>presenças nos últimos 7 dias</span><span class="spark" id="spark" aria-hidden="true"><i class="wk"></i><i class="wk"></i><i></i><i></i><i></i><i></i><i class="today"></i></span></div>
                   <button class="kpi warn" type="button" data-goto="alunos" data-chip="aus"><b>3</b><span>sem treinar há 14 dias ou mais</span><span class="go-s">Ver quem<svg class="ic"><use href="#i-chev"/></svg></span></button>
                   <button class="kpi" type="button" data-goto="leads"><b id="kLeads">3</b><span>interessados esperando retorno</span><span class="go-s">Abrir<svg class="ic"><use href="#i-chev"/></svg></span></button>
                 </div>
                 <div class="day-grid">
                   <div class="classes" id="classes" role="group" aria-label="Aulas de hoje">
-                    <button type="button" class="past" data-c="a8" aria-pressed="false"><b>08:00</b><span>Adulto</span><small>7 vieram</small></button>
-                    <button type="button" class="past" data-c="k10" aria-pressed="false"><b>10:00</b><span>Kids</span><small>9 vieram</small></button>
-                    <button type="button" class="past" data-c="a11" aria-pressed="false"><b>11:00</b><span>Adulto</span><small>6 vieram</small></button>
-                    <button type="button" data-c="k18" aria-pressed="false"><b>18:00</b><span>Kids · agora</span><small id="c18s">6 de 8 marcadas</small></button>
-                    <button type="button" data-c="a19" aria-pressed="true"><b>19:00</b><span>Adulto</span><small id="c19s">8 de 10</small></button>
+                    <button type="button" class="past" data-c="a8" aria-pressed="false"><b>8h</b><span>Adulto</span><small>7 vieram</small></button>
+                    <button type="button" class="past" data-c="k10" aria-pressed="false"><b>10h</b><span>Kids</span><small>9 vieram</small></button>
+                    <button type="button" class="past" data-c="a11" aria-pressed="false"><b>11h</b><span>Adulto</span><small>6 vieram</small></button>
+                    <button type="button" data-c="k18" aria-pressed="false"><b>18h</b><span>Kids · agora</span><small id="c18s">6 de 8 marcadas</small></button>
+                    <button type="button" data-c="a19" aria-pressed="true"><b>19h</b><span>Adulto</span><small id="c19s">8 de 10</small></button>
                   </div>
                   <div class="room" id="room"></div>
                 </div>
@@ -260,9 +305,9 @@
                       <tr data-f="aval" data-id="thiago"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 3 graus</span></span></td><td>ontem</td><td class="num hide-s">5</td><td class="act"><button class="mini-btn" type="button" data-grad="thiago">Avaliar grau</button></td></tr>
                       <tr data-f="aval" data-id="ana"><td><div class="nm"><span class="av">AR</span><div>Ana Beatriz Rocha<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 4 graus</span></span></td><td>hoje, 8h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="ana">Avaliar faixa</button></td></tr>
                       <tr data-f="aval" data-id="joao"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · 9 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-cinza)"></i><span>Cinza · 3 graus</span></span></td><td>hoje, 18h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="joao">Avaliar grau</button></td></tr>
-                      <tr data-f="aus" data-id="diego"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-roxa)"></i><span>Roxa · 1 grau</span></span></td><td><span class="pill-s warn">há 16 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-wa="Diego">WhatsApp</button></td></tr>
-                      <tr data-f="aus" data-id="patricia"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 2 graus</span></span></td><td><span class="pill-s warn">há 21 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-wa="Patrícia">WhatsApp</button></td></tr>
-                      <tr data-f="aus" data-id="caio"><td><div class="nm"><span class="av">CF</span><div>Caio Fernandes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · sem grau</span></span></td><td><span class="pill-s warn">há 15 dias</span></td><td class="num hide-s">1</td><td class="act"><button class="mini-btn wa" type="button" data-wa="Caio">WhatsApp</button></td></tr>
+                      <tr data-f="aus" data-id="diego"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-roxa)"></i><span>Roxa · 1 grau</span></span></td><td><span class="pill-s warn">há 16 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-care="diego">WhatsApp</button></td></tr>
+                      <tr data-f="aus" data-id="patricia"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 2 graus</span></span></td><td><span class="pill-s warn">há 21 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-care="patricia">WhatsApp</button></td></tr>
+                      <tr data-f="aus" data-id="caio"><td><div class="nm"><span class="av">CF</span><div>Caio Fernandes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · sem grau</span></span></td><td><span class="pill-s warn">há 15 dias</span></td><td class="num hide-s">1</td><td class="act"><button class="mini-btn wa" type="button" data-care="caio">WhatsApp</button></td></tr>
                       <tr data-f="" data-id="larissa"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 1 grau</span></span></td><td>ontem</td><td class="num hide-s">5</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
                       <tr data-f="" data-id="helena"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · 7 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-amarela)"></i><span>Amarela · 2 graus</span></span></td><td>hoje, 10h</td><td class="num hide-s">6</td><td class="act"><span class="pill-s in">Veio hoje</span></td></tr>
                     </tbody>
@@ -293,7 +338,7 @@
                   <article class="gcard" data-id="thiago" data-belt="azul" data-graus="3" data-next="grau" data-first="Thiago">
                     <h4>Thiago Moreira</h4><p class="meta">Adulto 19h · desde 2023 no Studio</p>
                     <div class="belt"></div>
-                    <dl><dt>Aulas desde o último grau</dt><dd>31</dd><dt>Competências da faixa</dt><dd>6 de 8</dd><dt>Último grau</dt><dd>20 de junho</dd></dl>
+                    <dl><dt>Aulas desde o último grau</dt><dd>31</dd><dt>Competências da faixa</dt><dd>6 de 8</dd><dt>Último grau</dt><dd>19 de junho</dd></dl>
                     <div class="space"></div>
                     <div class="gact"><button class="ap-btn" type="button" data-ask>Registrar o 4º grau</button></div>
                   </article>
@@ -318,40 +363,44 @@
                   <div><b data-k="agendado">1</b><span>Aula agendada</span></div>
                   <div><b data-k="mat">3</b><span>Matriculados em outubro</span></div>
                 </div>
+                <!-- data-req: o dia e a turma que a pessoa pediu no site (o código do ingresso vem junto); data-slot: a aula marcada -->
                 <div class="leads" id="leads">
-                  <div class="lead" data-first="Camila" data-turma="Adulto das 19h">
+                  <div class="lead" data-first="Camila" data-art="a" data-prog="adulto" data-turma="Adulto" data-req="seg|19">
                     <span class="av">CS</span>
-                    <div><b>Camila Souza</b><span class="pill-s gold">Retornar hoje</span><small>Adulto 19h · pediu ontem, às 21:14</small></div>
-                    <div class="acts"><select class="sel" aria-label="Status de Camila Souza"><option value="novo" selected>Novo</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-wa="Camila" data-kind="lead">WhatsApp</button></div>
+                    <div><b>Camila Souza</b><span class="pill-s gold">Retornar hoje</span><small>Adulto · seg 19/10, 19h · EVO-ADU-1910-19H · pedido ontem, 21:14</small></div>
+                    <div class="acts"><select class="sel" aria-label="Status de Camila Souza"><option value="novo" selected>Novo</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
-                  <div class="lead" data-first="Rafael" data-turma="Adulto das 8h">
+                  <div class="lead" data-first="Rafael" data-art="o" data-prog="adulto" data-turma="Adulto" data-req="ter|8">
                     <span class="av">RT</span>
-                    <div><b>Rafael Teixeira</b><span class="pill-s gold">Retornar hoje</span><small>Adulto 8h · pediu hoje, às 07:02</small></div>
-                    <div class="acts"><select class="sel" aria-label="Status de Rafael Teixeira"><option value="novo" selected>Novo</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-wa="Rafael" data-kind="lead">WhatsApp</button></div>
+                    <div><b>Rafael Teixeira</b><span class="pill-s gold">Retornar hoje</span><small>Adulto · ter 20/10, 8h · EVO-ADU-2010-08H · pedido hoje, 07:02</small></div>
+                    <div class="acts"><select class="sel" aria-label="Status de Rafael Teixeira"><option value="novo" selected>Novo</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
-                  <div class="lead" data-first="Juliana" data-turma="Feminino, junto com o adulto">
+                  <div class="lead" data-first="Juliana" data-art="a" data-prog="feminino" data-turma="Feminino (junto com o Adulto)">
                     <span class="av">JM</span>
                     <div><b>Juliana Martins</b><span class="pill-s warn">Retorno atrasado desde 14/10</span><small>Feminino · pediu dia 12</small></div>
-                    <div class="acts"><select class="sel" aria-label="Status de Juliana Martins"><option value="novo">Novo</option><option value="atendimento" selected>Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-wa="Juliana" data-kind="lead">WhatsApp</button></div>
+                    <div class="acts"><select class="sel" aria-label="Status de Juliana Martins"><option value="novo">Novo</option><option value="atendimento" selected>Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
-                  <div class="lead" data-first="Pedro" data-turma="Kids das 18h">
+                  <div class="lead" data-first="Pedro" data-art="o" data-prog="kids" data-turma="Kids" data-child="Theo" data-slot="seg|18">
                     <span class="av">PH</span>
                     <div><b>Pedro Henrique</b><span class="pill-s in">Aula seg, 18h</span><small>Kids 18h, para o filho Theo, de 7 anos · pediu dia 13</small></div>
-                    <div class="acts"><select class="sel" aria-label="Status de Pedro Henrique"><option value="novo">Novo</option><option value="atendimento">Em atendimento</option><option value="agendado" selected>Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-wa="Pedro" data-kind="lead">WhatsApp</button></div>
+                    <div class="acts"><select class="sel" aria-label="Status de Pedro Henrique"><option value="novo">Novo</option><option value="atendimento">Em atendimento</option><option value="agendado" selected>Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
                 </div>
                 <div class="msg" id="leadMsg" hidden></div>
-                <p class="leads-closed"><span>Fechados</span><span id="closedN">6</span></p>
+                <button class="leads-closed" type="button" id="closedBtn" aria-expanded="false" aria-controls="closedBox"><span>Fechados</span><span><span id="closedN">6</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+                <div class="closed-box" id="closedBox" hidden><ul id="closedList"></ul><p id="closedNote">Os 6 contatos fechados são de antes de hoje.</p></div>
               </div>
 
-              <!-- Financeiro: mensalidades pelo Asaas, lembretes pelo WhatsApp do Studio (Evolution API) -->
+              <!-- Financeiro: mensalidades pelo Asaas, lembretes por um número de WhatsApp só de avisos (Evolution API) -->
               <div class="dv" data-v="fin" aria-label="Financeiro">
-                <div class="dv-h"><div><p class="dv-k">Outubro · valores de exemplo</p><h3>Financeiro</h3></div><p>Mensalidades por Pix, boleto ou cartão. Os lembretes saem sozinhos no WhatsApp do Studio.</p></div>
+                <div class="dv-h"><div><p class="dv-k">Outubro · valores de exemplo</p><h3>Financeiro</h3></div><div class="fin-hd"><span class="pill-s in">WhatsApp de avisos · conectado</span><p>Mensalidades por Pix, boleto ou cartão, com lembretes automáticos pelo WhatsApp.</p></div></div>
+                <!-- 31 adultos e 18 Kids pagos (R$ 200 e R$ 180), 5 adultos e 2 Kids a vencer, 2 adultos em atraso: 58 mensalidades -->
                 <div class="kpis">
-                  <div class="kpi"><b id="fRec">R$ 9.620</b><span id="fRecS">recebidos em outubro · 49 de 58 pagas</span></div>
-                  <div class="kpi"><b>R$ 1.380</b><span>a vencer até o fim do mês · 7 alunos</span></div>
-                  <button class="kpi warn" type="button" data-ff-go="late"><b id="fLate">R$ 400</b><span id="fLateS">em atraso · 2 alunos</span><span class="go-s">Ver quem<svg class="ic"><use href="#i-chev"/></svg></span></button>
-                  <div class="kpi"><b id="fSent">37</b><span>lembretes enviados no mês pelo WhatsApp</span></div>
+                  <div class="kpi"><b id="fRec">R$ 9.440</b><span id="fRecS">recebidos em outubro · 49 de 58 mensalidades pagas</span></div>
+                  <div class="kpi"><b>R$ 1.360</b><span>a vencer até o fim do mês · 7 mensalidades</span></div>
+                  <button class="kpi warn" type="button" data-ff-go="late"><b id="fLate">R$ 400</b><span id="fLateS">em atraso · 2 mensalidades</span><span class="go-s">Ver quem<svg class="ic"><use href="#i-chev"/></svg></span></button>
+                  <!-- já vencidas: as 49 pagas e as 2 atrasadas. Quem paga atrasado não muda a conta, só sai de "em atraso" -->
+                  <div class="kpi"><b id="fOnTime">90%</b><span>pagas até o vencimento · 46 das 51 já vencidas</span></div>
                 </div>
                 <div class="chips" id="finChips" role="group" aria-label="Filtrar mensalidades">
                   <button type="button" data-ff="all" aria-pressed="true">Todas</button>
@@ -363,11 +412,12 @@
                   <table class="tbl" id="finTbl">
                     <thead><tr><th>Aluno</th><th>Situação</th><th>Valor</th><th class="hide-s">Forma</th><th class="act">Ação</th></tr></thead>
                     <tbody>
-                      <tr data-st="late" data-id="diego" data-v="200"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h · venceu 10/10</small></div></div></td><td><span class="pill-s warn">Atrasada há 6 dias</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn wa" type="button" data-fin="diego">Cobrar agora</button></td></tr>
-                      <tr data-st="late" data-id="patricia" data-v="200"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h · venceu 11/10</small></div></div></td><td><span class="pill-s warn">Atrasada há 5 dias</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn wa" type="button" data-fin="patricia">Cobrar agora</button></td></tr>
+                      <!-- sem treinar e em atraso: a ação principal é conversar; cobrar fica ao lado -->
+                      <tr data-st="late" data-id="diego" data-v="200"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h · venceu 10/10 · lembretes pausados</small></div></div></td><td><span class="pill-s warn">Atrasada há 6 dias</span> <span class="pill-s warn aus">16 dias sem treinar</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act two"><button class="mini-btn wa" type="button" data-care="diego">Conversar</button> <button class="mini-btn ghost" type="button" data-fin="diego">Cobrar</button></td></tr>
+                      <tr data-st="late" data-id="patricia" data-v="200"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h · venceu 11/10 · último lembrete 12/10</small></div></div></td><td><span class="pill-s warn">Atrasada há 5 dias</span> <span class="pill-s warn aus">21 dias sem treinar</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act two"><button class="mini-btn wa" type="button" data-care="patricia">Conversar</button> <button class="mini-btn ghost" type="button" data-fin="patricia">Cobrar</button></td></tr>
                       <tr data-st="due" data-id="larissa" data-v="200"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h · vence 16/10</small></div></div></td><td><span class="pill-s gold">Vence hoje · lembrada às 8h</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-fin="larissa">Ver lembrete</button></td></tr>
                       <tr data-st="due" data-id="joao" data-v="180"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · vence 19/10</small></div></div></td><td><span class="pill-s">Vence em 3 dias</span></td><td class="num">R$ 180</td><td class="hide-s">Cartão automático</td><td class="act"><span class="pill-s in">Cobra sozinho</span></td></tr>
-                      <tr data-st="paid" data-id="thiago" data-v="200"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h · pago 15/10</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Pix</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Thiago">Recibo</button></td></tr>
+                      <tr data-st="paid" data-id="thiago" data-v="200"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h · pago hoje, 09:12</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Pix</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Thiago">Recibo</button></td></tr>
                       <tr data-st="paid" data-id="helena" data-v="180"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · pago 10/10</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 180</td><td class="hide-s">Boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Helena">Recibo</button></td></tr>
                       <tr data-st="paid" data-id="marina" data-v="200"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h · pago 05/10</small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Cartão automático</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Marina">Recibo</button></td></tr>
                     </tbody>
@@ -378,7 +428,7 @@
 
                 <div class="fin-grid">
                   <div class="fin-box">
-                    <p class="fin-k">Régua de lembretes · automática</p>
+                    <p class="fin-k">Lembretes automáticos</p>
                     <ul class="rules" id="rules">
                       <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: 3 dias antes"></button><button class="rl" type="button" data-rule="d3"><b>3 dias antes</b><small>Lembrete com o link de pagamento</small></button></li>
                       <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: no dia"></button><button class="rl" type="button" data-rule="d0"><b>No dia do vencimento</b><small>Pix copia e cola e o link</small></button></li>
@@ -386,19 +436,20 @@
                       <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: 5 dias depois"></button><button class="rl" type="button" data-rule="a5"><b>5 dias depois</b><small>Último aviso e alerta para o professor</small></button></li>
                       <li><button class="tog" type="button" aria-pressed="true" aria-label="Ligar ou desligar: pagamento confirmado"></button><button class="rl" type="button" data-rule="ok"><b>Pagamento confirmado</b><small>Agradecimento e recibo</small></button></li>
                     </ul>
-                    <p class="fin-note">Toque numa etapa para ver a mensagem. No Kids, quem recebe é o responsável.</p>
+                    <p class="fin-note">Toque numa etapa para ver a mensagem. No Kids, quem recebe é o responsável. Quem paga no cartão automático não recebe lembrete com link.</p>
                   </div>
                   <div class="fin-box">
                     <p class="fin-k">Hoje no automático</p>
                     <ol class="flog" id="flog">
-                      <li><time>09:12</time><div>Pix recebido de Thiago Moreira<small>Baixa automática pelo Asaas · recibo enviado no WhatsApp</small></div></li>
-                      <li><time>08:00</time><div>“Vence hoje” para Larissa Mendes<small>WhatsApp do Studio · entregue e lido</small></div></li>
-                      <li><time>08:00</time><div>“3 dias antes” para a família de João Pedro<small>WhatsApp do Studio · entregue</small></div></li>
-                      <li><time>08:00</time><div>“5 dias depois” para Patrícia Nunes<small>Alerta no painel: falar pessoalmente</small></div></li>
+                      <li><time>09:12</time><div>Pix recebido de Thiago Moreira<small>Baixa automática pelo Asaas · recibo pelo WhatsApp de avisos</small></div></li>
+                      <li><time>08:00</time><div>“No dia do vencimento” para Larissa Mendes<small>WhatsApp de avisos · entregue</small></div></li>
+                      <li><time>08:00</time><div>“3 dias antes” para Bruno Costa<small>WhatsApp de avisos · entregue</small></div></li>
+                      <li><time>08:00</time><div>“5 dias depois” pausado para Patrícia Nunes<small>21 dias sem treinar: conversar antes de cobrar</small></div></li>
                     </ol>
                   </div>
                 </div>
-                <p class="fin-how"><b>Como funciona:</b> o Asaas gera a cobrança de cada mês e avisa o painel quando o pagamento cai. Os lembretes saem do número de WhatsApp do Studio, conectado pela Evolution API. Só o dono do Studio e quem ele autorizar veem esta aba.</p>
+                <!-- o canal técnico (Evolution API, número só de avisos) fica só neste comentário: na tela, "WhatsApp de avisos" -->
+                <p class="fin-how"><b>Como funciona:</b> o Asaas, serviço de cobrança, gera a mensalidade de cada mês e avisa o painel quando o pagamento cai. Os lembretes saem de um número de WhatsApp só para avisos, separado do atendimento do Studio. Se a conexão cair, o selo no topo fica vermelho e os lembretes esperam. Só o dono do Studio e quem ele autorizar veem esta aba.</p>
               </div>
 
               <!-- ficha do aluno: um diálogo por cima da lista, com rolagem própria (sem aria-modal: o resto da página continua clicável) -->
@@ -464,14 +515,14 @@
               </div>
               <div class="ap-dock" aria-hidden="true">
                 <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-home"/></svg>Início</button>
-                <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-play"/></svg>Movimentos</button>
                 <button type="button" tabindex="-1" aria-current="true"><svg class="ic"><use href="#i-check"/></svg>Presença</button>
+                <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-play"/></svg>Movimentos</button>
                 <button type="button" tabindex="-1" aria-current="false"><svg class="ic"><use href="#i-belt"/></svg>Perfil</button>
               </div>
               <i class="ap-glare" aria-hidden="true"></i>
             </div>
           </div>
-          <figcaption>O celular da Marina, aluna da turma das 19h. Ela digita o código que aparece na TV.</figcaption>
+          <figcaption>O celular da Marina, aluna das 19h (no modo claro do celular dela). Ela digita o código da TV.</figcaption>
         </figure>
       </div>
       <div class="tv-ctrl">
@@ -488,10 +539,10 @@
       <h2 class="split" id="t-diff">O que muda para <em>quem dá aula</em>.</h2>
       <ul class="diff-grid" data-rise>
         <li><h3>O dia numa tela só</h3><p>Aulas de hoje, código, chamada e quem chegou, sem trocar de página.</p><span class="was">Antes: o Início listava as aulas, e a chamada ficava em outra página.</span></li>
-        <li><h3>Financeiro no painel</h3><p>Mensalidades cobradas pelo Asaas, com baixa automática, e lembretes que saem sozinhos no WhatsApp do Studio.</p><span class="was">Antes: o resumo mostrava R$ 0 para o professor, que não tinha acesso às mensalidades.</span></li>
+        <li><h3>Financeiro no painel</h3><p>Mensalidades cobradas pelo Asaas, com baixa automática, e lembretes automáticos por um WhatsApp só de avisos.</p><span class="was">Antes: o resumo mostrava R$ 0 para o professor, que não tinha acesso às mensalidades.</span></li>
         <li><h3>Código na TV</h3><p>Um toque e a turma vê o código em letras grandes, com a lista de quem chegou.</p><span class="was">Antes: o código ficava no celular do professor, com um botão para compartilhar.</span></li>
         <li><h3>A frequência à vista</h3><p>A ficha mostra as últimas 12 semanas de cada aluno, dia por dia, e quem está perto do grau.</p><span class="was">Antes: as aulas desde o último grau só apareciam no perfil do próprio aluno.</span></li>
-        <li><h3>Grau com aviso</h3><p>Ao registrar o grau, o aluno (ou a família, no Kids) recebe a notícia no celular.</p><span class="was">Antes: o grau entrava no sistema em silêncio.</span></li>
+        <li><h3>Grau com aviso</h3><p>Ao registrar o grau, o professor escolhe: o aluno (ou a família, no Kids) recebe a notícia no celular depois da aula, ou ela fica guardada para a entrega.</p><span class="was">Antes: o grau entrava no sistema em silêncio.</span></li>
         <li><h3>Interessados no menu</h3><p>Os pedidos de aula do site têm lugar próprio, com status, funil do mês e mensagem pronta.</p><span class="was">Antes: para o professor, ficavam no meio do Início; a lista completa era só do administrador.</span></li>
       </ul>
     </div>
@@ -529,7 +580,9 @@
   var $ = Site.$, $$ = Site.$$, focusSoft = Site.focusSoft;
   var anim = !!window.gsap && !Site.reduce;
   /* a altura do painel só anima com mouse: no toque, animar height força o layout a cada quadro (INP ruim) */
-  var tweenH = anim && Site.fine, MORPH_MS = tweenH ? 720 : 60;
+  /* MORPH_MS: quando a caixa nova pode ser trazida à tela. No toque, depois do ScrollTrigger.refresh() (250 ms),
+     que interrompia a rolagem nativa no meio e deixava a mensagem abaixo da tela */
+  var tweenH = anim && Site.fine, MORPH_MS = tweenH ? 720 : 320;
   var dash = $("#dash"), main = $(".dash-main", dash), views = $$(".dv", dash), side = $$(".dash-side button[data-go]", dash);
   var drawer = $("#drawer"), scrim = $("#drScrim"), drFrom = null;
 
@@ -590,6 +643,31 @@
     }
   }
 
+  /* dados de exemplo da ficha: a frequência das últimas 12 semanas sai de um sorteio fixo por aluno,
+     com a última aula e a ausência batendo com a lista (as presenças depois do último grau somam "desde").
+     call: como o aluno é chamado; resp: o responsável, no Kids; art: "a" ou "o" antes do nome; nova: menos de 6 meses
+     de Studio; fee: a mensalidade, como a ficha mostra; contact: o último contato (automático ou manual) */
+  var PEOPLE = {
+    marina: { n: "Marina Alves", art: "a", cls: "Adulto 19h", since: "aluna desde março de 2025", belt: "azul", g: 2, total: 142, desde: 21, ult: "14 de agosto", comp: [3, 8], days: [0, 2, 4], skip: 0.12, gap: [5], last: "2026-10-14", force: ["2026-10-12"], conf: 1 },
+    thiago: { n: "Thiago Moreira", cls: "Adulto 19h", since: "aluno desde 2023", belt: "azul", g: 3, total: 312, desde: 31, ult: "19 de junho", comp: [6, 8], days: [1, 3, 4], skip: 0.35, last: "2026-10-15", conf: 1, grad: 1, contact: { d: "hoje, 09:12", how: "recibo automático do Pix" } },
+    ana: { n: "Ana Beatriz Rocha", call: "Ana Beatriz", art: "a", cls: "Adulto 8h", since: "aluna desde 2024", belt: "branca", g: 4, total: 118, desde: 41, ult: "2 de abril", comp: [8, 8], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", grad: 1 },
+    joao: { n: "João Pedro Lima", call: "João Pedro", resp: "Carla", cls: "Kids 18h", age: "9 anos", since: "no Studio desde 2024", belt: "cinza", g: 3, total: 126, desde: 34, ult: "14 de maio", comp: [6, 6], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", kid: 1, grad: 1 },
+    diego: { n: "Diego Ramos", cls: "Adulto 11h", since: "aluno desde 2022", belt: "roxa", g: 1, total: 205, desde: 17, ult: "18 de agosto", comp: [4, 10], days: [1, 2, 3], skip: 0.25, last: "2026-09-30", aus: 16,
+      fee: "em atraso desde 10/10 · lembretes automáticos pausados", contact: { d: "11/10", how: "lembrete automático “1 dia depois”" } },
+    patricia: { n: "Patrícia Nunes", art: "a", nova: 1, cls: "Adulto 8h", since: "aluna desde maio de 2026", belt: "branca", g: 2, total: 38, desde: 3, ult: "11 de setembro", comp: [2, 8], days: [1, 4], skip: 0.3, last: "2026-09-25", aus: 21,
+      fee: "em atraso desde 11/10 · lembretes automáticos pausados", contact: { d: "12/10", how: "lembrete automático “1 dia depois”" } },
+    caio: { n: "Caio Fernandes", cls: "Adulto 19h", since: "aluno desde 2025", belt: "azul", g: 0, total: 64, desde: 18, ult: "1º de julho", comp: [1, 8], days: [0, 3], skip: 0.3, last: "2026-10-01", aus: 15 },
+    larissa: { n: "Larissa Mendes", art: "a", cls: "Adulto 19h", since: "aluna desde junho de 2026", belt: "branca", g: 1, total: 31, desde: 10, ult: "8 de setembro", comp: [2, 8], days: [1, 3], skip: 0.1, last: "2026-10-15", conf: 1,
+      fee: "vence hoje", contact: { d: "hoje, 08:00", how: "lembrete automático “No dia do vencimento”" } },
+    helena: { n: "Helena Prado", art: "a", resp: "Marcos", cls: "Kids 10h", age: "7 anos", since: "no Studio desde 2025", belt: "amarela", g: 2, total: 88, desde: 2, ult: "9 de outubro", comp: [4, 6], days: [0, 2, 4], skip: 0.12, last: "2026-10-16", kid: 1 }
+  };
+  function pid(name) { for (var id in PEOPLE) if (PEOPLE[id].n === name) return id; return null; }
+  function callOf(p) { return p.call || first(p.n); }
+  function artOf(p) { return p.art || "o"; }
+  /* o nome que abre a ficha: o mesmo botão em Alunos, Graduações, Financeiro e nas aulas de hoje */
+  function nameBtn(id, n) { return '<button class="nm-btn" type="button" data-person="' + id + '" aria-label="Abrir a ficha de ' + n + '">' + n + "</button>"; }
+  function nameHTML(n) { var id = pid(n); return id ? nameBtn(id, n) : n; }
+
   /* ---------- menu do painel ---------- */
   var cur = "hoje";
   function viewH(name) { return $('.dv[data-v="' + name + '"] h3', dash); }
@@ -607,6 +685,8 @@
   function go(name, focus) {
     closeDrawer(true);
     if (name !== cur) {
+      /* ao sair de Interessados, o status final (matriculado, sem interesse) vale de vez */
+      if (cur === "leads") leadsLeave();
       cur = name;
       morph(function () {
         views.forEach(function (v) { v.classList.toggle("on", v.dataset.v === name); });
@@ -649,10 +729,15 @@
      kids: hora das crianças marcadas agora; waitTV: a fila espera a TV ligar para a Marina digitar no celular */
   var st = { code: null, ci: -1, start: START, valid: 30, arrived: {}, by: {}, order: [], walk: [], kids: {}, idx: 0, timer: null, clock: START, mine: null, waitTV: false, fresh: null, ask: null, q: "" };
 
+  /* reconhecimento na chamada das 19h (dados fictícios): no máximo uma etiqueta por aluno, só no painel, nunca na TV */
+  var TAGS = { "Eduardo Prado": "100ª aula", "Felipe Antunes": "1 ano de Studio" };
+
   function confOf(n) { return CONF.filter(function (c) { return c[0] === n; })[0]; }
   function walkOf(n) { return WALK.filter(function (w) { return w[0] === n; })[0]; }
-  function personLi(name, belt, g, pill, note, act) {
-    return '<li data-n="' + name + '"' + (act ? ' class="r4"' : "") + '><span class="av">' + ini(name) + "</span><div>" + name + "<small>" + beltTxt(belt, g) + (note ? " · " + note : "") + "</small></div>" + pill + (act || "") + "</li>";
+  /* o nome abre a ficha quando o aluno tem uma; a etiqueta fica dentro do bloco do nome, logo depois dele */
+  function personLi(name, belt, g, pill, note, act, tag) {
+    return '<li data-n="' + name + '"' + (act ? ' class="r4"' : "") + '><span class="av">' + ini(name) + "</span><div>" + nameHTML(name) +
+      (tag ? ' <span class="pill-s rec">' + tag + "</span>" : "") + "<small>" + beltTxt(belt, g) + (note ? " · " + note : "") + "</small></div>" + pill + (act || "") + "</li>";
   }
   /* pílula com o texto longo no computador e o curto no celular, onde a linha da chamada vira duas */
   function pill(cls, lg, sm) { return '<span class="pill-s' + (cls ? " " + cls : "") + '"><span class="pl">' + lg + '</span><span class="ps">' + sm + "</span></span>"; }
@@ -667,8 +752,16 @@
       ? '<button class="mini-btn ghost r-act" type="button" data-undo' + kind + '="' + name + '" aria-label="Desfazer a presença de ' + name + '">Desfazer</button>'
       : '<button class="mini-btn r-act" type="button" data-mark' + kind + '="' + name + '" aria-label="Marcar chegada de ' + name + '">Marcar chegada</button>';
   }
-  function confLi(c) { return personLi(c[0], c[1], c[2], pillFor(c[0]), "confirmou às " + c[3], actBtn(c[0], !!st.arrived[c[0]], "")); }
-  function walkLi(w) { return personLi(w[0], w[1], w[2], pillFor(w[0]), w[3] + ", sem confirmar", actBtn(w[0], true, "")); }
+  function confLi(c) { return personLi(c[0], c[1], c[2], pillFor(c[0]), "confirmou às " + c[3], actBtn(c[0], !!st.arrived[c[0]], ""), TAGS[c[0]]); }
+  function walkLi(w) { return personLi(w[0], w[1], w[2], pillFor(w[0]), w[3] + ", sem confirmar", actBtn(w[0], true, ""), TAGS[w[0]]); }
+  /* "2 para reconhecer hoje": quem da turma das 19h tem etiqueta */
+  function paintRec() {
+    var el = $("#rRec");
+    if (!el) return;
+    var n = CONF.map(function (c) { return c[0]; }).concat(st.walk).filter(function (x) { return TAGS[x]; }).length;
+    el.textContent = n + " para reconhecer hoje";
+    el.hidden = !n;
+  }
   function pastLi(s) { var q = s.split("|"); return personLi(q[0], q[1], +q[2], '<span class="pill-s in">Veio</span>'); }
   function kidPill(n) {
     var t = st.kids[n];
@@ -690,7 +783,7 @@
   function roomSub(id) { var c = PAST[id]; return c.s + " · " + (id === "k18" ? kidsTxt() : c.p.length + " vieram"); }
 
   function room19() {
-    return '<div class="room-h"><div><h4>Adulto · 19h</h4><p id="rCount"></p></div>' +
+    return '<div class="room-h"><div><h4>Adulto · 19h</h4><p id="rCount"></p><p class="rec-n" id="rRec" hidden></p></div>' +
       '<div class="room-tools"><label for="valSel">Vale por</label><select class="sel" id="valSel">' +
       '<option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hora</option><option value="90">1h30</option></select>' +
       '<button class="ap-btn" type="button" id="genBtn"><svg class="ic"><use href="#i-code"/></svg><span>Gerar código da aula</span></button></div></div>' +
@@ -711,6 +804,7 @@
     paintWalk();
     paintCodeBox(false);
     paintCounts();
+    paintRec();
   }
   /* "Marcar quem veio sem confirmar": a busca filtra os nomes; com 10 no tatame, o professor confirma antes */
   function paintWalk() {
@@ -1091,20 +1185,6 @@
   }
   chips.forEach(function (c) { c.addEventListener("click", function () { morph(function () { filter(c.dataset.f); }); }); });
 
-  /* dados de exemplo da ficha: a frequência das últimas 12 semanas sai de um sorteio fixo por aluno,
-     com a última aula e a ausência batendo com a lista */
-  var PEOPLE = {
-    marina: { n: "Marina Alves", cls: "Adulto 19h", since: "aluna desde março de 2025", belt: "azul", g: 2, total: 142, desde: 21, ult: "12 de agosto", comp: [3, 8], days: [0, 2, 4], skip: 0.12, gap: [5], last: "2026-10-14", force: ["2026-10-12"], conf: 1 },
-    thiago: { n: "Thiago Moreira", cls: "Adulto 19h", since: "aluno desde 2023", belt: "azul", g: 3, total: 312, desde: 31, ult: "20 de junho", comp: [6, 8], days: [1, 3, 4], skip: 0.35, last: "2026-10-15", conf: 1, grad: 1 },
-    ana: { n: "Ana Beatriz Rocha", cls: "Adulto 8h", since: "aluna desde 2024", belt: "branca", g: 4, total: 118, desde: 41, ult: "2 de abril", comp: [8, 8], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", grad: 1 },
-    joao: { n: "João Pedro Lima", cls: "Kids 18h", age: "9 anos", since: "no Studio desde 2024", belt: "cinza", g: 3, total: 126, desde: 34, ult: "14 de maio", comp: [6, 6], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", kid: 1, grad: 1 },
-    diego: { n: "Diego Ramos", cls: "Adulto 11h", since: "aluno desde 2022", belt: "roxa", g: 1, total: 205, desde: 17, ult: "3 de agosto", comp: [4, 10], days: [1, 2, 3], skip: 0.25, last: "2026-09-30", aus: 16 },
-    patricia: { n: "Patrícia Nunes", cls: "Adulto 8h", since: "aluna desde maio de 2026", belt: "branca", g: 2, total: 38, desde: 4, ult: "11 de setembro", comp: [2, 6], days: [1, 4], skip: 0.3, last: "2026-09-25", aus: 21 },
-    caio: { n: "Caio Fernandes", cls: "Adulto 19h", since: "aluno desde 2025", belt: "azul", g: 0, total: 64, desde: 18, ult: "1º de julho", comp: [1, 8], days: [0, 3], skip: 0.3, last: "2026-10-01", aus: 15 },
-    larissa: { n: "Larissa Mendes", cls: "Adulto 19h", since: "aluna desde junho de 2026", belt: "branca", g: 1, total: 31, desde: 10, ult: "8 de setembro", comp: [2, 6], days: [1, 3], skip: 0.1, last: "2026-10-15", conf: 1 },
-    helena: { n: "Helena Prado", cls: "Kids 10h", age: "7 anos", since: "no Studio desde 2025", belt: "amarela", g: 2, total: 88, desde: 3, ult: "9 de outubro", comp: [4, 6], days: [0, 2, 4], skip: 0.12, last: "2026-10-16", kid: 1 }
-  };
-  function pid(name) { for (var id in PEOPLE) if (PEOPLE[id].n === name) return id; return null; }
   function rng(seed) {
     var h = 2166136261;
     for (var i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -1146,13 +1226,16 @@
   /* o nome vira botão (dá para abrir a ficha pelo teclado) e as aulas do mês saem da mesma frequência da ficha.
      ORIG guarda "Última aula" e a ação de cada linha, para o desfazer da chamada */
   var ORIG = {};
+  function nameCell(tr) {
+    var holder = $(".nm > div", tr), tn = holder.firstChild;
+    tn.remove();
+    holder.insertAdjacentHTML("afterbegin", nameBtn(tr.dataset.id, tn.textContent.trim()));
+  }
+  /* no Financeiro e nas Graduações, o nome também abre a ficha (a linha do Financeiro não) */
+  $$("#finTbl tbody tr").forEach(nameCell);
+  $$(".gcard").forEach(function (c) { var h = $("h4", c); h.innerHTML = nameBtn(c.dataset.id, h.textContent); });
   $$("#tbl tbody tr").forEach(function (tr) {
-    var holder = $(".nm > div", tr), tn = holder.firstChild, b = document.createElement("button");
-    b.type = "button";
-    b.className = "nm-btn";
-    b.textContent = tn.textContent.trim();
-    b.setAttribute("aria-label", "Abrir a ficha de " + b.textContent);
-    holder.replaceChild(b, tn);
+    nameCell(tr);
     $("td.num", tr).textContent = heat(tr.dataset.id).filter(inOct).length;
     var last = $("td:nth-child(3)", tr).cloneNode(true), act = $("td.act", tr), cl = $("small.cl", last);
     if (cl) cl.remove();
@@ -1190,6 +1273,13 @@
     return cells.filter(function (c) { return c.s === "y"; }).slice(-3).reverse().map(function (c) { return "<li>" + dl(c.k) + "<span>" + p.cls + "</span></li>"; }).join("");
   }
   function heatLabel(cells) { return cells.filter(function (c) { return c.s === "y"; }).length + " presenças nas últimas 12 semanas"; }
+  /* na vitrine, o professor é o dono: a ficha mostra a mensalidade (sem valores) e o último contato, de qualquer canal */
+  function infoHTML(p) {
+    var fee = p.fee || "em dia", c = p.contact;
+    return "<div><dt>Mensalidade</dt><dd" + (/atraso/.test(fee) ? ' class="warn"' : "") + ">" + fee + "</dd></div>" +
+      (c ? "<div><dt>Último contato</dt><dd>" + c.d + ", " + c.how + "</dd></div>" : "");
+  }
+  function drawerOn(id) { return drawer.classList.contains("on") && drawer.dataset.id === id; }
   /* ficha aberta quando o aluno chega: só os números, o dia de hoje e as últimas aulas mudam (o mapa não reanima) */
   function refreshDrawer(id) {
     var p = PEOPLE[id], cells = heat(id), map = $(".heat", drawer), ti = $("i[data-today]", map), tc = cells.filter(function (c) { return c.k === TODAY; })[0];
@@ -1197,6 +1287,7 @@
     map.setAttribute("aria-label", heatLabel(cells));
     if (ti && tc) { ti.className = tc.s === "n" ? "" : tc.s; ti.title = cellTitle(tc); }
     $(".heat-leg", drawer).innerHTML = legHTML(cells);
+    $(".dr-info", drawer).innerHTML = infoHTML(p);
     $(".dr-last", drawer).innerHTML = lastHTML(p, cells);
   }
   function openDrawer(id, from) {
@@ -1214,6 +1305,7 @@
       '<div class="dr-trio">' + trioHTML(p, cells) + "</div>" +
       '<div class="dr-sec"><p class="k">Presenças · últimas 12 semanas</p><div class="heat" role="img" aria-label="' + heatLabel(cells) + '">' + heatHTML(cells) + "</div>" +
       '<p class="heat-leg">' + legHTML(cells) + "</p></div>" +
+      '<dl class="dr-info">' + infoHTML(p) + "</dl>" +
       '<div class="dr-sec"><p class="k">Competências da faixa</p><div class="dr-comp"><span class="bar"><i style="width:' + Math.round(p.comp[0] / p.comp[1] * 100) + '%"></i></span><span>' + p.comp[0] + " de " + p.comp[1] + "</span></div></div>" +
       '<div class="dr-sec"><p class="k">Últimas aulas</p><ul class="dr-last">' + lastHTML(p, cells) + "</ul></div>" +
       '<div class="msg" hidden></div></div>' +
@@ -1236,7 +1328,9 @@
     scrim.classList.remove("on");
     syncInert();
     if (!had || silent) return;
-    if (drFrom && drFrom.isConnected && drFrom.closest(".dv.on")) focusSoft(drFrom, { preventScroll: true });
+    /* a linha da chamada pode ter sido refeita (uma chegada) enquanto a ficha estava aberta: vale o botão novo */
+    var back = drFrom && drFrom.isConnected ? drFrom : $('.dv.on .nm-btn[data-person="' + drawer.dataset.id + '"]', dash);
+    if (back && back.closest(".dv.on")) focusSoft(back, { preventScroll: true });
     else focusSoft(viewH(cur), { preventScroll: true });
   }
   $("#tbl tbody").addEventListener("click", function (e) {
@@ -1261,11 +1355,8 @@
     if (!b) return;
     if (b.classList.contains("dr-close")) closeDrawer();
     else if (b.dataset.drwa) {
-      var p = PEOPLE[b.dataset.drwa], f = first(p.n), box = $(".msg", drawer);
-      var text = p.aus ? "Oi, " + f + ". Sentimos sua falta no tatame. Quer combinar a próxima aula?"
-        : p.kid ? "Oi! Aqui é do Studio Evolution BJJ. Tudo certo para o próximo treino de " + f + "?"
-        : "Oi, " + f + "! Aqui é do Studio Evolution BJJ. Tudo certo para o próximo treino?";
-      box.innerHTML = '<p class="msg-k">Mensagem para ' + (p.kid ? "a família de " + f : f) + "</p><q>" + text + '</q><div class="msg-acts"><button class="mini-btn wa" type="button" data-send="' + f + '">Abrir no WhatsApp</button><button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
+      var box = $(".msg", drawer), m = careMsg(b.dataset.drwa);
+      box.innerHTML = msgHTML(m.to, m.text, sendBtn("data-sendcare", b.dataset.drwa));
       box.hidden = false;
       box._from = b;
       /* a mensagem aparece inteira dentro da ficha, acima das ações fixas; se a ficha saiu da tela, a página volta até ela */
@@ -1276,14 +1367,60 @@
     }
   });
 
-  /* mensagens prontas: from é o botão que abriu a caixa (o foco volta para ele ao fechar) */
-  function openMsg(box, f, text, from) {
+  /* mensagens prontas: o rótulo de quem recebe, o texto e os botões (o "Fechar" vem sempre por último) */
+  function msgHTML(to, text, acts) {
+    return '<p class="msg-k">Mensagem para ' + to + "</p><q>" + text + '</q><div class="msg-acts">' + acts + '<button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
+  }
+  function sendBtn(attr, v) { return '<button class="mini-btn wa" type="button" ' + attr + '="' + v + '">Abrir no WhatsApp</button>'; }
+  /* from é o botão que abriu a caixa (o foco volta para ele ao fechar) */
+  function openMsg(box, to, text, from, acts) {
     box._from = from || null;
     morph(function () {
-      box.innerHTML = '<p class="msg-k">Mensagem para ' + f + "</p><q>" + text + '</q><div class="msg-acts"><button class="mini-btn wa" type="button" data-send="' + f + '">Abrir no WhatsApp</button><button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
+      box.innerHTML = msgHTML(to, text, acts);
       box.hidden = false;
     }, box);
     showBox(box);
+  }
+
+  /* ---------- cuidado: uma mensagem só por aluno, venha de Alunos, do Financeiro ou da ficha ---------- */
+  var HRS = ["8h", "11h", "19h"];
+  /* quem sumiu ouve primeiro sobre o treino, com a turma e as outras saídas; a mensalidade só entra se também
+     estiver atrasada. No Kids, a conversa é com o responsável. Quem vem normalmente recebe só a abertura */
+  function careMsg(id) {
+    var p = PEOPLE[id], nm = callOf(p);
+    if (p.kid) return { to: p.resp + ", responsável pel" + artOf(p) + " " + nm, text: "Oi, " + p.resp + "! Aqui é do Studio Evolution BJJ, sobre " + artOf(p) + " " + nm + "." };
+    var t = "Oi, " + nm + "! Aqui é do Studio Evolution BJJ.";
+    if (p.aus) {
+      var hr = p.cls.split(" ")[1], alt = HRS.filter(function (h) { return h !== hr; });
+      t += " Faz umas " + (p.aus < 18 ? "duas" : "três") + " semanas que a gente não te vê no treino das " + hr + ". Tá tudo bem? Se a rotina mudou, tem aula também às " + alt[0] + " e às " + alt[1] + ".";
+      t += p.nova ? " Começo de jiu-jitsu cansa mesmo; se quiser, volta com uma aula por semana." : " Se for lesão, avisa que a gente adapta a volta.";
+    }
+    if (isLate(id)) t += " A mensalidade de outubro ficou em aberto; se precisar de outra data, me fala que a gente combina.";
+    return { to: nm, text: t };
+  }
+  function isLate(id) { var tr = $('#finTbl tr[data-id="' + id + '"]'); return !!tr && tr.dataset.st === "late"; }
+  /* o registro do contato: um só por aluno, visto na ficha, em Alunos e no Financeiro */
+  function contacted(id) {
+    var p = PEOPLE[id];
+    p.contact = { d: "hoje, " + $("#dClock").textContent, how: "WhatsApp (manual)" };
+    p.cared = 1;
+    paintCared(id);
+    if (drawerOn(id)) $(".dr-info", drawer).innerHTML = infoHTML(p);
+  }
+  /* depois da conversa, o botão de conversar vira o registro (a linha continua em Ausentes; "Cobrar" fica) */
+  function paintCared(id) {
+    if (!PEOPLE[id].cared) return;
+    $$('#tbl [data-care="' + id + '"], #finTbl [data-care="' + id + '"]').forEach(function (b) { b.outerHTML = '<span class="pill-s in">Contatado hoje</span>'; });
+  }
+  function sendCare(b) {
+    var id = b.dataset.sendcare, p = PEOPLE[id], box = b.closest(".msg"), inDr = !!b.closest("#drawer");
+    contacted(id);
+    /* o botão que abriu a caixa pode ter virado "Contatado hoje": o foco vai para a célula da ação */
+    var back = inDr ? $("[data-drwa]", drawer) : $('.dv.on tr[data-id="' + id + '"] td.act', dash);
+    if (inDr) box.hidden = true; else morph(function () { box.hidden = true; });
+    focusIn(back);
+    var who = p.kid ? "O contato com a família d" + artOf(p) + " " + callOf(p) + " fica registrado hoje." : callOf(p) + " fica marcad" + artOf(p) + " como contatad" + artOf(p) + " hoje.";
+    toast("No app, abre o WhatsApp com a mensagem pronta. " + who);
   }
   /* depois da transição de altura, a caixa precisa estar inteira na tela */
   function showBox(box) {
@@ -1309,14 +1446,14 @@
   dash.addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;
-    if (b.dataset.wa) {
-      var lead = b.dataset.kind === "lead", row = b.closest(lead ? ".lead" : "tr");
-      var text = lead
-        ? "Oi, " + b.dataset.wa + "! Aqui é do Studio Evolution BJJ. Recebemos seu pedido de aula experimental para a turma " + row.dataset.turma + ". Que dia fica bom para você vir conhecer o tatame?"
-        : "Oi, " + b.dataset.wa + ". Sentimos sua falta no tatame. Quer combinar a próxima aula?";
-      openMsg(lead ? $("#leadMsg") : $("#waMsg"), b.dataset.wa, text, b);
-    } else if (b.dataset.send) {
-      toast("No app, este botão abre o WhatsApp com a mensagem para " + b.dataset.send + " já escrita.");
+    if (b.dataset.care) {
+      /* "WhatsApp" em Alunos e "Conversar" no Financeiro: a mesma mensagem, na caixa da própria aba */
+      var m = careMsg(b.dataset.care);
+      openMsg(b.closest("#finTbl") ? finMsg : $("#waMsg"), m.to, m.text, b, sendBtn("data-sendcare", b.dataset.care));
+    } else if (b.dataset.sendcare) {
+      sendCare(b);
+    } else if (b.dataset.person && !b.closest("#tbl")) {
+      openDrawer(b.dataset.person, b);
     } else if (b.hasAttribute("data-close")) {
       closeMsg(b.closest(".msg"));
     } else if (b.dataset.grad) {
@@ -1329,33 +1466,45 @@
     }
   });
 
-  /* ---------- Financeiro: o Asaas cobra, a Evolution API lembra pelo WhatsApp do Studio ---------- */
+  /* ---------- Financeiro: o Asaas cobra, a Evolution API lembra por um número de WhatsApp só de avisos ---------- */
   var FIN = {
     diego: { n: "Diego Ramos", due: "10/10" }, patricia: { n: "Patrícia Nunes", due: "11/10" },
     larissa: { n: "Larissa Mendes", due: "16/10" }, joao: { n: "João Pedro Lima", due: "19/10", kid: 1 }
   };
-  var LINK = '<b class="lk">asaas.com/i/7kq2mz</b>';
+  /* links de exemplo: o de pagamento e o do recibo são diferentes */
+  var LINK = '<b class="lk">asaas.com/i/7kq2mz</b>', RCB = '<b class="lk">asaas.com/comprovantes/4h8tq1</b>';
   var RULES = {
-    d3: function (f, d) { return "Oi, " + f + "! Passando para lembrar que a mensalidade do Studio Evolution vence em 3 dias, no dia " + d + ". Dá para pagar por Pix, boleto ou cartão neste link: " + LINK; },
-    d0: function (f) { return "Oi, " + f + "! A mensalidade do Studio Evolution vence hoje. O Pix copia e cola e as outras formas de pagamento estão neste link: " + LINK; },
-    a1: function (f) { return "Oi, " + f + ", tudo bem? Não encontramos o pagamento da mensalidade que venceu ontem. Se já pagou, pode desconsiderar. O link continua valendo: " + LINK; },
-    a5: function (f) { return "Oi, " + f + ". Sua mensalidade está em aberto há 5 dias. Precisa de outra data ou de ajuda? Responda aqui que a gente resolve. Link: " + LINK; },
-    ok: function (f) { return "Pagamento recebido, " + f + "! Obrigado. Seu recibo está aqui: " + LINK + ". Bons treinos!"; },
-    now: function (f, d) { return "Oi, " + f + ", tudo bem? A mensalidade que venceu em " + d + " ainda está em aberto. Pague por Pix, boleto ou cartão neste link: " + LINK + ". Qualquer coisa, é só responder aqui."; }
+    d3: function (f, d) { return "Oi, " + f + "! Passando para lembrar que a mensalidade do Studio Evolution BJJ vence em 3 dias, no dia " + d + ". Dá para pagar por Pix, boleto ou cartão neste link: " + LINK; },
+    d0: function (f) { return "Oi, " + f + "! A mensalidade do Studio Evolution BJJ (R$ 200) vence hoje. O Pix copia e cola vai na próxima mensagem. Boleto ou cartão: " + LINK; },
+    a1: function (f) { return "Oi, " + f + ", tudo bem? Aqui é do Studio Evolution BJJ. Não encontramos o pagamento da mensalidade que venceu ontem. Se já pagou, pode desconsiderar. O link continua valendo: " + LINK; },
+    a5: function (f) { return "Oi, " + f + ". Aqui é do Studio Evolution BJJ. Sua mensalidade está em aberto há 5 dias. Precisa de outra data ou de ajuda? Responda aqui que a gente resolve. Link: " + LINK; },
+    ok: function (f) { return "Pagamento recebido, " + f + "! Obrigado por treinar no Studio Evolution BJJ. Seu recibo está aqui: " + RCB + ". Bons treinos!"; },
+    now: function (f, d) { return "Oi, " + f + ", tudo bem? Aqui é do Studio Evolution BJJ. A mensalidade que venceu em " + d + " ainda está em aberto. Dá para pagar por Pix, boleto ou cartão neste link: " + LINK + ". Qualquer coisa, é só responder aqui."; }
   };
+  /* o segundo balão do "No dia do vencimento": o Pix copia e cola, sozinho, fácil de copiar */
+  var PIX = '<q class="mono">[Pix copia e cola]</q>';
   var RULE_T = { d3: "3 dias antes", d0: "No dia do vencimento", a1: "1 dia depois", a5: "5 dias depois", ok: "Pagamento confirmado" };
-  var finMsg = $("#finMsg"), late = { n: 2, v: 400 }, rec = { v: 9620, n: 49 }, sent = 37, curFF = "all", kLate = $("[data-ff-go]", dash);
+  /* prévias: cada etapa com um caso que bate com a tabela. Bruno (Pix ou boleto, vence 19/10) está entre os 7 a vencer;
+     o "5 dias depois" não tem ninguém hoje (a Patrícia está pausada), então o exemplo é inventado e sem data */
+  var EX = { d3: ["Bruno", "19/10"], d0: ["Larissa", "16/10"], a1: ["Patrícia", "11/10"], a5: ["Vitor"], ok: ["Thiago"] };
+  function vr(s) { return s && '<span class="var">' + s + "</span>"; }
+  var finMsg = $("#finMsg"), late = { n: 2, v: 400 }, rec = { v: 9440, n: 49 }, curFF = "all", kLate = $("[data-ff-go]", dash);
   function brl(v) { return "R$ " + v.toLocaleString("pt-BR"); }
-  function finOpen(title, text, send, from) {
+  function mens(n) { return n + (n === 1 ? " mensalidade" : " mensalidades"); }
+  function finOpen(title, text, send, from, extra) {
     finMsg._from = from || null;
     morph(function () {
-      finMsg.innerHTML = '<p class="msg-k">' + title + "</p><q>" + text + '</q><div class="msg-acts">' +
-        (send ? '<button class="mini-btn wa" type="button" data-finsend="' + send + '">Enviar pelo WhatsApp do Studio</button>' : "") +
+      finMsg.innerHTML = '<p class="msg-k">' + title + "</p><q>" + text + "</q>" + (extra || "") + '<div class="msg-acts">' +
+        (send ? '<button class="mini-btn wa" type="button" data-finsend="' + send + '">Enviar pelo WhatsApp de avisos</button>' : "") +
         '<button class="mini-btn ghost" type="button" data-close>Fechar</button></div>';
       finMsg.hidden = false;
     }, finMsg);
     showBox(finMsg);
   }
+  /* a etapa está desligada na régua? (a linha ganha .off ao desligar) */
+  function ruleOff(r) { return $('#rules [data-rule="' + r + '"]').closest("li").classList.contains("off"); }
+  /* a situação da linha: a pílula da cobrança e, para quem sumiu, a dos dias sem treinar (que continua verdade) */
+  function setSit(tr, html) { var a = $(".pill-s.aus", tr); setCell($("td:nth-child(2)", tr), html + (a ? " " + a.outerHTML : "")); }
   function finLog(t, h, s) {
     $("#flog").insertAdjacentHTML("afterbegin", '<li class="new"><time>' + t + "</time><div>" + h + "<small>" + s + "</small></div></li>");
   }
@@ -1388,25 +1537,32 @@
   kLate.addEventListener("click", function () { finFilter("late"); });
   /* o pagamento cai pelo webhook do Asaas: a linha vira paga, os números mudam e o recibo sai sozinho */
   function finPaid(id) {
-    var tr = $('#finTbl tr[data-id="' + id + '"]'), p = FIN[id], v = +tr.dataset.v, f = first(p.n), t = $("#dClock").textContent;
+    var tr = $('#finTbl tr[data-id="' + id + '"]'), p = FIN[id], v = +tr.dataset.v, f = first(p.n), t = $("#dClock").textContent, rcb = !ruleOff("ok"), pp = PEOPLE[id];
     tr.dataset.st = "paid";
-    $("td:nth-child(2)", tr).innerHTML = '<span class="pill-s in">Paga agora</span>';
+    setSit(tr, '<span class="pill-s in">Paga agora</span>');
     $("td:nth-child(4)", tr).textContent = "Pix";
-    $("small", tr).textContent = $("small", tr).textContent.replace(/venceu .*/, "pago hoje");
+    $(".nm small", tr).textContent = $(".nm small", tr).textContent.replace(/venceu .*/, "pago hoje, " + t);
     $("td.act", tr).innerHTML = '<button class="mini-btn ghost" type="button" data-rcb="' + f + '">Recibo</button>';
     replayClass(tr, "paid-now");
-    late.n--; late.v -= v; rec.v += v; rec.n++; sent++;
+    /* pagou depois do vencimento: sai de "em atraso"; o "pagas até o vencimento" (46 das 51 já vencidas) não muda */
+    late.n--; late.v -= v; rec.v += v; rec.n++;
     $("#fLate").textContent = brl(late.v);
-    $("#fLateS").textContent = late.n ? "em atraso · " + late.n + (late.n === 1 ? " aluno" : " alunos") : "nada em atraso";
+    $("#fLateS").textContent = late.n ? "em atraso · " + mens(late.n) : "nada em atraso";
     $("#fRec").textContent = brl(rec.v);
-    $("#fRecS").textContent = "recebidos em outubro · " + rec.n + " de 58 pagas";
-    $("#fSent").textContent = sent;
+    $("#fRecS").textContent = "recebidos em outubro · " + rec.n + " de 58 mensalidades pagas";
     $("#chipLate").textContent = "Atrasadas · " + late.n;
     var bf = $("#bFin"); bf.textContent = late.n; bf.hidden = !late.n;
     /* sem atraso, o KPI perde a cor de alerta e o "Ver quem" */
     if (!late.n) { kLate.classList.remove("warn"); $(".go-s", kLate).hidden = true; }
-    finLog(t, "Pix recebido de " + p.n, "Baixa automática pelo Asaas · recibo enviado no WhatsApp");
-    toast("Pix de " + f + " recebido. O Asaas deu baixa e o recibo saiu no WhatsApp.");
+    /* a ficha acompanha: mensalidade em dia e, se o recibo saiu, ele é o último contato */
+    if (pp) {
+      pp.fee = "em dia · paga hoje, " + t;
+      if (rcb) pp.contact = { d: "hoje, " + t, how: "recibo automático do Pix" };
+      if (drawerOn(id)) $(".dr-info", drawer).innerHTML = infoHTML(pp);
+    }
+    /* a etapa "Pagamento confirmado" desligada não manda o recibo */
+    finLog(t, "Pix recebido de " + p.n, "Baixa automática pelo Asaas · " + (rcb ? "recibo pelo WhatsApp de avisos" : "recibo não enviado (etapa desligada)"));
+    toast("Pix de " + f + " recebido. O Asaas deu baixa" + (rcb ? " e o recibo saiu pelo WhatsApp de avisos." : "; o recibo não foi enviado (etapa desligada)."));
     /* depois do destaque (.paid-now, 1,4 s), a lista se refaz: a linha paga sai de "Atrasadas" */
     setTimeout(function () { finFilter(curFF); }, 1400);
   }
@@ -1415,28 +1571,37 @@
     if (!b) return;
     if (b.dataset.fin) {
       var p = FIN[b.dataset.fin], f = first(p.n);
-      if (b.dataset.fin === "larissa") finOpen("Enviado hoje às 8h para " + f + " · No dia do vencimento", RULES.d0(f), null, b);
+      if (b.dataset.fin === "larissa") finOpen("Enviado hoje às 8h para " + f + " · No dia do vencimento", RULES.d0(f), null, b, PIX);
       else finOpen("Cobrança para " + f, RULES.now(f, p.due), b.dataset.fin, b);
     } else if (b.dataset.finsend) {
-      var id = b.dataset.finsend, q = FIN[id], tr = $('#finTbl tr[data-id="' + id + '"]');
+      var id = b.dataset.finsend, q = FIN[id], tr = $('#finTbl tr[data-id="' + id + '"]'), t = $("#dClock").textContent;
       morph(function () { finMsg.hidden = true; });
-      $("td:nth-child(2)", tr).innerHTML = '<span class="pill-s gold">Cobrança enviada agora</span>';
+      setSit(tr, '<span class="pill-s gold">Cobrança enviada agora</span>');
       $("td.act", tr).innerHTML = '<span class="pill-s">Aguardando</span>';
+      $("td.act", tr).classList.remove("two");
+      /* a cobrança também é um contato: a ficha mostra a mensalidade e o último contato atualizados */
+      if (PEOPLE[id]) {
+        PEOPLE[id].fee = "em atraso desde " + q.due + " · cobrança enviada hoje, " + t;
+        PEOPLE[id].contact = { d: "hoje, " + t, how: "cobrança pelo WhatsApp de avisos (manual)" };
+      }
       /* o botão sumiu com a caixa: o foco vai para a situação da linha, que acabou de mudar */
       focusIn($("td:nth-child(2)", tr));
-      finLog($("#dClock").textContent, "Cobrança para " + q.n, "WhatsApp do Studio · entregue");
-      toast("Mensagem enviada para " + first(q.n) + " pelo WhatsApp do Studio.");
+      finLog(t, "Cobrança para " + q.n, "WhatsApp de avisos · entregue");
+      toast("Mensagem enviada para " + first(q.n) + " pelo WhatsApp de avisos.");
       /* na demonstração, o pagamento cai alguns segundos depois */
       setTimeout(function () { finPaid(id); }, 4200);
     } else if (b.dataset.rule) {
-      var r = b.dataset.rule;
-      finOpen("Mensagem automática · " + RULE_T[r], RULES[r]("Larissa", "19/10"), null, b);
+      var r = b.dataset.rule, ex = EX[r];
+      finOpen("Mensagem automática · " + RULE_T[r] + " · exemplo", RULES[r](vr(ex[0]), vr(ex[1])), null, b, r === "d0" ? PIX : "");
     } else if (b.dataset.rcb) {
       toast("No app, abre o recibo de " + b.dataset.rcb + " gerado pelo Asaas.");
     } else if (b.classList.contains("tog")) {
-      var on = b.getAttribute("aria-pressed") !== "true", li = b.closest("li");
+      var on = b.getAttribute("aria-pressed") !== "true", li = b.closest("li"), off = $(".rl-off", li);
       b.setAttribute("aria-pressed", on ? "true" : "false");
       li.classList.toggle("off", !on);
+      /* desligada, a etapa diz na própria linha que não sai para ninguém */
+      if (!on && !off) li.insertAdjacentHTML("beforeend", '<p class="rl-off">Desligado: este lembrete não sai para ninguém.</p>');
+      if (on && off) off.remove();
       toast((on ? "Ligado: " : "Desligado: ") + $(".rl b", li).textContent.toLowerCase() + ".");
     }
   });
@@ -1454,8 +1619,12 @@
   }
   $$(".gcard").forEach(function (card) { $(".belt", card).innerHTML = beltSVG(card.dataset.belt, +card.dataset.graus); });
   function gradLabel(d) { return d.next === "grau" ? "Registrar o " + (+d.graus + 1) + "º grau" : "Registrar a faixa " + d.next; }
+  /* para quem vai o aviso do grau: o aluno ou, no Kids, a família */
+  function notifyWho(d) { var p = PEOPLE[d.id]; return d.kid ? "a família d" + artOf(p) + " " + d.first : artOf(p) + " " + d.first; }
   function promote(card) {
     var d = card.dataset, svg = $("svg", card), g = +d.graus, belt = d.next === "grau" ? d.belt : d.next, newG = d.next === "grau" ? g + 1 : 0, p = PEOPLE[d.id];
+    /* no jiu-jitsu o grau costuma ser entregue na frente da turma: o aviso sai depois da aula ou fica guardado */
+    var box = $(".ask input", card), notify = !box || box.checked, whose = d.kid ? "da família" : artOf(p) === "a" ? "dela" : "dele";
     if (d.next === "grau") {
       svg.insertAdjacentHTML("beforeend", stripe(g));
       if (anim) gsap.fromTo(svg.lastElementChild, { scaleY: 0, transformOrigin: "50% 50%" }, { scaleY: 1, duration: 0.8, ease: "expo.out", delay: 0.1 });
@@ -1471,7 +1640,8 @@
     }
     svg.setAttribute("aria-label", "Faixa " + belt + ", " + newG + " graus");
     replayClass(card, "got");
-    $(".gact", card).innerHTML = '<button class="ap-btn ok" type="button" disabled>' + (d.next === "grau" ? "Grau registrado" : "Faixa registrada") + '</button><p class="note">' + (d.kid ? "A família recebe" : d.first + " recebe") + " o aviso no celular hoje.</p>";
+    $(".gact", card).innerHTML = '<button class="ap-btn ok" type="button" disabled>' + (d.next === "grau" ? "Grau registrado" : "Faixa registrada") + '</button><p class="note">' +
+      (notify ? (d.kid ? "A família recebe" : d.first + " recebe") + " o aviso no celular depois da aula." : "O aviso fica guardado até você entregar. Dá para avisar em Últimas graduações.") + "</p>";
     /* o próprio card: aulas desde o último grau voltam a 0, e o último grau é hoje */
     var dds = $$("dd", card);
     dds[0].textContent = "0";
@@ -1487,15 +1657,16 @@
     }
     if (p) {
       p.belt = belt; p.g = newG; p.desde = 0; p.ult = "hoje"; p.grad = 0;
-      CONF.forEach(function (c) { if (c[0] === p.n) { c[1] = belt; c[2] = newG; } });
+      CONF.forEach(function (c) { if (c[0] === p.n) { c[1] = belt; c[2] = newG; TAGS[p.n] = "Grau novo hoje"; } });
       Object.keys(PAST).forEach(function (k) {
         PAST[k].p = PAST[k].p.map(function (s) { return s.split("|")[0] === p.n ? p.n + "|" + belt + "|" + newG : s; });
       });
       var on = $('#classes [aria-pressed="true"]');
       if (on && on.dataset.c === "a19") paint19(); else if (on) renderRoom(on.dataset.c);
     }
-    $("#hist").insertAdjacentHTML("afterbegin", '<li class="new"><i class="belt-s" style="--b:var(--b-' + belt + ')"></i><div>' + (p ? p.n : d.first) + "<small>" +
-      (d.next === "grau" ? newG + "º grau na faixa " + belt : "Faixa " + belt) + (p ? " · " + p.cls : "") + "</small></div><time>hoje</time></li>");
+    $("#hist").insertAdjacentHTML("afterbegin", '<li class="new" data-id="' + d.id + '"><i class="belt-s" style="--b:var(--b-' + belt + ')"></i><div>' + (p ? p.n : d.first) + "<small>" +
+      (d.next === "grau" ? newG + "º grau na faixa " + belt : "Faixa " + belt) + (p ? " · " + p.cls : "") + " · <span>" + (notify ? "aviso depois da aula" : "aviso guardado") + "</span></small>" +
+      (notify ? "" : '<button class="mini-btn ghost" type="button" data-notify="' + d.id + '" aria-label="Avisar agora: ' + (p ? p.n : d.first) + '">Avisar agora</button>') + "</div><time>hoje</time></li>");
     var hs = $$("#hist li");
     if (hs.length > 5) hs[hs.length - 1].remove();
     var left = $$('#tbl tr[data-f="aval"]').length, bg = $("#bGrad");
@@ -1504,15 +1675,30 @@
     bg.hidden = !left;
     /* o botão que tinha o foco virou "Grau registrado" (desabilitado): o foco vai para a nota */
     focusIn($(".note", card));
-    toast(d.next === "grau" ? g + 1 + "º grau registrado para " + d.first + "." : d.first + " agora é faixa " + belt + ".");
+    toast((d.next === "grau" ? "O " + (g + 1) + "º grau de " + d.first + " foi registrado." : "A faixa " + belt + " de " + d.first + " foi registrada.") +
+      (notify ? " O aviso chega no celular " + whose + " depois da aula." : " O aviso fica guardado até você entregar."));
   }
+  /* "Avisar agora": o aviso guardado sai na hora (ex.: o grau já foi entregue no tatame) */
+  $("#hist").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-notify]");
+    if (!b) return;
+    var li = b.closest("li"), card = $('.gcard[data-id="' + b.dataset.notify + '"]'), d = card.dataset;
+    $("small span", li).textContent = "aviso enviado";
+    b.remove();
+    var note = $(".note", card);
+    if (note) note.textContent = (d.kid ? "A família recebeu" : d.first + " recebeu") + " o aviso no celular.";
+    focusIn($("div", li));
+    toast("Aviso enviado para " + (d.kid ? notifyWho(d) : d.first) + ".");
+  });
   $("#cards").addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b || b.disabled) return;
     var card = b.closest(".gcard"), act = $(".gact", card), d = card.dataset, g = +d.graus;
     if (b.hasAttribute("data-ask")) {
       var q = d.next === "grau" ? "Dar o " + (g + 1) + "º grau na faixa " + d.belt + " para " + d.first + "?" : "Graduar " + d.first + " para a faixa " + d.next + "?";
-      act.innerHTML = '<div class="ask"><p>' + q + '</p><div class="row"><button class="ap-btn" type="button" data-yes>Confirmar</button><button class="ap-btn ghost" type="button" data-no>Voltar</button></div></div>';
+      /* marcado: o aviso sai depois da aula; desmarcado: fica guardado para a entrega */
+      act.innerHTML = '<div class="ask"><p>' + q + '</p><label class="notify"><input type="checkbox" checked> Avisar ' + notifyWho(d) + " no celular depois da aula</label>" +
+        '<div class="row"><button class="ap-btn" type="button" data-yes>Confirmar</button><button class="ap-btn ghost" type="button" data-no>Voltar</button></div></div>';
       if (anim) gsap.from(act.firstChild, { y: 10, opacity: 0, duration: 0.5, ease: "expo.out" });
       focusIn($("[data-yes]", act));
     } else if (b.hasAttribute("data-no")) {
@@ -1523,13 +1709,85 @@
     }
   });
 
-  /* ---------- Interessados: status, retorno e o funil do mês ---------- */
-  var closedN = 6;
-  function leadPill(v) { return v === "agendado" ? '<span class="pill-s in">Aula agendada</span>' : v === "atendimento" ? '<span class="pill-s">Em atendimento</span>' : '<span class="pill-s gold">Retornar hoje</span>'; }
+  /* ---------- Interessados: o pedido do site, a confirmação, o status e o funil do mês ---------- */
+  /* a semana da aula experimental e as turmas de cada programa (o feminino treina junto com o adulto) */
+  var DAYS = { seg: ["segunda", "19/10"], ter: ["terça", "20/10"], qua: ["quarta", "21/10"], qui: ["quinta", "22/10"], sex: ["sexta", "23/10"] };
+  var TURMAS = { adulto: ["8", "11", "19"], feminino: ["8", "11", "19"], kids: ["10", "18"] };
+  /* st: o status em vigor; pend: matriculado ou sem interesse, ainda com "Desfazer"; closed: já em Fechados */
+  var leads = $$("#leads .lead"), closedT = [];
+  function slotS(s) { var q = s.split("|"); return q[0] + ", " + q[1] + "h"; }
+  function slotL(s) { var q = s.split("|"); return DAYS[q[0]][0] + ", " + DAYS[q[0]][1] + ", às " + q[1] + "h"; }
+  function leadPill(row) {
+    var d = row.dataset, v = d.pend || d.st;
+    if (v === "matriculado") return '<span class="pill-s in">Matriculado</span>';
+    if (v === "perdido") return '<span class="pill-s">Sem interesse</span>';
+    if (v === "agendado") return '<span class="pill-s in">Aula ' + slotS(d.slot) + "</span>";
+    if (v === d.st0) return row._pill0;
+    return v === "atendimento" ? '<span class="pill-s">Em atendimento</span>' : '<span class="pill-s gold">Retornar hoje</span>';
+  }
+  /* a ação principal acompanha o status: quem é "Novo" já pediu dia e turma no site, então é só confirmar */
+  function paintLead(row) {
+    var d = row.dataset, wa = $("[data-lead]", row), undo = $("[data-lead-undo]", row), nm = $("b", row).textContent;
+    $(".pill-s", row).outerHTML = leadPill(row);
+    wa.hidden = !!d.pend;
+    undo.hidden = !d.pend;
+    wa.textContent = d.st === "novo" && d.req ? "Confirmar " + slotS(d.req) : "WhatsApp";
+    wa.setAttribute("aria-label", d.st === "novo" && d.req ? wa.textContent + ", aula de " + nm : "WhatsApp para " + nm);
+    undo.setAttribute("aria-label", "Desfazer o status de " + nm);
+  }
+  function setLead(row, v) {
+    var d = row.dataset;
+    clearTimeout(row._t);
+    $("select", row).value = v;
+    if (v === "matriculado" || v === "perdido") d.pend = v;
+    else {
+      delete d.pend;
+      d.st = v;
+      /* aula agendada para quem pediu pelo site: vale o dia e a turma do pedido, sem redigitar */
+      if (v === "agendado" && !d.slot) d.slot = d.req;
+    }
+    paintLead(row);
+    paintLeads();
+    armOut(row);
+  }
+  /* o status final só vale depois de 8 s sem foco na linha, ou ao trocar de aba; até lá, a linha mostra "Desfazer" */
+  function armOut(row) {
+    clearTimeout(row._t);
+    if (!row.dataset.pend || row.contains(document.activeElement)) return;
+    row._t = setTimeout(function () { leadOut(row); }, 8000);
+  }
+  /* a linha vai para Fechados: só aqui mudam o funil, o "Fechados" e o KPI de matrículas, e sai o aviso */
+  function leadOut(row, now) {
+    var d = row.dataset, v = d.pend;
+    if (!v) return;
+    clearTimeout(row._t);
+    var had = row.contains(document.activeElement), rest = leads.filter(function (l) { return l !== row && !l.hidden && !l.dataset.closed; });
+    var nx = rest.filter(function (l) { return leads.indexOf(l) > leads.indexOf(row); })[0] || rest[rest.length - 1];
+    delete d.pend;
+    d.closed = v;
+    closedT.push(row);
+    var hide = function () { row.hidden = true; row.classList.remove("out"); };
+    if (now) hide();
+    else if (anim) { row.classList.add("out"); setTimeout(function () { morph(hide); }, 620); }
+    else morph(hide);
+    paintLeads();
+    paintClosed();
+    var who = d.child || d.first;
+    toast(v === "matriculado" ? who + " matriculad" + d.art + ". O cadastro e o plano d" + (d.art === "a" ? "ela" : "ele") + " se completam em Alunos." : d.first + " foi para Fechados.");
+    if (had) focusIn(nx ? $("select", nx) : $("#closedBtn"));
+  }
+  /* ao sair da aba: os status finais valem de vez, e a escolha de dia que ficou aberta é cancelada */
+  function leadsLeave() {
+    leads.forEach(function (row) {
+      var pk = $(".lead-pick", row);
+      if (!pk.hidden) { pk.hidden = true; $("select", row).value = row.dataset.pend || row.dataset.st; }
+      leadOut(row, true);
+    });
+  }
   function paintLeads() {
     var c = { novo: 0, atendimento: 0, agendado: 0, mat: 3 };
-    $$("#leads .lead").forEach(function (l) {
-      var v = $("select", l).value;
+    leads.forEach(function (l) {
+      var v = l.dataset.closed || l.dataset.st;
       if (v === "matriculado") c.mat++;
       else if (v !== "perdido") c[v]++;
     });
@@ -1539,26 +1797,105 @@
       b.textContent = n;
       if (anim) replayClass(b, "bump");
     });
+    /* matrícula: só o "+N em outubro" do Hoje muda; os 58 ativos não (o cadastro se completa em Alunos) */
+    $("#kNew").textContent = "+" + c.mat + " em outubro";
     var wait = c.novo + c.atendimento, bl = $("#bLeads");
     $("#kLeads").textContent = wait;
     bl.textContent = wait;
     bl.hidden = !wait;
   }
-  $$("#leads select").forEach(function (s) {
+  /* "Fechados": os desta visita (com "Reabrir") e os de antes de hoje */
+  function paintClosed() {
+    var n = closedT.length;
+    $("#closedN").textContent = 6 + n;
+    $("#closedList").innerHTML = closedT.map(function (row) {
+      var nm = $("b", row).textContent;
+      return "<li><span>" + nm + "</span>" + (row.dataset.closed === "matriculado" ? '<span class="pill-s in">Matriculado</span>' : '<span class="pill-s">Sem interesse</span>') +
+        '<button class="mini-btn ghost" type="button" data-reopen="' + leads.indexOf(row) + '" aria-label="Reabrir ' + nm + '">Reabrir</button></li>';
+    }).join("");
+    $("#closedNote").textContent = n ? "Mais 6 contatos fechados antes de hoje." : "Os 6 contatos fechados são de antes de hoje.";
+  }
+  /* "Outro dia" (ou aula agendada sem pedido do site): dia e turma na própria linha */
+  function pick(row, focus, pre) {
+    var d = row.dataset, box = $(".lead-pick", row), hs = TURMAS[d.prog], at = (d.slot || d.req || "seg|" + hs[hs.length - 1]).split("|");
+    box.setAttribute("aria-label", "Dia e turma da aula de " + (d.child || d.first));
+    box.innerHTML = '<select class="sel" data-pk="d" aria-label="Dia da aula">' + Object.keys(DAYS).map(function (k) { return '<option value="' + k + '"' + (k === at[0] ? " selected" : "") + ">" + k + " " + DAYS[k][1] + "</option>"; }).join("") + "</select>" +
+      '<select class="sel" data-pk="h" aria-label="Turma">' + hs.map(function (h) { return '<option value="' + h + '"' + (h === at[1] ? " selected" : "") + ">" + (d.prog === "kids" ? "Kids " : "Adulto ") + h + "h</option>"; }).join("") + "</select>" +
+      '<button class="mini-btn" type="button" data-pick-ok>Marcar</button><button class="mini-btn ghost" type="button" data-pick-no>Cancelar</button>' +
+      (d.prog === "feminino" ? "<small>O feminino treina junto com o adulto.</small>" : "");
+    morph(function () { if (pre) pre(); box.hidden = false; }, box);
+    if (focus) focusSoft($("select", box), { preventScroll: true });
+  }
+  function closePick(row) { var box = $(".lead-pick", row); if (!box.hidden) morph(function () { box.hidden = true; }); }
+  /* a mensagem muda com o status: confirmar o pedido, retomar a conversa ou lembrar a aula marcada */
+  function leadText(row) {
+    var d = row.dataset, of = d.child ? " do " + d.child : "", hi = "Oi, " + d.first + "! Aqui é do Studio Evolution BJJ";
+    if (d.st === "novo" && d.req) return hi + ". Recebi seu pedido de aula experimental" + of + " para " + slotL(d.req) + ", no " + d.turma + ". Está confirmado! Chegue alguns minutos antes; a gente empresta o kimono. Se esse dia não der, me fala que eu te passo outro.";
+    if (d.st === "agendado") return hi + ". Confirmando a aula experimental" + of + " na " + slotL(d.slot) + ", no " + d.turma + ". Qualquer dúvida, é só chamar aqui.";
+    var hs = TURMAS[d.prog].map(function (h) { return h + "h"; }), list = hs.slice(0, -1).join(", ") + " ou " + hs[hs.length - 1];
+    var grp = d.prog === "feminino" ? "As alunas treinam junto com as turmas de adulto" : d.prog === "kids" ? "As turmas Kids treinam" : "As turmas de adulto treinam";
+    return hi + " de novo. " + grp + ", de segunda a sexta, às " + list + ". Qual horário fica melhor para " + (d.child ? "a aula experimental" + of : "a sua aula experimental") + "?";
+  }
+  leads.forEach(function (row) {
+    var s = $("select", row), d = row.dataset;
+    d.st = d.st0 = s.value;
+    row._pill0 = $(".pill-s", row).outerHTML;
+    $("[data-lead]", row).insertAdjacentHTML("afterend", '<button class="mini-btn ghost" type="button" data-lead-undo hidden>Desfazer</button>');
+    row.insertAdjacentHTML("beforeend", '<div class="lead-pick" role="group" hidden></div>');
+    paintLead(row);
+    /* com as setas, o Chromium dispara change a cada opção: aqui nada some, nada avisa e o foco fica no lugar */
     s.addEventListener("change", function () {
-      var row = s.closest(".lead"), f = row.dataset.first, v = s.value;
-      paintLeads();
-      if (v === "matriculado" || v === "perdido") {
-        row.classList.add("out");
-        setTimeout(function () { morph(function () { row.hidden = true; }); }, 620);
-        closedN++;
-        $("#closedN").textContent = closedN;
-        toast(v === "matriculado" ? f + " agora está na lista de alunos." : "Contato de " + f + " movido para Fechados.");
-        return;
-      }
-      $(".pill-s", row).outerHTML = leadPill(v);
-      if (v === "agendado") toast("Aula experimental marcada para " + f + ".");
+      if (s.value === "agendado" && !d.slot && !d.req) { pick(row, false); return; }
+      closePick(row);
+      setLead(row, s.value);
     });
+  });
+  /* foco dentro da linha segura o status final; ao sair, os 8 s recomeçam */
+  $("#leads").addEventListener("focusin", function (e) { var r = e.target.closest(".lead"); if (r) clearTimeout(r._t); });
+  $("#leads").addEventListener("focusout", function (e) { var r = e.target.closest(".lead"); if (r) setTimeout(function () { armOut(r); }, 0); });
+  $('.dv[data-v="leads"]').addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    var d = b.dataset, row = b.closest(".lead"), box = $("#leadMsg"), r2, i;
+    if (d.lead !== undefined) {
+      i = leads.indexOf(row);
+      openMsg(box, row.dataset.first, leadText(row), b, sendBtn("data-sendlead", i) + (row.dataset.slot || row.dataset.req ? '<button class="mini-btn ghost" type="button" data-other="' + i + '">Outro dia</button>' : ""));
+    } else if (d.sendlead) {
+      /* "Confirmar" de quem é Novo: mandada a mensagem, a pessoa passa para Aula agendada, com o dia do pedido */
+      r2 = leads[+d.sendlead];
+      var conf = r2.dataset.st === "novo" && r2.dataset.req;
+      if (conf) setLead(r2, "agendado");
+      closeMsg(box);
+      toast("No app, abre o WhatsApp com a mensagem pronta." + (conf ? " " + r2.dataset.first + " passou para Aula agendada: " + slotS(r2.dataset.slot) + "." : ""));
+    } else if (d.other) {
+      pick(leads[+d.other], true, function () { box.hidden = true; });
+    } else if (d.pickOk !== undefined) {
+      var pk = $(".lead-pick", row);
+      row.dataset.slot = $('[data-pk="d"]', pk).value + "|" + $('[data-pk="h"]', pk).value;
+      closePick(row);
+      setLead(row, "agendado");
+      focusIn($("[data-lead]", row));
+      toast("Aula experimental de " + (row.dataset.child || row.dataset.first) + " marcada: " + slotS(row.dataset.slot) + ". Falta mandar a confirmação no WhatsApp.");
+    } else if (d.pickNo !== undefined) {
+      closePick(row);
+      $("select", row).value = row.dataset.pend || row.dataset.st;
+      focusSoft($("select", row), { preventScroll: true });
+    } else if (d.leadUndo !== undefined) {
+      setLead(row, row.dataset.st);
+      focusSoft($("select", row), { preventScroll: true });
+    } else if (b.id === "closedBtn") {
+      var cb = $("#closedBox"), open = cb.hidden;
+      morph(function () { cb.hidden = !open; }, cb);
+      b.setAttribute("aria-expanded", open ? "true" : "false");
+    } else if (d.reopen) {
+      /* "Reabrir": a linha volta como Em atendimento, no mesmo lugar */
+      r2 = leads[+d.reopen];
+      closedT.splice(closedT.indexOf(r2), 1);
+      delete r2.dataset.closed;
+      morph(function () { r2.hidden = false; setLead(r2, "atendimento"); paintClosed(); }, r2);
+      focusIn($("select", r2));
+      toast(r2.dataset.first + " voltou para Em atendimento.");
+    }
   });
 
   /* ---------- Modo tatame: a TV liga quando aparece na tela ---------- */
