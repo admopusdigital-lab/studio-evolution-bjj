@@ -72,6 +72,7 @@
 /* o retorno do quiz fica sempre na árvore (região de status), sem espaço quando vazio */
 .ap-quiz .fb:empty { margin: 0; }
 .ap-list .pill-s { display: inline-block; margin-left: 6px; padding: 2px 7px; vertical-align: 1px; }
+#apMovLb { letter-spacing: 0.16em; }  /* com a unidade ("5 de 12 movimentos"), o rótulo cabe numa linha */
 
 /* Perfil: "5 de 12" no trio, com o "de 12" menor para caber na coluna; as 8 competências em linhas compactas */
 .ap-trio b small { font-size: 15px; letter-spacing: 0; }
@@ -256,7 +257,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
 
               <!-- Movimentos -->
               <section class="ap-view" data-view="movimentos" aria-label="Tela Movimentos">
-                <p class="ap-lb">Faixa azul · <span id="apMov">5</span> de 12 movimentos</p>
+                <p class="ap-lb" id="apMovLb">Faixa azul · <span id="apMov">5</span> de 12 movimentos</p>
                 <p class="ap-hi">Movimentos</p>
                 <p class="ap-lb gold hide-q" style="margin-top:16px">Continue assistindo</p>
                 <button class="ap-cover pulse" type="button" id="apPlay" aria-label="Continuar o vídeo Raspagem de gancho">
