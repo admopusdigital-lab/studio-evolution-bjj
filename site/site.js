@@ -219,63 +219,6 @@
 
   var saveData = !!(navigator.connection && navigator.connection.saveData);
 
-  /* ---------- fumaça de ouro em WebGL: sobe do chão e acende onde o mouse passa; pausa fora da tela.
-     Só com mouse (computador), sem "reduzir movimento" e sem economia de dados. ---------- */
-  Site.smoke = function (c, area) {
-    if (!c || !fine || reduce || saveData || !window.gsap) return null;
-    var gl = c.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, depth: false });
-    if (!gl) return null;
-    var VS = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
-    var FS = [
-      "precision mediump float;uniform vec2 r;uniform float t;uniform vec2 m;",
-      "float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}",
-      "float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}",
-      "float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}",
-      "void main(){vec2 uv=gl_FragCoord.xy/r;vec2 p=uv*vec2(r.x/r.y,1.)*2.2;float tt=t*.045;",
-      "vec2 q=vec2(fbm(p+vec2(0.,-tt)),fbm(p+vec2(5.2,1.3)+tt*.6));",
-      "vec2 w=vec2(fbm(p+3.*q+vec2(1.7,9.2)+tt*1.3),fbm(p+3.*q+vec2(8.3,2.8)-tt));",
-      "float f=fbm(p+3.2*w+vec2(0.,-tt*2.));",
-      "float base=1.-smoothstep(0.,.98,uv.y);",
-      "float smoke=smoothstep(.52,.96,f)*(.25+.75*base);",
-      "vec2 d=(uv-m)*vec2(r.x/r.y,1.);float glow=exp(-dot(d,d)*5.)*.42;",
-      "float a=clamp(smoke*.75+glow*(.2+smoke*1.4),0.,.9);",
-      "vec3 col=mix(vec3(.78,.52,.2),vec3(1.,.86,.55),clamp(smoke*1.4,0.,1.));",
-      "gl_FragColor=vec4(col*a,a);}"
-    ].join("\n");
-    var mk = function (type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
-    var vs = mk(gl.VERTEX_SHADER, VS), fs = mk(gl.FRAGMENT_SHADER, FS);
-    if (!vs || !fs) return null;
-    var pr = gl.createProgram();
-    gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
-    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
-    gl.useProgram(pr);
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    var loc = gl.getAttribLocation(pr, "p");
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    var uR = gl.getUniformLocation(pr, "r"), uT = gl.getUniformLocation(pr, "t"), uM = gl.getUniformLocation(pr, "m");
-    var mx = 0.7, my = 0.35, tx = 0.7, ty = 0.35, vis = true, t0 = performance.now();
-    var size = function () {
-      var w = Math.max(2, Math.round(c.clientWidth * 0.5)), hh = Math.max(2, Math.round(c.clientHeight * 0.5));
-      if (c.width !== w || c.height !== hh) { c.width = w; c.height = hh; gl.viewport(0, 0, w, hh); }
-      gl.uniform2f(uR, w, hh);
-    };
-    size();
-    window.addEventListener("resize", size);
-    (area || c.parentElement).addEventListener("mousemove", function (e) { var r = c.getBoundingClientRect(); tx = (e.clientX - r.left) / r.width; ty = 1 - (e.clientY - r.top) / r.height; });
-    new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }).observe(c);
-    gsap.ticker.add(function () {
-      if (!vis) return;
-      mx += (tx - mx) * 0.05; my += (ty - my) * 0.05;
-      gl.uniform1f(uT, (performance.now() - t0) / 1000);
-      gl.uniform2f(uM, mx, my);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    });
-    c.classList.add("on");
-    return { canvas: c };
-  };
-
   /* ---------- selos ao vivo: a próxima aula e o atendimento, pela hora de quem está vendo ---------- */
   Site.nextClass = function () {
     var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60;
@@ -747,8 +690,6 @@
           if (trY) { trY(mx * 16); trx(-my * 9); }
         });
       }
-      var c = $(".cin-gl", h);
-      if (c) Site.smoke(c, h);
     });
     /* títulos: as palavras sobem por trás de uma máscara, esticadas, e assentam */
     $$(".split").forEach(function (h) {

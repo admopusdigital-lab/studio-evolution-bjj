@@ -40,7 +40,7 @@ html.seen #loader { display: none; }
 .ld-bar i { display: block; height: 100%; background: var(--gold); transform: scaleX(0); transform-origin: left; }
 .ld-tail { position: absolute; left: -5%; right: -5%; top: 100%; height: 22vh; background: var(--paper); border-radius: 0 0 50% 50% / 0 0 100% 100%; }
 
-/* abertura: o vídeo da faixa ao fundo, fumaça de ouro em WebGL por cima (com mouse), um kanji gigante
+/* abertura: o vídeo da faixa ao fundo, o tatame em perspectiva com a luz que segue o mouse, um kanji gigante
    em contorno e o título em três camadas: sólido, contornado e em ouro metálico */
 .hero { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; overflow: hidden; isolation: isolate; }
 .hv { position: absolute; inset: 0; z-index: -4; overflow: hidden; background: var(--cine-bg); will-change: transform; }
@@ -48,8 +48,6 @@ html.seen #loader { display: none; }
 .hv-shade { position: absolute; inset: 0; z-index: -3; pointer-events: none;
   background: radial-gradient(ellipse 110% 85% at 72% 28%, transparent 0%, color-mix(in oklch, var(--cine-bg) 50%, transparent) 58%, var(--cine-bg) 100%),
               linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 70%, transparent) 0%, transparent 28%, transparent 46%, var(--cine-bg) 100%); }
-.hv-gl { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity 1.8s var(--ease); }
-.hv-gl.on { opacity: 1; }
 .hero-ghost { position: absolute; z-index: -1; right: -3vw; top: 50%; translate: 0 -50%; writing-mode: vertical-rl; font: 500 min(70vh, 44vw)/0.9 var(--mincho); color: transparent; -webkit-text-stroke: 1px oklch(0.83 0.13 84 / 0.2); pointer-events: none; user-select: none; will-change: transform; }
 .hero-in { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; padding-top: clamp(108px, 14vh, 150px); padding-bottom: clamp(30px, 5vh, 60px); }
 .hero-top { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
@@ -288,6 +286,12 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 .bp .lead { margin-top: 26px; }
 .bp-stage { margin-top: clamp(40px, 6vh, 72px); }
 .belt-big { display: block; width: 100%; height: auto; overflow: visible; }
+/* a faixa em 3D (faixa3d.js) fica por cima do SVG, com folga em volta para ondular e girar; o SVG continua
+   embaixo para o leitor de tela e para quem não tem WebGL */
+.belt-box { position: relative; }
+.belt-gl { position: absolute; left: -9%; top: -170%; width: 118%; height: 440%; pointer-events: none; opacity: 0; transition: opacity 900ms var(--ease); }
+.belt-box.gl .belt-gl { opacity: 1; }
+.belt-box.gl .belt-big { opacity: 0; transition: opacity 600ms var(--ease); }
 .bp-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-top: 22px; }
 .bp-names { height: 1.04em; overflow: hidden; font: 400 clamp(46px, 4.8vw, 84px)/1.04 var(--serif); letter-spacing: -0.03em; }
 .bp-names-in { display: flex; flex-direction: column; will-change: transform; }
@@ -480,7 +484,6 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     <div class="hv" aria-hidden="true"><video class="hv-v" data-src="img/faixa-amarrando.mp4" poster="img/faixa-hero.jpg" data-ambient data-eager muted loop playsinline preload="none"></video></div>
     <div class="hv-shade" aria-hidden="true"></div>
     <div class="tatame" aria-hidden="true"><div class="tt-plane" id="ttPlane"><i class="tt-light" id="ttLight"></i></div></div>
-    <canvas class="hv-gl" id="heroGL" aria-hidden="true"></canvas>
     <span class="hero-ghost" aria-hidden="true">柔術</span>
     <div class="wrap hero-in">
       <div class="hero-top">
@@ -655,6 +658,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <h2 class="h2 split" id="t-faixa">Cada nó é um passo do <em>seu caminho</em>.</h2>
         <p class="lead">A faixa não é troféu, é diário de bordo. Ela guarda cada treino, cada respiro difícil e cada dia em que você escolheu voltar ao tatame.</p>
         <div class="bp-stage">
+          <div class="belt-box">
           <svg class="belt-big" viewBox="0 0 900 112" role="img" aria-label="O caminho das faixas do adulto: branca, azul, roxa, marrom e preta">
             <defs>
               <linearGradient id="bsheen" x1="0" y1="0" x2="0" y2="1">
@@ -672,6 +676,8 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
             <rect id="beltTip" x="652" y="8" width="168" height="76" fill="#17171a"/>
             <rect x="10" y="8" width="880" height="76" rx="4" fill="url(#bsheen)"/>
           </svg>
+          <canvas class="belt-gl" aria-hidden="true"></canvas>
+          </div>
           <div class="bp-row">
             <div class="bp-names" aria-hidden="true"><div class="bp-names-in" id="beltNames"><span>Branca</span><span><em>Azul</em></span><span>Roxa</span><span><em>Marrom</em></span><span>Preta</span></div></div>
             <span class="bp-count" id="beltCount">1 / 5</span>
@@ -852,6 +858,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="site.js"></script>
+<script src="faixa3d.js"></script>
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$, fine = Site.fine;
@@ -964,8 +971,6 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       gsap.to(".hv", { yPercent: 16, scale: 1.08, ease: "none", scrollTrigger: heroST });
       gsap.to(".hero-ghost", { yPercent: -16, ease: "none", scrollTrigger: heroST });
 
-      /* fumaça de ouro em WebGL sobre o vídeo: sobe do tatame e acende onde o mouse passa (site.js) */
-      Site.smoke($("#heroGL"), $(".hero"));
 
       /* o tatame em perspectiva: o mouse vira a câmera (para os lados e para cima), a luz acompanha o cursor
          e, ao rolar, o chão vai se erguendo, como se a câmera descesse até ele */
@@ -1079,6 +1084,28 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       /* a faixa: a rolagem escolhe a faixa (presa no computador) e a troca acontece inteira, de uma vez:
          o nome nunca fica cortado pela metade quando a pessoa para de rolar, nem no celular. */
       var COLORS = ["#f3f2ed", "#2b5fd0", "#6a35b0", "#6e4326", "#1c1c20"];
+      /* a faixa em 3D realista: o Three.js só carrega quando a seção se aproxima; sem WebGL, fica o SVG */
+      var beltGL = null, beltIdx = 0;
+      (function () {
+        var box = $(".belt-box"), cv = $(".belt-gl");
+        if (!box || !cv || !window.Faixa3D || !Faixa3D.supported() || !("IntersectionObserver" in window)) return;
+        var io = new IntersectionObserver(function (es) {
+          if (!es[0].isIntersecting) return;
+          io.disconnect();
+          Faixa3D.mount(cv, {
+            colors: COLORS, tips: ["#17171a", "#17171a", "#17171a", "#17171a", "#b3261e"],
+            normal: "img/faixa-normal.webp", detail: "img/faixa-detalhe.webp",
+            small: !fine || window.innerWidth < 900, reduce: Site.reduce, fine: fine, hover: $(".belt-sec")
+          }, function (api) {
+            if (!api) return;
+            beltGL = api;
+            api.set(beltIdx, false);
+            if (fine) gsap.set(".bp-stage", { rotationX: 0, rotationY: 0 });
+            box.classList.add("gl");
+          });
+        }, { rootMargin: "800px 0px" });
+        io.observe(box);
+      })();
       function buildBelt(pin) {
         var names = $("#beltNames"), countB = $("#beltCount"), cur = -1;
         gsap.set(".belt-big", { transformPerspective: 900, transformOrigin: "50% 50%" });
@@ -1088,6 +1115,9 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           cur = i;
           countB.textContent = (i + 1) + " / 5";
           gsap.to(names, { yPercent: -20 * i, duration: 0.8, ease: "expo.out", overwrite: true });
+          beltIdx = i;
+          /* com a faixa 3D, a volta e a troca de cor acontecem dentro dela */
+          if (beltGL) { beltGL.set(i, !first); return; }
           gsap.to("#beltBase", { attr: { fill: COLORS[i] }, duration: 0.6, ease: "power2.out", overwrite: true });
           gsap.to("#beltTip", { attr: { fill: i === 4 ? "#b3261e" : "#17171a" }, duration: 0.6, overwrite: true });
           gsap.to("#stitches", { attr: { stroke: i === 4 ? "#ffffff" : "#000000" }, duration: 0.6, overwrite: true });
@@ -1108,6 +1138,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         gsap.set(bs, { transformPerspective: 1100 });
         var bsx = gsap.quickTo(bs, "rotationX", { duration: 1.1, ease: "power3" }), bsy = gsap.quickTo(bs, "rotationY", { duration: 1.1, ease: "power3" });
         $(".belt-sec").addEventListener("mousemove", function (e) {
+          if (beltGL) return;
           var r = bs.getBoundingClientRect(), x = (e.clientX - (r.left + r.width / 2)) / innerWidth, y = (e.clientY - (r.top + r.height / 2)) / innerHeight;
           bsy(x * 26); bsx(-y * 20);
         });

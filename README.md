@@ -11,8 +11,10 @@ Versão publicada (privada): https://claude.ai/artifact/7PbBFQCkuSw1SPbBvzXHuw
 - `site/area-do-aluno.html`, `site/area-do-professor.html` e `site/app.css`: demonstrações das áreas logadas.
 - `site/site.css`: tokens (tema Black, o padrão, e Claro), componentes e o sistema de profundidade 3D.
 - `site/tema.css`: ajustes finais da linguagem visual "noite de luta". Carrega por último em todas as páginas.
-- `site/site.js`: comportamento comum. `Site.boot({ intro, setup, loader })`, aberturas de cinema, fumaça de ouro em WebGL, fitas cruzadas, inclinação 3D (`data-tilt3d`, `data-z`, `data-glare`, `data-tilt-touch`, `data-stand`), kanjis em volume e vitrine nos trilhos do celular.
-- `site/img/`: fotos e vídeo do Studio.
+- `site/site.js`: comportamento comum. `Site.boot({ intro, setup, loader })`, aberturas de cinema, fitas cruzadas (faixas pretas de jiu-jitsu), inclinação 3D (`data-tilt3d`, `data-z`, `data-glare`, `data-tilt-touch`, `data-stand`), kanjis em volume e vitrine nos trilhos do celular.
+- `site/faixa3d.js`: a faixa em 3D realista da seção "A faixa" (Three.js r149, carregado só quando a seção se aproxima; sem WebGL, fica o SVG).
+- `site/img/`: fotos e vídeo do Studio, e as texturas do tecido da faixa (`faixa-normal.webp`, `faixa-detalhe.webp`, `faixa-preta.webp`).
+- `tools/faixa-texturas.py`: gera as texturas da faixa a partir de um mapa de altura do tecido (`python3 tools/faixa-texturas.py <pasta>`).
 - `area-do-aluno-evolution.html`: estudo inicial de direções para a Área do Aluno.
 
 ## Ver localmente
