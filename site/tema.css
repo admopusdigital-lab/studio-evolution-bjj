@@ -14,8 +14,9 @@
 .vals b, .prog h3, .pa-tx h3, .blist h3, .pc h3, .bi h3, .dgrid h3, .qz-res h3, .diff-grid h3, .dv-h h3, .room-h h4, .bp-names, .qz-q legend, .features b, .sched-notes b, .day-label b { text-transform: uppercase; }
 
 /* ---------- página inicial ---------- */
-.lema p { font-size: clamp(38px, 6.4vw, 118px); line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; max-width: 15ch; }
-.lema p em { font-style: normal; }
+.lema p { font-size: clamp(38px, 6.4vw, 118px); line-height: 0.96; letter-spacing: -0.02em; text-transform: uppercase; max-width: 15ch; }
+/* cada frase do lema começa numa linha: nada de "A" pendurado no fim da linha de cima */
+.lema p em { display: block; font-style: normal; }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .lema p em .wi, .lema p em:not(:has(.wi)) { background: var(--gold-metal); -webkit-background-clip: text; background-clip: text; color: transparent; }
 }
@@ -33,7 +34,6 @@
 .quiz-sec::before { right: -22vw; top: -10%; }
 .team-sec::before { left: 30vw; top: 20%; }
 .col-it .ci, .team .tilt, .p-img, .cta-photo, .bp-video .vclip, .pa-ph { border-radius: 4px; }
-.true-sec .h2 em .wi, .true-sec .h2 em { filter: drop-shadow(0 0 24px oklch(0.83 0.13 84 / 0.25)); }
 .vals li { padding-inline: 2px; }
 .vals b { font-size: clamp(24px, 2vw, 32px); }
 .pa-t { text-shadow: 0 0 60px color-mix(in oklch, var(--gold) 45%, transparent); letter-spacing: -0.02em; }

@@ -45,8 +45,10 @@ html.seen #loader { display: none; }
 .hero { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; overflow: hidden; isolation: isolate; }
 .hv { position: absolute; inset: 0; z-index: -4; overflow: hidden; background: var(--cine-bg); will-change: transform; }
 /* três takes verticais da ZV-E10 lado a lado, na resolução original; em tela em pé, uma cena só, em tela cheia */
-.hv-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; height: 100%; }
+.hv-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); height: 100%; }
 .hv-v { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0.66; filter: contrast(1.06) brightness(0.88) saturate(0.95); background: var(--cine-bg); }
+/* entre as colunas, um fio de ouro em vez de um vão escuro */
+.hv-v + .hv-v { border-left: 1px solid oklch(0.83 0.13 84 / 0.22); }
 @media (max-aspect-ratio: 4/5) { .hv-cols { grid-template-columns: minmax(0, 1fr); } .hv-v.c1, .hv-v.c3 { display: none; } }
 .hv-shade { position: absolute; inset: 0; z-index: -3; pointer-events: none;
   background: radial-gradient(ellipse 110% 85% at 72% 28%, transparent 0%, color-mix(in oklch, var(--cine-bg) 50%, transparent) 58%, var(--cine-bg) 100%),
@@ -64,7 +66,7 @@ html.seen #loader { display: none; }
 .hero-title .ln2 { padding-left: 0.62em; }
 .hero-title .o { color: transparent; -webkit-text-stroke: 0.022em var(--ink); }
 .hero-title em { font-style: normal; background: linear-gradient(100deg, oklch(0.6 0.12 72) 0%, oklch(0.84 0.13 85) 22%, oklch(0.98 0.06 92) 40%, oklch(0.84 0.13 85) 56%, oklch(0.6 0.12 72) 78%, oklch(0.84 0.13 85) 100%);
-  background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 34px oklch(0.83 0.13 84 / 0.28)); }
+  background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
 @media (prefers-reduced-motion: no-preference) { .hero-title em { animation: hero-metal 6.5s linear infinite; } }
 @keyframes hero-metal { from { background-position: 100% 0; } to { background-position: -150% 0; } }
 .hero-title .dot { color: var(--gold); }
@@ -91,8 +93,8 @@ html.seen #loader { display: none; }
   .hero-ghost { right: -14vw; font-size: 92vw; opacity: 0.7; }
   .hb-r { justify-items: start; }
   .cue { display: none; }
-  /* no celular o texto ocupa a metade de baixo inteira: a sombra sobe mais para ele continuar legível */
-  .hv-shade { background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 72%, transparent) 0%, transparent 20%, transparent 28%, color-mix(in oklch, var(--cine-bg) 88%, transparent) 60%, var(--cine-bg) 100%); }
+  /* no celular o texto ocupa a metade de baixo: a cena fica limpa no alto e a sombra só começa perto do título */
+  .hv-shade { background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 60%, transparent) 0%, transparent 16%, transparent 36%, color-mix(in oklch, var(--cine-bg) 84%, transparent) 62%, var(--cine-bg) 100%); }
 }
 
 /* as fitas cruzadas (em 3D) vêm do site.css, iguais em todas as páginas */
@@ -105,11 +107,15 @@ html.seen #loader { display: none; }
 .lema cite { display: flex; align-items: center; gap: 14px; margin-top: 30px; font: normal 600 12px/1.4 var(--sans); letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-3); }
 .lema cite::before { content: ""; width: 32px; height: 1px; background: var(--gold); flex-shrink: 0; }
 .man-grid { display: grid; gap: 32px; }
-@media (min-width: 1000px) { .man-grid { grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 48px; } }
+@media (min-width: 1000px) { .man-grid { grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 48px; align-items: start; } .man-grid .label { margin-top: 0.9em; } }
 .statement { font: 400 clamp(32px, 3.7vw, 64px)/1.14 var(--serif); letter-spacing: -0.02em; }
 .statement em { color: var(--gold-text); }
 .pill { display: inline-block; width: 1.75em; height: 0.84em; border-radius: 999px; overflow: hidden; vertical-align: -0.05em; margin: 0 0.06em; box-shadow: 0 10px 20px -10px oklch(0.2 0.02 75 / 0.5); }
 .pill img { width: 100%; height: 100%; object-fit: cover; }
+/* no celular as miniaturas ficariam pequenas demais para ler: a frase segue sem elas */
+@media (max-width: 600px) { .statement .pill { display: none; } }
+/* o "ª" pequeno, colado no alto do número (um <i>: as regras de .numbers span são do rótulo) */
+.numbers .ord { font-style: normal; font-size: 0.42em; vertical-align: 1.05em; margin-left: 0.04em; letter-spacing: 0; }
 .numbers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: clamp(80px, 9vw, 140px); border-top: 1px solid var(--ink); }
 .numbers div { padding: 26px 24px 0 0; }
 .numbers div + div { padding-left: 24px; border-left: 1px solid var(--rule); }
@@ -118,7 +124,7 @@ html.seen #loader { display: none; }
 @media (max-width: 800px) { .numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); } .numbers div:nth-child(3) { padding-left: 0; border-left: 0; } .numbers div { padding-bottom: 28px; } .numbers div + div { padding-left: 18px; } .numbers b { font-size: clamp(46px, 13.5vw, 64px); white-space: nowrap; } }
 
 /* colagem em camadas: no computador, cada foto flutua numa profundidade e o conjunto gira com a rolagem */
-.collage { position: relative; height: min(62vw, 1000px); margin-bottom: clamp(60px, 8vw, 140px); }
+.collage { position: relative; height: min(56vw, 900px); margin-bottom: clamp(60px, 8vw, 140px); }
 @media (min-width: 901px) { .collage { transform-style: preserve-3d; will-change: transform; } }
 /* as fotos mais próximas podem passar da borda da tela: o recorte fica na própria seção */
 .col-sec { overflow-x: clip; }
@@ -132,7 +138,8 @@ html.seen #loader { display: none; }
 .c-a .ci { aspect-ratio: 4 / 5; }
 .c-b { right: 0; top: 30%; width: 24%; z-index: 3; }
 .c-b .ci { aspect-ratio: 3 / 4; }
-.c-c { left: 33%; top: 64%; width: 25%; z-index: 2; }
+/* a foto pequena fica à direita da legenda da principal, sem parecer colada nela */
+.c-c { left: auto; right: 26%; top: 70%; width: 24%; z-index: 2; }
 .c-c .ci { aspect-ratio: 4 / 3; }
 @media (max-width: 900px) {
   .collage { height: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
@@ -150,7 +157,8 @@ html.seen #loader { display: none; }
 .true-ph { position: relative; margin: 0; display: grid; place-items: center; height: min(74vh, 640px); }
 /* o símbolo da TRUE em 2D, vetorizado da logo oficial (tools/simbolo-true.py); a rolagem desenha o contorno,
    enche de ouro de baixo para cima e passa um reflexo (sem animação, aparece pronto) */
-.sym { position: relative; height: 92%; width: auto; max-width: 100%; overflow: visible; }
+/* posição absoluta: altura em % não resolve dentro do item de grid, e o desenho crescia por cima do texto no tablet */
+.sym { position: absolute; inset: 4% 0; width: 100%; height: 92%; overflow: visible; }
 .sym-glow { position: absolute; inset: 8% 14%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in oklch, var(--gold) 22%, transparent), transparent 72%); filter: blur(30px); opacity: 0.6; pointer-events: none; }
 .sym .sym-line { fill: none; stroke: var(--gold); stroke-width: 1.4; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 @media (max-width: 999px) { .true-ph { height: min(56vh, 460px); } }
@@ -190,6 +198,8 @@ html[data-look="light"] .cta-map figcaption b { color: oklch(0.16 0.006 75); }
 .pa-steps { display: grid; gap: 64px; margin-top: clamp(48px, 6vw, 80px); }
 .pa-step { display: grid; gap: 22px; }
 @media (min-width: 700px) and (max-width: 1023px) { .pa-step { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 40px; } }
+/* celular: o horário e o título vêm antes da cena, para ninguém ler a cena do passo seguinte como a deste */
+@media (max-width: 699px) { .pa-step .pa-tx { order: -1; } }
 .pa-ph { position: relative; margin: 0; aspect-ratio: 4 / 3; overflow: hidden; }
 .pa-ph img { width: 100%; height: 100%; object-fit: cover; }
 /* takes do vídeo do Studio (img/takes): o vídeo cobre a foto, que é o mesmo quadro, e aparece quando começa a tocar */
@@ -360,7 +370,8 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 /* horários */
 .sched-sec { padding-block: clamp(80px, 9vw, 150px); }
 .sched { display: grid; gap: 56px; }
-@media (min-width: 1000px) { .sched { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 6vw; align-items: start; } }
+@media (min-width: 1000px) { .sched { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 5vw; align-items: start; } }
+.sched .h2 { margin-top: 26px; }
 .sched .lead { margin-top: 26px; }
 .sched .btn { margin-top: 40px; }
 .day-label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
@@ -533,7 +544,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         </h1>
         <div class="hero-bottom">
           <div class="hb-l">
-            <p class="lede">O treino vira qualidade de vida, confiança e alívio do estresse. Aulas para adultos e crianças, no Jardim São Paulo, com acompanhamento de perto.</p>
+            <p class="lede">O treino vira qualidade de vida, confiança e alívio do estresse. Aulas para adultos e crianças de 4 a 12 anos no Jardim São Paulo, com no máximo 10 alunos por aula e o professor sempre por perto.</p>
             <div class="ctas">
               <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
               <a class="link" href="#primeira-aula">Como é a primeira aula</a>
@@ -570,10 +581,10 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <p class="statement" id="statement" data-fadewords>Um tatame acolhedor <span class="pill"><img src="img/treino-tecnica.webp" alt=""></span> no Jardim São Paulo, para quem quer <em>começar</em>, quem quer <em>voltar a se cuidar</em> <span class="pill"><img src="img/aula-jiu-jitsu.webp" alt="" style="object-position:40% 45%"></span> e quem quer <em>dividir o esporte com a família</em> <span class="pill"><img src="img/programa-familia-real.jpg" alt=""></span></p>
       </div>
       <div class="numbers">
-        <div data-stand="76"><b class="count" data-to="15">15</b><span>academias na Equipe TRUE</span></div>
+        <div data-stand="76"><b class="count" data-to="15">15</b><span>unidades na rede da Equipe TRUE</span></div>
         <div data-stand="76"><b class="count" data-to="5">5</b><span>aulas por dia, de segunda a sexta</span></div>
         <div data-stand="76"><b>4–12</b><span>anos na turma Kids</span></div>
-        <div data-stand="76"><b>1<em style="font-size:.5em;vertical-align:.7em">ª</em></b><span>aula por nossa conta, com kimono emprestado</span></div>
+        <div data-stand="76"><b>1<i class="ord">ª</i></b><span>aula por nossa conta, com kimono emprestado</span></div>
       </div>
     </div>
   </section>
@@ -602,7 +613,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       <div class="true-tx">
         <p class="label">Equipe TRUE BJJ</p>
         <h2 class="h2 split" id="t-true">Uma academia. <em>Uma equipe inteira</em> por trás.</h2>
-        <p class="lead">O Studio Evolution faz parte da Equipe TRUE, uma rede com 15 academias e uma metodologia própria, a Lifestyle BJJ®. Você treina no Jardim São Paulo com o apoio de uma equipe inteira.</p>
+        <p class="lead">O Studio Evolution faz parte da Equipe TRUE, uma rede com 15 unidades ativas. Você treina no Jardim São Paulo com o mesmo padrão de ensino e o apoio de toda a equipe.</p>
         <ol class="vals" data-rise>
           <li><span>01</span><b>Técnica</b><p>Fundamento antes de força. Cada detalhe ensinado com calma.</p></li>
           <li><span>02</span><b>Respeito</b><p>Pelo professor, pelo parceiro de treino e pelo seu ritmo.</p></li>
@@ -616,7 +627,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 
   <section class="wrap col-sec" aria-label="Fotos do Studio">
     <div class="collage">
-      <figure class="col-it c-main" data-speed="0"><div class="ci" data-reveal><img src="img/comunidade-evolution.webp" alt="Alunos e professores do Studio Evolution BJJ sentados no tatame em frente ao painel da academia" loading="lazy" width="1200" height="684" style="object-position:50% 72%"></div><figcaption>A turma reunida na inauguração do Studio.</figcaption></figure>
+      <figure class="col-it c-main" data-speed="0"><div class="ci" data-reveal><img src="img/comunidade-evolution.webp" alt="Alunos e professores do Studio Evolution BJJ sentados no tatame em frente ao painel da academia" loading="lazy" width="1200" height="684" style="object-position:50% 72%"></div><figcaption>A turma reunida no tatame do Studio.</figcaption></figure>
       <figure class="col-it c-a" data-speed="-0.35"><div class="ci" data-reveal><img src="img/treino-tecnica.webp" alt="Dois alunos treinando técnica no chão do tatame" loading="lazy" width="1200" height="800"></div></figure>
       <figure class="col-it c-b" data-speed="0.3"><div class="ci" data-reveal><img src="img/jiu-jitsu-kids.webp" alt="Professor sentado no tatame com uma criança nos ombros" loading="lazy" width="741" height="1100" style="object-position:50% 30%"></div></figure>
       <figure class="col-it c-c" data-speed="-0.2"><div class="ci" data-reveal><img src="img/programa-familia-real.jpg" alt="Alunos adultos de kimono em frente ao painel do Studio Evolution" loading="lazy" width="1264" height="848"></div></figure>
@@ -639,20 +650,20 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           <div class="pa-tx"><span class="pa-t">19:00</span><h3>A turma se alinha.</h3><p>Todo mundo no tatame, um cumprimento ao professor e a aula começa. Aqui, cada um respeita o ritmo do outro.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph v"><img src="img/takes/aquecimento.jpg" alt="Aluno de kimono preto passando a guarda de um colega de kimono branco" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/aquecimento" poster="img/takes/aquecimento.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
+          <figure class="pa-ph v"><img src="img/takes/aquecimento.jpg" alt="Professor de kimono branco demonstrando um rolamento para trás no tatame, com um aluno à frente" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/aquecimento" poster="img/takes/aquecimento.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:05</span><h3>Aquecimento.</h3><p>Você aquece junto com a turma, com movimentos do próprio jiu-jitsu. Quem está começando faz a versão mais leve.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph v"><img src="img/takes/tecnica.jpg" alt="Dois alunos repetindo uma passagem de guarda no tatame" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/tecnica" poster="img/takes/tecnica.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
+          <figure class="pa-ph v"><img src="img/takes/tecnica.jpg" alt="Aluno de kimono preto repetindo uma passagem de guarda sobre um colega de kimono branco" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/tecnica" poster="img/takes/tecnica.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:20</span><h3>Movimentos básicos.</h3><p>O professor mostra uma posição passo a passo e você repete com um parceiro, devagar, até ficar natural.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph v"><img src="img/takes/guarda.jpg" alt="Dois alunos treinando a guarda com calma, sem luta pesada" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/guarda" poster="img/takes/guarda.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
+          <figure class="pa-ph v"><img src="img/takes/guarda.jpg" alt="Aluno de kimono branco treinando na guarda de um colega de kimono preto" loading="lazy" width="1080" height="1350" style="object-position:50% 50%"><video class="take" data-take="img/takes/guarda" poster="img/takes/guarda.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:40</span><h3>Sem luta pesada.</h3><p>No primeiro dia, ninguém te coloca numa luta. Você aprende, repete e entende o jogo. O resto vem com o tempo.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph v"><img src="img/takes/resenha.jpg" alt="Dois alunos rindo e conversando sentados no tatame depois do treino" loading="lazy" width="1080" height="1350" style="object-position:50% 45%"><video class="take" data-take="img/takes/resenha" poster="img/takes/resenha.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 45%"></video></figure>
-          <div class="pa-tx"><span class="pa-t">Fim</span><h3>Você sai mais leve.</h3><p>Cansado, com a cabeça leve e com vontade de voltar. A primeira aula é por nossa conta.</p><a class="btn btn-ink" href="agendamento.html" data-int>Agendar minha primeira aula<svg class="ic"><use href="#i-arrow"/></svg></a></div>
+          <figure class="pa-ph v"><img src="img/takes/resenha.jpg" alt="Aluno de kimono azul rindo ao lado de um faixa-preta que ajusta a faixa, os dois sentados no tatame" loading="lazy" width="1080" height="1350" style="object-position:50% 45%"><video class="take" data-take="img/takes/resenha" poster="img/takes/resenha.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 45%"></video></figure>
+          <div class="pa-tx"><span class="pa-t">Fim</span><h3>Você sai mais leve.</h3><p>Cansado, de cabeça fresca e com vontade de voltar. A primeira aula é por nossa conta.</p><a class="btn btn-ink" href="agendamento.html" data-int>Agendar minha primeira aula<svg class="ic"><use href="#i-arrow"/></svg></a></div>
         </li>
       </ol>
       <div class="pa-ui" aria-hidden="true"><div class="pa-bars"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div><span class="pa-n">01 / 06</span></div>
@@ -667,12 +678,12 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <div class="panel-intro">
           <p class="label">Programas</p>
           <h2 class="h2 split" id="t-prog">Um caminho para <em>cada fase</em> da vida.</h2>
-          <p class="lead">Três turmas, um mesmo cuidado: técnica de verdade, respeito ao corpo de cada um e nenhuma pressão para competir.</p>
+          <p class="lead">Adulto, Kids e Feminino. Em todas, a técnica é ensinada com calma e ninguém é obrigado a competir.</p>
           <p class="hint"><span class="hint-d">Continue rolando</span><span class="hint-m">Deslize para ver as turmas</span><svg class="ic"><use href="#i-arrow"/></svg></p>
         </div>
         <div class="prog-row" data-swipe>
         <article class="prog" data-vt-card data-cursor="Ver turma">
-          <div class="p-img"><img src="img/takes/adulto.jpg" alt="Dois alunos adultos treinando no tatame enquanto a turma assiste" width="1080" height="1350"><video class="take" data-take="img/takes/adulto" poster="img/takes/adulto.jpg" muted loop playsinline preload="none" aria-hidden="true"></video></div>
+          <div class="p-img"><img src="img/takes/adulto.jpg" alt="Dois alunos adultos, de kimono preto e azul, treinando no chão do tatame" width="1080" height="1350"><video class="take" data-take="img/takes/adulto" poster="img/takes/adulto.jpg" muted loop playsinline preload="none" aria-hidden="true"></video></div>
           <div>
             <div class="p-meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h</span></div>
             <h3>Adulto</h3>
@@ -685,7 +696,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           <div>
             <div class="p-meta"><span>4 a 12 anos</span><span class="tnum">10h · 18h</span></div>
             <h3><em>Kids</em></h3>
-            <p>Disciplina, foco e respeito para crianças de 4 a 12 anos. Ótimo para quem tem hiperatividade e precisa de uma direção.</p>
+            <p>Disciplina, foco e respeito para crianças de 4 a 12 anos, com brincadeiras que ajudam a gastar energia e a prestar atenção.</p>
             <a class="link" href="agendamento.html#kids" data-int>Agendar na turma Kids</a>
           </div>
         </article>
@@ -694,7 +705,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           <div>
             <div class="p-meta"><span>Junto com o adulto</span><span class="tnum">8h · 11h · 19h</span></div>
             <h3>Feminino</h3>
-            <p>Espaço seguro para fortalecer o corpo, a voz e a confiança. Defesa pessoal e autoestima em primeiro lugar.</p>
+            <p>As mulheres treinam nas aulas de adulto, nos mesmos horários e no ritmo de cada uma. Defesa pessoal, força e confiança.</p>
             <a class="link" href="agendamento.html#feminino" data-int>Agendar no Feminino</a>
           </div>
         </article>
@@ -709,7 +720,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       <div>
         <p class="label">A faixa</p>
         <h2 class="h2 split" id="t-faixa">Cada nó é um passo do <em>seu caminho</em>.</h2>
-        <p class="lead">A faixa não é troféu, é diário de bordo. Ela guarda cada treino, cada respiro difícil e cada dia em que você escolheu voltar ao tatame.</p>
+        <p class="lead">Cada faixa marca meses de treino, os dias difíceis e todas as vezes em que você escolheu voltar ao tatame.</p>
         <div class="bp-stage">
           <div class="belt-box">
           <svg class="belt-big" viewBox="0 0 900 112" role="img" aria-label="O caminho das faixas do adulto: branca, azul, roxa, marrom e preta">
@@ -739,7 +750,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         </div>
       </div>
       <figure class="bp-video">
-        <div class="vclip"><video data-src="img/faixa-amarrando.mp4" poster="img/faixa-poster.jpg" muted loop playsinline preload="none" aria-label="Aluno amarrando a faixa antes do treino"></video></div>
+        <div class="vclip"><video data-src="img/faixa-amarrando.mp4" poster="img/faixa-poster.jpg" muted loop playsinline preload="none" aria-label="Mãos amarrando uma faixa preta sobre o kimono branco"></video></div>
         <figcaption>Antes de cada treino, o mesmo nó.</figcaption>
       </figure>
     </div>
@@ -767,12 +778,12 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <p class="lead">Benefícios que você sente no dia a dia, desde o primeiro mês.</p>
       </div>
       <ul class="blist" id="blist">
-        <li data-img="img/programa-familia-real.jpg"><h3>Menos estresse</h3><p>Deixe o peso do dia no tatame. O Jiu-Jitsu acalma a mente e devolve o sono.</p></li>
-        <li data-img="img/treino-tecnica.webp"><h3>Segurança de si</h3><p>Técnicas reais de defesa pessoal para você se sentir seguro em qualquer lugar.</p></li>
+        <li data-img="img/programa-familia-real.jpg"><h3>Menos estresse</h3><p>Deixe o peso do dia no tatame. O treino cansa o corpo e acalma a cabeça.</p></li>
+        <li data-img="img/treino-tecnica.webp"><h3>Segurança de si</h3><p>Técnicas reais de defesa pessoal para você se sentir mais seguro no dia a dia.</p></li>
         <li data-img="img/programa-feminino-real.jpg"><h3>Autoestima</h3><p>Cada aula vencida constrói uma confiança que aparece no trabalho, em casa e nos relacionamentos.</p></li>
-        <li data-img="img/jiu-jitsu-kids.webp"><h3>Foco para as crianças</h3><p>Crianças com hiperatividade ganham foco, limites e disciplina de forma leve e lúdica.</p></li>
-        <li data-img="img/programa-adulto-real.jpg"><h3>Qualidade de vida</h3><p>Mobilidade, força e fôlego sem monotonia. Seu corpo agradece desde o primeiro mês.</p></li>
-        <li data-img="img/comunidade-evolution.webp"><h3>Comunidade acolhedora</h3><p>Famílias que treinam juntas. Respeito, amizade e um ambiente sem julgamentos.</p></li>
+        <li data-img="img/jiu-jitsu-kids.webp"><h3>Foco para as crianças</h3><p>As crianças gastam energia, aprendem a prestar atenção e a respeitar combinados, brincando.</p></li>
+        <li data-img="img/programa-adulto-real.jpg"><h3>Qualidade de vida</h3><p>Mobilidade, força e fôlego sem monotonia. O corpo sente a diferença.</p></li>
+        <li data-img="img/comunidade-evolution.webp"><h3>Comunidade acolhedora</h3><p>Pais e filhos no mesmo lugar, cada um na sua turma. Respeito, amizade e um ambiente sem julgamentos.</p></li>
       </ul>
     </div>
     <div class="hover-img" id="hoverImg" aria-hidden="true"><img src="img/programa-familia-real.jpg" alt=""></div>
@@ -795,8 +806,8 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <p class="lead">Professores presentes em todas as aulas, acompanhando cada aluno de perto, do primeiro treino à próxima faixa.</p>
       </div>
       <div class="team">
-        <figure class="a" data-speed="-0.15"><div class="tilt" data-tilt3d="9" data-glare data-tilt-touch data-reveal><img src="img/equipe-evolution.webp" alt="Fundadores do Studio Evolution BJJ em frente ao painel dourado da academia" loading="lazy" width="713" height="1100" style="object-position:50% 62%"></div><figcaption>À frente do Studio.</figcaption></figure>
-        <figure class="b" data-speed="0.18"><div class="tilt" data-tilt3d="7" data-glare data-tilt-touch data-reveal><img src="img/professores-evolution.webp" alt="Quatro professores do Studio Evolution BJJ lado a lado, de kimono" loading="lazy" width="1200" height="800" style="object-position:50% 45%"></div><figcaption>A equipe de professores, das faixas coloridas à preta.</figcaption></figure>
+        <figure class="a" data-speed="-0.15"><div class="tilt" data-tilt3d="9" data-glare data-tilt-touch data-reveal><img src="img/equipe-evolution.webp" alt="Uma mulher e um faixa-preta de kimono branco em frente ao painel dourado do Studio Evolution BJJ" loading="lazy" width="713" height="1100" style="object-position:50% 62%"></div><figcaption>À frente do Studio.</figcaption></figure>
+        <figure class="b" data-speed="0.18"><div class="tilt" data-tilt3d="7" data-glare data-tilt-touch data-reveal><img src="img/professores-evolution.webp" alt="Quatro alunos de kimono lado a lado em frente ao painel do Studio, de faixas branca, preta, azul e marrom" loading="lazy" width="1200" height="800" style="object-position:50% 45%"></div><figcaption>Da faixa branca à preta, no mesmo tatame.</figcaption></figure>
       </div>
     </div>
   </section>
@@ -805,8 +816,8 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     <div class="wrap sched">
       <div>
         <p class="label">Horários</p>
-        <h2 class="h2 split" id="t-hor">Sempre tem uma turma <em>esperando você</em>.</h2>
-        <p class="lead">Treinos de manhã, no fim da manhã e à noite. Quem já é aluno confirma a vaga pelo app e garante o lugar no tatame.</p>
+        <h2 class="h2 split" id="t-hor">Cinco aulas por dia, <em>de segunda a sexta</em>.</h2>
+        <p class="lead">Adulto de manhã, no fim da manhã e à noite. Kids de manhã e no fim da tarde, logo antes de uma aula de adulto.</p>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
       </div>
       <div>
@@ -856,7 +867,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
                 <div class="card">
                   <p class="lb gold">Sua aula de hoje</p>
                   <div class="big"><b>19h</b><span>Adulto</span></div>
-                  <p class="sub">Começa em 48 min · 7 de 10 vagas</p>
+                  <p class="sub">Começa em 48 min · 7 de 10 vagas ocupadas</p>
                   <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
                   <div class="pbtn"><svg class="ic"><use href="#i-check"/></svg>Confirmar vaga</div>
                 </div>
@@ -878,7 +889,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <div>
           <p class="label">Primeira aula grátis</p>
           <h2 class="h2 split" id="t-cta">Vista o kimono e sinta o peso do dia <em>sumir</em>.</h2>
-          <p class="lead">Agende sua aula experimental. Kimono emprestado, zero pressão e toda a atenção para quem está começando.</p>
+          <p class="lead">A primeira aula é grátis e a gente empresta o kimono. É só chegar alguns minutos antes.</p>
           <a class="btn btn-gold" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
           <dl class="contact">
             <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
@@ -905,7 +916,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Turma Adulto (o Feminino treina junto) e Kids, de 4 a 12 anos, de segunda a sexta.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
       <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
@@ -955,7 +966,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
   (function () {
     var stage = $("#qzStage"); if (!stage) return;
     var nEl = $("#qzN"), back = $("#qzBack"), fill = $("#qzFill"), step = 1, a = {};
-    var WHO = [["eu", "Para mim", "Turma Adulto ou Feminino"], ["crianca", "Para uma criança", "De 4 a 12 anos"], ["familia", "Para mim e uma criança", "Treinar em família"]];
+    var WHO = [["eu", "Para mim", "Turma Adulto ou Feminino"], ["crianca", "Para uma criança", "De 4 a 12 anos"], ["familia", "Para mim e uma criança", "Kids e Adulto, um depois do outro"]];
     var WHEN = {
       eu: [["8", "De manhã", "Adulto às 8h"], ["11", "No fim da manhã", "Adulto às 11h"], ["19", "À noite", "Adulto às 19h"]],
       crianca: [["10", "De manhã", "Kids às 10h"], ["18", "No fim da tarde", "Kids às 18h"]],
@@ -973,9 +984,9 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       var t = +a.when, title, text, href;
       if (a.who === "eu") { title = "Adulto, às <em>" + t + "h</em>."; text = "De segunda a sexta, numa turma para todos os níveis. Para mulheres, o Feminino treina junto, nos mesmos horários."; href = "agendamento.html#adulto-" + t; }
       else if (a.who === "crianca") { title = "<em>Kids</em>, às " + t + "h."; text = "De segunda a sexta, para crianças de 4 a 12 anos, com foco em disciplina e diversão."; href = "agendamento.html#kids-" + t; }
-      else { title = "Kids às " + t + "h e <em>Adulto às " + (t + 1) + "h</em>."; text = "Um horário logo depois do outro, de segunda a sexta. Dá para vir junto e treinar em família."; href = "agendamento.html#kids-" + t; }
-      var note = a.exp === "novo" ? "Primeira vez? Chegue alguns minutos antes. A gente empresta o kimono para a aula." : "Já treinou antes? Conte na conversa: o professor ajusta o treino ao seu nível.";
-      return '<div class="qz-res qz-in"><p class="k">Sua turma</p><h3>' + title + "</h3><p>" + text + '</p><p class="note">' + note + '</p><div class="ctas"><a class="btn btn-ink" href="' + href + '" data-int>Agendar esse horário<svg class="ic"><use href="#i-arrow"/></svg></a><button class="qz-redo" type="button">Refazer</button></div></div>';
+      else { title = "Kids às " + t + "h e <em>Adulto às " + (t + 1) + "h</em>."; text = "A criança treina primeiro e você logo depois, de segunda a sexta. Vocês vêm juntos e cada um treina na sua turma."; href = "agendamento.html#familia-" + t; }
+      var note = a.exp === "novo" ? "Primeira vez? Chegue alguns minutos antes. A gente empresta o kimono para a aula." : (a.who === "crianca" ? "Já treinou antes? Conte na conversa: o professor ajusta o treino ao nível da criança." : "Já treinou antes? Conte na conversa: o professor ajusta o treino ao seu nível.");
+      return '<div class="qz-res qz-in"><p class="k">Sua turma</p><h3>' + title + "</h3><p>" + text + '</p><p class="note">' + note + '</p><div class="ctas"><a class="btn btn-ink" href="' + href + '" data-int>Agendar este horário<svg class="ic"><use href="#i-arrow"/></svg></a><button class="qz-redo" type="button">Refazer</button></div></div>';
     };
     var render = function (focus) {
       nEl.textContent = step <= 3 ? "Pergunta " + step + " de 3" : "Sua recomendação";

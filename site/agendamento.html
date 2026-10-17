@@ -218,12 +218,12 @@
     <div class="wrap">
       <div class="phero-top" data-in><p class="label gold">Aula experimental gratuita</p><p class="phero-meta">Kimono emprestado · segunda a sexta</p></div>
       <h1 class="phero-title" id="t-ag">Agende seu <span class="o">primeiro</span> <em class="gl">treino.</em></h1>
-      <p class="lede" data-in>Escolha o programa, a data e o horário. A confirmação chega direto no nosso WhatsApp. Simples assim.</p>
+      <p class="lede" data-in>Escolha a turma, a data e o horário. O site monta a mensagem, você envia pelo WhatsApp e a gente responde confirmando a vaga.</p>
       <div class="cin-row"><p class="pill-live" data-next><i aria-hidden="true"></i><span>Próxima aula</span><b>Adulto · 19h</b></p></div>
       <div class="ag-steps-wrap" data-in>
         <i class="fill" id="agFill" aria-hidden="true"></i>
         <ol class="ag-steps" id="agSteps" aria-label="Seu progresso">
-          <li data-s="program"><span class="n">01</span>Programa</li>
+          <li data-s="program"><span class="n">01</span>Turma</li>
           <li data-s="date"><span class="n">02</span>Data</li>
           <li data-s="time"><span class="n">03</span>Horário</li>
         </ol>
@@ -235,8 +235,8 @@
     <div class="wrap ag-grid">
       <div>
         <div class="step" id="stepProgram">
-          <div class="step-h"><h2><span class="sn">1</span>Escolha o programa</h2><p>Três turmas</p></div>
-          <div class="progs" role="group" aria-label="Programa">
+          <div class="step-h"><h2><span class="sn">1</span>Escolha a turma</h2><p>Adulto, Kids ou Feminino</p></div>
+          <div class="progs" role="group" aria-label="Turma">
             <button class="opt" type="button" data-prog="adulto" aria-pressed="false" data-cursor="Escolher" data-tilt3d="10" data-glare>
               <span class="ph"><img src="img/programa-adulto-real.jpg" alt="" style="object-position:62% 50%"></span>
               <span class="ob" data-z="48"><b>Adulto</b><small>Para todos os níveis, do iniciante ao avançado.</small><span class="tms">08:00 · 11:00 · 19:00</span></span>
@@ -244,12 +244,12 @@
             </button>
             <button class="opt" type="button" data-prog="kids" aria-pressed="false" data-cursor="Escolher" data-tilt3d="10" data-glare>
               <span class="ph"><img src="img/programa-kids-real.jpg" alt="" style="object-position:50% 70%"></span>
-              <span class="ob" data-z="48"><b>Kids &amp; Família</b><small>Crianças a partir de 4 anos, com foco em disciplina e diversão.</small><span class="tms">10:00 · 18:00</span></span>
+              <span class="ob" data-z="48"><b>Kids</b><small>Crianças de 4 a 12 anos, com foco em disciplina e diversão.</small><span class="tms">10:00 · 18:00</span></span>
               <span class="tz" data-z="86"><span class="tick" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span></span>
             </button>
             <button class="opt" type="button" data-prog="feminino" aria-pressed="false" data-cursor="Escolher" data-tilt3d="10" data-glare>
               <span class="ph"><img src="img/programa-feminino-real.jpg" alt="" style="object-position:52% 60%"></span>
-              <span class="ob" data-z="48"><b>Feminino</b><small>Turma integrada aos horários adultos, com acompanhamento próximo.</small><span class="tms">08:00 · 11:00 · 19:00</span></span>
+              <span class="ob" data-z="48"><b>Feminino</b><small>Treina junto com as aulas de adulto, nos mesmos horários.</small><span class="tms">08:00 · 11:00 · 19:00</span></span>
               <span class="tz" data-z="86"><span class="tick" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span></span>
             </button>
           </div>
@@ -264,12 +264,12 @@
         <div class="step" id="stepTime">
           <div class="step-h"><h2><span class="sn">3</span>Escolha o horário</h2><p id="timeHint"></p></div>
           <div class="times" id="times" role="group" aria-label="Horário da aula"></div>
-          <p class="empty" id="timesEmpty">Escolha um programa para ver os horários.</p>
+          <p class="empty" id="timesEmpty">Escolha uma turma para ver os horários.</p>
         </div>
 
         <div class="step">
           <div class="step-h"><h2>Seu nome <span class="opc">(opcional)</span></h2></div>
-          <div class="field"><input id="nome" type="text" maxlength="100" placeholder=" " autocomplete="given-name"><label for="nome">Como podemos te chamar?</label></div>
+          <div class="field"><input id="nome" type="text" maxlength="100" placeholder=" " autocomplete="given-name"><label for="nome">Seu nome (ou do responsável)</label></div>
         </div>
       </div>
 
@@ -280,7 +280,7 @@
           <p class="label">Seu ingresso</p>
           <h3 id="t-ticket">Primeiro <em>treino</em></h3>
           <dl class="tk-rows">
-            <div><dt>Programa</dt><dd id="sumProgram" class="pending"><span>Escolha ao lado</span></dd></div>
+            <div><dt>Turma</dt><dd id="sumProgram" class="pending"><span>Escolha ao lado</span></dd></div>
             <div><dt>Data</dt><dd id="sumDate" class="pending"><span>Escolha ao lado</span></dd></div>
             <div><dt>Horário</dt><dd id="sumTime" class="pending"><span>Escolha ao lado</span></dd></div>
             <div><dt>Nome</dt><dd id="sumName" class="pending"><span>Opcional</span></dd></div>
@@ -288,10 +288,10 @@
         </div>
         <div class="tk-cut" aria-hidden="true"></div>
         <div class="tk-bot">
-          <a class="btn" id="waBtn" href="#" aria-disabled="true" target="_blank" rel="noopener">Confirmar no WhatsApp<svg class="ic"><use href="#i-arrow"/></svg></a>
-          <p class="tk-note" id="waNote" aria-live="polite">Complete os três passos para liberar a confirmação.</p>
+          <a class="btn" id="waBtn" href="#" aria-disabled="true" target="_blank" rel="noopener">Enviar pelo WhatsApp<svg class="ic"><use href="#i-arrow"/></svg></a>
+          <p class="tk-note" id="waNote" aria-live="polite">Complete os três passos para montar a mensagem.</p>
           <div class="tk-code" aria-hidden="true"><i></i><span id="tkCode">EVO-···</span></div>
-          <p class="tk-addr">Av. Getúlio Vargas, 400, sala 3 (sobreloja) · Jardim São Paulo, Sorocaba/SP · 18051-480</p>
+          <p class="tk-addr">Av. Getúlio Vargas, 400, sala 3, sobreloja · Jardim São Paulo, Sorocaba/SP · 18051-480</p>
         </div>
       </aside>
     </div>
@@ -303,7 +303,7 @@
         <div>
           <p class="label">Prefere conversar antes?</p>
           <h2 class="h2 split" id="t-cta">Tire suas dúvidas <em>com a gente</em>.</h2>
-          <p class="lead">Responderemos sobre horários, turmas, planos ou qualquer outra questão. Nossa equipe atende de segunda a sexta, das 8h às 21h.</p>
+          <p class="lead">Pergunte o que quiser sobre horários, turmas e planos. A gente responde de segunda a sexta, das 8h às 21h.</p>
           <a class="btn btn-gold" data-magnetic href="perguntas.html" data-int>Ver perguntas frequentes<svg class="ic"><use href="#i-arrow"/></svg></a>
           <dl class="contact">
             <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
@@ -311,7 +311,7 @@
             <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
           </dl>
         </div>
-        <figure class="cta-photo"><img src="img/hero-real.jpg" alt="Professores do Studio Evolution BJJ sorrindo no tatame" loading="lazy" width="1531" height="1027" style="object-position:50% 35%"></figure>
+        <figure class="cta-photo"><img src="img/hero-real.jpg" alt="Dois faixas-pretas de kimono branco sorrindo lado a lado" loading="lazy" width="1531" height="1027" style="object-position:50% 35%"></figure>
       </div>
     </div>
   </section>
@@ -320,7 +320,7 @@
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Turma Adulto (o Feminino treina junto) e Kids, de 4 a 12 anos, de segunda a sexta.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
       <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
@@ -333,7 +333,7 @@
 <a class="wa-float" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener"><i aria-hidden="true"></i>WhatsApp</a>
 
 <div class="ag-bar" id="agBar" aria-live="polite">
-  <div class="ag-bar-txt"><small id="agBarStep">Passo 1 de 3</small><b id="agBarSum">Escolha o programa</b></div>
+  <div class="ag-bar-txt"><small id="agBarStep">Passo 1 de 3</small><b id="agBarSum">Escolha a turma</b></div>
   <a class="btn btn-ink" id="agBarBtn" href="#stepProgram" rel="noopener">Escolher</a>
 </div>
 
@@ -347,12 +347,12 @@
   var anim = !!window.gsap && !Site.reduce;
   var PROGRAMS = {
     adulto: { name: "Adulto", code: "ADU", times: ["08:00", "11:00", "19:00"] },
-    kids: { name: "Kids & Família", short: "Kids", code: "KID", times: ["10:00", "18:00"] },
+    kids: { name: "Kids", code: "KID", times: ["10:00", "18:00"] },
     feminino: { name: "Feminino", code: "FEM", times: ["08:00", "11:00", "19:00"] }
   };
   var WD_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   var MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-  var state = { program: null, date: null, time: null, name: "" };
+  var state = { program: null, date: null, time: null, name: "", family: false };
   var pad = function (n) { return String(n).padStart(2, "0"); };
   var iso = function (d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
   var fromIso = function (s) { var p = s.split("-").map(Number); return new Date(p[0], p[1] - 1, p[2]); };
@@ -415,15 +415,17 @@
 
   /* horários */
   function timeOk(t) { return !(state.date === todayIso && minutes(t) <= nowMin); }
+  /* o mesmo nome de período do quiz da página inicial */
+  function period(t) { var m = minutes(t); return m < 600 ? "Manhã" : m < 720 ? "Fim da manhã" : m < 1140 ? "Fim da tarde" : "Noite"; }
   function renderTimes() {
     var box = $("#times"), empty = $("#timesEmpty");
     if (!state.program) { box.innerHTML = ""; empty.hidden = false; $("#timeHint").textContent = ""; return; }
     empty.hidden = true;
     var times = PROGRAMS[state.program].times;
-    $("#timeHint").textContent = PROGRAMS[state.program].name;
+    $("#timeHint").textContent = PROGRAMS[state.program].name + (state.family && state.program === "kids" ? " · e o Adulto logo depois" : "");
     box.innerHTML = times.map(function (t) {
       var ok = timeOk(t);
-      return '<button class="tm" type="button" data-t="' + t + '" aria-pressed="' + (state.time === t ? "true" : "false") + '"' + (ok ? "" : " disabled") + "><b>" + t + "</b><small>" + (ok ? (minutes(t) < 720 ? "Manhã" : "Noite") : "Já começou hoje") + "</small></button>";
+      return '<button class="tm" type="button" data-t="' + t + '" aria-pressed="' + (state.time === t ? "true" : "false") + '"' + (ok ? "" : " disabled") + "><b>" + t + "</b><small>" + (ok ? period(t) : nowMin < minutes(t) + 60 ? "Já começou" : "Já passou") + "</small></button>";
     }).join("");
     if (anim) gsap.from($$(".tm", box), { y: 18, opacity: 0, duration: 0.6, stagger: 0.06, ease: "expo.out" });
   }
@@ -465,7 +467,9 @@
     if (ready) {
       var lines = ["Olá! Quero agendar uma aula experimental no Studio Evolution BJJ.", ""];
       if (state.name) lines.push("Nome: " + state.name);
-      lines.push("Programa: " + p.name, "Data: " + weekdayLong(d) + ", " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear(), "Horário: " + state.time);
+      lines.push("Turma: " + p.name, "Data: " + weekdayLong(d) + ", " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear(), "Horário: " + state.time);
+      /* do quiz "para mim e uma criança": a aula de adulto logo depois da Kids vai no mesmo pedido */
+      if (state.family && state.program === "kids") lines.push("Também quero fazer a aula de Adulto das " + pad(parseInt(state.time, 10) + 1) + ":00, logo depois.");
       /* o código do ingresso vai junto, para o professor conferir o pedido no painel */
       lines.push("Código do ingresso: " + code);
       btn.href = "https://wa.me/5515996741812?text=" + encodeURIComponent(lines.join("\n"));
@@ -477,7 +481,7 @@
     } else {
       btn.href = "#";
       tk.classList.remove("ready");
-      var missing = !done.program ? "o programa" : !done.date ? "a data" : "o horário";
+      var missing = !done.program ? "a turma" : !done.date ? "a data" : "o horário";
       $("#waNote").textContent = "Falta escolher " + missing + ".";
     }
     paintBar(p, d, n, ready, btn.href);
@@ -491,8 +495,8 @@
     if (d) parts.push(WD_SHORT[d.getDay()].toLowerCase() + " " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1));
     if (state.time) parts.push(parseInt(state.time, 10) + "h");
     $("#agBarStep").textContent = ready ? "Tudo pronto" : "Passo " + (n + 1) + " de 3";
-    $("#agBarSum").textContent = parts.length ? parts.join(" · ") : "Escolha o programa";
-    var label = ready ? "Confirmar" : !p ? "Escolher" : "Continuar", bt = $(".bt", barBtn);
+    $("#agBarSum").textContent = parts.length ? parts.join(" · ") : "Escolha a turma";
+    var label = ready ? "Enviar" : !p ? "Escolher" : "Continuar", bt = $(".bt", barBtn);
     if (bt) { bt.setAttribute("data-t", label); bt.firstChild.textContent = label; } else barBtn.textContent = label;
     barBtn.classList.toggle("ready", ready);
     if (ready) { barBtn.href = href; barBtn.target = "_blank"; }
@@ -517,8 +521,10 @@
   });
   function pop(el) { if (anim && el) gsap.fromTo(el, { scale: 0.96 }, { scale: 1, duration: 0.7, ease: "expo.out" }); }
 
-  /* programa (e horário) vindo de outra página: agendamento.html#kids ou, do quiz, agendamento.html#adulto-19 */
+  /* turma (e horário) vindo de outra página: agendamento.html#kids ou, do quiz, agendamento.html#adulto-19;
+     #familia-18 marca a Kids das 18h e pede também a aula de adulto das 19h */
   var fromHash = /^([a-z]+)(?:-(\d{1,2}))?$/.exec(location.hash.replace("#", ""));
+  if (fromHash && fromHash[1] === "familia") { fromHash[1] = "kids"; state.family = true; }
   if (fromHash && PROGRAMS[fromHash[1]]) {
     selectProgram(fromHash[1], false);
     var wanted = fromHash[2] ? pad(+fromHash[2]) + ":00" : null;

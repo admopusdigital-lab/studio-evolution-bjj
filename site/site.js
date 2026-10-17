@@ -130,7 +130,8 @@
   }
   function navTone() {
     if (!nav || !darks) return;
-    nav.classList.toggle("on-dark", over(40) && !menuOpen);
+    /* o menu aberto é sempre escuro: a barra fica clara por cima dele, nos dois temas */
+    nav.classList.toggle("on-dark", menuOpen || over(40));
     if (waBtn) waBtn.classList.toggle("on-dark", over(window.innerHeight - 50));
   }
   if (nav && darks.length) {
@@ -221,7 +222,9 @@
 
   /* ---------- trilha: tenta tocar ao abrir; quando o navegador bloqueia som automático, começa no primeiro
      toque, clique ou tecla. O botão no canto liga e desliga, a escolha fica guardada, e a música continua
-     do mesmo ponto ao trocar de página. Com economia de dados, só toca se a pessoa pedir. ---------- */
+     do mesmo ponto ao trocar de página. Com economia de dados, só toca se a pessoa pedir.
+     O botão segue a regra do WhatsApp: aparece depois da primeira tela e some perto do convite final,
+     para nunca cobrir um botão ou um texto importante. ---------- */
   Site.music = function (src) {
     if (!src || $(".snd")) return;
     var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
@@ -230,8 +233,17 @@
     a.loop = true; a.preload = "none";
     var btn = document.createElement("button");
     btn.type = "button"; btn.className = "snd";
-    btn.innerHTML = '<span class="snd-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="snd-txt">Som</span>';
+    btn.innerHTML = '<span class="snd-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>';
     document.body.appendChild(btn);
+    var end = $(".cta") || $(".foot");
+    var place = function () {
+      var show = window.scrollY > window.innerHeight * 0.55;
+      if (show && end && end.getBoundingClientRect().top < window.innerHeight * 0.9) show = false;
+      btn.classList.toggle("shown", show);
+    };
+    window.addEventListener("scroll", place, { passive: true });
+    window.addEventListener("resize", place);
+    place();
     function paint(on) {
       btn.classList.toggle("on", on);
       btn.setAttribute("aria-pressed", on ? "true" : "false");

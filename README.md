@@ -14,7 +14,12 @@ Versão publicada (privada): https://claude.ai/artifact/7PbBFQCkuSw1SPbBvzXHuw
 - `site/site.js`: comportamento comum. `Site.boot({ intro, setup, loader })`, aberturas de cinema, fitas cruzadas (faixas pretas de jiu-jitsu), inclinação 3D (`data-tilt3d`, `data-z`, `data-glare`, `data-tilt-touch`, `data-stand`), kanjis em volume e vitrine nos trilhos do celular.
 - `site/faixa3d.js`: a faixa em 3D realista da seção "A faixa" (Three.js r149, carregado só quando a seção se aproxima; sem WebGL, fica o SVG).
 - `site/img/`: fotos e vídeo do Studio, e as texturas do tecido da faixa (`faixa-normal.webp`, `faixa-detalhe.webp`, `faixa-preta.webp`).
-- `site/img/takes/`: cenas curtas do vídeo gravado no Studio (MP4 e WebM, 720x900, câmera um pouco lenta, sem som) e o primeiro quadro de cada uma. Usadas na "Sua primeira aula" e no cartão da turma Adulto; cada take só baixa quando aparece e só toca enquanto está à vista.
+- `site/img/takes/`: cenas curtas dos dois vídeos gravados no Studio (ZV-E10 II, 1080x1920), em MP4 (H.264) e WebM (VP9), sem som, com o quadro de abertura em JPG. Nenhuma cena se repete:
+  - "Sua primeira aula" (1080x1350): `chega` (o professor recebe o aluno), `aquecimento` (o professor demonstra um rolamento), `tecnica` (passagem de guarda), `guarda` e `resenha` (dupla rindo depois do treino). Cada take só baixa quando aparece e só toca enquanto está à vista.
+  - Cartão da turma Adulto: `adulto` (dupla de rosto à mostra, em loop sem emenda).
+  - Abertura no computador, três colunas de 636x1080 em câmera lenta e loop sem emenda: `abertura-1` (a parede com o medalhão, sem o teto), `abertura-2` (a sala clara, com a turma assistindo) e `abertura-3` (treino no escuro). No celular, `abertura-celular` (720px, a sala clara enquadrada no alto, acima do título).
+  - Os quadros dos takes também servem de foto vertical nítida nas aberturas das páginas internas no celular e nos convites finais de Perguntas e Contato.
+  - A cena de pressão (o faixa-roxa por cima do colega careca) ficou de fora de propósito: assusta quem nunca treinou.
 - `tools/faixa-texturas.py`: gera as texturas da faixa a partir de um mapa de altura do tecido (`python3 tools/faixa-texturas.py <pasta>`).
 - `tools/simbolo-true.py`: vetoriza o símbolo da Equipe TRUE a partir de `tools/fontes/logo-true.png` (logo oficial, baixada de bjjtrue.com) e gera `site/img/true-simbolo.svg`. O mesmo desenho vai embutido na seção "Equipe TRUE", onde a rolagem o desenha e enche de ouro.
 - `area-do-aluno-evolution.html`: estudo inicial de direções para a Área do Aluno.
