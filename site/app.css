@@ -9,6 +9,13 @@
 .ar-title em { color: var(--gold-text); }
 .ar-lede { margin-top: 30px; max-width: 46ch; font-size: 19px; color: var(--ink-2); }
 .ar-hero .ctas { margin-top: 40px; }
+/* até a abertura começar (site.js põe .intro-go no <html> quando a fonte de títulos chega, em até 1 s),
+   o conteúdo do topo fica invisível: a troca de fonte com o título já na tela deslocava a página (CLS).
+   Se o script falhar, ele aparece sozinho em 2,5 s. Com movimento reduzido, nada fica escondido */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  html:not(.intro-go) .ar-hero > * { visibility: hidden; animation: intro-safety 0s linear 2.5s forwards; }
+}
+@keyframes intro-safety { to { visibility: visible; } }
 .ar-glow { position: absolute; right: -10vw; top: 10%; width: 60vw; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, color-mix(in oklch, var(--gold) 16%, transparent), transparent 62%); pointer-events: none; }
 .ar-switch { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--rule); border-radius: 999px; margin-top: 30px; }
 .ar-switch a { padding: 9px 18px; border-radius: 999px; font: 500 14px/1 var(--sans); text-decoration: none; color: var(--ink-2); transition: background-color 300ms var(--ease), color 300ms var(--ease); }
@@ -36,7 +43,8 @@
 .dch .try:hover span { text-decoration: underline; text-underline-offset: 4px; }
 @media (min-width: 1024px) {
   .demo-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 6vw; align-items: start; }
-  .demo-dev { top: 0; height: 100vh; background: none; padding-top: 0; }
+  /* o aparelho fica abaixo da barra fixa do site (80 px), para ela nunca cobrir o topo do celular */
+  .demo-dev { top: 80px; height: calc(100vh - 80px); background: none; padding-top: 0; }
   .dch { min-height: 100vh; }
 }
 
@@ -50,17 +58,22 @@
 .ap::after { content: ""; position: absolute; bottom: 6px; left: 50%; z-index: 30; width: 104px; height: 4px; margin-left: -52px; border-radius: 4px; background: color-mix(in oklch, var(--ink) 50%, transparent); }
 .ap-sbar { position: absolute; z-index: 25; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 14px 28px 0; height: 44px; font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .ap-views { position: absolute; inset: 44px 0 0; }
-.ap-view { position: absolute; inset: 0; padding: 6px 18px 90px; overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(14px); transition: opacity 450ms var(--ease), transform 650ms var(--ease), visibility 0s linear 650ms; }
+/* cada tela rola por dentro, como no app de verdade: o fim do conteúdo sempre passa acima do dock
+   (dock de 54 px a 16 px da borda, mais 16 px de folga). A barra de rolagem fica oculta, como no celular;
+   no computador, site.js manda a roda para a tela enquanto ela ainda tem para onde rolar */
+.ap { --dock-h: 54px; --dock-b: 16px; }
+.ap-view { position: absolute; inset: 0; padding: 6px 18px calc(var(--dock-b) + var(--dock-h) + 16px); overflow-x: hidden; overflow-y: auto; scrollbar-width: none; opacity: 0; visibility: hidden; transform: translateY(14px); transition: opacity 450ms var(--ease), transform 650ms var(--ease), visibility 0s linear 650ms; }
+.ap-view::-webkit-scrollbar { display: none; }
 .ap-view.on { opacity: 1; visibility: visible; transform: none; transition: opacity 450ms var(--ease), transform 650ms var(--ease), visibility 0s; }
-.ap-lb { font: 600 10px/1.3 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3); }
+.ap-lb { font: 600 11px/1.3 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3); }
 .ap-lb.gold { color: var(--gold-text); }
 .ap-hi { margin-top: 6px; font: 400 27px/1.05 var(--serif); letter-spacing: -0.02em; }
-.ap-mut { color: var(--ink-2); font-size: 12px; }
+.ap-mut { color: var(--ink-2); font-size: 12.5px; }
 .ap-card { position: relative; margin-top: 16px; padding: 16px; background: var(--paper-2); border-top: 1px solid var(--gold); }
 .ap-big { display: flex; align-items: flex-end; gap: 10px; margin-top: 8px; }
 .ap-big b { font: 400 62px/0.8 var(--serif); letter-spacing: -0.04em; }
 .ap-big span { padding-bottom: 2px; font: italic 400 18px/1.1 var(--serif); }
-.ap-sub { margin-top: 8px; color: var(--ink-2); font-size: 12px; }
+.ap-sub { margin-top: 8px; color: var(--ink-2); font-size: 12.5px; }
 .ap-dots { display: flex; gap: 4px; margin-top: 12px; }
 .ap-dots i { flex: 1; height: 4px; background: var(--rule); transition: background-color 400ms var(--ease); }
 .ap-dots i.on { background: var(--ink); }
@@ -81,8 +94,8 @@
 .ap-row .r { display: flex; align-items: center; gap: 4px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .ap-row .r .ic { width: 13px; height: 13px; color: var(--gold-text); }
 .ap-row .ok { color: var(--ok); }
-.ap-dock { position: absolute; left: 10px; right: 10px; bottom: 16px; z-index: 20; height: 54px; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--glass); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 12px 26px -16px oklch(0.15 0.01 75 / 0.5); }
-.ap-dock button { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; border: 0; background: none; color: var(--ink-3); font: 400 9.5px/1.2 var(--sans); cursor: pointer; transition: color 300ms var(--ease); }
+.ap-dock { position: absolute; left: 10px; right: 10px; bottom: var(--dock-b); z-index: 20; height: var(--dock-h); display: grid; grid-template-columns: repeat(4, 1fr); background: var(--glass); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 12px 26px -16px oklch(0.15 0.01 75 / 0.5); }
+.ap-dock button { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; border: 0; background: none; color: var(--ink-3); font: 400 10.5px/1.2 var(--sans); cursor: pointer; transition: color 300ms var(--ease); }
 .ap-dock .ic { width: 18px; height: 18px; }
 .ap-dock button[aria-current="true"] { color: var(--ink); font-weight: 600; }
 .ap-dock button[aria-current="true"]::before { content: ""; position: absolute; top: -1px; width: 18px; height: 2px; background: var(--gold); }
@@ -120,7 +133,7 @@
 .ap-cover .play { position: absolute; z-index: 2; left: 12px; bottom: 14px; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: oklch(0.98 0.004 95); color: oklch(0.2 0.01 75); transition: transform 300ms var(--ease); }
 .ap-cover:hover .play { transform: scale(1.08); }
 .ap-cover .play svg { width: 14px; height: 14px; margin-left: 2px; fill: currentColor; }
-.ap-cover .dur { position: absolute; z-index: 2; right: 12px; bottom: 18px; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: oklch(0.98 0.004 95); }
+.ap-cover .dur { position: absolute; z-index: 2; right: 12px; bottom: 16px; padding: 2px 6px; border-radius: 4px; background: oklch(0 0 0 / 0.55); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: oklch(0.98 0.004 95); }  /* fundo próprio: legível sobre qualquer foto */
 .ap-cover .pg { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 3px; background: oklch(1 0 0 / 0.35); }
 .ap-cover .pg span { display: block; height: 100%; background: var(--gold); transition: width 300ms linear; }
 .ap-ttl { margin-top: 10px; font: 400 21px/1.1 var(--serif); }
@@ -149,7 +162,8 @@
 .ap-trio span { display: block; margin-top: 6px; font-size: 10.5px; line-height: 1.3; color: var(--ink-2); }
 .ap-comp { margin-top: 10px; }
 .ap-comp li { display: flex; align-items: center; gap: 8px; padding-block: 7px; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-2); }
-.ap-comp li .ic { width: 14px; height: 14px; stroke-width: 2.2; color: var(--rule); }
+/* conquistada e a conquistar diferem na forma (check cheio x círculo vazio), não só na cor */
+.ap-comp li .ic { width: 14px; height: 14px; stroke-width: 2.2; color: var(--ink-3); }
 .ap-comp li.got { color: var(--ink); }
 .ap-comp li.got .ic { color: var(--ok); }
 
@@ -162,7 +176,7 @@
 .ap-note { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 12px; border-radius: 18px; background: oklch(0.98 0.004 95 / 0.18); -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2); opacity: 0; transform: translateY(-12px) scale(0.98); transition: opacity 500ms var(--ease), transform 700ms var(--ease); }
 .ap-note.on { opacity: 1; transform: none; }
 .ap-note .ico { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: oklch(0.14 0.006 75); }
-.ap-note .ico span { width: 22px; aspect-ratio: 16 / 5; background: var(--cine-logo); background-size: 300% 100%; -webkit-mask: url("img/logo-evolution-refinada.png") center / contain no-repeat; mask: url("img/logo-evolution-refinada.png") center / contain no-repeat; }
+.ap-note .ico span { width: 22px; aspect-ratio: 16 / 5; background: var(--cine-logo); background-size: 300% 100%; -webkit-mask: url("img/logo-evolution-mask.webp") center / contain no-repeat; mask: url("img/logo-evolution-mask.webp") center / contain no-repeat; }
 .ap-note .hd { display: flex; justify-content: space-between; gap: 6px; font-size: 10.5px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.08em; }
 .ap-note b { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 600; }
 .ap-note p { font-size: 12px; line-height: 1.35; opacity: 0.92; }
@@ -198,8 +212,11 @@
 .classes button b { font: 400 22px/1 var(--serif); font-variant-numeric: tabular-nums; }
 .classes button span { font-size: 12.5px; color: var(--ink-2); }
 .classes button small { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+/* aula encerrada: contorno e tinta mais fracos, sem opacidade (que apagava o texto abaixo de 3:1) */
+.classes button.past { background: transparent; box-shadow: inset 0 0 0 1px var(--rule); }
+.classes button.past b, .classes button.past span { color: var(--ink-2); }
+.classes button.past small { color: var(--ink-3); }
 .classes button[aria-pressed="true"] { background: var(--paper); box-shadow: inset 0 0 0 1px var(--gold); }
-.classes button.past { opacity: 0.5; }
 .room { padding: 18px 20px; background: var(--paper-2); border-top: 1px solid var(--gold); }
 .room-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .room-h h4 { font: 400 26px/1.05 var(--serif); letter-spacing: -0.02em; }
@@ -217,6 +234,8 @@
 .pill-s.in { background: color-mix(in oklch, var(--ok) 15%, transparent); color: var(--ok); }
 .pill-s.warn { background: color-mix(in oklch, var(--warn) 14%, transparent); color: var(--warn); }
 .pill-s.gold { background: color-mix(in oklch, var(--gold) 22%, transparent); color: var(--gold-text); }
+/* no Claro, o ouro de texto sobre o fundo dourado da pílula fica abaixo de 4,5:1: um tom mais escuro só aqui */
+:root:not([data-look="black"]) .pill-s.gold { color: oklch(0.46 0.10 70); }
 .roster li.arrive { animation: arrive 900ms var(--ease); }
 @keyframes arrive { from { background: color-mix(in oklch, var(--ok) 12%, transparent); } }
 .tbl { width: 100%; margin-top: 18px; border-collapse: collapse; font-size: 13px; }
@@ -243,14 +262,16 @@
 .lead b { font-weight: 500; }
 .lead small { display: block; font-size: 12px; color: var(--ink-3); }
 .lead .acts { display: flex; align-items: center; gap: 8px; }
-.lead select { height: 32px; padding: 0 8px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); font: 500 12px/1 var(--sans); border-radius: 6px; }
 .mini-btn { height: 32px; padding: 0 12px; border: 0; border-radius: 6px; background: var(--ink); color: var(--paper); font: 500 12px/1 var(--sans); cursor: pointer; }
 .mini-btn.wa { background: var(--wa); color: oklch(0.16 0.02 152); }
 .msg { margin-top: 16px; padding: 14px 16px; border-left: 2px solid var(--wa); background: var(--paper-2); font-size: 13px; color: var(--ink-2); }
 .msg b { color: var(--ink); font-weight: 500; }
-.dash-toast { position: absolute; z-index: 10; right: 20px; bottom: 20px; display: flex; align-items: center; gap: 10px; max-width: 360px; padding: 12px 16px; border-radius: 12px; background: var(--ink); color: var(--paper); font-size: 13px; box-shadow: var(--shadow-lg); transform: translateY(140%); opacity: 0; transition: transform 600ms var(--ease), opacity 400ms; }
-.dash-toast.on { transform: none; opacity: 1; }
-.dash-toast .ic { width: 18px; height: 18px; color: var(--gold); stroke-width: 2; }
+/* aviso do painel: preso à janela, não ao painel (que passa da altura da tela). O script do painel o move
+   para o fim do <body>; por isso a fonte é declarada aqui, e as cores vêm dos tokens do tema */
+.dash-toast { position: fixed; z-index: 60; right: max(24px, env(safe-area-inset-right, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 10px; max-width: min(380px, calc(100vw - 32px)); padding: 12px 16px; border-radius: 12px; background: var(--ink); color: var(--paper); font: 400 13px/1.45 var(--sans); box-shadow: var(--shadow-lg); transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; transition: transform 600ms var(--ease), opacity 400ms; }
+.dash-toast.on { transform: none; opacity: 1; pointer-events: auto; }
+.dash-toast .ic { width: 18px; height: 18px; flex-shrink: 0; color: var(--gold); stroke-width: 2; }
+@media (max-width: 600px) { .dash-toast { left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-width: none; } }
 
 /* ---------- tela da TV (modo tatame) ---------- */
 .tv { position: relative; width: 100%; max-width: 1120px; margin-inline: auto; }
@@ -280,7 +301,7 @@
 .tv-list small { font-size: 1.2cqi; color: var(--cine-fg-3); font-variant-numeric: tabular-nums; }
 .tv-list li.new { animation: tv-new 900ms var(--ease) both; }
 @keyframes tv-new { from { opacity: 0; transform: translateX(3cqi); } }
-.tv-logo { position: absolute; right: 5.4cqi; bottom: 3cqi; width: 12cqi; aspect-ratio: 16 / 5; background: var(--cine-logo); background-size: 300% 100%; -webkit-mask: url("img/logo-evolution-refinada.png") center / contain no-repeat; mask: url("img/logo-evolution-refinada.png") center / contain no-repeat; opacity: 0.9; }
+.tv-logo { position: absolute; right: 5.4cqi; bottom: 3cqi; width: 12cqi; aspect-ratio: 16 / 5; background: var(--cine-logo); background-size: 300% 100%; -webkit-mask: url("img/logo-evolution-mask.webp") center / contain no-repeat; mask: url("img/logo-evolution-mask.webp") center / contain no-repeat; opacity: 0.9; }
 
 /* ---------- antes e depois ---------- */
 .diff { padding-block: clamp(90px, 10vw, 150px); }
@@ -393,17 +414,18 @@
 .ap-view.lockv { top: -44px; padding: 0; }
 .ap-view.lockv .ap-lock { padding-top: 112px; }
 .ap-view.quiz .hide-q { display: none; }
-.ap-quiz .ap-lb { margin-bottom: 6px; font: 600 10px/1.3 var(--sans); }
+.ap-quiz .ap-lb { margin-bottom: 6px; font: 600 11px/1.3 var(--sans); }
 .ap-quiz p.q { font-size: 15px; }
 .ap-quiz button { padding: 9px 12px; }
 
 /* no celular de verdade: abas no lugar da rolagem guiada, e o aparelho grande o bastante para ler */
 .demo-tabs { display: none; }
 @media (max-width: 1023px) {
-  .demo-tabs { display: flex; gap: 6px; margin-top: 28px; margin-left: calc(-1 * var(--gut)); margin-right: calc(-1 * var(--gut-r)); padding-inline: var(--gut) var(--gut-r); overflow-x: auto; scrollbar-width: none; }
+  /* 6 px em cima e embaixo: o anel de foco (3 px de folga + 2 px de linha) não é cortado pela rolagem lateral */
+  .demo-tabs { display: flex; gap: 6px; margin-top: 22px; margin-left: calc(-1 * var(--gut)); margin-right: calc(-1 * var(--gut-r)); padding: 6px var(--gut-r) 6px var(--gut); overflow-x: auto; scrollbar-width: none; }
   .demo-tabs::-webkit-scrollbar { display: none; }
   .demo-tabs button { flex-shrink: 0; padding: 11px 16px; border: 1px solid var(--rule); border-radius: 999px; background: none; color: var(--ink-2); font: 500 14px/1 var(--sans); cursor: pointer; transition: background-color 300ms var(--ease), color 300ms var(--ease), border-color 300ms var(--ease); }
-  .demo-tabs button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .demo-tabs button[aria-selected="true"], .demo-tabs button[aria-current="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
   .demo-dev { position: relative; height: auto; padding-block: 26px 6px; background: none; }
   .dch { display: none; min-height: 0; padding-block: 18px 0; }
   .dch.on { display: flex; animation: dch-in 700ms var(--ease) both; }
@@ -428,6 +450,7 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 .kpi .go-s .ic { width: 12px; height: 12px; stroke-width: 2.2; }
 .room-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .room-tools label { font-size: 12px; color: var(--ink-3); }
+/* .sel vale também para o status dos interessados (antes, ".lead select" o encolhia para 32 px) */
 .sel { height: 38px; padding: 0 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--field); color: var(--ink); font: 500 12.5px/1 var(--sans); }
 .room .ap-btn { height: 38px; }
 .cap-bar { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; margin-top: 14px; }
@@ -480,15 +503,24 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
   .room { padding: 16px 14px; }
 }
 
-/* celular: cada aluno vira um cartão, com a ação sempre à vista (sem rolar a tabela para o lado) */
+/* rótulo de coluna dentro da célula (<small class="cl">): só aparece quando a linha vira cartão */
+.tbl small.cl { display: none; }
+/* celular: cada aluno vira um cartão, com a ação sempre à vista (sem rolar a tabela para o lado).
+   O cabeçalho sai da tela, mas continua lido como cabeçalho de coluna */
 @media (max-width: 600px) {
   .tbl { min-width: 0; }
-  .tbl thead { display: none; }
+  .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
   .tbl tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 12px; padding-block: 12px; border-bottom: 1px solid var(--rule); }
   .tbl td { padding: 0; border: 0; }
   .tbl td:nth-child(2) { grid-column: 1; grid-row: 2; padding-left: 40px; }
-  .tbl td:nth-child(3) { grid-column: 2; grid-row: 1; text-align: right; font-size: 12px; color: var(--ink-3); }
+  .tbl td:nth-child(3) { grid-column: 2; grid-row: 1; text-align: right; }
   .tbl td.act { grid-column: 2; grid-row: 2; }
+  .tbl small.cl { display: block; }
+  /* Alunos: "Última aula" é detalhe, em letra pequena */
+  #tbl td:nth-child(3) { font-size: 12px; color: var(--ink-3); }
+  /* Financeiro: o valor é dado principal, e a pílula de situação quebra a linha em vez de cobrir o botão */
+  #finTbl td:nth-child(2) .pill-s { display: inline-block; white-space: normal; }
+  #finTbl td:nth-child(3) { font: 500 14px/1 var(--sans); color: var(--ink); }
 }
 
 /* modo tatame */
@@ -528,8 +560,12 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
    e o celular da aluna conectado à TV do tatame
    ========================================================================= */
 
-/* celular: o que dá para tocar pulsa de leve; o vidro tem reflexo; a meta batida acende */
-.ap .pulse { animation: hot 2.2s var(--ease) infinite; }
+/* celular: o que dá para tocar pulsa de leve; o vidro tem reflexo; a meta batida acende.
+   O pulso só roda na tela aberta e com o aparelho à vista (site.js liga .live no .device): parado fora
+   da tela, ele ocupava a CPU à toa. O anel continua em box-shadow, que o overflow dos botões não corta */
+.device.live .ap .pulse { animation: hot 2.2s var(--ease) infinite; }
+.device .ap-view:not(.on) .pulse { animation: none; }
+.device:not(.live) .ap-code b.caret::after, .device .ap-view:not(.on) .ap-code b.caret::after { animation: none; }
 @keyframes hot { 0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--gold) 65%, transparent); } 70%, 100% { box-shadow: 0 0 0 12px color-mix(in oklch, var(--gold) 0%, transparent); } }
 .ap-glare { position: absolute; inset: 0; z-index: 28; pointer-events: none; border-radius: inherit; mix-blend-mode: soft-light;
   background: linear-gradient(118deg, oklch(1 0 0 / 0.2) 0%, oklch(1 0 0 / 0) 26%, oklch(1 0 0 / 0) 74%, oklch(1 0 0 / 0.08) 100%) var(--gx, 30%) var(--gy, 30%) / 160% 160%; }
@@ -549,7 +585,7 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
   .demo-rail button span { display: none; }
   .demo-rail button:hover { color: var(--ink); }
   .demo-rail button[aria-current="true"] { background: var(--ink); color: var(--paper); }
-  .demo-rail button[aria-current="true"] b { color: var(--gold); }
+  .demo-rail button[aria-current="true"] b { color: var(--inv-accent); }  /* ouro feito para fundo invertido: legível nos dois temas */
   .demo-rail button[aria-current="true"] span { display: inline; }
 }
 
@@ -561,8 +597,9 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 .kpi .spark i.today { background: var(--gold); }
 
 /* ficha do aluno: abre por cima da lista, com o mapa de presenças */
-.tbl tbody tr { cursor: pointer; transition: background-color 250ms var(--ease); }
-.tbl tbody tr:hover { background: color-mix(in oklch, var(--gold) 8%, transparent); }
+/* só a tabela de Alunos abre a ficha pela linha; as linhas do Financeiro não têm ação */
+#tbl tbody tr { cursor: pointer; transition: background-color 250ms var(--ease); }
+#tbl tbody tr:hover { background: color-mix(in oklch, var(--gold) 8%, transparent); }
 .nm-btn { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .nm-btn:hover { text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
 .drawer-scrim { position: absolute; inset: 0; z-index: 8; background: color-mix(in oklch, var(--ink) 24%, transparent); opacity: 0; visibility: hidden; transition: opacity 450ms var(--ease), visibility 0s linear 450ms; }
@@ -592,11 +629,16 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 .heat .m, .heat .d { font-size: 10px; line-height: 1; color: var(--ink-3); }
 .heat i { aspect-ratio: 1; border-radius: 3px; background: color-mix(in oklch, var(--ink) 8%, transparent); }
 .heat i.y { background: var(--gold); }
-.heat i.t { background: transparent; box-shadow: inset 0 0 0 1.5px var(--gold); animation: hot 2.2s var(--ease) infinite; }
+.heat i.t { background: transparent; outline: 1.5px solid var(--gold); outline-offset: -1.5px; animation: hot 2.2s var(--ease) infinite; }  /* o contorno fica no outline: o pulso anima o box-shadow por fora */
+.drawer:not(.on) .heat i.t { animation: none; }  /* ficha fechada: o pulso de hoje para */
 .heat-leg { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: 11.5px; color: var(--ink-3); }
 .heat-leg i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 2px; vertical-align: -1px; background: color-mix(in oklch, var(--ink) 8%, transparent); }
 .heat-leg i.y { background: var(--gold); }
 .heat-leg i.t { background: transparent; box-shadow: inset 0 0 0 1.5px var(--gold); }
+/* no Claro, o ouro claro some contra a célula vazia (1,9:1): 'veio' e 'hoje' usam o ouro de texto */
+:root:not([data-look="black"]) .heat i.y, :root:not([data-look="black"]) .heat-leg i.y { background: var(--gold-text); }
+:root:not([data-look="black"]) .heat i.t { outline-color: var(--gold-text); }
+:root:not([data-look="black"]) .heat-leg i.t { box-shadow: inset 0 0 0 1.5px var(--gold-text); }
 .dr-comp { display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
 .dr-comp .bar { flex: 1; height: 4px; background: var(--rule); }
 .dr-comp .bar i { display: block; height: 100%; background: var(--gold); }
@@ -637,14 +679,33 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 .tv-phone figcaption { max-width: 24ch; text-align: center; font-size: 13px; line-height: 1.4; color: var(--ink-3); }
 @media (max-width: 999px) { .tv-phone .device { --z: 0.66; } }
 /* o celular de verdade está no modo claro: ele acende no meio do capítulo escuro */
-.tv-phone .ap { --paper: oklch(0.982 0.004 95); --paper-2: oklch(0.952 0.008 88); --ink: oklch(0.2 0.01 75); --ink-2: oklch(0.42 0.012 75); --ink-3: oklch(0.58 0.01 75);
+.tv-phone .ap { --paper: oklch(0.982 0.004 95); --paper-2: oklch(0.952 0.008 88); --ink: oklch(0.2 0.01 75); --ink-2: oklch(0.42 0.012 75); --ink-3: oklch(0.50 0.01 75);
   --rule: oklch(0.86 0.012 85); --gold: oklch(0.72 0.11 82); --gold-text: oklch(0.5 0.095 72); --btn-bg: oklch(0.2 0.01 75); --btn-fg: oklch(0.982 0.004 95);
-  --glass: color-mix(in oklch, white 84%, transparent); --field: white; --ok: oklch(0.55 0.13 150); color-scheme: light; }
+  --glass: color-mix(in oklch, white 84%, transparent); --field: white; --ok: oklch(0.45 0.13 150); color-scheme: light; }
 .tv-code b { transition: color 250ms var(--ease), box-shadow 250ms var(--ease); }
 .tv-code b.hit { color: var(--cine-gold); box-shadow: inset 0 0 0 1px var(--cine-gold), 0 0 3cqi -0.6cqi color-mix(in oklch, var(--cine-gold) 60%, transparent); }
 .tv-list li.me, .tv-list li.me small { color: var(--cine-gold); }
 .tv-list li.me .av { color: var(--cine-gold); box-shadow: inset 0 0 0 1px var(--cine-gold); }
+
+/* a tela que está saindo (fade de 650 ms) fica por cima e não pode receber o toque da tela nova */
+.ap-view:not(.on), .dv:not(.on) { pointer-events: none; }
+
+/* utilitários do celular simulado, para caber mais sem rolar */
+/* link de texto (ex.: liberar a vaga), com 44 px de toque */
+.ap-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; border: 0; background: none; color: var(--ink-2); font: 500 12.5px/1.2 var(--sans); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; cursor: pointer; }
+.ap-link:hover { color: var(--ink); text-decoration-color: var(--gold); }
+/* botão e link na mesma linha: o botão ocupa o resto */
+.ap-btnrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.ap-btnrow .ap-btn { flex: 1; min-width: 0; margin-top: 0; }
+.ap-btnrow .ap-link { flex-shrink: 0; }
+/* uma linha de resumo no lugar de um bloco que terminou (ex.: "Quiz feito · movimento estudado") */
+.ap-doneline { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; background: var(--paper-2); border-top: 1px solid var(--gold); font-size: 12.5px; color: var(--ink-2); }
+.ap-doneline .ic { width: 14px; height: 14px; stroke-width: 2.2; color: var(--ok); }
+.ap-doneline b { color: var(--ink); font-weight: 600; }
+
+/* reduzir movimento: as regras de troca de tela (.on) e as animações novas vencem sem depender da ordem */
 @media (prefers-reduced-motion: reduce) {
-  .ap .pulse, .heat i.t, .ap-goal.burst i, .hist li.new, .funnel b.bump { animation: none; }
-  .drawer, .drawer-scrim { transition: none; }
+  .ap-view, .ap-view.on, .dv, .dv.on, .drawer, .drawer.on, .drawer-scrim, .drawer-scrim.on { transition: none !important; }
+  .msg, .dch.on, .gcard.got, .lead.out, .drawer.on .heat i { animation: none !important; }
+  .ap .pulse, .heat i.t, .ap-goal.burst i, .hist li.new, .funnel b.bump { animation: none !important; }
 }

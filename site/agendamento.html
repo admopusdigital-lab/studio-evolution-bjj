@@ -20,9 +20,9 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
-<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
 <link rel="stylesheet" href="site.css">
 <style>
 /* Agendamento: abertura de cinema com os três passos acesos em ouro, programas em cartazes, datas e
@@ -201,7 +201,7 @@
       <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
     </nav>
     <div class="nav-right">
-      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
       <div class="nav-cta">
         <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
@@ -467,6 +467,8 @@
       var lines = ["Olá! Quero agendar uma aula experimental no Studio Evolution BJJ.", ""];
       if (state.name) lines.push("Nome: " + state.name);
       lines.push("Programa: " + p.name, "Data: " + weekdayLong(d) + ", " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear(), "Horário: " + state.time);
+      /* o código do ingresso vai junto, para o professor conferir o pedido no painel */
+      lines.push("Código do ingresso: " + code);
       btn.href = "https://wa.me/5515996741812?text=" + encodeURIComponent(lines.join("\n"));
       $("#waNote").textContent = "Tudo pronto. O WhatsApp abre com a mensagem preenchida.";
       if (!tk.classList.contains("ready")) {

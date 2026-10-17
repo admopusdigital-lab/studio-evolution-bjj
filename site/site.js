@@ -32,14 +32,13 @@
 
   /* ---------- Versão Black (padrão) / Claro ---------- */
   var lookBtn = $("#lookBtn"), lookTxt = $("#lookTxt");
+  /* o nome do botão é o próprio texto ("Versão clara"): quem usa comando de voz fala o que vê.
+     Onde não cabe, o texto sai da tela pelo CSS, mas continua sendo o nome. */
+  if (lookBtn) { lookBtn.removeAttribute("aria-pressed"); lookBtn.removeAttribute("aria-label"); }
   function paintLook(l) {
     var black = l === "black";
     root.setAttribute("data-look", l);
-    if (lookBtn) {
-      lookBtn.setAttribute("aria-pressed", black ? "true" : "false");
-      lookBtn.setAttribute("aria-label", black ? "Mudar para a versão clara" : "Mudar para a versão black");
-    }
-    if (lookTxt) lookTxt.textContent = black ? "Claro" : "Black";
+    if (lookTxt) lookTxt.textContent = black ? "Versão clara" : "Versão black";
     /* sem armazenamento no navegador, a versão clara segue de página em página pelo #claro */
     $$("a[data-int]").forEach(function (a) {
       var base = a.getAttribute("data-base") || a.getAttribute("href");
@@ -334,14 +333,45 @@
     });
   }
 
-  /* rola até um elemento descontando a barra fixa: Lenis no computador, rolagem nativa no celular */
-  Site.scrollTo = function (target, offset) {
-    var el = typeof target === "string" ? $(target) : target;
-    if (!el) return;
+  /* rola até um elemento descontando a barra fixa: Lenis no computador, rolagem nativa no celular.
+     cb (opcional) roda uma vez quando a rolagem termina; se nada avisar o fim, roda em 1,7 s */
+  Site.scrollTo = function (target, offset, cb) {
+    var el = typeof target === "string" ? $(target) : target, done = false;
+    var end = function () { if (done) return; done = true; window.removeEventListener("scrollend", end); if (cb) cb(); };
+    if (!el) { end(); return; }
     offset = offset === undefined ? -90 : offset;
-    if (Site.lenis) Site.lenis.scrollTo(el, { offset: offset, duration: 1.4 });
-    else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: reduce ? "auto" : "smooth" });
+    var top = el.getBoundingClientRect().top + window.scrollY + offset;
+    if (Math.abs(top - window.scrollY) < 2) { end(); return; }
+    if (cb) setTimeout(end, 1700);
+    if (Site.lenis) { Site.lenis.scrollTo(el, { offset: offset, duration: 1.4, onComplete: end }); return; }
+    if (cb && "onscrollend" in window) window.addEventListener("scrollend", end);
+    window.scrollTo({ top: top, behavior: reduce ? "auto" : "smooth" });
   };
+
+  /* move o foco para el sem deixá-lo cair no body. Regra: quem esconde ou troca o elemento focado
+     chama isto com o próximo lugar. Título, célula ou nota ganham tabindex=-1 (focáveis só pelo script).
+     opts vai direto para focus() (ex.: { preventScroll: true }). Devolve true se o foco chegou lá:
+     um elemento escondido ou dentro de [inert] não recebe foco, então tire o inert antes de chamar. */
+  Site.focusSoft = function (el, opts) {
+    el = typeof el === "string" ? $(el) : el;
+    if (!el) return false;
+    if (!el.matches("a[href], button, input, select, textarea, summary, [tabindex], [contenteditable]")) el.setAttribute("tabindex", "-1");
+    el.focus(opts);
+    return document.activeElement === el;
+  };
+
+  /* animações sem fim (pulsos do celular, brilho da logo do rodapé) só rodam com o elemento na tela:
+     .live liga e desliga a animação pelo CSS. Sem IntersectionObserver, ficam sempre ligadas */
+  function liveFx() {
+    var els = $$(".device, .foot-logo-wrap, [data-live]");
+    if (!els.length) return;
+    if (!("IntersectionObserver" in window)) { els.forEach(function (el) { el.classList.add("live"); }); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { e.target.classList.toggle("live", e.isIntersecting); });
+    }, { rootMargin: "80px 0px" });
+    els.forEach(function (el) { io.observe(el); });
+  }
+  liveFx();
 
   /* WhatsApp: ícone redondo no celular; aparece depois da primeira tela e some perto do convite final,
      para nunca ficar por cima de um botão ou de um texto importante */
@@ -418,6 +448,7 @@
     });
     if (reduce || !window.gsap || !window.ScrollTrigger) {
       root.classList.remove("entering", "entering-img");
+      root.classList.add("intro-go");
       if (loader) loader.remove();
       $$("video[autoplay]").forEach(function (v) { if (reduce) { v.removeAttribute("autoplay"); v.pause(); v.controls = true; } });
       if (opts.basic) opts.basic(Site);
@@ -433,7 +464,15 @@
       /* rolagem suave só com mouse e trackpad; no toque, a rolagem nativa do celular é mais leve e natural */
       var lenis = null;
       if (window.Lenis && fine) {
-        lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 0.95 });
+        /* uma tela que rola por dentro (as telas do celular simulado, ou [data-scroll-own]) recebe a roda
+           enquanto ainda tem para onde rolar; no fim dela, a página volta a rolar suave */
+        var ownScroll = function (v) {
+          var t = v.event && v.event.target, dy = v.deltaY;
+          var box = dy && t && t.closest ? t.closest(".ap-view, [data-scroll-own]") : null;
+          if (!box || box.scrollHeight <= box.clientHeight + 1) return true;
+          return !(dy > 0 ? box.scrollTop + box.clientHeight < box.scrollHeight - 1 : box.scrollTop > 0);
+        };
+        lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 0.95, virtualScroll: ownScroll });
         lenis.on("scroll", ScrollTrigger.update);
         gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
         gsap.ticker.lagSmoothing(0);
@@ -508,7 +547,12 @@
       pointerFx(lenis);
       bandsFx(lenis);
 
-      var play = function () { tl.play(0); };
+      /* a abertura só começa com a fonte de títulos pronta (ou depois de 1 s): se ela chega com o título
+         já na tela, as linhas mudam de largura e a página salta (CLS). .intro-go mostra o topo das áreas do app */
+      var fontsIn = document.fonts && document.fonts.load ?
+        Promise.race([document.fonts.load('400 1em "Archivo Black"'), new Promise(function (r) { setTimeout(r, 1000); })]) : Promise.resolve();
+      var go = function () { root.classList.add("intro-go"); tl.play(0); };
+      var play = function () { fontsIn.then(go, go); };
       session("evo-seen", "1");
       if (loader && opts.loader && getComputedStyle(loader).display !== "none") {
         if (lenis) lenis.stop();
@@ -542,6 +586,7 @@
       window.addEventListener("load", function () { ScrollTrigger.refresh(); });
     } catch (err) {
       root.classList.remove("entering", "entering-img");
+      root.classList.add("intro-go");
       if (loader && loader.parentNode) loader.remove();
       if (window.gsap) gsap.set(".wi, .fw, .nav-in, [data-in], [data-in-media]", { clearProps: "all" });
       console.error(err);

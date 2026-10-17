@@ -19,9 +19,9 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
-<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
 <link rel="stylesheet" href="site.css">
 <style>
 /* Página inicial, contada como uma aula: abertura de cinema com o vídeo da faixa, o lema da Equipe TRUE,
@@ -466,7 +466,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
     </nav>
     <div class="nav-right">
-      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
       <div class="nav-cta">
         <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
@@ -747,7 +747,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       <div>
         <p class="label">Horários</p>
         <h2 class="h2 split" id="t-hor">Sempre tem uma turma <em>esperando você</em>.</h2>
-        <p class="lead">Treinos de manhã, no fim da manhã e à noite. Quem já é aluno confirma a presença pelo app e garante a vaga no tatame.</p>
+        <p class="lead">Treinos de manhã, no fim da manhã e à noite. Quem já é aluno confirma a vaga pelo app e garante o lugar no tatame.</p>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
       </div>
       <div>
@@ -775,20 +775,20 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <p class="label">App do aluno</p>
         <h2 class="h2 split" id="t-app">Sua evolução, <em>no celular</em>.</h2>
         <ul class="features">
-          <li><svg class="ic"><use href="#i-check"/></svg><div><b>Presença em um toque</b><span>Confirme a vaga na aula do dia antes de sair de casa.</span></div></li>
-          <li><svg class="ic"><use href="#i-code"/></svg><div><b>Check-in com código</b><span>O professor mostra o código e a presença conta na hora.</span></div></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><div><b>Vaga em um toque</b><span>Confirme a vaga na aula do dia antes de sair de casa.</span></div></li>
+          <li><svg class="ic"><use href="#i-code"/></svg><div><b>Presença com código</b><span>O professor mostra o código e a presença conta na hora.</span></div></li>
           <li><svg class="ic"><use href="#i-play"/></svg><div><b>Movimentos da sua faixa</b><span>Vídeos das técnicas, com quiz no fim de cada uma.</span></div></li>
-          <li><svg class="ic"><use href="#i-belt"/></svg><div><b>Faixa e graus</b><span>Frequência, sequência de semanas e conquistas.</span></div></li>
+          <li><svg class="ic"><use href="#i-belt"/></svg><div><b>Faixa e graus</b><span>Frequência, semanas seguidas e a faixa com os graus.</span></div></li>
         </ul>
         <a class="link" href="area-do-aluno.html" data-int>Ver as telas da Área do Aluno</a>
       </div>
       <div class="stage" id="stage">
         <span class="kj" aria-hidden="true">道</span>
-        <div class="chip c1" data-depth="60"><span class="ok"><svg class="ic"><use href="#i-check"/></svg></span><span>Presença confirmada<small>Adulto · hoje, 19h</small></span></div>
+        <div class="chip c1" data-depth="60"><span class="ok"><svg class="ic"><use href="#i-check"/></svg></span><span>Vaga confirmada<small>Adulto · hoje, 19h</small></span></div>
         <div class="chip c2" data-depth="90"><span class="beltchip"></span><span>Faixa azul<small>2 de 4 graus</small></span></div>
         <div class="chip c3" data-depth="40"><span style="font:400 26px/1 var(--serif)">2/3</span><span>Treinos na semana<small>meta de 3</small></span></div>
         <div class="tiltwrap" id="tiltwrap">
-          <div class="phone" id="phone" role="img" aria-label="Tela inicial do app do aluno com a aula das 19h e o botão de confirmar presença">
+          <div class="phone" id="phone" role="img" aria-label="Tela inicial do app do aluno com a aula das 19h e o botão de confirmar a vaga">
             <div class="screen">
               <div class="sbar"><span>18:12</span><span>5G</span></div>
               <div class="scr">
@@ -799,13 +799,13 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
                   <div class="big"><b>19h</b><span>Adulto</span></div>
                   <p class="sub">Começa em 48 min · 7 de 10 vagas</p>
                   <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
-                  <div class="pbtn"><svg class="ic"><use href="#i-check"/></svg>Confirmar presença</div>
+                  <div class="pbtn"><svg class="ic"><use href="#i-check"/></svg>Confirmar vaga</div>
                 </div>
                 <p class="lb" style="margin-top:18px">Sua semana · 2 de 3</p>
                 <div class="wk"><div><span>Seg</span><b>12</b><i></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b></div></div>
                 <div class="prow" style="margin-top:10px"><span>Mensalidade de outubro</span><span>Em dia</span></div>
               </div>
-              <div class="dock"><span class="on"><svg class="ic"><use href="#i-home"/></svg>Início</span><span><svg class="ic"><use href="#i-play"/></svg>Movimentos</span><span><svg class="ic"><use href="#i-check"/></svg>Presença</span><span><svg class="ic"><use href="#i-belt"/></svg>Perfil</span></div>
+              <div class="dock"><span class="on"><svg class="ic"><use href="#i-home"/></svg>Início</span><span><svg class="ic"><use href="#i-check"/></svg>Presença</span><span><svg class="ic"><use href="#i-play"/></svg>Movimentos</span><span><svg class="ic"><use href="#i-belt"/></svg>Perfil</span></div>
             </div>
           </div>
         </div>
