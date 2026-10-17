@@ -20,9 +20,8 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
-<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="app.css">
 <style>
@@ -74,6 +73,10 @@
 .ap-quiz .fb:empty { margin: 0; }
 .ap-list .pill-s { display: inline-block; margin-left: 6px; padding: 2px 7px; vertical-align: 1px; }
 
+/* Perfil: "5 de 12" no trio, com o "de 12" menor para caber na coluna; as 8 competências em linhas compactas */
+.ap-trio b small { font-size: 15px; letter-spacing: 0; }
+.ap-comp li { padding-block: 4px; font-size: 13px; line-height: 1.35; }
+
 /* Avisos: cada aviso é um botão que leva à tela certa; o relógio volta ao Início */
 .ap-note { width: 100%; border: 0; color: inherit; font: inherit; text-align: left; }
 button.ap-note { cursor: pointer; }
@@ -99,6 +102,19 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
 .note-ex { margin-top: 26px; max-width: 46ch; }
 .note-ex .ap-note { margin-top: 12px; opacity: 1; transform: none; background: var(--cine-bg-2); color: var(--cine-fg); box-shadow: 0 0 0 1px var(--rule), 0 24px 40px -28px oklch(0 0 0 / 0.6); }
 
+/* abas no celular: a faixa rola de lado e esmaece na ponta enquanto houver aba escondida.
+   A aba ativa sempre aparece inteira: show() rola só a faixa, nunca a página */
+@media (max-width: 860px) {
+  .demo-tabs { scroll-snap-type: x proximity; scroll-padding-inline: var(--gut) var(--gut-r); -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .demo-tabs button { scroll-snap-align: start; }
+  .demo-tabs.at-end { -webkit-mask-image: none; mask-image: none; }
+}
+/* toque: abas, atalhos dos capítulos e a troca Aluno/Professor com 44 px de altura */
+@media (pointer: coarse) {
+  .demo-tabs button, .dch .try { min-height: 44px; }
+  .ar-switch a { padding-block: 15px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ap-sheet, .ap-sheet.on, .ap-scrim, .ap-scrim.on, .ap-rowbtn .r .ic { transition: none !important; }
 }
@@ -116,6 +132,9 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-tri" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <!-- competências: conquistada é um check num círculo cheio; a conquistar, um círculo vazio (forma, não só cor) -->
+    <symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><path d="M8 12.5l2.8 2.8L16.5 9" style="stroke:var(--paper)"/></symbol>
+    <symbol id="i-todo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/></symbol>
     <symbol id="i-touch" viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 9.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3l-1.6-2.9a1.5 1.5 0 0 1 2.6-1.5L9 15"/></symbol>
   </defs>
 </svg>
@@ -137,7 +156,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
       <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
     </nav>
     <div class="nav-right">
-      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
       <div class="nav-cta">
         <a class="roll" href="area-do-aluno.html" data-int aria-current="page"><span data-t="Área do aluno">Área do aluno</span></a>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
@@ -169,14 +188,15 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
   <section class="demo" id="demo" aria-labelledby="t-demo">
     <div class="demo-head">
       <p class="label">Experimente</p>
-      <h2 id="t-demo">Quatro abas, <em>uma prioridade</em> em cada.</h2>
-      <p>Cada parte do app responde uma pergunta da aluna. Toque nos botões do celular como se fosse o seu.</p>
-      <div class="demo-tabs" id="demoTabs" role="tablist" aria-label="Partes do app">
-        <button type="button" role="tab" data-view="inicio" aria-selected="true">Início</button>
-        <button type="button" role="tab" data-view="presenca" aria-selected="false">Presença</button>
-        <button type="button" role="tab" data-view="movimentos" aria-selected="false">Movimentos</button>
-        <button type="button" role="tab" data-view="perfil" aria-selected="false">Perfil</button>
-        <button type="button" role="tab" data-view="avisos" aria-selected="false">Avisos</button>
+      <h2 id="t-demo">Quatro abas e os avisos. <em>Uma pergunta</em> em cada.</h2>
+      <p>Cada parte do app responde a uma pergunta da aluna. Toque nos botões do celular como se fosse o seu.</p>
+      <!-- botões que escolhem a tela (como o trilho do computador), não abas: o painel não fica logo abaixo -->
+      <div class="demo-tabs" id="demoTabs" role="group" aria-label="Partes do app">
+        <button type="button" data-view="inicio" aria-current="true">Início</button>
+        <button type="button" data-view="presenca" aria-current="false">Presença</button>
+        <button type="button" data-view="movimentos" aria-current="false">Movimentos</button>
+        <button type="button" data-view="perfil" aria-current="false">Perfil</button>
+        <button type="button" data-view="avisos" aria-current="false">Avisos</button>
       </div>
     </div>
     <div class="wrap demo-grid">
