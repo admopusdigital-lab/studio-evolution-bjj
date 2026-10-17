@@ -32,6 +32,7 @@
 .hc.c2 { top: 9%; }  /* acima das alunas, sobre a parede, para não cobrir os rostos */
 @media (max-width: 1023px) { .hc.c2 { top: auto; bottom: 64px; } }  /* no celular, sobre o tatame, entre os outros dois cartões */
 .diff { background: var(--paper-2); }
+.hc small { color: var(--cine-fg-2); }  /* no celular, o cartão de cima fica sobre o brilho dourado: o cinza mais claro mantém 4,5:1 */
 
 /* ---------- celular: peças só desta página ---------- */
 /* Início: o "mudar" da meta fica na linha da semana, sem altura extra; a área de toque cresce por fora do texto */
@@ -113,7 +114,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
 /* toque: abas, atalhos dos capítulos e a troca Aluno/Professor com 44 px de altura */
 @media (pointer: coarse) {
   .demo-tabs button, .dch .try { min-height: 44px; }
-  .ar-switch a { padding-block: 15px; }
+  .ar-switch a { display: flex; align-items: center; min-height: 44px; }  /* tema.css usa 12 px: a altura não depende da fonte */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -870,11 +871,18 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
 
   /* no computador, o capítulo que passa pelo meio da tela escolhe a tela do celular */
   var io = null;
+  /* com o teclado dentro do celular, a página rola sozinha para mostrar o item focado; isso não pode trocar a tela
+     debaixo de quem está digitando (o clique do mouse não conta: ele não deixa :focus-visible) */
+  function kbdInPhone() {
+    var a = document.activeElement;
+    if (!a || !ap.contains(a)) return false;
+    try { return a.matches(":focus-visible"); } catch (e) { return false; }
+  }
   function watchChapters() {
     if (io) { io.disconnect(); io = null; }
     if (!desk() || !("IntersectionObserver" in window)) return;
     io = new IntersectionObserver(function (es) {
-      if (jumping) return;
+      if (jumping || kbdInPhone()) return;
       es.forEach(function (e) { if (e.isIntersecting) show(e.target.dataset.view); });
     }, { rootMargin: "-48% 0px -48% 0px" });
     chs.forEach(function (c) { io.observe(c); });

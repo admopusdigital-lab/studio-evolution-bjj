@@ -600,6 +600,9 @@
     views.forEach(function (v) { v.inert = !(v.classList.contains("on") && !open); });
     drawer.inert = !open;
   }
+  /* o mesmo, logo depois da próxima pintura: trocar inert junto com a aba atrasava o quadro do toque (~25 ms
+     num celular simples). Nesse intervalo, a aba que sai já não recebe toque (pointer-events, em app.css) */
+  function syncInertSoon() { requestAnimationFrame(function () { setTimeout(syncInert, 0); }); }
   /* focus: a troca veio de um atalho (KPI), e o foco vai para o título da aba. Clique no menu não move o foco */
   function go(name, focus) {
     closeDrawer(true);
@@ -610,7 +613,8 @@
         side.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
         if (name === "alunos" && needF) { needF = false; filter(curF); }
       });
-      syncInert();
+      /* com o foco indo para a aba nova, o inert sai antes; senão, depois da pintura */
+      if (focus) syncInert(); else syncInertSoon();
       if (dash.getBoundingClientRect().top < 0) Site.scrollTo(dash, -90);
     }
     if (focus) focusSoft(viewH(name), { preventScroll: true });
@@ -1319,6 +1323,7 @@
       /* "Avaliar grau" (na lista ou na ficha): a aba Graduações abre com o card em destaque e o foco no botão dele */
       var gid = b.dataset.grad;
       go("grad");
+      syncInert();
       highlight(gid);
       focusSoft($('.gcard[data-id="' + gid + '"] [data-ask]') || viewH("grad"), { preventScroll: true });
     }
