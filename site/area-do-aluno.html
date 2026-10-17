@@ -33,6 +33,68 @@
 .hc.c2 { top: 9%; }  /* acima das alunas, sobre a parede, para não cobrir os rostos */
 @media (max-width: 1023px) { .hc.c2 { top: auto; bottom: 64px; } }  /* no celular, sobre o tatame, entre os outros dois cartões */
 .diff { background: var(--paper-2); }
+
+/* ---------- celular: peças só desta página ---------- */
+/* Início: o "mudar" da meta fica na linha da semana, sem altura extra; a área de toque cresce por fora do texto */
+.ap-wkh { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 18px; }
+.ap-wkb { position: relative; flex-shrink: 0; padding: 0; border: 0; background: none; color: var(--ink-2); font: 500 12px/1.15 var(--sans); text-decoration: underline; text-decoration-color: color-mix(in oklch, var(--ink-2) 55%, transparent); text-underline-offset: 3px; cursor: pointer; }
+.ap-wkb::before { content: ""; position: absolute; inset: -15px -12px; }
+.ap-wkb:hover { color: var(--ink); text-decoration-color: var(--gold); }
+/* linha que é botão (mensalidade): o mesmo desenho da .ap-row, com a seta */
+.ap-rowbtn { width: 100%; border: 0; border-top: 1px solid var(--rule); background: none; color: inherit; font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; }
+.ap-rowbtn .r .ic { transition: transform 300ms var(--ease); }
+.ap-rowbtn:hover .r .ic { transform: translateX(2px); }
+/* liberar a vaga: a pergunta aparece dentro do cartão, no lugar do botão */
+.ap-ask { margin-top: 14px; }
+.ap-ask p { font: 400 16px/1.25 var(--serif); }
+.ap-ask .ap-btnrow { gap: 8px; margin-top: 10px; }
+
+/* Presença: um campo de verdade, transparente, por cima das seis caixas, que só desenham o que foi digitado.
+   Fonte de 24 px (o Safari não dá zoom ao focar) e cursor nativo escondido (o das caixas já mostra onde digitar) */
+.ap-codef { position: relative; margin-top: 12px; }
+.ap-codef .ap-code { margin-top: 0; }
+#apCode b { border-color: var(--ink-3); }  /* contorno das caixas com pelo menos 3:1 sobre o campo */
+#apCode b.caret { border-color: var(--ink); }
+.ap-codef:focus-within #apCode b.caret { border-color: var(--gold-text); }
+.ap-codef.bad #apCode b { border-color: var(--warn); }
+#apCodeIn { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 0; -webkit-appearance: none; appearance: none; background: transparent; color: transparent; -webkit-text-fill-color: transparent; caret-color: transparent; font: 400 24px/1 var(--serif); cursor: text; }
+#apCodeIn::selection { background: transparent; }
+.ap-err { font-size: 12px; line-height: 1.35; color: var(--warn); }
+.ap-err:not(:empty) { margin-top: 8px; }
+.ap-steps .skip .ap-st { color: var(--ink-2); }
+
+/* Movimentos: o retorno do quiz fica sempre na árvore (região de status), sem espaço quando vazio */
+.ap-quiz .fb:empty { margin: 0; }
+.ap-list .pill-s { display: inline-block; margin-left: 6px; padding: 2px 7px; vertical-align: 1px; }
+
+/* Avisos: cada aviso é um botão que leva à tela certa; o relógio volta ao Início */
+.ap-note { width: 100%; border: 0; color: inherit; font: inherit; text-align: left; }
+button.ap-note { cursor: pointer; }
+button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
+.ap-note .nb { display: block; min-width: 0; }
+.ap-note .tx { display: block; font-size: 12px; line-height: 1.35; opacity: 0.92; }
+.ap-lock .clock { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.ap-lock :focus-visible { outline-color: var(--cine-gold); }  /* a tela bloqueada é sempre escura */
+
+/* mensalidade: uma folha que sobe dentro do celular, por cima do dock; o fundo escurece e fecha ao toque */
+.ap-scrim { position: absolute; inset: 0; z-index: 21; background: oklch(0 0 0 / 0.38); opacity: 0; visibility: hidden; transition: opacity 450ms var(--ease), visibility 0s linear 450ms; }
+.ap-scrim.on { opacity: 1; visibility: visible; transition: opacity 450ms var(--ease), visibility 0s; }
+.ap-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 22; padding: 18px 18px 30px; border-radius: 22px 22px 0 0; background: var(--paper); box-shadow: 0 -20px 40px -24px oklch(0 0 0 / 0.5), 0 -1px 0 var(--rule); transform: translateY(104%); visibility: hidden; transition: transform 600ms var(--ease), visibility 0s linear 600ms; }
+.ap-sheet.on { transform: none; visibility: visible; transition: transform 600ms var(--ease), visibility 0s; }
+.ap-sheet-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.ap-x { position: relative; width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--paper-2); color: var(--ink); cursor: pointer; }
+.ap-x::before { content: ""; position: absolute; inset: -6px; }
+.ap-x .ic { width: 14px; height: 14px; stroke-width: 2; }
+.ap-sheet .ap-hi { margin-top: 10px; }
+.ap-sheet .ap-btn.ghost { margin-top: 8px; }
+
+/* capítulo 05: exemplo do aviso de grau, no desenho da notificação da tela bloqueada */
+.note-ex { margin-top: 26px; max-width: 46ch; }
+.note-ex .ap-note { margin-top: 12px; opacity: 1; transform: none; background: var(--cine-bg-2); color: var(--cine-fg); box-shadow: 0 0 0 1px var(--rule), 0 24px 40px -28px oklch(0 0 0 / 0.6); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-sheet, .ap-sheet.on, .ap-scrim, .ap-scrim.on, .ap-rowbtn .r .ic { transition: none !important; }
+}
 </style>
 <link rel="stylesheet" href="tema.css">
 </head>
@@ -46,6 +108,7 @@
     <symbol id="i-belt" viewBox="0 0 24 24"><path d="M2 9h7M15 9h7"/><rect x="9" y="6.5" width="6" height="5" rx="1"/><path d="M10.5 11.5L7.5 21M13.5 11.5l3 9.5"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-tri" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
     <symbol id="i-touch" viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 9.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3l-1.6-2.9a1.5 1.5 0 0 1 2.6-1.5L9 15"/></symbol>
   </defs>
 </svg>
@@ -125,12 +188,19 @@
                   <div class="ap-big"><b>19h</b><span>Adulto</span></div>
                   <p class="ap-sub" id="apVagas">Começa em 48 min · 7 de 10 vagas ocupadas</p>
                   <div class="ap-dots" id="apDots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
-                  <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic"><use href="#i-check"/></svg><span>Confirmar presença</span></button>
+                  <div class="ap-btnrow" id="apBtnRow">
+                    <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic"><use href="#i-check"/></svg><span>Confirmar vaga</span></button>
+                    <button class="ap-link" type="button" id="apRelease" hidden>Liberar a vaga</button>
+                  </div>
+                  <div class="ap-ask" id="apAsk" hidden>
+                    <p>Liberar sua vaga das 19h?</p>
+                    <div class="ap-btnrow"><button class="ap-btn" type="button" id="apRelYes">Liberar</button><button class="ap-btn ghost" type="button" id="apRelNo">Manter</button></div>
+                  </div>
                 </div>
-                <p class="ap-lb" style="margin-top:18px">Sua semana · <span id="apWeek">2 de 3</span> treinos</p>
+                <div class="ap-wkh"><p class="ap-lb">Semana · <span id="apWeek">2 de 3</span> treinos</p><button class="ap-wkb" type="button" id="apGoal" aria-label="Mudar a meta da semana">mudar</button></div>
                 <div class="ap-wk"><div><span>Seg</span><b>12</b><i></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><i id="apToday" hidden></i></div></div>
-                <div class="ap-row" style="margin-top:10px"><span>Outros horários hoje</span><span class="r">08:00 · 11:00</span></div>
-                <div class="ap-row"><span>Mensalidade de outubro</span><span class="r ok">Em dia</span></div>
+                <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r">segunda, 19 de outubro, 19h</span></div>
+                <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic"><use href="#i-chev"/></svg></span></button>
               </section>
 
               <!-- Presença -->
@@ -139,10 +209,18 @@
                 <p class="ap-hi">Aula das 19h</p>
                 <p class="ap-mut" style="margin-top:4px">Adulto · sexta, 16 de outubro</p>
                 <ol class="ap-steps">
-                  <li class="done" id="apStep1"><span class="ap-mk"><svg class="ic"><use href="#i-check"/></svg></span><div><p class="ap-st">Vaga confirmada</p><p>Às 18:14 · 8 de 10 vagas</p></div></li>
-                  <li class="now" id="apStep2"><span class="ap-mk">2</span><div><p class="ap-st" id="apStep2h">Digite o código da aula</p><p id="apStep2t">3 letras e 3 números, mostrados no tatame.</p>
-                    <div id="apCodeWrap" style="overflow:hidden"><div class="ap-code pulse" id="apCode" aria-label="Código da aula"><b class="caret"></b><b></b><b></b><b></b><b></b><b></b></div>
-                    <button class="ap-btn off" type="button" id="apRegister" aria-disabled="true">Registrar presença</button></div></div></li>
+                  <li class="now" id="apStep1"><span class="ap-mk">1</span><div><p class="ap-st" id="apStep1h">Confirme sua vaga</p><p id="apStep1t">Na tela Início, um toque.</p></div></li>
+                  <li id="apStep2"><span class="ap-mk">2</span><div><p class="ap-st" id="apStep2h">Digite o código da aula</p><p id="apCodeHelp">3 letras e 3 números, mostrados na TV do tatame.</p>
+                    <div id="apCodeWrap" style="overflow:hidden">
+                      <div class="ap-codef">
+                        <label class="sr-only" for="apCodeIn">Código da aula</label>
+                        <input id="apCodeIn" type="text" inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="20" aria-describedby="apCodeHelp apCodeErr">
+                        <div class="ap-code pulse" id="apCode" aria-hidden="true"><b class="caret"></b><b></b><b></b><b></b><b></b><b></b></div>
+                      </div>
+                      <p class="ap-err" id="apCodeErr" role="alert"></p>
+                      <button class="ap-btn off" type="button" id="apRegister" aria-disabled="true">Registrar presença</button>
+                      <button class="ap-link" type="button" id="apWrong">Testar um código errado</button>
+                    </div></div></li>
                   <li class="later" id="apStep3"><span class="ap-mk">3</span><div><p class="ap-st">Presença registrada</p><p>Conta para a meta da semana.</p></div></li>
                 </ol>
                 <div class="ap-done" id="apDone" hidden><b>18:55</b><p>Presença registrada. Meta da semana batida: 3 de 3.</p><div class="ap-goal"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
@@ -165,12 +243,14 @@
                   <p class="ap-lb gold" id="apQn">Pergunta 1 de 2</p>
                   <p class="q" id="apQt"></p>
                   <div id="apQa"></div>
-                  <p class="fb" id="apFb" hidden></p>
+                  <p class="fb" id="apFb" role="status"></p>
                 </div>
+                <p class="ap-doneline" id="apQdone" hidden><svg class="ic"><use href="#i-check"/></svg><span><b>Quiz feito</b> · movimento estudado</span></p>
                 <div id="apList">
                   <p class="ap-lb" style="margin-top:16px;margin-bottom:6px">Para sua faixa</p>
                   <ul class="ap-list">
-                    <li><div class="th"><img src="img/treino-tecnica.webp" alt=""></div><div><b>Passagem toreando</b><small>Passagem · 5:20</small></div></li>
+                    <li id="apStudied" hidden><div class="th"><img src="img/programa-adulto-real.jpg" alt="" style="object-position:60% 50%"></div><div><b>Raspagem de gancho</b><small>Raspagem · 6:40</small><span class="pill-s in">Estudado</span></div></li>
+                    <li><div class="th"><img src="img/treino-tecnica.webp" alt=""></div><div><b>Passagem toreando</b><small>Passagem · 5:20</small><span class="pill-s gold" id="apNext" hidden>Próximo</span></div></li>
                     <li><div class="th"><img src="img/programa-feminino-real.jpg" alt="" style="object-position:55% 60%"></div><div><b>Armlock da guarda fechada</b><small>Finalização · 7:05</small></div></li>
                   </ul>
                 </div>
@@ -205,15 +285,26 @@
               <!-- Avisos -->
               <section class="ap-view lockv" data-view="avisos" aria-label="Avisos na tela bloqueada">
                 <div class="ap-lock">
-                  <p class="clock">18:00</p>
+                  <button class="clock" type="button" id="apLockClock" aria-label="18:00, voltar ao Início">18:00</button>
                   <p class="date">sexta-feira, 16 de outubro</p>
                   <div class="ap-notes">
-                    <div class="ap-note"><span class="ico"><span></span></span><div><p class="hd"><span>Studio Evolution</span><span>agora</span></p><b>Sua aula começa em 1 hora</b><p>Adulto 19h · ainda há 3 vagas. Toque para confirmar.</p></div></div>
-                    <div class="ap-note"><span class="ico"><span></span></span><div><p class="hd"><span>Studio Evolution</span><span>ontem</span></p><b>Falta 1 treino para a meta</b><p>Você treinou 2 de 3 nesta semana. Amanhã, às 19h, você fecha a meta.</p></div></div>
-                    <div class="ap-note"><span class="ico"><span></span></span><div><p class="hd"><span>Studio Evolution</span><span>seg</span></p><b>Movimento novo na sua faixa</b><p>“Passagem toreando” já está em Movimentos.</p></div></div>
+                    <button class="ap-note" type="button" data-note="aula"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>Sua aula começa em 1 hora</b><span class="tx">Adulto 19h · ainda há 3 vagas. Toque para confirmar.</span></span></button>
+                    <button class="ap-note" type="button" data-note="meta"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>ontem</span></span><b>Falta 1 treino para a meta</b><span class="tx">Se der, amanhã às 19h você fecha a semana. Se não der, tudo bem.</span></span></button>
+                    <button class="ap-note" type="button" data-note="mov"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>seg</span></span><b>Movimento novo na sua faixa</b><span class="tx">“Passagem toreando” já está em Movimentos.</span></span></button>
                   </div>
                 </div>
               </section>
+            </div>
+            <!-- mensalidade: a folha que abre ao tocar na linha do Início (valores de exemplo, iguais aos da Marina no Financeiro) -->
+            <div class="ap-scrim" id="apScrim" aria-hidden="true"></div>
+            <div class="ap-sheet" id="apSheet" role="dialog" aria-labelledby="apSheetT">
+              <div class="ap-sheet-h"><p class="ap-lb">Mensalidade</p><button class="ap-x" type="button" id="apSheetX" aria-label="Fechar"><svg class="ic"><use href="#i-x"/></svg></button></div>
+              <p class="ap-hi" id="apSheetT">Plano Mensal</p>
+              <p class="ap-mut" style="margin-top:4px">Cartão automático · valores de exemplo</p>
+              <div class="ap-row" style="margin-top:12px"><span>Próxima cobrança</span><span class="r">05/11 · R$ 200</span></div>
+              <div class="ap-row"><span>Outubro</span><span class="r ok">Pago em 05/10</span></div>
+              <button class="ap-btn" type="button" id="apReceipt">Recibo de outubro</button>
+              <button class="ap-btn ghost" type="button" id="apTalk">Falar sobre meu plano</button>
             </div>
             <nav class="ap-dock" id="apDock" aria-label="Abas do app">
               <button type="button" data-go="inicio" aria-current="true"><svg class="ic"><use href="#i-home"/></svg>Início</button>
@@ -241,14 +332,14 @@
           <ul>
             <li><svg class="ic"><use href="#i-check"/></svg>Só a turma dela, sem as aulas Kids no meio</li>
             <li><svg class="ic"><use href="#i-check"/></svg>Vagas contadas com todo mundo, até 10 por aula</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>A semana à vista, com a meta de 3 treinos</li>
+            <li><svg class="ic"><use href="#i-check"/></svg>A semana à vista, com a meta que ela escolheu</li>
           </ul>
           <button class="try" type="button" data-act="confirm"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Confirmar a presença no celular</span></button>
         </article>
         <article class="dch" data-view="presenca">
           <p class="label">02 · Presença</p>
           <h2>Três passos, <em>uma tela só</em>.</h2>
-          <p>No tatame, o professor mostra o código da aula: três letras e três números. A aluna digita, e a presença entra na hora, contando para a meta da semana.</p>
+          <p>No tatame, o professor mostra o código da aula na TV: três letras e três números. A aluna digita, e a presença entra na hora, contando para a meta da semana. Na TV de hoje, o código é <b>KTR 482</b>.</p>
           <ul>
             <li><svg class="ic"><use href="#i-check"/></svg>O botão só acende com o código completo</li>
             <li><svg class="ic"><use href="#i-check"/></svg>O código vale só para aquela aula, pelo tempo que o professor escolher</li>
@@ -259,11 +350,11 @@
         <article class="dch" data-view="movimentos">
           <p class="label">03 · Movimentos</p>
           <h2>Continue <em>de onde parou</em>.</h2>
-          <p>O vídeo em andamento vem primeiro. Aos 90%, abre um quiz curto; acertando tudo, o movimento conta como concluído.</p>
+          <p>O vídeo em andamento vem primeiro. Aos 90%, abre um quiz curto; respondendo certo, o movimento conta como estudado.</p>
           <ul>
             <li><svg class="ic"><use href="#i-check"/></svg>Só os movimentos da faixa dela</li>
             <li><svg class="ic"><use href="#i-check"/></svg>Capas com fotos reais do Studio</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Errou? Tenta de novo, quantas vezes quiser</li>
+            <li><svg class="ic"><use href="#i-check"/></svg>Errou? Tente de novo, quantas vezes quiser</li>
           </ul>
           <button class="try" type="button" data-act="watch"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Assistir até os 90% e abrir o quiz</span></button>
         </article>
@@ -284,9 +375,13 @@
           <p>Um aviso uma hora antes da aula, um lembrete para fechar a meta da semana e os movimentos novos da faixa. Quando o professor registra um grau, a notícia chega no mesmo dia.</p>
           <ul>
             <li><svg class="ic"><use href="#i-check"/></svg>Lembrete da aula com as vagas que restam</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Um empurrão para fechar a meta da semana</li>
+            <li><svg class="ic"><use href="#i-check"/></svg>Um lembrete, só quando ainda dá para fechar a meta da semana</li>
             <li><svg class="ic"><use href="#i-check"/></svg>O grau novo chega no celular no mesmo dia</li>
           </ul>
+          <figure class="note-ex">
+            <figcaption class="label">Exemplo do aviso de grau</figcaption>
+            <div class="ap-note"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>Grau novo!</b><span class="tx">Seu 3º grau na faixa azul foi registrado. O professor destacou: “passagem com pressão, sem pressa”.</span></span></div>
+          </figure>
           <button class="try" type="button" data-act="notes"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Mostrar os avisos</span></button>
         </article>
       </div>
@@ -300,10 +395,10 @@
       <ul class="diff-grid" data-rise>
         <li><h3>Só a turma do aluno</h3><p>A tela inicial destaca a aula do aluno e resume os outros horários numa linha.</p><span class="was">Antes: todas as turmas do dia, Kids incluído, cada uma com um botão.</span></li>
         <li><h3>Vagas de verdade</h3><p>O contador soma as reservas de todos os alunos da turma.</p><span class="was">Antes: o aluno só enxergava a própria reserva, e a turma parecia sempre vazia.</span></li>
-        <li><h3>Mensalidade como status</h3><p>Uma linha diz se está em dia. O detalhe fica no Financeiro.</p><span class="was">Antes: valores em aberto e em atraso no meio do resumo de treino.</span></li>
+        <li><h3>Mensalidade como status</h3><p>Uma linha diz se está em dia. Um toque mostra o plano, a próxima cobrança e o recibo.</p><span class="was">Antes: valores em aberto e em atraso no meio do resumo de treino.</span></li>
         <li><h3>Presença numa tela</h3><p>Confirmar, digitar o código e registrar, nessa ordem.</p><span class="was">Antes: “Presença do dia” e “Check-in” em itens separados do menu.</span></li>
-        <li><h3>Uma faixa só</h3><p>O mesmo desenho no Início, no Perfil e nos movimentos.</p><span class="was">Antes: uma barra no Início e uma faixa em 3D no Perfil, cada uma de um jeito.</span></li>
-        <li><h3>Avisos que ajudam</h3><p>Lembrete da aula, grau novo e movimento novo, nada além disso.</p><span class="was">Antes: sem avisos; era preciso abrir o app para saber de tudo.</span></li>
+        <li><h3>Uma faixa só</h3><p>O mesmo desenho no Perfil do aluno e na ficha e nas Graduações do professor.</p><span class="was">Antes: uma barra no Início e uma faixa em 3D no Perfil, cada uma de um jeito.</span></li>
+        <li><h3>Avisos que ajudam</h3><p>Lembrete da aula, um toque para fechar a meta da semana, movimento novo e grau novo. Nada além disso.</p><span class="was">Antes: sem avisos; era preciso abrir o app para saber de tudo.</span></li>
       </ul>
     </div>
   </section>
@@ -338,117 +433,262 @@
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$;
-  var ap = $("#ap"), views = $$(".ap-view", ap), dockBtns = $$("#apDock button"), toastEl = $("#apToast"), toastT = null;
+  var ap = $("#ap"), views = $$(".ap-view", ap), dock = $("#apDock"), dockBtns = $$("button", dock), toastEl = $("#apToast"), toastT = null;
   var tabs = $$("#demoTabs button"), chs = $$(".dch"), rail = $$("#demoRail button");
   var anim = !!window.gsap && !Site.reduce;
+  var CHECK = '<svg class="ic"><use href="#i-check"/></svg>';
   function later(fn, ms) { return setTimeout(fn, ms); }
   function desk() { return window.innerWidth >= 1024; }
+  function screenOf(name) { return $('.ap-view[data-view="' + name + '"]', ap); }
 
   /* ---------- celular: trocar de tela (o capítulo e a aba acompanham) ---------- */
-  var current = "inicio";
+  var current = "inicio", sheetOn = false;
+  /* só a tela aberta recebe foco e toque (a que sai ainda fica 650 ms por cima, sumindo).
+     Com a folha da mensalidade aberta, a tela e o dock ficam de fora; na tela bloqueada, o dock some */
+  function syncInert() {
+    views.forEach(function (v) { v.inert = sheetOn || v.dataset.view !== current; });
+    dock.inert = sheetOn || current === "avisos";
+  }
   function show(name) {
     tabs.forEach(function (t) { t.setAttribute("aria-selected", t.dataset.view === name ? "true" : "false"); });
     rail.forEach(function (r) { r.setAttribute("aria-current", r.dataset.view === name ? "true" : "false"); });
     chs.forEach(function (c) { c.classList.toggle("on", c.dataset.view === name); });
     if (name === current) return;
+    closeSheet(false);
     current = name;
     views.forEach(function (v) { v.classList.toggle("on", v.dataset.view === name); });
     dockBtns.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
     ap.classList.toggle("is-lock", name === "avisos");
+    syncInert();
     if (name === "avisos") notes();
   }
+  syncInert();
   dockBtns.forEach(function (b) { b.addEventListener("click", function () { show(b.dataset.go); }); });
   tabs.forEach(function (t) { t.addEventListener("click", function () { show(t.dataset.view); }); });
-  /* computador: os números abaixo do celular levam ao capítulo de cada tela */
+  /* computador: os números abaixo do celular levam ao capítulo de cada tela. Enquanto a página rola até lá,
+     os capítulos do meio não trocam a tela (antes o celular piscava por todas elas) */
+  var jumping = false;
   rail.forEach(function (r) {
-    r.addEventListener("click", function () { show(r.dataset.view); Site.scrollTo($('.dch[data-view="' + r.dataset.view + '"]'), 0); });
+    r.addEventListener("click", function () {
+      jumping = true;
+      show(r.dataset.view);
+      Site.scrollTo($('.dch[data-view="' + r.dataset.view + '"]'), 0, function () { jumping = false; });
+    });
   });
   function toast(msg) {
     $("span", toastEl).textContent = msg;
     toastEl.classList.add("on");
     clearTimeout(toastT);
-    toastT = setTimeout(function () { toastEl.classList.remove("on"); }, 2800);
+    /* tempo de leitura: aviso longo fica mais na tela */
+    toastT = setTimeout(function () { toastEl.classList.remove("on"); }, Math.max(2800, msg.length * 55));
+  }
+  /* rola a tela do celular (nunca a página) até el aparecer inteiro acima do dock */
+  function into(el) {
+    var v = el && el.closest(".ap-view"), top = 0, n = el;
+    if (!v) return;
+    while (n && n !== v) { top += n.offsetTop; n = n.offsetParent; }
+    if (n !== v) return;
+    var room = v.clientHeight - parseFloat(getComputedStyle(v).paddingBottom), y = v.scrollTop;
+    if (top + el.offsetHeight > y + room) y = top + el.offsetHeight - room;
+    if (top < y) y = Math.max(0, top - 12);
+    if (y !== v.scrollTop) v.scrollTo({ top: y, behavior: Site.reduce ? "auto" : "smooth" });
   }
 
-  /* ---------- Início: confirmar a vaga ---------- */
-  var confirmed = false;
-  function markConfirmed() {
-    confirmed = true;
-    var btn = $("#apConfirm");
-    btn.classList.remove("pulse");
-    btn.classList.add("ok");
-    $("span", btn).textContent = "Vaga confirmada";
-    $$("#apDots i")[7].classList.add("me");
-    $("#apVagas").textContent = "Começa em 48 min · 8 de 10 vagas ocupadas";
+  /* ---------- relógio da cena: 18:12 ao abrir; confirmar leva a 18:14 e registrar a 18:55. Ele nunca volta ---------- */
+  var now = 18 * 60 + 12;
+  function hm(m) { return Math.floor(m / 60) + ":" + ("0" + (m % 60)).slice(-2); }
+  function clockTo(m) { now = Math.max(now, m); $("#apClock").textContent = hm(now); return hm(now); }
+
+  /* ---------- Início: confirmar e liberar a vaga ---------- */
+  var confirmed = false, registered = false, confAt = "", regAt = "";
+  var confBtn = $("#apConfirm"), relBtn = $("#apRelease"), askEl = $("#apAsk"), btnRow = $("#apBtnRow");
+  /* a turma já tem 7 de 10 vagas reservadas; a 8ª é da Marina, reservada pelo app ou ocupada no tatame.
+     Tudo que depende disso (Início e passo 1 da Presença) é pintado aqui, a partir do mesmo estado */
+  function paintSpot() {
+    var mine = confirmed || registered;
+    $$("#apDots i")[7].classList.toggle("me", mine);
+    $("#apVagas").textContent = registered ? "Presença registrada às " + regAt + " · aula às 19h"
+      : "Começa em " + (19 * 60 - now) + " min · " + (mine ? 8 : 7) + " de 10 vagas ocupadas";
+    $("span", confBtn).textContent = registered ? "Presença registrada" : confirmed ? "Vaga confirmada" : "Confirmar vaga";
+    confBtn.classList.toggle("ok", mine);
+    confBtn.classList.toggle("pulse", !mine);
+    if (mine) confBtn.setAttribute("aria-disabled", "true"); else confBtn.removeAttribute("aria-disabled");
+    relBtn.hidden = !confirmed || registered;
+    /* passo 1: pede a vaga, mostra a reserva ou, se a presença entrou sem reserva, que havia vaga */
+    var li = $("#apStep1");
+    li.className = confirmed ? "done" : registered ? "skip" : "now";
+    $(".ap-mk", li).innerHTML = confirmed ? CHECK : registered ? "–" : "1";
+    $("#apStep1h").textContent = confirmed ? "Vaga confirmada" : registered ? "Sem reserva" : "Confirme sua vaga";
+    $("#apStep1t").textContent = confirmed ? "Às " + confAt + " · 8 de 10 vagas ocupadas" : registered ? "Havia vaga: 8 de 10 vagas ocupadas." : "Na tela Início, um toque.";
+    /* o código pode ser digitado mesmo sem reserva; com a vaga garantida, ele vira o passo da vez */
+    if (!registered) $("#apStep2").className = confirmed ? "now" : "";
   }
   function confirmSpot() {
     show("inicio");
-    if (confirmed) return;
-    markConfirmed();
+    if (confirmed || registered) return;
+    confirmed = true;
+    confAt = clockTo(18 * 60 + 14);
+    paintSpot();
     toast("Vaga confirmada. Te esperamos às 19h.");
   }
-  $("#apConfirm").addEventListener("click", confirmSpot);
+  confBtn.addEventListener("click", confirmSpot);
+  /* liberar: uma pergunta no próprio cartão, no lugar do botão; a vaga volta para a turma */
+  function askRelease(open) {
+    btnRow.hidden = open;
+    askEl.hidden = !open;
+  }
+  relBtn.addEventListener("click", function () {
+    askRelease(true);
+    Site.focusSoft($("#apRelNo"), { preventScroll: true });
+    into(askEl);
+  });
+  $("#apRelNo").addEventListener("click", function () {
+    askRelease(false);
+    Site.focusSoft(relBtn, { preventScroll: true });
+  });
+  $("#apRelYes").addEventListener("click", function () {
+    confirmed = false;
+    askRelease(false);
+    paintSpot();
+    Site.focusSoft(confBtn, { preventScroll: true });
+    toast("Vaga liberada. Obrigado por avisar.");
+  });
+  /* a meta é da aluna: na vitrine, o toque explica como ela escolhe */
+  $("#apGoal").addEventListener("click", function () {
+    toast("No app, a aluna escolhe a meta: de 1 a 5 treinos por semana. Quem está começando parte de 2.");
+  });
 
-  /* ---------- Presença: o código tem 3 letras e 3 números, como no app ---------- */
-  var CODE = "KTR482", typed = "", registered = false, typing = false;
-  var cells = $$("#apCode b"), regBtn = $("#apRegister");
+  /* ---------- Início: a mensalidade abre uma folha com o plano (dados de exemplo da Marina no Financeiro) ---------- */
+  var sheet = $("#apSheet"), scrim = $("#apScrim"), fee = $("#apFee");
+  function openSheet() {
+    sheetOn = true;
+    sheet.classList.add("on");
+    scrim.classList.add("on");
+    fee.setAttribute("aria-expanded", "true");
+    syncInert();
+    Site.focusSoft($("#apSheetT"), { preventScroll: true });
+  }
+  /* back: devolve o foco à linha da mensalidade (fechar pelo X, pelo Esc ou tocando fora) */
+  function closeSheet(back) {
+    if (!sheetOn) return;
+    sheetOn = false;
+    sheet.classList.remove("on");
+    scrim.classList.remove("on");
+    fee.setAttribute("aria-expanded", "false");
+    syncInert();
+    if (back) Site.focusSoft(fee, { preventScroll: true });
+  }
+  fee.addEventListener("click", openSheet);
+  $("#apSheetX").addEventListener("click", function () { closeSheet(true); });
+  scrim.addEventListener("click", function () { closeSheet(true); });
+  sheet.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.stopPropagation(); closeSheet(true); } });
+  $("#apReceipt").addEventListener("click", function () { toast("No app, abre o recibo gerado pelo Asaas."); });
+  $("#apTalk").addEventListener("click", function () { toast("No app, abre o WhatsApp do Studio com a mensagem pronta."); });
+
+  /* ---------- Presença: o código tem 3 letras e 3 números, digitado num campo de verdade ---------- */
+  var CODE = "KTR482", typed = "", typing = false, errT = null;
+  var inp = $("#apCodeIn"), codeF = $(".ap-codef"), cells = $$("#apCode b"), regBtn = $("#apRegister"), errEl = $("#apCodeErr");
   function paintCode() {
     cells.forEach(function (c, i) { c.textContent = typed[i] || ""; c.classList.toggle("caret", i === typed.length && typed.length < 6); });
     var full = typed.length === 6;
     regBtn.classList.toggle("off", !full);
     regBtn.setAttribute("aria-disabled", full ? "false" : "true");
   }
+  /* o alerta é apagado e escrito de novo: a mesma frase duas vezes também é anunciada */
+  function setErr(msg, bad) {
+    clearTimeout(errT);
+    errEl.textContent = "";
+    codeF.classList.toggle("bad", !!bad);
+    if (bad) inp.setAttribute("aria-invalid", "true"); else inp.removeAttribute("aria-invalid");
+    if (msg) errT = later(function () { errEl.textContent = msg; into(errEl); }, 60);
+  }
+  /* fica só com letras e números, em maiúsculas, até 6: colar 'ktr-482' ou 'KTR 482' vale.
+     Durante a composição do teclado (Android), só desenha; o valor do campo é ajustado no fim */
+  function onCode(e) {
+    var composing = !!(e && e.isComposing), v = inp.value.replace(/[^a-z0-9]/gi, "").toUpperCase().slice(0, 6);
+    if (!composing && inp.value !== v) inp.value = v;
+    if (v !== typed) { setErr(""); $("#apCode").classList.remove("pulse"); }
+    typed = v;
+    paintCode();
+    if (v.length === 6 && !typing && !composing) submit();
+  }
+  function submit() {
+    if (registered || typing) return;
+    var left = 6 - typed.length;
+    if (left > 0) {
+      setErr(left === 1 ? "Falta 1 caractere." : "Faltam " + left + " caracteres.");
+      Site.focusSoft(inp, { preventScroll: true });
+      return;
+    }
+    if (typed !== CODE) {
+      setErr("Código não confere. Confira na TV do tatame: 3 letras e 3 números.", true);
+      if (document.activeElement === inp) inp.select();
+      return;
+    }
+    register();
+  }
+  inp.addEventListener("input", onCode);
+  inp.addEventListener("compositionend", onCode);
+  /* depois de um código errado, voltar ao campo seleciona tudo: digitar já substitui */
+  inp.addEventListener("focus", function () { if (inp.getAttribute("aria-invalid") === "true") inp.select(); });
+  regBtn.addEventListener("click", submit);
   function register() {
-    if (registered || typed.length < 6) return;
+    if (registered) return;
     registered = true;
-    [$("#apStep2"), $("#apStep3")].forEach(function (li) { li.className = "done"; $(".ap-mk", li).innerHTML = '<svg class="ic"><use href="#i-check"/></svg>'; });
-    /* o teclado do código se recolhe numa linha, abrindo espaço para a confirmação */
+    regAt = clockTo(18 * 60 + 55);
+    askRelease(false);
+    paintSpot();
+    var wrap = $("#apCodeWrap"), done = $("#apDone"), had = wrap.contains(document.activeElement);
+    [$("#apStep2"), $("#apStep3")].forEach(function (li) { li.className = "done"; $(".ap-mk", li).innerHTML = CHECK; });
+    /* o campo do código se recolhe numa linha, abrindo espaço para a confirmação */
     $("#apStep2h").textContent = "Código digitado";
-    $("#apStep2t").textContent = CODE.slice(0, 3) + " " + CODE.slice(3) + " · às 18:55";
-    var wrap = $("#apCodeWrap");
+    $("#apCodeHelp").textContent = CODE.slice(0, 3) + " " + CODE.slice(3) + " · às " + regAt;
     if (anim) gsap.to(wrap, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: function () { wrap.hidden = true; } });
     else wrap.hidden = true;
-    $("#apDone").hidden = false;
+    done.hidden = false;
     $("#apWeek").textContent = "3 de 3";
     $("#apToday").hidden = false;
-    $("#apClock").textContent = "18:55";
     /* as três barras da meta acendem em sequência */
-    var goal = $("#apDone .ap-goal");
+    var goal = $(".ap-goal", done);
     goal.classList.remove("burst"); void goal.offsetWidth; goal.classList.add("burst");
-    if (anim) gsap.from("#apDone", { y: 18, opacity: 0, duration: 0.8, ease: "expo.out" });
+    if (anim) gsap.from(done, { y: 18, opacity: 0, duration: 0.8, ease: "expo.out" });
+    /* quem digitou o código não perde o lugar: o foco vai para a confirmação */
+    if (had) Site.focusSoft(done, { preventScroll: true });
+    later(function () { into(done); }, anim ? 650 : 0);
     toast("Presença registrada. Meta da semana batida!");
+  }
+  /* atalhos da demonstração: o código aparece letra por letra no campo, como se a aluna digitasse */
+  function typeCode(code) {
+    if (registered || typing) return;
+    typing = true;
+    inp.value = "";
+    onCode();
+    code.split("").forEach(function (ch, i) { later(function () { inp.value += ch; onCode(); }, 420 + i * 170); });
+    later(function () { typing = false; submit(); }, 420 + code.length * 170 + 520);
   }
   function checkin() {
     show("presenca");
-    if (registered || typing) return;
-    if (!confirmed) markConfirmed();
-    typing = true;
-    $("#apCode").classList.remove("pulse");
-    typed = "";
-    paintCode();
-    CODE.split("").forEach(function (ch, i) { later(function () { typed += ch; paintCode(); }, 420 + i * 170); });
-    later(function () { typing = false; register(); }, 420 + 6 * 170 + 520);
+    typeCode(CODE);
   }
-  regBtn.addEventListener("click", function () { if (typed.length < 6) checkin(); else register(); });
-  $("#apCode").addEventListener("click", checkin);
+  $("#apWrong").addEventListener("click", function () { typeCode("KTR481"); });
 
-  /* ---------- Movimentos: aos 90% abre o quiz; acertando tudo, o movimento conta ---------- */
+  /* ---------- Movimentos: aos 90% abre o quiz; respondendo certo, o movimento conta como estudado ---------- */
   var QUIZ = [
-    { q: "Para a raspagem funcionar, o que vem primeiro?", a: ["Fazer força com os braços", "Desequilibrar o parceiro", "Esperar o parceiro cair"], r: 1, hint: "Quase. Pense no que tira o parceiro da base." },
-    { q: "Onde fica o pé que faz o gancho?", a: ["Apoiado no chão, longe do parceiro", "Por fora do joelho do parceiro", "Por dentro da coxa do parceiro"], r: 2, hint: "Quase. O gancho levanta o parceiro por dentro da perna." }
+    { q: "Para a raspagem funcionar, o que vem primeiro?", a: ["Fazer força com os braços", "Desequilibrar o parceiro", "Esperar o parceiro cair"], r: 1, hint: "Ainda não. Pense no que tira o parceiro da base." },
+    { q: "Onde fica o pé que faz o gancho?", a: ["Apoiado no chão, longe do parceiro", "Por fora do joelho do parceiro", "Por dentro da coxa do parceiro"], r: 2, hint: "Ainda não. O gancho levanta o parceiro por dentro da perna." }
   ];
-  var watched = false, qi = 0, quizDone = false, qLock = false;
+  var watched = false, qi = 0, qErr = 0, quizDone = false, qLock = false;
   function renderQ() {
     var Q = QUIZ[qi];
     $("#apQn").textContent = "Pergunta " + (qi + 1) + " de " + QUIZ.length;
     $("#apQt").textContent = Q.q;
     $("#apQa").innerHTML = Q.a.map(function (t, k) { return '<button type="button" data-k="' + k + '">' + t + "</button>"; }).join("");
-    $("#apFb").hidden = true;
+    $("#apFb").textContent = "";
     qLock = false;
     if (anim) gsap.from($$("#apQa button"), { y: 10, opacity: 0, duration: 0.6, stagger: 0.06, ease: "expo.out" });
   }
   function openQuiz() {
-    $('[data-view="movimentos"]', ap).classList.add("quiz");
+    screenOf("movimentos").classList.add("quiz");
     $("#apList").hidden = true;
     renderQ();
     $("#apQuiz").hidden = false;
@@ -456,6 +696,17 @@
       gsap.to("#apPlay", { height: 84, duration: 0.8, ease: "expo.inOut" });
       gsap.from("#apQuiz", { y: 16, opacity: 0, duration: 0.8, ease: "expo.out", delay: 0.15 });
     } else $("#apPlay").style.height = "84px";
+  }
+  /* fim do quiz: o bloco vira uma linha de resumo e a lista da faixa volta, com o estudado e o próximo */
+  function finishQuiz() {
+    var quiz = $("#apQuiz"), line = $("#apQdone"), had = quiz.contains(document.activeElement);
+    quiz.hidden = true;
+    line.hidden = false;
+    $("#apStudied").hidden = false;
+    $("#apNext").hidden = false;
+    $("#apList").hidden = false;
+    if (had) Site.focusSoft(line, { preventScroll: true });
+    if (anim) gsap.from([line, "#apList"], { y: 12, opacity: 0, duration: 0.7, stagger: 0.08, ease: "expo.out" });
   }
   function watch() {
     show("movimentos");
@@ -479,16 +730,29 @@
     if (+b.dataset.k === Q.r) {
       b.classList.add("right");
       qLock = true;
-      if (qi < QUIZ.length - 1) { fb.hidden = true; later(function () { qi++; renderQ(); }, 750); return; }
+      if (qi < QUIZ.length - 1) {
+        fb.textContent = "";
+        later(function () {
+          var had = $("#apQuiz").contains(document.activeElement);
+          qi++;
+          renderQ();
+          /* as respostas foram trocadas: o foco vai para a pergunta nova */
+          if (had) Site.focusSoft($("#apQt"), { preventScroll: true });
+        }, 750);
+        return;
+      }
       quizDone = true;
-      fb.hidden = false;
-      fb.textContent = "Você acertou 2 de 2. Movimento concluído: agora são 6 de 12 da faixa azul.";
+      /* o texto final diz a verdade: "de primeira" só quando não houve nenhum erro */
+      fb.textContent = (qErr ? "Pronto!" : "Você acertou as " + QUIZ.length + " de primeira.") + " Movimento estudado: agora são 6 de 12 da faixa azul.";
       $("#apMov").textContent = "6";
       $("#apMov2").textContent = "6/12";
-      toast("Movimento concluído.");
+      toast("Movimento estudado.");
+      later(finishQuiz, 2600);
     } else {
+      qErr++;
       b.classList.add("wrong");
-      fb.hidden = false;
+      b.setAttribute("aria-disabled", "true");
+      b.insertAdjacentHTML("beforeend", '<span class="sr-only"> (incorreta)</span>');
       fb.textContent = Q.hint;
     }
   });
@@ -506,14 +770,28 @@
   }
   $("#apCompBtn").addEventListener("click", function () { toggleComps(); });
 
-  /* ---------- Avisos: chegam um por um ---------- */
-  var noteT = [];
+  /* ---------- Avisos: chegam um por um, e cada um leva à tela certa ---------- */
+  var lockV = screenOf("avisos"), noteT = [];
   function notes() {
-    var ns = $$(".ap-note");
+    var ns = $$(".ap-note", lockV);
     noteT.forEach(clearTimeout);
     ns.forEach(function (n) { n.classList.remove("on"); });
     noteT = ns.map(function (n, i) { return later(function () { n.classList.add("on"); }, 400 + i * 480); });
   }
+  /* a tela bloqueada fica inerte ao sair: quem estava com o foco nela continua na tela nova */
+  function leaveLock(name, then, focusEl) {
+    var had = lockV.contains(document.activeElement);
+    show(name);
+    if (then) then();
+    if (had) Site.focusSoft(focusEl || $(".ap-hi", screenOf(name)), { preventScroll: true });
+  }
+  var NOTE = {
+    aula: function () { leaveLock("inicio", confirmSpot, confBtn); },
+    meta: function () { leaveLock("inicio"); },
+    mov: function () { leaveLock("movimentos"); }
+  };
+  $$(".ap-note[data-note]", lockV).forEach(function (n) { n.addEventListener("click", NOTE[n.dataset.note]); });
+  $("#apLockClock").addEventListener("click", function () { leaveLock("inicio"); });
 
   /* botões dos capítulos: no celular, a página sobe até o aparelho antes da ação */
   var acts = {
@@ -536,23 +814,37 @@
     if (io) { io.disconnect(); io = null; }
     if (!desk() || !("IntersectionObserver" in window)) return;
     io = new IntersectionObserver(function (es) {
+      if (jumping) return;
       es.forEach(function (e) { if (e.isIntersecting) show(e.target.dataset.view); });
     }, { rootMargin: "-48% 0px -48% 0px" });
     chs.forEach(function (c) { io.observe(c); });
   }
 
-  /* o celular cabe na área dele: altura da tela no computador, largura e altura no celular */
-  var dev = $("#device"), devBox = $(".demo-dev"), wasDesk = desk();
+  /* o celular cabe na área dele sem ficar pequeno demais para ler.
+     Computador: pela altura, descontada a barra fixa, entre 0,82 e 1.
+     Celular em pé: pela largura e pela altura, nunca abaixo de 0,86. Deitado e baixo: até 0,8, e a página rola.
+     A altura do celular (H) é lida no carregamento e ao girar: a barra de endereço que some não muda o aparelho */
+  var dev = $("#device"), devBox = $(".demo-dev"), wasDesk = desk(), lastW = window.innerWidth, H = window.innerHeight;
   function fit() {
-    var z = desk() ? (window.innerHeight - 170) / 660 : Math.min((devBox.clientWidth - 6) / 312, (window.innerHeight * 0.72) / 660);
-    dev.style.setProperty("--z", Math.max(0.5, Math.min(1, z)).toFixed(3));
+    var w = (devBox.clientWidth - 6) / 312, z;
+    if (desk()) z = Math.max(0.82, Math.min(1, (window.innerHeight - 230) / 660));
+    else if (H < 500) z = Math.min(0.8, w);
+    else z = Math.min(1, w, Math.max(0.86, H * 0.8 / 660));
+    dev.style.setProperty("--z", z.toFixed(3));
   }
   fit();
   watchChapters();
   window.addEventListener("resize", function () {
-    fit();
+    var wChanged = window.innerWidth !== lastW;
+    lastW = window.innerWidth;
+    if (wChanged) H = window.innerHeight;
+    if (wChanged || desk()) fit();
     if (desk() !== wasDesk) { wasDesk = desk(); watchChapters(); }
   });
+  var portrait = window.matchMedia && window.matchMedia("(orientation: portrait)");
+  var turned = function () { H = window.innerHeight; fit(); };
+  if (portrait && portrait.addEventListener) portrait.addEventListener("change", turned);
+  else if (portrait && portrait.addListener) portrait.addListener(turned);
 
   Site.boot({
     intro: function (S) {

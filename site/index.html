@@ -157,6 +157,14 @@ html.seen #loader { display: none; }
   -webkit-mask-image: radial-gradient(ellipse 74% 72% at 50% 42%, #000 50%, transparent 100%); mask-image: radial-gradient(ellipse 74% 72% at 50% 42%, #000 50%, transparent 100%); }
 /* um leve zoom tira da foto a faixa clara do teto e deixa o medalhão no centro da atenção */
 .true-ph img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; transform: scale(1.18); transform-origin: 50% 72%; }
+/* a medalha 3D (medalha3d.js) toma o lugar da foto quando o WebGL está disponível; arrastar gira */
+.medal-gl { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 900ms var(--ease); touch-action: pan-y; cursor: grab; }
+.medal-gl:active { cursor: grabbing; }
+.true-ph.gl { overflow: visible; -webkit-mask-image: none; mask-image: none; }
+.true-ph.gl img { opacity: 0; transition: opacity 600ms var(--ease); }
+.true-ph.gl .medal-gl { opacity: 1; }
+.medal-hint { position: absolute; left: 0; right: 0; bottom: 2%; text-align: center; font: 500 11px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); opacity: 0; transition: opacity 600ms var(--ease) 1.2s; pointer-events: none; }
+.true-ph.gl .medal-hint { opacity: 1; }
 .true-tx .h2 { margin-top: 26px; font-size: clamp(40px, 4.4vw, 76px); }
 .true-tx .lead { margin-top: 26px; }
 .vals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin-top: 44px; border-top: 1px solid var(--rule); }
@@ -545,7 +553,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 
   <section class="true-sec cine" id="equipe-true" data-dark aria-labelledby="t-true">
     <div class="wrap true-grid">
-      <figure class="true-ph" data-tilt3d="7"><img src="img/ambiente-studio.webp" alt="Medalhão dourado da Equipe TRUE acima do painel do Studio Evolution BJJ, na parede preta da academia" loading="lazy" width="1200" height="800"></figure>
+      <figure class="true-ph"><img src="img/ambiente-studio.webp" alt="Medalhão dourado da Equipe TRUE acima do painel do Studio Evolution BJJ, na parede preta da academia" loading="lazy" width="1200" height="800"><canvas class="medal-gl" role="img" aria-label="Medalha dourada da Equipe TRUE em 3D: na frente, a logo da TRUE; no verso, a do Studio Evolution"></canvas><p class="medal-hint" aria-hidden="true">Arraste para girar</p></figure>
       <div class="true-tx">
         <p class="label">Equipe TRUE BJJ</p>
         <h2 class="h2 split" id="t-true">Uma academia. <em>Uma equipe inteira</em> por trás.</h2>
@@ -859,6 +867,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="site.js"></script>
 <script src="faixa3d.js"></script>
+<script src="medalha3d.js"></script>
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$, fine = Site.fine;
@@ -1083,6 +1092,27 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 
       /* a faixa: a rolagem escolhe a faixa (presa no computador) e a troca acontece inteira, de uma vez:
          o nome nunca fica cortado pela metade quando a pessoa para de rolar, nem no celular. */
+      /* a medalha da Equipe TRUE em 3D: carrega perto da seção; o giro acompanha a rolagem */
+      (function () {
+        var fig = $(".true-ph"), cv = $(".medal-gl");
+        if (!fig || !cv || !window.Medalha3D || !Medalha3D.supported() || !("IntersectionObserver" in window)) return;
+        var io = new IntersectionObserver(function (es) {
+          if (!es[0].isIntersecting) return;
+          io.disconnect();
+          Medalha3D.mount(cv, {
+            front: { orm: "img/medalha-frente-orm.webp", normal: "img/medalha-frente-normal.webp" },
+            back: { orm: "img/medalha-verso-orm.webp", normal: "img/medalha-verso-normal.webp" },
+            small: !fine || window.innerWidth < 900, reduce: Site.reduce, fine: fine, hover: $(".true-sec")
+          }, function (api) {
+            if (!api) return;
+            fig.classList.add("gl");
+            $("img", fig).setAttribute("aria-hidden", "true");
+            ScrollTrigger.create({ trigger: ".true-sec", start: "top bottom", end: "bottom top", onUpdate: function (st) { api.scroll(st.progress); } });
+          });
+        }, { rootMargin: "800px 0px" });
+        io.observe(fig);
+      })();
+
       var COLORS = ["#f3f2ed", "#2b5fd0", "#6a35b0", "#6e4326", "#1c1c20"];
       /* a faixa em 3D realista: o Three.js só carrega quando a seção se aproxima; sem WebGL, fica o SVG */
       var beltGL = null, beltIdx = 0;

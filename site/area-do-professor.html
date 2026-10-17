@@ -65,6 +65,66 @@
 @media (max-width: 860px) { .fin-grid { grid-template-columns: minmax(0, 1fr); } }
 .dv[data-v="fin"] .kpi b { white-space: nowrap; }
 @media (max-width: 600px) { .dv[data-v="fin"] .kpi b { font-size: 22px; } }
+
+/* chamada: cada linha tem a pílula de presença e um único botão de ação */
+.roster li.r4 { grid-template-columns: 30px minmax(0, 1fr) auto auto; }
+.roster .r-act { height: 30px; padding: 0 12px; white-space: nowrap; }
+.pill-s .ps { display: none; }  /* texto curto da pílula: só no celular */
+.classes small { text-align: right; line-height: 1.35; }
+.kids-note { margin-top: 12px; font-size: 12.5px; color: var(--ink-2); }
+#cdNote.wait { color: var(--ink-2); }
+.walkin > button { min-height: 44px; }
+.walkin #walkBox { margin-top: 4px; }
+#walkQ { width: min(100%, 280px); font-size: 14px; -webkit-appearance: none; appearance: none; }
+.walkin li.ask { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); }
+.walk-none { margin-top: 8px; font-size: 12px; color: var(--ink-3); }
+/* lista sem ninguém depois do filtro */
+.tbl tr.empty td { padding: 22px 10px; text-align: center; font-size: 13px; color: var(--ink-3); }
+#tbl tbody tr.empty { cursor: default; }
+#tbl tbody tr.empty:hover { background: none; }
+@media (pointer: coarse) { #walkQ { font-size: 16px; } }  /* 16 px: o iPhone não dá zoom ao focar */
+@media (max-width: 600px) {
+  /* no celular, a linha vira duas: nome em cima; presença e ação embaixo, com a pílula curta */
+  .roster li.r4 { grid-template-columns: 30px minmax(0, 1fr) auto; grid-template-areas: "av nm nm" "av st ac"; row-gap: 6px; }
+  .roster li.r4 > .av { grid-area: av; align-self: start; }
+  .roster li.r4 > div { grid-area: nm; }
+  .roster li.r4 > .pill-s { grid-area: st; justify-self: start; }
+  .roster li.r4 > .r-act { grid-area: ac; }
+  .pill-s .pl { display: none; }
+  .pill-s .ps { display: inline; }
+  .tbl tbody tr.empty { display: block; }
+}
+
+/* ficha: rola por dentro, com o nome e o X sempre no alto e as ações sempre embaixo */
+.drawer { padding: 0; max-height: min(100%, calc(100svh - 120px)); }
+.dr-top { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px; padding: 18px 16px 14px 26px; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.dr-top .dr-h { flex: 1; min-width: 0; padding-right: 0; }
+.dr-top .dr-close { position: static; width: 44px; height: 44px; flex-shrink: 0; }
+.dr-body { padding: 4px 26px 24px; }
+.drawer .dr-acts { position: sticky; bottom: 0; z-index: 2; margin-top: 0; padding: 14px 26px calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--paper); border-top: 1px solid var(--rule); }
+#drName { scroll-margin-top: 96px; }
+@media (max-width: 600px) { .dr-top { padding-left: 16px; } .dr-body { padding-inline: 16px; } .drawer .dr-acts { padding-inline: 16px; } }
+/* o mapa de presenças entra célula por célula só com CSS (antes, 60 tweens a cada abertura) */
+.drawer.on .heat i { animation: pop 0.45s var(--ease) both; animation-delay: calc(var(--i) * 8ms + 300ms); }
+.drawer.on .heat i.t { animation: pop 0.45s var(--ease) both, hot 2.2s var(--ease) infinite; animation-delay: calc(var(--i) * 8ms + 300ms), 1s; }
+@keyframes pop { from { transform: scale(0.2); opacity: 0; } }
+
+/* TV: a turma inteira (até 10); a partir de 7, em duas colunas, com a chegada mais nova no alto */
+.tv-list.two { grid-template-rows: repeat(5, auto); grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); column-gap: 1.6cqi; row-gap: 0.8cqi; }
+.tv-list.two li { grid-template-columns: 2.8cqi minmax(0, 1fr) auto; gap: 0.8cqi; font-size: 1.4cqi; }
+.tv-list.two .av { width: 2.8cqi; height: 2.8cqi; font-size: 0.95cqi; }
+.tv-list.two small { font-size: 1.05cqi; }
+.tv-list li > span:nth-child(2) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tv-list li.more { display: block; padding-left: 3.6cqi; font-size: 1.4cqi; color: var(--cine-fg-3); }
+/* celular: TV e celular da aluna cabem juntos na tela (sem o pé da TV e sem o dock, que é só desenho) */
+@media (max-width: 999px) {
+  .tv-stand { display: none; }
+  .tv-stage { gap: 16px; }
+  .tv-phone { gap: 10px; }
+  .tv-phone .ap { height: 480px; --dock-h: 0px; --dock-b: 0px; }
+  .tv-phone .ap-dock { display: none; }
+  .tv-mob { margin-top: 12px; }
+}
 </style>
 <link rel="stylesheet" href="tema.css">
 </head>
@@ -160,11 +220,11 @@
               <div class="dv on" data-v="hoje" aria-label="Hoje">
                 <div class="dv-h">
                   <div><p class="dv-k">Sexta, 16 de outubro</p><h3>Boa noite. <em>Cinco aulas hoje.</em></h3></div>
-                  <p>Agora: Kids 18h · Próxima: Adulto 19h</p>
+                  <p id="dNow">Agora: Kids 18h · Próxima: Adulto 19h</p>
                 </div>
                 <div class="kpis">
                   <div class="kpi"><b>58<small class="delta">+3 em outubro</small></b><span>alunos ativos</span></div>
-                  <div class="kpi"><b id="kPres">148</b><span>presenças nos últimos 7 dias</span><span class="spark" id="spark" aria-hidden="true"><i class="wk"></i><i class="wk"></i><i></i><i></i><i></i><i></i><i class="today"></i></span></div>
+                  <div class="kpi"><b id="kPres">146</b><span>presenças nos últimos 7 dias</span><span class="spark" id="spark" aria-hidden="true"><i class="wk"></i><i class="wk"></i><i></i><i></i><i></i><i></i><i class="today"></i></span></div>
                   <button class="kpi warn" type="button" data-goto="alunos" data-chip="aus"><b>3</b><span>sem treinar há 14 dias ou mais</span><span class="go-s">Ver quem<svg class="ic"><use href="#i-chev"/></svg></span></button>
                   <button class="kpi" type="button" data-goto="leads"><b id="kLeads">3</b><span>interessados esperando retorno</span><span class="go-s">Abrir<svg class="ic"><use href="#i-chev"/></svg></span></button>
                 </div>
@@ -173,10 +233,10 @@
                     <button type="button" class="past" data-c="a8" aria-pressed="false"><b>08:00</b><span>Adulto</span><small>7 vieram</small></button>
                     <button type="button" class="past" data-c="k10" aria-pressed="false"><b>10:00</b><span>Kids</span><small>9 vieram</small></button>
                     <button type="button" class="past" data-c="a11" aria-pressed="false"><b>11:00</b><span>Adulto</span><small>6 vieram</small></button>
-                    <button type="button" data-c="k18" aria-pressed="false"><b>18:00</b><span>Kids · agora</span><small>8 vieram</small></button>
+                    <button type="button" data-c="k18" aria-pressed="false"><b>18:00</b><span>Kids · agora</span><small id="c18s">6 de 8 marcadas</small></button>
                     <button type="button" data-c="a19" aria-pressed="true"><b>19:00</b><span>Adulto</span><small id="c19s">8 de 10</small></button>
                   </div>
-                  <div class="room" id="room" aria-live="polite"></div>
+                  <div class="room" id="room"></div>
                 </div>
               </div>
 
@@ -309,7 +369,7 @@
                     </tbody>
                   </table>
                 </div>
-                <p class="tbl-more">Mostrando 7 de 58 mensalidades.</p>
+                <p class="tbl-more" id="finMore">Mostrando 7 de 58 mensalidades.</p>
                 <div class="msg" id="finMsg" hidden></div>
 
                 <div class="fin-grid">
@@ -337,12 +397,14 @@
                 <p class="fin-how"><b>Como funciona:</b> o Asaas gera a cobrança de cada mês e avisa o painel quando o pagamento cai. Os lembretes saem do número de WhatsApp do Studio, conectado pela Evolution API. Só o dono do Studio e quem ele autorizar veem esta aba.</p>
               </div>
 
-              <!-- ficha do aluno: abre por cima da lista -->
+              <!-- ficha do aluno: um diálogo por cima da lista, com rolagem própria (sem aria-modal: o resto da página continua clicável) -->
               <div class="drawer-scrim" id="drScrim" aria-hidden="true"></div>
-              <aside class="drawer" id="drawer" aria-label="Ficha do aluno" aria-hidden="true" data-lenis-prevent></aside>
+              <div class="drawer" id="drawer" role="dialog" aria-labelledby="drName" data-lenis-prevent></div>
             </div>
           </div>
+          <!-- o script leva o aviso para o fim do <body>, preso à janela -->
           <div class="dash-toast" id="dashToast" role="status" aria-live="polite"><svg class="ic"><use href="#i-check"/></svg><span></span></div>
+          <p class="sr-only" id="srLive" aria-live="polite"></p>
         </div>
       </div>
     </div>
@@ -410,8 +472,8 @@
       </div>
       <div class="tv-ctrl">
         <button class="btn btn-line" type="button" id="tvNew">Gerar novo código</button>
-        <button class="btn btn-ink" type="button" id="tvReplay">Ver as chegadas de novo</button>
-        <p>Um código novo substitui o anterior na hora. Ele só vale no dia da aula, pelo tempo que o professor escolher: de 15 minutos até o fim do dia.</p>
+        <button class="btn btn-ink" type="button" id="tvReplay">Recomeçar a demonstração</button>
+        <p>Um código novo substitui o anterior na hora. Ele só vale no dia da aula, pelo tempo que o professor escolher: de 15 minutos a uma hora e meia.</p>
       </div>
     </div>
   </section>

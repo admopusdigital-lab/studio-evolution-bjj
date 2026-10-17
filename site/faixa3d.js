@@ -7,19 +7,18 @@
 (function () {
   var THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js";
 
-  /* carrega o Three.js uma vez só */
-  var loading = null;
+  /* carrega o Three.js uma vez só (a medalha 3D usa a mesma promessa) */
   function loadThree() {
     if (window.THREE) return Promise.resolve(window.THREE);
-    if (loading) return loading;
-    loading = new Promise(function (ok, fail) {
+    if (window.__threeP) return window.__threeP;
+    window.__threeP = new Promise(function (ok, fail) {
       var s = document.createElement("script");
       s.src = THREE_URL; s.async = true;
       s.onload = function () { window.THREE ? ok(window.THREE) : fail(); };
       s.onerror = fail;
       document.head.appendChild(s);
     });
-    return loading;
+    return window.__threeP;
   }
 
   function hasGL() {
