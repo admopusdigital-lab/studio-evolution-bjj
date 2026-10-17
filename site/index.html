@@ -185,6 +185,10 @@ html.seen #loader { display: none; }
 @media (min-width: 700px) and (max-width: 1023px) { .pa-step { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 40px; } }
 .pa-ph { position: relative; margin: 0; aspect-ratio: 4 / 3; overflow: hidden; }
 .pa-ph img { width: 100%; height: 100%; object-fit: cover; }
+/* takes do vídeo do Studio (img/takes): o vídeo cobre a foto, que é o mesmo quadro, e aparece quando começa a tocar */
+.pa-ph .take, .p-img .take { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 700ms var(--ease); }
+.pa-ph .take.on, .p-img .take.on { opacity: 1; }
+.pa-ph.v { aspect-ratio: 4 / 5; }
 .pa-t { display: block; font: 400 clamp(52px, 6vw, 112px)/0.9 var(--serif); letter-spacing: -0.04em; color: var(--gold-text); font-variant-numeric: tabular-nums; }
 .pa-tx h3 { margin-top: 14px; font-size: clamp(32px, 3.2vw, 54px); line-height: 1.02; letter-spacing: -0.03em; }
 .pa-tx p { margin-top: 16px; font-size: 18px; color: var(--ink-2); max-width: 36ch; }
@@ -199,9 +203,9 @@ html.pa-live .pa-step { position: absolute; inset: 0; display: block; pointer-ev
 html.pa-live .pa-step.on { pointer-events: auto; }
 html.pa-live .pa-ph { position: absolute; left: 0; top: 0; bottom: 0; width: 56vw; aspect-ratio: auto; opacity: 0; transition: opacity 900ms var(--ease); }
 html.pa-live .pa-ph::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 60%, var(--paper) 100%); }
-html.pa-live .pa-ph img { transform: scale(1.1); transition: transform 2600ms var(--ease); }
+html.pa-live .pa-ph img, html.pa-live .pa-ph .take { transform: scale(1.1); transition: transform 2600ms var(--ease), opacity 700ms var(--ease); }
 html.pa-live .pa-step.on .pa-ph { opacity: 1; }
-html.pa-live .pa-step.on .pa-ph img { transform: scale(1); }
+html.pa-live .pa-step.on .pa-ph img, html.pa-live .pa-step.on .pa-ph .take { transform: scale(1); }
 html.pa-live .pa-tx { position: absolute; left: 60vw; right: var(--gut-r); top: 56%; transform: translateY(-40%); opacity: 0; transition: opacity 450ms var(--ease), transform 900ms var(--ease); }
 html.pa-live .pa-step.on .pa-tx { opacity: 1; transform: translateY(-50%); transition-delay: 180ms; }
 html.pa-live .pa-t { font-size: min(6vw, 11vh, 112px); }
@@ -259,7 +263,9 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 @keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(8px); } }
 .prog { width: 66vw; flex-shrink: 0; display: grid; grid-template-columns: 31vw minmax(0, 1fr); gap: 4vw; align-items: end; }
 .p-img { height: min(72vh, 700px); overflow: hidden; box-shadow: var(--shadow-lg); background: var(--paper-2); clip-path: inset(0% 0% 0% 0%); will-change: transform; }
-.p-img img { width: 118%; max-width: none; height: 100%; object-fit: cover; margin-left: -9%; will-change: transform; }
+.p-img { position: relative; }
+.p-img img, .p-img .take { width: 118%; max-width: none; height: 100%; object-fit: cover; margin-left: -9%; will-change: transform; }
+.p-img .take { left: 0; }
 .p-meta { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); font-size: 14px; color: var(--ink-3); }
 .prog h3 { margin-top: 22px; font-size: clamp(72px, 8.4vw, 150px); line-height: 0.86; letter-spacing: -0.05em; }
 .prog p { margin-top: 22px; color: var(--ink-2); max-width: 34ch; }
@@ -280,7 +286,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
   .prog-row::-webkit-scrollbar { display: none; }
   .prog { flex: 0 0 min(84%, 440px); width: auto; grid-template-columns: minmax(0, 1fr); gap: 22px; scroll-snap-align: start; }
   .p-img { height: auto; aspect-ratio: 1 / 1.08; box-shadow: none; }
-  .p-img img { width: 100%; margin-left: 0; }
+  .p-img img, .p-img .take { width: 100%; margin-left: 0; }
   .prog h3 { font-size: clamp(54px, 15vw, 84px); }
   .hs-track .swipe-dots { margin-top: -18px; }
   .hs-bar, .hs-bg { display: none; }
@@ -586,7 +592,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       </div>
       <ol class="pa-steps">
         <li class="pa-step on">
-          <figure class="pa-ph"><img src="img/hero-real.jpg" alt="Professores do Studio Evolution BJJ sorrindo no tatame, de kimono branco" loading="lazy" width="1531" height="1027" style="object-position:48% 30%"></figure>
+          <figure class="pa-ph v"><img src="img/takes/chega.jpg" alt="Professor do Studio Evolution conversando com um aluno no tatame" loading="lazy" width="720" height="900" style="object-position:60% 40%"><video class="take" data-take="img/takes/chega" poster="img/takes/chega.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:60% 40%"></video></figure>
           <div class="pa-tx"><span class="pa-t">18:50</span><h3>Você chega.</h3><p>Alguns minutos antes da aula. Tira o tênis, veste o kimono emprestado e conhece o professor, que te recebe pelo nome.</p></div>
         </li>
         <li class="pa-step">
@@ -594,19 +600,19 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           <div class="pa-tx"><span class="pa-t">19:00</span><h3>A turma se alinha.</h3><p>Todo mundo no tatame, um cumprimento ao professor e a aula começa. Aqui, cada um respeita o ritmo do outro.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame" loading="lazy" width="1264" height="848" style="object-position:52% 60%"></figure>
+          <figure class="pa-ph v"><img src="img/takes/aquecimento.jpg" alt="Professor demonstrando um rolamento no tatame" loading="lazy" width="720" height="900" style="object-position:50% 50%"><video class="take" data-take="img/takes/aquecimento" poster="img/takes/aquecimento.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:05</span><h3>Aquecimento.</h3><p>Você aquece junto com a turma, com movimentos do próprio jiu-jitsu. Quem está começando faz a versão mais leve.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph"><img src="img/aula-jiu-jitsu.webp" alt="Professor ensinando um movimento a um aluno pequeno" loading="lazy" width="900" height="913" style="object-position:40% 50%"></figure>
+          <figure class="pa-ph v"><img src="img/takes/tecnica.jpg" alt="Dois alunos repetindo uma passagem de guarda no tatame" loading="lazy" width="720" height="900" style="object-position:50% 50%"><video class="take" data-take="img/takes/tecnica" poster="img/takes/tecnica.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:20</span><h3>Movimentos básicos.</h3><p>O professor mostra uma posição passo a passo e você repete com um parceiro, devagar, até ficar natural.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph"><img src="img/treino-tecnica.webp" alt="Dois alunos repetindo uma técnica no chão do tatame" loading="lazy" width="1200" height="800"></figure>
+          <figure class="pa-ph v"><img src="img/takes/guarda.jpg" alt="Dois alunos treinando a guarda com calma, sem luta pesada" loading="lazy" width="720" height="900" style="object-position:50% 50%"><video class="take" data-take="img/takes/guarda" poster="img/takes/guarda.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 50%"></video></figure>
           <div class="pa-tx"><span class="pa-t">19:40</span><h3>Sem luta pesada.</h3><p>No primeiro dia, ninguém te coloca numa luta. Você aprende, repete e entende o jogo. O resto vem com o tempo.</p></div>
         </li>
         <li class="pa-step">
-          <figure class="pa-ph"><img src="img/professores-evolution.webp" alt="Professores do Studio Evolution lado a lado, sorrindo" loading="lazy" width="1200" height="800" style="object-position:50% 40%"></figure>
+          <figure class="pa-ph v"><img src="img/takes/resenha.jpg" alt="Dois alunos rindo e conversando sentados no tatame depois do treino" loading="lazy" width="720" height="900" style="object-position:50% 45%"><video class="take" data-take="img/takes/resenha" poster="img/takes/resenha.jpg" muted loop playsinline preload="none" aria-hidden="true" style="object-position:50% 45%"></video></figure>
           <div class="pa-tx"><span class="pa-t">Fim</span><h3>Você sai mais leve.</h3><p>Cansado, com a cabeça leve e com vontade de voltar. A primeira aula é por nossa conta.</p><a class="btn btn-ink" href="agendamento.html" data-int>Agendar minha primeira aula<svg class="ic"><use href="#i-arrow"/></svg></a></div>
         </li>
       </ol>
@@ -627,7 +633,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         </div>
         <div class="prog-row" data-swipe>
         <article class="prog" data-vt-card data-cursor="Ver turma">
-          <div class="p-img"><img src="img/programa-adulto-real.jpg" alt="Aluno adulto trabalhando a guarda com um colega no tatame" width="1264" height="848" style="object-position:62% 50%"></div>
+          <div class="p-img"><img src="img/takes/rolagem.jpg" alt="Dois alunos adultos treinando no tatame, em frente ao letreiro do Studio Evolution" width="720" height="900"><video class="take" data-take="img/takes/rolagem" poster="img/takes/rolagem.jpg" muted loop playsinline preload="none" aria-hidden="true"></video></div>
           <div>
             <div class="p-meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h</span></div>
             <h3>Adulto</h3>
@@ -1041,6 +1047,32 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       /* sua primeira aula: no computador o capítulo fica preso e cada passo entra inteiro, de uma vez;
          no celular vira uma linha do tempo em que cada foto se abre ao chegar */
       var paSteps = $$(".pa-step"), paBars = $$(".pa-bars i"), paN = $(".pa-n"), paCount = paSteps.length;
+      /* takes do vídeo do Studio: cada um só baixa quando aparece e só toca enquanto está à vista;
+         no capítulo preso do computador, toca apenas o do passo ativo. Sem vídeo com "reduzir movimento" ou economia de dados */
+      var noTakes = Site.reduce || !!(navigator.connection && navigator.connection.saveData) || !("IntersectionObserver" in window);
+      var seen = new Map();
+      /* MP4 (H.264) onde o navegador toca; senão, WebM (VP9) */
+      var probe = document.createElement("video");
+      var takeExt = probe.canPlayType('video/mp4; codecs="avc1.640028"') ? ".mp4" : probe.canPlayType('video/webm; codecs="vp9"') ? ".webm" : "";
+      if (!takeExt) noTakes = true;
+      function takeOn(v, on) {
+        if (on) {
+          if (!v.getAttribute("src")) { v.src = v.dataset.take + takeExt; v.addEventListener("playing", function () { v.classList.add("on"); }, { once: true }); }
+          var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+        } else if (v.getAttribute("src")) v.pause();
+      }
+      function takesRefresh() {
+        if (noTakes) return;
+        var live = S.root.classList.contains("pa-live");
+        seen.forEach(function (vis, v) {
+          var step = v.closest(".pa-step");
+          takeOn(v, vis && (!live || !step || step.classList.contains("on")));
+        });
+      }
+      if (!noTakes) {
+        var tio = new IntersectionObserver(function (es) { es.forEach(function (e) { seen.set(e.target, e.isIntersecting); }); takesRefresh(); }, { threshold: 0.25 });
+        $$("video.take").forEach(function (v) { seen.set(v, false); tio.observe(v); });
+      }
       var pad2 = function (n) { return (n < 10 ? "0" : "") + n; };
       mm.add("(min-width: 1024px)", function () {
         S.root.classList.add("pa-live");
@@ -1051,6 +1083,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           paSteps.forEach(function (s, k) { s.classList.toggle("on", k === i); });
           paBars.forEach(function (b, k) { b.classList.toggle("on", k <= i); });
           paN.textContent = pad2(i + 1) + " / " + pad2(paCount);
+          takesRefresh();
         };
         set(0);
         ScrollTrigger.create({ trigger: ".pa", start: "top top", end: function () { return "+=" + Math.round(window.innerHeight * paCount * 0.62); }, pin: ".pa-pin", anticipatePin: 1, invalidateOnRefresh: true,
@@ -1082,7 +1115,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           gsap.set(h3, { transformPerspective: 900, transformOrigin: "0% 50%" });
           gsap.fromTo(pi, { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left 102%", end: "left 62%", scrub: true } });
           gsap.fromTo(pi, { rotationY: -34 }, { rotationY: 26, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left right", end: "right left", scrub: true } });
-          gsap.fromTo($("img", p), { xPercent: -7 }, { xPercent: 7, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left right", end: "right left", scrub: true } });
+          gsap.fromTo($$("img, .take", p), { xPercent: -7 }, { xPercent: 7, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left right", end: "right left", scrub: true } });
           gsap.from(h3, { yPercent: 40, opacity: 0, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left 85%", end: "left 45%", scrub: true } });
           gsap.fromTo(h3, { rotationY: 40 }, { rotationY: -14, ease: "none", scrollTrigger: { trigger: p, containerAnimation: hsTween, start: "left right", end: "right left", scrub: true } });
         });

@@ -14,6 +14,7 @@ Versão publicada (privada): https://claude.ai/artifact/7PbBFQCkuSw1SPbBvzXHuw
 - `site/site.js`: comportamento comum. `Site.boot({ intro, setup, loader })`, aberturas de cinema, fitas cruzadas (faixas pretas de jiu-jitsu), inclinação 3D (`data-tilt3d`, `data-z`, `data-glare`, `data-tilt-touch`, `data-stand`), kanjis em volume e vitrine nos trilhos do celular.
 - `site/faixa3d.js`: a faixa em 3D realista da seção "A faixa" (Three.js r149, carregado só quando a seção se aproxima; sem WebGL, fica o SVG).
 - `site/img/`: fotos e vídeo do Studio, e as texturas do tecido da faixa (`faixa-normal.webp`, `faixa-detalhe.webp`, `faixa-preta.webp`).
+- `site/img/takes/`: cenas curtas do vídeo gravado no Studio (MP4 e WebM, 720x900, câmera um pouco lenta, sem som) e o primeiro quadro de cada uma. Usadas na "Sua primeira aula" e no cartão da turma Adulto; cada take só baixa quando aparece e só toca enquanto está à vista.
 - `tools/faixa-texturas.py`: gera as texturas da faixa a partir de um mapa de altura do tecido (`python3 tools/faixa-texturas.py <pasta>`).
 - `site/medalha3d.js`: a medalha da Equipe TRUE em 3D na seção "Equipe TRUE" (frente com a logo da TRUE, verso com a do Studio). Usa o mesmo Three.js da faixa; sem WebGL, fica a foto do medalhão.
 - `tools/medalha-mapas.py`: gera os mapas de relevo e material das duas faces da medalha (`site/img/medalha-*.webp`) a partir de `tools/fontes/logo-true.png` (logo oficial, baixada de bjjtrue.com) e de `site/img/logo-evolution-refinada.png`.

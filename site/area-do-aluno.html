@@ -36,7 +36,7 @@
 
 /* ---------- celular: peças só desta página ---------- */
 /* Início: o "mudar" da meta fica na linha da semana, sem altura extra; a área de toque cresce por fora do texto */
-.ap-wkh { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 18px; }
+.ap-wkh { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 18px; }
 .ap-wkb { position: relative; flex-shrink: 0; padding: 0; border: 0; background: none; color: var(--ink-2); font: 500 12px/1.15 var(--sans); text-decoration: underline; text-decoration-color: color-mix(in oklch, var(--ink-2) 55%, transparent); text-underline-offset: 3px; cursor: pointer; }
 .ap-wkb::before { content: ""; position: absolute; inset: -15px -12px; }
 .ap-wkb:hover { color: var(--ink); text-decoration-color: var(--gold); }
@@ -61,7 +61,8 @@
 .ap-codef:focus-within #apCode b.caret { border-color: var(--gold-text); }
 .ap-codef.bad #apCode b { border-color: var(--warn); }
 #apCodeIn { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 0; -webkit-appearance: none; appearance: none; background: transparent; color: transparent; -webkit-text-fill-color: transparent; caret-color: transparent; font: 400 24px/1 var(--serif); cursor: text; }
-#apCodeIn::selection { background: transparent; }
+#apCodeIn::selection { background: transparent; color: transparent; -webkit-text-fill-color: transparent; }
+#apCodeWrap { margin-inline: -5px; padding-inline: 5px; }  /* o anel de foco do campo (3 + 2 px) cabe dentro do recorte que recolhe o bloco */
 .ap-err { font-size: 12px; line-height: 1.35; color: var(--warn); }
 .ap-err:not(:empty) { margin-top: 8px; }
 .ap-steps .skip .ap-st { color: var(--ink-2); }

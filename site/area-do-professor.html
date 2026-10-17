@@ -736,7 +736,7 @@
     var m = st.order.length, conf = CONF.length, taken = conf + st.walk.length;
     var prof = st.order.filter(function (n) { return st.by[n] === "prof"; }).length;
     var r = $("#rCount");
-    if (r) r.textContent = conf + " de 10 vagas confirmadas · " + (m ? m + " no tatame" + (prof ? " (" + (m - prof) + " pelo app, " + prof + " pelo professor)" : "") : "ninguém chegou ainda");
+    if (r) r.textContent = conf + " de 10 vagas confirmadas · " + (m ? m + " no tatame" + (prof ? " (" + (m > prof ? m - prof + " pelo app, " : "") + prof + " pelo professor)" : "") : "ninguém chegou ainda");
     $$("#capBar i").forEach(function (b, i) { b.className = i < m ? "in" : i < taken ? "c" : ""; });
     $("#c19s").innerHTML = conf + " de 10" + (m ? "<br>" + m + " no tatame" : "");
     /* presenças da semana: cada adulto que chega e cada criança marcada agora */
