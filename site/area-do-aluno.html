@@ -4,26 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Área do Aluno · Studio Evolution BJJ</title>
+<script src="supabase-config.js"></script>
+<script src="acesso.js"></script>
 <script>
-/* acesso: esta área só abre com login (entrar.html); a sessão de professor também abre esta área. Roda antes de tudo, para a cortina
-   da troca de página seguir para a tela de entrada. Sem servidor, é uma conferência de demonstração:
-   na produção, quem confere a sessão é o backend */
-(function () {
-  var need = "aluno", s = null;
-  ["sessionStorage", "localStorage"].forEach(function (k) { if (s) return; try { s = JSON.parse(window[k].getItem("evo-sessao") || "null"); } catch (e) {} });
-  var q = /[?&]acesso=(aluno|professor)/.exec(location.search);
-  if (!s && q) s = { papel: q[1] };
-  if (!s || (s.papel !== need && !(need === "aluno" && s.papel === "professor"))) {
-    document.documentElement.style.display = "none";
-    location.replace("entrar.html" + (need === "professor" ? "#professor" : ""));
-    return;
-  }
-  /* "Sair" apaga a sessão antes de a página trocar */
-  document.addEventListener("click", function (e) {
-    if (!e.target.closest || !e.target.closest("[data-sair]")) return;
-    ["sessionStorage", "localStorage"].forEach(function (k) { try { window[k].removeItem("evo-sessao"); } catch (e2) {} });
-  }, true);
-})();
+/* esta área só abre com login (entrar.html); a sessão de professor também abre esta área. Roda antes de tudo, para a cortina da troca de
+   página seguir para a tela de entrada; no modo Supabase, a sessão é conferida com o servidor logo depois (acesso.js) */
+Acesso.portao("aluno");
 </script>
 <script>
 (function () {
