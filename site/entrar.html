@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Entrar · Studio Evolution BJJ</title>
+<meta name="theme-color" content="#14110d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Evolution">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/app/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
 <script>
 (function () {
   var d = document.documentElement, l = "black";
@@ -26,6 +34,13 @@
 <link rel="stylesheet" href="site.css">
 <script src="supabase-config.js"></script>
 <script src="acesso.js"></script>
+<script>
+/* o app instalado no celular abre aqui (entrar.html?app): quem já está conectado vai direto para o seu app */
+(function () {
+  var s = /[?&]app\b/.test(location.search) && Acesso.sessao();
+  if (s) { document.documentElement.style.display = "none"; location.replace(Acesso.area(s.papel)); }
+})();
+</script>
 <link rel="stylesheet" href="acesso.css">
 <link rel="stylesheet" href="tema.css">
 </head>
@@ -216,7 +231,14 @@
     if (ext) { v.src = "img/takes/chega" + ext; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
   }
 
+  /* aberta pelo app instalado (?app): o app abre mesmo sem internet (sw.js) e sem a música do site */
+  var comoApp = /[?&]app\b/.test(location.search);
+  if (comoApp && "serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {}
+  }
+
   Site.boot({
+    music: comoApp ? false : undefined,
     intro: function (S) {
       var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
       tl.from(".lg-media", { opacity: 0, duration: 1.6 }, 0)

@@ -9,6 +9,8 @@ O que já está pronto:
 | Peça | Onde | O que faz |
 |---|---|---|
 | Tela de entrada | `site/entrar.html` | E-mail e senha, aluno ou professor, manter conectado, esqueci a senha |
+| App do aluno | `site/app.html` | Para onde o aluno vai depois de entrar; cumprimenta pelo nome do perfil |
+| Painel do professor | `site/area-do-professor.html?painel` | Para onde o professor vai depois de entrar |
 | Senha nova | `site/nova-senha.html` | Recebe o link do e-mail de "Esqueci a senha" e salva a senha nova |
 | Acessos ao app | `site/acessos.html` | O professor cria o login de um aluno (ou de outro professor) e manda pelo WhatsApp |
 | Módulo de acesso | `site/acesso.js` | Login, saída, conferência da sessão nas áreas, os dois modos |
@@ -91,6 +93,7 @@ no site a chave secreta (`sb_secret_...` / `service_role`).
   - O papel (aluno ou professor) vem da tabela `perfis`. Um aluno que escolher "Sou professor" recebe o aviso para trocar.
   - A sessão fica no navegador. Sem "Manter conectado", ela some ao fechar a aba (`sessionStorage`); com ele, fica guardada (`localStorage`).
 - **Áreas:**
+  - Depois de entrar, o aluno vai para `app.html` e o professor para o painel (`area-do-professor.html?painel`).
   - No `<head>`, `Acesso.portao("aluno" | "professor")` decide antes de a página aparecer, usando o papel guardado.
   - Logo depois, confere a sessão com o servidor (`auth.getUser`). Sessão vencida ou conta desativada (`ativo = false`) voltam para a entrada.
   - A sessão de professor também abre a Área do Aluno.
@@ -110,6 +113,8 @@ tela ao banco é a próxima etapa. Cada uma vira uma tabela com as mesmas regras
 - faixas e graus;
 - interessados vindos do Agendar;
 - mensalidades, com o Asaas e os lembretes da Evolution API.
+
+O service worker do app (`site/sw.js`) não guarda nada do Supabase: login e dados vão sempre direto ao servidor.
 
 Dentro do artifact (claude.ai), o login de verdade não funciona: a página bloqueia conexões com outros sites. Lá vale
 o modo demonstração. O login real vale no domínio da academia.

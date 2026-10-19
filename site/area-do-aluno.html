@@ -41,76 +41,8 @@ Acesso.portao("aluno");
 .diff { background: var(--paper-2); }
 .hc small { color: var(--cine-fg-2); }  /* no celular, o cartão de cima fica sobre o brilho dourado: o cinza mais claro mantém 4,5:1 */
 
-/* ---------- celular: peças só desta página ---------- */
-/* Início: o "mudar" da meta fica na linha da semana, sem altura extra; a área de toque cresce por fora do texto */
-.ap-wkh { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 18px; }
-.ap-wkb { position: relative; flex-shrink: 0; padding: 0; border: 0; background: none; color: var(--ink-2); font: 500 12px/1.15 var(--sans); text-decoration: underline; text-decoration-color: color-mix(in oklch, var(--ink-2) 55%, transparent); text-underline-offset: 3px; cursor: pointer; }
-.ap-wkb::before { content: ""; position: absolute; inset: -15px -12px; }
-.ap-wkb:hover { color: var(--ink); text-decoration-color: var(--gold); }
-/* linha que é botão (mensalidade): o mesmo desenho da .ap-row, com a seta */
-.ap-rowbtn { width: 100%; border: 0; border-top: 1px solid var(--rule); background: none; color: inherit; font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; }
-.ap-rowbtn .r .ic { transition: transform 300ms var(--ease); }
-.ap-rowbtn:hover .r .ic { transform: translateX(2px); }
-/* liberar a vaga: o link fica na linha do botão (cerca de 222 px); o botão perde a folga interna do navegador
-   para "Vaga confirmada" caber numa linha só. A pergunta aparece dentro do cartão, no lugar dos dois */
-#apBtnRow { gap: 10px; }
-#apBtnRow .ap-btn { gap: 6px; padding: 0 2px; }
-.ap-ask { margin-top: 14px; }
-.ap-ask p { font: 400 16px/1.25 var(--serif); }
-.ap-ask .ap-btnrow { gap: 8px; margin-top: 10px; }
-
-/* Presença: um campo de verdade, transparente, por cima das seis caixas, que só desenham o que foi digitado.
-   Fonte de 24 px (o Safari não dá zoom ao focar) e cursor nativo escondido (o das caixas já mostra onde digitar) */
-.ap-codef { position: relative; margin-top: 12px; }
-.ap-codef .ap-code { margin-top: 0; }
-#apCode b { border-color: var(--ink-3); }  /* contorno das caixas com pelo menos 3:1 sobre o campo */
-#apCode b.caret { border-color: var(--ink); }
-.ap-codef:focus-within #apCode b.caret { border-color: var(--gold-text); }
-.ap-codef.bad #apCode b { border-color: var(--warn); }
-/* o campo esconde a própria seleção e o cursor; as caixas mostram os dois: o trecho selecionado ganha o dourado
-   (a próxima tecla o substitui) e a caixa cheia onde está o cursor, contorno e traço dourados embaixo */
-.ap-codef:focus-within #apCode b.hl { background: color-mix(in oklch, var(--gold) 30%, var(--field)); }
-.ap-codef:focus-within #apCode b.at { border-color: var(--gold-text); box-shadow: inset 0 -3px 0 var(--gold-text); }
-#apCodeIn { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 0; -webkit-appearance: none; appearance: none; background: transparent; color: transparent; -webkit-text-fill-color: transparent; caret-color: transparent; font: 400 24px/1 var(--serif); cursor: text; }
-#apCodeIn::selection { background: transparent; color: transparent; -webkit-text-fill-color: transparent; }
-#apCodeWrap { margin-inline: -5px; padding-inline: 5px; }  /* o anel de foco do campo (3 + 2 px) cabe dentro do recorte que recolhe o bloco */
-.ap-err { font-size: 12px; line-height: 1.35; color: var(--warn); }
-.ap-err:not(:empty) { margin-top: 8px; }
-.ap-steps .skip .ap-st { color: var(--ink-2); }
-
-/* Movimentos: a tela ganha .quiz durante o quiz, e tema.css desenha o cartão .quiz do Início do site
-   (linha dourada e sombra) em qualquer .quiz; aqui a tela continua lisa */
-.ap-view.quiz { border-radius: 0; box-shadow: none; }
-/* o retorno do quiz fica sempre na árvore (região de status), sem espaço quando vazio */
-.ap-quiz .fb:empty { margin: 0; }
-.ap-list .pill-s { display: inline-block; margin-left: 6px; padding: 2px 7px; vertical-align: 1px; }
-#apMovLb { letter-spacing: 0.16em; }  /* com a unidade ("5 de 12 movimentos"), o rótulo cabe numa linha */
-
-/* Perfil: "5 de 12" no trio, com o "de 12" menor para caber na coluna; as 8 competências em linhas compactas */
-.ap-trio b small { font-size: 15px; letter-spacing: 0; }
-.ap-comp li { padding-block: 4px; font-size: 13px; line-height: 1.35; }
-
-/* Avisos: cada aviso é um botão que leva à tela certa; o relógio volta ao Início */
-.ap-note { width: 100%; border: 0; color: inherit; font: inherit; text-align: left; }
-button.ap-note { cursor: pointer; }
-button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
-.ap-note .nb { display: block; min-width: 0; }
-.ap-note .tx { display: block; font-size: 12px; line-height: 1.35; opacity: 0.92; }
-.ap-lock .clock { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
-.ap-lock :focus-visible { outline-color: var(--cine-gold); }  /* a tela bloqueada é sempre escura */
-
-/* mensalidade: uma folha que sobe dentro do celular, por cima do dock; o fundo escurece e fecha ao toque */
-.ap-scrim { position: absolute; inset: 0; z-index: 21; background: oklch(0 0 0 / 0.38); opacity: 0; visibility: hidden; transition: opacity 450ms var(--ease), visibility 0s linear 450ms; }
-.ap-scrim.on { opacity: 1; visibility: visible; transition: opacity 450ms var(--ease), visibility 0s; }
-.ap-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 22; padding: 18px 18px 30px; border-radius: 22px 22px 0 0; background: var(--paper); box-shadow: 0 -20px 40px -24px oklch(0 0 0 / 0.5), 0 -1px 0 var(--rule); transform: translateY(104%); visibility: hidden; transition: transform 600ms var(--ease), visibility 0s linear 600ms; }
-.ap-sheet.on { transform: none; visibility: visible; transition: transform 600ms var(--ease), visibility 0s; }
-.ap-sheet-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.ap-x { position: relative; width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--paper-2); color: var(--ink); cursor: pointer; }
-.ap-x::before { content: ""; position: absolute; inset: -6px; }
-.ap-x .ic { width: 14px; height: 14px; stroke-width: 2; }
-.ap-sheet .ap-hi { margin-top: 10px; }
-.ap-sheet .ap-btn.ghost { margin-top: 8px; }
-
+/* as peças das telas do celular (Início, Presença, Movimentos, Perfil, Avisos e a folha da mensalidade) estão em app.css,
+   divididas com o app de verdade (app.html) */
 /* capítulo 05: exemplo do aviso de grau, no desenho da notificação da tela bloqueada */
 .note-ex { margin-top: 26px; max-width: 46ch; }
 .note-ex .ap-note { margin-top: 12px; opacity: 1; transform: none; background: var(--cine-bg-2); color: var(--cine-fg); box-shadow: 0 0 0 1px var(--rule), 0 24px 40px -28px oklch(0 0 0 / 0.6); }
@@ -128,9 +60,6 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
   .ar-switch a { display: flex; align-items: center; min-height: 44px; }  /* tema.css usa 12 px: a altura não depende da fonte */
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ap-sheet, .ap-sheet.on, .ap-scrim, .ap-scrim.on, .ap-rowbtn .r .ic { transition: none !important; }
-}
 </style>
 <link rel="stylesheet" href="tema.css">
 </head>

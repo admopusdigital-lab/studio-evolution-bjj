@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Área do Professor · Studio Evolution BJJ</title>
+<meta name="theme-color" content="#14110d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Evolution">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/app/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
 <script src="supabase-config.js"></script>
 <script src="acesso.js"></script>
 <script>
@@ -19,6 +26,8 @@ Acesso.portao("professor");
   if (location.hash === "#claro") l = "light";
   d.setAttribute("data-look", l);
   d.setAttribute("data-page", "professor");
+  /* ?painel: o painel em tela cheia, para onde o professor vai depois de entrar (acesso.js); sem ?painel, a vitrine */
+  if (/[?&]painel\b/.test(location.search)) { d.setAttribute("data-mode", "painel"); document.title = "Painel · Studio Evolution BJJ"; }
   try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
     var im = sessionStorage.getItem("evo-nav-img");
     if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
@@ -250,6 +259,23 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   .tog[aria-checked="true"]::after { transform: translateX(20px); }
   .rules li { grid-template-columns: 48px minmax(0, 1fr); }
 }
+/* ---------- modo painel (?painel): o painel em tela cheia, sem a vitrine em volta. Abaixo dele, só o Modo tatame ---------- */
+.pn-top { display: none; }
+[data-mode="painel"] :is(#nav, .ar-hero, .demo-head, .diff, .bridge, .foot, .dash-bar, .dash-side .logo, .progress) { display: none; }
+[data-mode="painel"] .pdemo { padding: 0; }
+[data-mode="painel"] .pdemo > .wrap { max-width: none; padding: 0; }
+[data-mode="painel"] .dash-wrap { margin-top: 0; }
+[data-mode="painel"] .dash { max-width: none; border-radius: 0; box-shadow: none; }
+[data-mode="painel"] .dash-in { min-height: calc(100vh - 56px); min-height: calc(100dvh - 56px - env(safe-area-inset-top, 0px)); }
+[data-mode="painel"] .pn-top { position: sticky; z-index: 50; top: 0; display: flex; align-items: center; gap: 18px; height: calc(56px + env(safe-area-inset-top, 0px)); padding: env(safe-area-inset-top, 0px) var(--gut-r) 0 var(--gut); background: var(--paper); color: var(--ink); border-bottom: 1px solid var(--rule); }
+.pn-top .logo { width: 118px; flex-shrink: 0; }
+.pn-top .pn-t { font: 600 10.5px/1.3 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+.pn-top nav { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+.pn-top nav :is(a, button) { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font: 500 13.5px/1 var(--sans); text-decoration: none; white-space: nowrap; cursor: pointer; transition: background-color 300ms, color 300ms; }
+.pn-top nav :is(a, button):hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 5%, transparent); }
+.pn-top nav .pn-sair { color: var(--warn); }
+@media (max-width: 860px) { [data-mode="painel"] .dash-in { min-height: 0; } .pn-top .pn-t { display: none; } }
+@media (max-width: 600px) { [data-mode="painel"] .pn-top { gap: 6px; } .pn-top .logo { width: 88px; } .pn-top nav :is(a, button) { padding: 0 8px; font-size: 12.5px; } .pn-top nav .pn-tv { display: none; } }
 </style>
 <link rel="stylesheet" href="tema.css">
 </head>
@@ -296,6 +322,18 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       </div>
     </div>
   </div>
+</header>
+
+<!-- topo do modo painel (?painel): no lugar do menu do site -->
+<header class="pn-top" aria-label="Painel do professor">
+  <span class="logo" role="img" aria-label="Studio Evolution BJJ"></span>
+  <span class="pn-t">Painel do professor</span>
+  <nav aria-label="Atalhos do painel">
+    <a class="pn-tv" href="#tatame">Modo tatame</a>
+    <a href="acessos.html" data-int>Acessos</a>
+    <button type="button" id="pnLook">Versão clara</button>
+    <a class="pn-sair" href="entrar.html#professor" data-sair>Sair</a>
+  </nav>
 </header>
 
 <main id="top">
@@ -2158,7 +2196,22 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   /* telas escondidas já nascem fora do Tab e do leitor de tela */
   syncInert();
 
+  /* modo painel: o tema é trocado pelo topo do painel (o botão do site fica no menu, escondido) */
+  var pnLook = $("#pnLook");
+  if (pnLook) {
+    var pnPaint = function () { pnLook.textContent = document.documentElement.getAttribute("data-look") === "black" ? "Versão clara" : "Versão black"; };
+    pnPaint();
+    new MutationObserver(pnPaint).observe(document.documentElement, { attributes: true, attributeFilter: ["data-look"] });
+    pnLook.addEventListener("click", function () { Site.paintLook(document.documentElement.getAttribute("data-look") === "black" ? "light" : "black"); });
+  }
+  var painel = document.documentElement.getAttribute("data-mode") === "painel";
+  /* o painel também abre como app instalado (sw.js guarda as telas) */
+  if (painel && "serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {}
+  }
+
   Site.boot({
+    music: painel ? false : undefined,
     intro: function (S) {
       var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
       tl.from(S.split($(".ar-title"), "words"), { yPercent: 140, duration: 1.5, stagger: 0.07 })

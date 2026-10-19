@@ -110,7 +110,7 @@ Acesso.portao("professor");
           <div class="ctas"><a class="btn btn-ink" id="acWa" href="#" target="_blank" rel="noopener">Enviar pelo WhatsApp<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a><button class="link" type="button" id="acCopiar">Copiar mensagem</button><button class="link" type="button" id="acOutro">Fazer outro</button></div>
           <p class="lg-note">A senha provisória só aparece agora. Depois de entrar, a pessoa pode trocar em Esqueci a senha.</p>
         </div>
-        <a class="link lg-back" href="area-do-professor.html" data-int>Voltar ao painel</a>
+        <a class="link lg-back" href="area-do-professor.html?painel" data-int>Voltar ao painel</a>
       </div>
     </div>
   </section>
@@ -170,9 +170,10 @@ Acesso.portao("professor");
       $("#acResT").textContent = criar ? "Acesso criado" + (primeiro ? " para " + primeiro : "") + "." : "Senha nova gerada" + (primeiro ? " para " + primeiro : "") + ".";
       $("#acResEmail").textContent = r.email || dados.email;
       $("#acResSenha").textContent = r.senha;
-      var link = new URL("entrar.html", location.href).href;
+      var link = new URL("entrar.html?app", location.href).href;
       msgWa = (primeiro ? "Olá, " + primeiro + "! " : "Olá! ") + (criar ? "Seu acesso ao app do Studio Evolution BJJ está pronto." : "Aqui está sua senha nova do app do Studio Evolution BJJ.") +
-        "\n\nEntre em: " + link + "\nLogin: " + (r.email || dados.email) + "\nSenha provisória: " + r.senha + "\n\nDepois de entrar, você pode trocar a senha em Esqueci a senha.";
+        "\n\nEntre em: " + link + "\nLogin: " + (r.email || dados.email) + "\nSenha provisória: " + r.senha + "\n\nDepois de entrar, você pode trocar a senha em Esqueci a senha." +
+        "\n\nPara ter o app no celular: abra o link e toque em Instalar (Android) ou em Compartilhar e depois Adicionar à Tela de Início (iPhone).";
       var n = fone(whats.value);
       $("#acWa").href = "https://wa.me/" + n + "?text=" + encodeURIComponent(msgWa);
       $("#acWa").hidden = !n;

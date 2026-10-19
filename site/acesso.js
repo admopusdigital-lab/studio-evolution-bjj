@@ -12,7 +12,9 @@
   var TOKEN = "evo-auth";          /* onde o Supabase guarda a sessão (storageKey) */
   var SESSAO = "evo-sessao";       /* { papel, nome }: o que as páginas precisam saber na hora */
   var MANTER = "evo-manter";       /* "1": a sessão fica no localStorage (sobrevive ao fechar o navegador) */
-  var AREA = { aluno: "area-do-aluno.html", professor: "area-do-professor.html" };
+  /* depois de entrar, cada um cai no seu app: o do aluno (app.html) ou o painel em tela cheia (a área do professor com ?painel).
+     As vitrines (area-do-aluno.html e area-do-professor.html) continuam abertas para quem tem login */
+  var AREA = { aluno: "app.html", professor: "area-do-professor.html?painel" };
   var DEMO_SENHA = "evolution";
 
   /* armazenamento: sessionStorage por padrão, localStorage com "Manter conectado"; aba privada sem nenhum dos dois não quebra */
@@ -88,7 +90,7 @@
         if (senha === DEMO_SENHA && n === outro && !permite(outro, papel)) return Promise.resolve({ ok: false, campo: "usuario", msg: trocado });
         if (senha !== DEMO_SENHA || (n !== papel && !(n === "professor" && permite(n, papel)))) return Promise.resolve({ ok: false, campo: "senha", msg: "Usuário ou senha não conferem. Confira e tente de novo." });
         var salvo = gravar(SESSAO, JSON.stringify({ papel: n, nome: n === "professor" ? "Professor" : "Aluno", desde: new Date().toISOString() }));
-        return Promise.resolve({ ok: true, papel: n, destino: AREA[papel] + (salvo ? "" : "?acesso=" + n) });
+        return Promise.resolve({ ok: true, papel: n, destino: AREA[papel] + (salvo ? "" : (AREA[papel].indexOf("?") < 0 ? "?" : "&") + "acesso=" + n) });
       }
 
       if (u.indexOf("@") < 0) return Promise.resolve({ ok: false, campo: "usuario", msg: "Digite o e-mail cadastrado no Studio." });
