@@ -87,7 +87,7 @@
     var items = $$(".links a", nav).map(function (a) {
       return '<a href="' + a.getAttribute("href") + '" data-int><span>' + a.textContent.trim() + "</span></a>";
     }).join("");
-    menu.innerHTML = "<nav aria-label=\"Menu\">" + items + '<a href="area-do-aluno.html" data-int><span><em>Área do aluno</em></span></a></nav>' +
+    menu.innerHTML = "<nav aria-label=\"Menu\">" + items + '<a href="entrar.html" data-int><span><em>Área do aluno</em></span></a></nav>' +
       '<div class="menu-foot"><b>(15) 99674-1812</b><span>Av. Getúlio Vargas, 400 · Jardim São Paulo, Sorocaba</span><span>Segunda a sexta · Adulto 8h, 11h e 19h · Kids 10h e 18h</span></div>';
     document.body.appendChild(menu);
     menuBtn.setAttribute("aria-controls", "menu");

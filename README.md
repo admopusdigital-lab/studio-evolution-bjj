@@ -8,7 +8,10 @@ Versão publicada (privada): https://claude.ai/artifact/7PbBFQCkuSw1SPbBvzXHuw
 
 - `site/index.html`: página inicial. Começa sem `<!doctype>` porque o publicador do Artifact acrescenta o esqueleto da página; as outras páginas são documentos completos.
 - `site/aulas.html`, `site/agendamento.html`, `site/perguntas.html`, `site/contato.html`: páginas internas, cada uma com o próprio estilo no `<style>`.
-- `site/area-do-aluno.html`, `site/area-do-professor.html` e `site/app.css`: demonstrações das áreas logadas.
+- `site/entrar.html`: tela de entrada (login e senha) das áreas do aluno e do professor. "Área do aluno" e "Área do professor" no site levam para cá.
+- `site/area-do-aluno.html`, `site/area-do-professor.html` e `site/app.css`: as áreas logadas. Cada uma confere a sessão no topo do `<head>` e, sem login, volta para `entrar.html`; a sessão de professor também abre a Área do Aluno. "Sair" (no lugar do selo, ao lado da logo) apaga a sessão.
+  - Login de demonstração (sem servidor, a conferência é no navegador): aluno `aluno` / `evolution`; professor `professor` / `evolution`. "Manter conectado" guarda a sessão no `localStorage`; sem isso, ela dura até fechar a aba (`sessionStorage`).
+  - Na produção, o formulário chama o backend (ex.: Supabase Auth) e a conferência do `<head>` vira a verificação do token.
 - `site/site.css`: tokens (tema Black, o padrão, e Claro), componentes e o sistema de profundidade 3D.
 - `site/tema.css`: ajustes finais da linguagem visual "noite de luta". Carrega por último em todas as páginas.
 - `site/site.js`: comportamento comum. `Site.boot({ intro, setup, loader })`, aberturas de cinema, fitas cruzadas (faixas pretas de jiu-jitsu), inclinação 3D (`data-tilt3d`, `data-z`, `data-glare`, `data-tilt-touch`, `data-stand`), kanjis em volume e vitrine nos trilhos do celular.

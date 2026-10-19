@@ -3,7 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Área do Aluno · Redesign Studio Evolution</title>
+<title>Área do Aluno · Studio Evolution BJJ</title>
+<script>
+/* acesso: esta área só abre com login (entrar.html); a sessão de professor também abre esta área. Roda antes de tudo, para a cortina
+   da troca de página seguir para a tela de entrada. Sem servidor, é uma conferência de demonstração:
+   na produção, quem confere a sessão é o backend */
+(function () {
+  var need = "aluno", s = null;
+  ["sessionStorage", "localStorage"].forEach(function (k) { if (s) return; try { s = JSON.parse(window[k].getItem("evo-sessao") || "null"); } catch (e) {} });
+  var q = /[?&]acesso=(aluno|professor)/.exec(location.search);
+  if (!s && q) s = { papel: q[1] };
+  if (!s || (s.papel !== need && !(need === "aluno" && s.papel === "professor"))) {
+    document.documentElement.style.display = "none";
+    location.replace("entrar.html" + (need === "professor" ? "#professor" : ""));
+    return;
+  }
+  /* "Sair" apaga a sessão antes de a página trocar */
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest("[data-sair]")) return;
+    ["sessionStorage", "localStorage"].forEach(function (k) { try { window[k].removeItem("evo-sessao"); } catch (e2) {} });
+  }, true);
+})();
+</script>
 <script>
 (function () {
   var d = document.documentElement, l = "black";
@@ -152,7 +173,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
   <div class="wrap nav-in">
     <div class="brandrow">
       <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
-      <a class="tagp" href="index.html" data-int title="Esta página é uma proposta de redesign"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
+      <a class="tagp" href="entrar.html" data-sair>Sair</a>
     </div>
     <nav class="links" aria-label="Menu principal">
       <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
@@ -462,7 +483,7 @@ button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
       <div><p class="foot-h">Contato</p><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
-    <div class="foot-bottom"><span>Dados de exemplo: Marina Alves é uma aluna fictícia, e os nomes dos vídeos são ilustrativos.</span><span>Proposta de redesign · versão para aprovação</span></div>
+    <div class="foot-bottom"><span>Dados de exemplo: Marina Alves é uma aluna fictícia, e os nomes dos vídeos são ilustrativos.</span><span>© 2026 Studio Evolution BJJ</span></div>
   </div>
 </footer>
 

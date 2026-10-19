@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Entrar · Studio Evolution BJJ</title>
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "entrar");
+  try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
+<link rel="stylesheet" href="site.css">
+<style>
+/* Entrar: a porta das áreas do aluno e do professor. No computador, o vídeo do Studio de um lado e o formulário
+   do outro; no celular, o vídeo fica ao fundo, bem escurecido, e o formulário vem por cima.
+   O login aqui é de demonstração (sem servidor): a sessão fica no navegador e as áreas conferem antes de abrir. */
+[data-page="entrar"] .nav-cta .roll { color: var(--gold-text); }
+/* border-radius: no tema Claro, os capítulos escuros ganham cantos (site.css); esta tela é inteira, de ponta a ponta */
+.login { position: relative; min-height: 100vh; min-height: 100svh; display: grid; isolation: isolate; overflow: hidden; border-radius: 0 !important; }
+@media (min-width: 1000px) { .login { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); } }
+
+/* o vídeo do Studio, com o lema da Equipe TRUE */
+.lg-media { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: var(--cine-bg); }
+.lg-media video, .lg-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; opacity: 0.5; filter: contrast(1.05) brightness(0.85) saturate(0.95); }
+.lg-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 70%, transparent) 0%, color-mix(in oklch, var(--cine-bg) 82%, transparent) 40%, var(--cine-bg) 100%); }
+.lg-ghost { position: absolute; z-index: 1; right: -6vw; top: 50%; translate: 0 -50%; font: 500 min(78vh, 60vw)/0.9 var(--mincho); color: transparent; -webkit-text-stroke: 1px oklch(0.83 0.13 84 / 0.16); pointer-events: none; user-select: none; }
+.lg-media-in { display: none; }
+@media (min-width: 1000px) {
+  .lg-media { position: relative; inset: auto; z-index: 0; }
+  .lg-media video, .lg-media img { opacity: 0.62; }
+  .lg-media::after { background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 60%, transparent) 0%, transparent 26%, transparent 52%, var(--cine-bg) 100%), linear-gradient(90deg, transparent 70%, var(--cine-bg) 100%); }
+  .lg-ghost { right: 4vw; font-size: min(70vh, 30vw); }
+  .lg-media-in { position: absolute; z-index: 2; left: var(--gut); right: 6vw; bottom: clamp(40px, 9vh, 104px); display: block; }
+  .lg-lema { margin-top: 22px; max-width: 17ch; font: 400 clamp(30px, 3vw, 54px)/0.96 var(--serif); letter-spacing: -0.02em; text-transform: uppercase; }
+  .lg-lema em { display: block; font-style: normal; }
+}
+
+/* o formulário */
+.lg-panel { position: relative; z-index: 1; display: grid; align-content: center; padding: calc(116px + env(safe-area-inset-top, 0px)) var(--gut-r) 64px var(--gut); }
+@media (min-width: 1000px) { .lg-panel { padding-left: clamp(32px, 4vw, 80px); } }
+.lg-card { width: 100%; max-width: 440px; justify-self: center; }
+.lg-title { margin-top: 24px; font-size: clamp(42px, 4.4vw, 70px); line-height: 0.92; }
+.lg-sub { margin-top: 18px; color: var(--ink-2); font-size: 16.5px; max-width: 38ch; }
+
+/* aluno ou professor: duas pílulas, a escolhida em ouro */
+.role { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 30px 0 0; padding: 4px; border: 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--rule); }
+.role label { position: relative; display: grid; place-items: center; height: 46px; border-radius: 999px; font: 600 12px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); cursor: pointer; transition: color 300ms var(--ease), background-color 300ms var(--ease); }
+.role input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.role label:has(input:checked) { background: var(--gold); color: oklch(0.13 0.005 70); }
+.role label:has(input:focus-visible) { outline: 2px solid var(--gold-text); outline-offset: 3px; }
+
+.field { position: relative; margin-top: 22px; }
+.field input { width: 100%; height: 60px; padding: 22px 0 6px; border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; background: transparent; color: var(--ink); font: 500 19px/1 var(--sans); letter-spacing: -0.01em; outline: none; transition: border-color 300ms var(--ease); }
+.field input:focus { border-bottom-color: var(--gold); }
+.field input[aria-invalid="true"] { border-bottom-color: var(--warn); }
+.field label { position: absolute; left: 0; top: 22px; font-size: 16px; color: var(--ink-3); pointer-events: none; transform-origin: left top; transition: transform 400ms var(--ease), color 300ms; }
+.field input:focus + label, .field input:not(:placeholder-shown) + label { transform: translateY(-20px) scale(0.78); color: var(--gold-text); }
+.field input:-webkit-autofill { -webkit-text-fill-color: var(--ink); transition: background-color 9999s; }
+.field.pw input { padding-right: 84px; }
+.pw-tg { position: absolute; right: 0; bottom: 8px; height: 36px; padding: 0 4px; border: 0; background: none; color: var(--ink-2); font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+.pw-tg:hover { color: var(--gold-text); }
+
+.lg-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 20px; margin-top: 22px; font-size: 14.5px; color: var(--ink-2); }
+.lg-row a { color: var(--ink); text-underline-offset: 4px; text-decoration-color: color-mix(in oklch, var(--gold) 70%, transparent); }
+.lg-row a:hover { color: var(--gold-text); }
+.chk { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.chk input { appearance: none; -webkit-appearance: none; display: grid; place-items: center; width: 20px; height: 20px; margin: 0; border-radius: 5px; box-shadow: inset 0 0 0 1.5px var(--ink-3); cursor: pointer; transition: background-color 200ms var(--ease), box-shadow 200ms var(--ease); }
+.chk input::after { content: ""; width: 10px; height: 6px; margin-top: -2px; border: solid oklch(0.13 0.005 70); border-width: 0 0 2px 2px; transform: rotate(-45deg) scale(0); transition: transform 200ms var(--ease); }
+.chk input:checked { background: var(--gold); box-shadow: none; }
+.chk input:checked::after { transform: rotate(-45deg) scale(1); }
+
+.lg-err { min-height: 1.5em; margin-top: 14px; font-size: 14.5px; color: var(--warn); }
+.lg-card .btn { width: 100%; margin-top: 8px; }
+.lg-card .btn[aria-busy="true"] { pointer-events: none; opacity: 0.8; }
+.lg-foot { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--rule); font-size: 15px; color: var(--ink-2); }
+.lg-foot a { color: var(--gold-text); text-underline-offset: 4px; }
+.lg-note { margin-top: 10px; font-size: 13.5px; color: var(--ink-3); }
+
+/* já conectado: um aviso no lugar do formulário, com continuar e sair */
+.lg-on { margin-top: 26px; padding: 18px 20px; border-radius: 6px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule), inset 0 2px 0 var(--gold); }
+.lg-on p { color: var(--ink-2); font-size: 15px; }
+.lg-on b { color: var(--ink); }
+.lg-on .ctas { margin-top: 14px; gap: 12px 24px; }
+.lg-on .btn { width: auto; margin: 0; min-height: 48px; }
+.lg-on button.link { border: 0; color: var(--ink); cursor: pointer; }
+
+.foot-slim { padding-top: 0; }
+.foot-slim .foot-bottom { border-top: 0; }
+@media (prefers-reduced-motion: reduce) { .lg-media video { display: none; } }
+</style>
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="entrar.html" data-int aria-current="page"><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="login cine" data-dark aria-labelledby="t-login">
+    <div class="lg-media" aria-hidden="true">
+      <img src="img/takes/chega.jpg" alt="" width="1080" height="1350">
+      <video id="lgVideo" muted loop playsinline preload="none" poster="img/takes/chega.jpg"></video>
+      <span class="lg-ghost">道</span>
+      <div class="lg-media-in">
+        <p class="label">Studio Evolution BJJ · Equipe TRUE</p>
+        <p class="lg-lema">A luta é o meio. <em class="metal">A evolução é o propósito.</em></p>
+      </div>
+    </div>
+
+    <div class="lg-panel">
+      <div class="lg-card">
+        <p class="label gold" data-in>Área restrita</p>
+        <h1 class="lg-title" id="t-login">Bem-vindo <em>de volta</em>.</h1>
+        <p class="lg-sub" id="lgSub" data-in>Entre para confirmar a vaga, registrar a presença e ver os movimentos da sua faixa.</p>
+
+        <div class="lg-on" id="lgOn" hidden>
+          <p>Você está conectado como <b id="lgOnRole">aluno</b>.</p>
+          <div class="ctas"><a class="btn btn-ink" id="lgGo" href="area-do-aluno.html">Continuar<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a><button class="link" type="button" id="lgOut">Sair</button></div>
+        </div>
+
+        <form id="lgForm" novalidate data-in>
+          <fieldset class="role">
+            <legend class="sr-only">Você é</legend>
+            <label><input type="radio" name="papel" value="aluno" checked><span>Sou aluno</span></label>
+            <label><input type="radio" name="papel" value="professor"><span>Sou professor</span></label>
+          </fieldset>
+          <div class="field"><input id="usuario" name="usuario" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder=" " aria-describedby="lgErr"><label for="usuario">E-mail ou usuário</label></div>
+          <div class="field pw"><input id="senha" name="senha" type="password" autocomplete="current-password" placeholder=" " aria-describedby="lgErr"><label for="senha">Senha</label><button class="pw-tg" type="button" id="pwTg" aria-controls="senha" aria-pressed="false">Mostrar</button></div>
+          <div class="lg-row">
+            <label class="chk"><input type="checkbox" id="manter"><span>Manter conectado</span></label>
+            <a id="esqueci" href="https://wa.me/5515996741812" target="_blank" rel="noopener">Esqueci a senha</a>
+          </div>
+          <p class="lg-err" id="lgErr" aria-live="assertive"></p>
+          <button class="btn btn-ink" type="submit" id="lgBtn">Entrar<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button>
+          <p class="lg-foot" id="lgFoot">Ainda não treina com a gente? <a href="agendamento.html" data-int>Agende uma aula grátis</a>.</p>
+          <p class="lg-note" id="lgNote">A conta é criada pelo Studio na matrícula. Para receber ou trocar a senha, chame no WhatsApp.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot foot-slim">
+  <div class="wrap">
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Academia da Equipe TRUE · Sorocaba/SP</span></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$;
+
+  /* Contas de demonstração: sem servidor, o login confere aqui mesmo. Na versão de produção, isto vira uma
+     chamada ao backend (ex.: Supabase Auth), e a sessão passa a ser um token. */
+  var SENHA = "evolution";
+  var AREA = { aluno: "area-do-aluno.html", professor: "area-do-professor.html" };
+  var TXT = {
+    aluno: { sub: "Entre para confirmar a vaga, registrar a presença e ver os movimentos da sua faixa.", wa: "Olá! Esqueci minha senha da Área do Aluno do Studio Evolution BJJ.", note: "A conta é criada pelo Studio na matrícula. Para receber ou trocar a senha, chame no WhatsApp." },
+    professor: { sub: "Entre para fazer a chamada e acompanhar os alunos, os interessados e o financeiro.", wa: "Olá! Esqueci minha senha da Área do Professor do Studio Evolution BJJ.", note: "Acesso da equipe do Studio. Para receber ou trocar a senha, chame no WhatsApp." }
+  };
+  var store = function (kind) { try { return window[kind]; } catch (e) { return null; } };
+  function readSession() {
+    var s = null;
+    ["sessionStorage", "localStorage"].forEach(function (k) { var st = store(k); if (s || !st) return; try { s = JSON.parse(st.getItem("evo-sessao") || "null"); } catch (e) {} });
+    return s && AREA[s.papel] ? s : null;
+  }
+  function clearSession() { ["sessionStorage", "localStorage"].forEach(function (k) { var st = store(k); try { if (st) st.removeItem("evo-sessao"); } catch (e) {} }); }
+
+  var form = $("#lgForm"), user = $("#usuario"), pass = $("#senha"), err = $("#lgErr"), btn = $("#lgBtn");
+  var role = function () { return $('input[name="papel"]:checked', form).value; };
+  function paintRole() {
+    var r = role();
+    $("#lgSub").textContent = TXT[r].sub;
+    $("#lgNote").textContent = TXT[r].note;
+    $("#esqueci").href = "https://wa.me/5515996741812?text=" + encodeURIComponent(TXT[r].wa);
+    $("#lgFoot").hidden = r === "professor";
+  }
+  $$('input[name="papel"]', form).forEach(function (i) { i.addEventListener("change", function () { paintRole(); say(""); }); });
+  /* entrar.html#professor já abre com "Sou professor" (as áreas mandam para cá com o papel certo) */
+  if (/professor/.test(location.hash)) $('input[value="professor"]', form).checked = true;
+  paintRole();
+
+  $("#pwTg").addEventListener("click", function () {
+    var show = pass.type === "password";
+    pass.type = show ? "text" : "password";
+    this.textContent = show ? "Ocultar" : "Mostrar";
+    this.setAttribute("aria-pressed", show ? "true" : "false");
+    pass.focus();
+  });
+
+  function say(msg, field) {
+    err.textContent = msg;
+    [user, pass].forEach(function (f) { f.setAttribute("aria-invalid", f === field ? "true" : "false"); });
+    if (field) {
+      field.focus();
+      if (msg && window.gsap && !Site.reduce) gsap.fromTo(".lg-card", { x: -10 }, { x: 0, duration: 0.6, ease: "elastic.out(1, 0.3)" });
+    }
+  }
+  [user, pass].forEach(function (f) { f.addEventListener("input", function () { if (f.getAttribute("aria-invalid") === "true") say(""); }); });
+
+  function go(papel) {
+    var url = AREA[papel];
+    if (Site.leave) Site.leave(url); else location.href = url;
+  }
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var u = user.value.trim().toLowerCase(), p = pass.value, r = role();
+    if (!u) return say("Digite seu e-mail ou usuário.", user);
+    if (!p) return say("Digite sua senha.", pass);
+    var other = r === "aluno" ? "professor" : "aluno";
+    if (p === SENHA && u === other) return say('Esse acesso é da Área do ' + (other === "aluno" ? "Aluno" : "Professor") + '. Escolha "Sou ' + other + '" acima.', user);
+    if (p !== SENHA || u !== r) return say("Usuário ou senha não conferem. Confira e tente de novo.", pass);
+    say("");
+    var data = JSON.stringify({ papel: r, desde: new Date().toISOString() }), saved = false;
+    var st = store($("#manter").checked ? "localStorage" : "sessionStorage");
+    try { if (st) { clearSession(); st.setItem("evo-sessao", data); saved = true; } } catch (e2) {}
+    btn.setAttribute("aria-busy", "true");
+    var bt = $(".bt > span", btn); if (bt) bt.textContent = "Entrando…";
+    /* sem armazenamento (aba privada bloqueada), a sessão vai no endereço */
+    if (!saved) { location.href = AREA[r] + "?acesso=" + r; return; }
+    go(r);
+  });
+
+  /* já conectado: continuar ou sair */
+  var s = readSession();
+  if (s) {
+    $("#lgOn").hidden = false; form.hidden = true;
+    $("#lgOnRole").textContent = s.papel;
+    $("#lgGo").href = AREA[s.papel];
+  }
+  $("#lgOut").addEventListener("click", function () {
+    clearSession();
+    $("#lgOn").hidden = true; form.hidden = false;
+    user.focus();
+  });
+
+  /* o take do Studio ao fundo: MP4 (H.264) onde o navegador toca, senão WebM; sem vídeo com economia de dados */
+  var v = $("#lgVideo");
+  if (v && !Site.reduce && !(navigator.connection && navigator.connection.saveData)) {
+    var ext = v.canPlayType('video/mp4; codecs="avc1.640028"') ? ".mp4" : v.canPlayType('video/webm; codecs="vp9"') ? ".webm" : "";
+    if (ext) { v.src = "img/takes/chega" + ext; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+  }
+
+  Site.boot({
+    intro: function (S) {
+      var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
+      tl.from(".lg-media", { opacity: 0, duration: 1.6 }, 0)
+        .from(Site.split($(".lg-title"), "words"), Object.assign({ duration: 1.3, stagger: 0.06 }, Site.PUNCH), 0.1)
+        .from(".lg-card [data-in], .lg-on", { y: 26, opacity: 0, duration: 1.1, stagger: 0.08, ease: "power3.out" }, 0.35)
+        .from(".lg-media-in > *", { y: 30, opacity: 0, duration: 1.2, stagger: 0.1, ease: "power3.out" }, 0.5)
+        .add(function () { $$(".lg-card .label").forEach(S.scramble); }, 0.3)
+        .from(".nav-in", { y: -30, opacity: 0, duration: 1.1 }, 0.15);
+      return tl;
+    }
+  });
+})();
+</script>
+</body>
+</html>
