@@ -34,7 +34,10 @@ jobs:
           # endereço de teste: fora do Google, para não competir com o site atual do Studio (apagar no domínio definitivo)
           printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
 
+      # liga o Pages sozinho (modo GitHub Actions) se ainda não estiver ligado
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
