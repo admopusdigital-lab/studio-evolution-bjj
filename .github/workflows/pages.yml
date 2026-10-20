@@ -1,0 +1,44 @@
+# Publica a pasta site/ no GitHub Pages a cada push nesta branch (ou à mão, em Actions → Publicar o site → Run workflow).
+# Para funcionar, o Pages precisa estar ligado: Settings → Pages → Source: GitHub Actions.
+name: Publicar o site
+
+on:
+  push:
+    branches: [main-kr1apn]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Montar o site
+        run: |
+          mkdir -p _site
+          cp -r site/. _site/
+          # o index.html começa sem o esqueleto da página (o publicador do Artifact acrescenta); aqui ele vem antes
+          { printf '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; cat site/index.html; } > _site/index.html
+          # endereço de teste: fora do Google, para não competir com o site atual do Studio (apagar no domínio definitivo)
+          printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

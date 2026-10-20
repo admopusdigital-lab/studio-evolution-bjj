@@ -31,6 +31,10 @@ Versão publicada (privada): https://claude.ai/artifact/7PbBFQCkuSw1SPbBvzXHuw
 - `tools/simbolo-true.py`: vetoriza o símbolo da Equipe TRUE a partir de `tools/fontes/logo-true.png` (logo oficial, baixada de bjjtrue.com) e gera `site/img/true-simbolo.svg`. O mesmo desenho vai embutido na seção "Equipe TRUE", onde a rolagem o desenha e enche de ouro.
 - `area-do-aluno-evolution.html`: estudo inicial de direções para a Área do Aluno.
 
+## Publicar (GitHub Pages)
+
+`.github/workflows/pages.yml` publica a pasta `site/` a cada push na branch `main-kr1apn` (ou à mão, em Actions → Publicar o site → Run workflow). Antes, o Pages precisa estar ligado em **Settings → Pages → Source: GitHub Actions**. O fluxo acrescenta o esqueleto ao `index.html` e um `robots.txt` que deixa o endereço de teste fora do Google; ao passar para o domínio do Studio, apague essa linha do fluxo.
+
 ## Ver localmente
 
 Qualquer servidor estático apontado para a pasta `site`, por exemplo:
