@@ -111,7 +111,9 @@ As áreas do aluno e do professor ainda mostram dados de exemplo (Marina, a turm
 tela ao banco é a próxima etapa. Cada uma vira uma tabela com as mesmas regras de segurança:
 - presenças e vagas;
 - faixas e graus;
-- interessados vindos do Agendar;
+- interessados (o CRM): contatos vindos do Agendar e os adicionados no painel, com anotações e histórico;
+- configurações: o status de cada integração e as chaves do Asaas e da Evolution API, guardadas só no servidor
+  (segredos da função ou Vault do Supabase), nunca numa tabela que o site leia;
 - mensalidades, com o Asaas e os lembretes da Evolution API.
 
 O service worker do app (`site/sw.js`) não guarda nada do Supabase: login e dados vão sempre direto ao servidor.

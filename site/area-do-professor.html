@@ -259,6 +259,70 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   .tog[aria-checked="true"]::after { transform: translateX(20px); }
   .rules li { grid-template-columns: 48px minmax(0, 1fr); }
 }
+/* CRM (Interessados): busca, filtro por etapa, contato novo e a ficha do contato com anotação e histórico */
+.crm-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+.crm-search { position: relative; flex: 1 1 220px; min-width: 0; }
+.crm-search .ic { position: absolute; left: 11px; top: 50%; width: 15px; height: 15px; transform: translateY(-50%); color: var(--ink-3); pointer-events: none; }
+.crm-search .crm-in { padding-left: 34px; }
+.crm-bar .chips { margin-top: 0; }
+.crm-add { display: inline-flex; align-items: center; gap: 6px; height: 38px; }
+.crm-add .ic { width: 14px; height: 14px; stroke-width: 2.2; }
+.crm-in { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--field); color: var(--ink); font: 400 13.5px/1.35 var(--sans); }
+textarea.crm-in { min-height: 64px; resize: vertical; }
+.crm-in::placeholder { color: var(--ink-3); }
+.crm-in[aria-invalid="true"] { border-color: var(--warn); box-shadow: inset 0 0 0 1px var(--warn); }
+.crm-form { margin-top: 14px; padding: 16px; background: var(--paper-2); border-top: 1px solid var(--gold); }
+.crm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 14px; margin-top: 12px; }
+.crm-f { display: grid; gap: 5px; align-content: start; font-size: 12px; color: var(--ink-2); }
+.crm-f[hidden] { display: none; }
+.crm-f > span { font-weight: 500; }
+.crm-f small { font-weight: 400; color: var(--ink-3); }
+.crm-f.wide { grid-column: 1 / -1; }
+.crm-f .sel { width: 100%; }
+.crm-two { display: flex; gap: 8px; }
+.crm-err { margin-top: 10px; font-size: 12.5px; color: var(--warn); }
+.crm-err:empty { display: none; }
+.crm-empty { margin-top: 12px; padding: 14px; background: var(--paper-2); font-size: 13px; color: var(--ink-3); }
+.lead.f-out { display: none; }
+.lead.new { animation: arrive 1.6s var(--ease); }
+.lead b .nm-btn { font-weight: 500; }
+.dr-sec > label.k { display: block; }
+.ld-note { display: grid; gap: 8px; margin-top: 10px; }
+.ld-note .mini-btn { justify-self: start; }
+.ld-hist { margin-top: 8px; }
+.ld-hist li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; padding-block: 9px; border-top: 1px solid var(--rule); font-size: 13px; }
+.ld-hist li:first-child { border-top: 0; }
+.ld-hist time { font: 500 11.5px/1.5 var(--mono, monospace); color: var(--gold-text); }
+@media (max-width: 600px) { .crm-grid { grid-template-columns: minmax(0, 1fr); } .crm-add { flex: 1 1 100%; justify-content: center; } }
+
+/* Configurações: um cartão por integração (status, o que faz, ações) e os dados do Studio */
+.cfg-demo { margin-top: 16px; padding: 12px 14px; background: color-mix(in oklch, var(--gold) 10%, transparent); font-size: 12.5px; color: var(--ink-2); }
+.cfg-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+.cfg-card { display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--paper-2); border-top: 2px solid var(--rule); }
+.cfg-card[data-st="on"] { border-top-color: var(--ok); }
+.cfg-card[data-st="off"] { border-top-color: var(--ink-3); }
+.cfg-card[data-st="demo"] { border-top-color: var(--gold); }
+.cfg-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.cfg-top h4 { margin: 0; font: 500 16px/1.2 var(--sans); }
+.cfg-top h4 small { display: block; margin-top: 3px; font-size: 11.5px; font-weight: 400; color: var(--ink-3); }
+.cfg-what { font-size: 12.5px; color: var(--ink-2); }
+.cfg-rows div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-block: 7px; border-top: 1px solid var(--rule); font-size: 12.5px; }
+.cfg-rows dt { flex-shrink: 0; color: var(--ink-3); }
+.cfg-rows dd { text-align: right; color: var(--ink); overflow-wrap: anywhere; }
+.cfg-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 4px; }
+.cfg-acts:empty { display: none; }
+.cfg-acts a.mini-btn { display: inline-flex; align-items: center; text-decoration: none; }
+.cfg-panel { display: grid; gap: 8px; padding: 12px; background: var(--paper); font-size: 12.5px; color: var(--ink-2); }
+.cfg-panel small { font-size: 11.5px; color: var(--ink-3); }
+.cfg-panel.ask { background: color-mix(in oklch, var(--warn) 9%, var(--paper)); }
+.cfg-panel .msg-acts { margin-top: 2px; }
+.cfg-qr { display: grid; place-items: center; width: 132px; aspect-ratio: 1; padding: 10px; border: 1.5px dashed var(--ink-3); border-radius: 8px; text-align: center; font-size: 11px; color: var(--ink-3); }
+.cfg-h { margin-top: 28px; font: 600 10.5px/1.3 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+.cfg-studio { margin-top: 10px; padding: 16px; background: var(--paper-2); }
+.cfg-studio .crm-grid { margin-top: 0; }
+.cfg-sec { margin-top: 12px; font-size: 12px; color: var(--ink-3); }
+@media (max-width: 1000px) { .cfg-grid { grid-template-columns: minmax(0, 1fr); } }
+
 /* ---------- modo painel (?painel): o painel em tela cheia, sem a vitrine em volta. Abaixo dele, só o Modo tatame ---------- */
 .pn-top { display: none; }
 [data-mode="painel"] :is(#nav, .ar-hero, .demo-head, .diff, .bridge, .foot, .dash-bar, .dash-side .logo, .progress) { display: none; }
@@ -295,6 +359,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M19 6.5A9 9 0 1 0 20.5 15"/><path d="M10 8.5v7l6-3.5z"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
     <symbol id="i-coin" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
   </defs>
 </svg>
 
@@ -374,6 +440,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
               <button type="button" data-go="grad" aria-current="false" aria-label="Graduações, 3 para avaliar"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad">3</span></button>
               <button type="button" data-go="leads" aria-current="false" aria-label="Interessados, 3 esperando retorno"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads">3</span></button>
               <button type="button" data-go="fin" aria-current="false" aria-label="Financeiro, 2 em atraso"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin">2</span></button>
+              <button type="button" data-go="config" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-gear"/></svg>Configurações</button>
               <div class="more"><p>Também no painel</p><ul><li>Movimentos e quizzes</li><li>Competências da faixa</li><li>Turmas e horários</li><li>Aprendizado por aluno</li><li>Cadastro rápido</li></ul></div>
               <div class="who"><span class="av">SE</span><span>Professor · dono<br><small>Studio Evolution</small></span></div>
             </nav>
@@ -470,36 +537,60 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
 
               <!-- Interessados -->
               <section class="dv" data-v="leads" aria-labelledby="t-leads">
-                <div class="dv-h"><div><p class="dv-k">Pedidos pelo site</p><h3 id="t-leads">Interessados</h3></div><p>Pedidos de aula experimental. Mude o status depois de cada contato.</p></div>
+                <div class="dv-h"><div><p class="dv-k">Pedidos e contatos</p><h3 id="t-leads">Interessados</h3></div><p>Pedidos do site e contatos adicionados aqui. Toque no nome para ver a ficha e o histórico; mude o status depois de cada contato.</p></div>
                 <div class="funnel" id="funnel" aria-label="Interessados por etapa">
                   <div><b data-k="novo">2</b><span>Novos</span></div>
                   <div><b data-k="atendimento">1</b><span>Em atendimento</span></div>
                   <div><b data-k="agendado">1</b><span>Aula agendada</span></div>
                   <div><b data-k="mat">3</b><span>Matriculados em outubro</span></div>
                 </div>
-                <!-- data-req: o dia e a turma que a pessoa pediu no site (o código do ingresso vem junto); data-slot: a aula marcada -->
+                <!-- busca (nome ou WhatsApp), filtro por etapa e o contato novo, que entra no topo da lista -->
+                <div class="crm-bar">
+                  <label class="crm-search"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-search"/></svg><span class="sr-only">Buscar contato</span><input class="crm-in" type="search" id="leadQ" placeholder="Buscar por nome ou WhatsApp" autocomplete="off"></label>
+                  <div class="chips" id="leadF" role="group" aria-label="Mostrar por etapa"><button type="button" data-f="all" aria-pressed="true">Todos</button><button type="button" data-f="novo" aria-pressed="false">Novos</button><button type="button" data-f="atendimento" aria-pressed="false">Em atendimento</button><button type="button" data-f="agendado" aria-pressed="false">Aula agendada</button></div>
+                  <button class="mini-btn crm-add" type="button" id="leadAdd" aria-expanded="false" aria-controls="leadForm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Adicionar contato</button>
+                </div>
+                <form class="crm-form" id="leadForm" aria-labelledby="leadFormT" novalidate hidden>
+                  <p class="fin-k" id="leadFormT">Novo contato</p>
+                  <div class="crm-grid">
+                    <label class="crm-f"><span>Nome</span><input class="crm-in" id="lfNome" autocomplete="off"></label>
+                    <label class="crm-f"><span>WhatsApp</span><input class="crm-in" id="lfFone" inputmode="tel" autocomplete="off" placeholder="(15) 99999-9999"></label>
+                    <label class="crm-f"><span>Turma de interesse</span><select class="sel" id="lfProg"><option value="adulto">Adulto</option><option value="feminino">Feminino</option><option value="kids">Kids (4 a 12 anos)</option></select></label>
+                    <label class="crm-f"><span>Como conheceu o Studio</span><select class="sel" id="lfOrig"><option value="instagram">Instagram</option><option value="indicacao">Indicação</option><option value="visita">Passou no Studio</option><option value="whatsapp">WhatsApp</option><option value="google">Google</option><option value="outro">Outro</option></select></label>
+                    <label class="crm-f lf-kid" hidden><span>Nome da criança <small>(opcional)</small></span><input class="crm-in" id="lfFilho" autocomplete="off"></label>
+                    <label class="crm-f lf-kid" hidden><span>Idade <small>(opcional)</small></span><input class="crm-in" id="lfIdade" inputmode="numeric" maxlength="2" autocomplete="off"></label>
+                    <label class="crm-f"><span>Etapa</span><select class="sel" id="lfEtapa"><option value="novo">Novo · retornar hoje</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option></select></label>
+                    <div class="crm-f lf-aula" role="group" aria-labelledby="lfAulaT" hidden><span id="lfAulaT">Aula experimental</span><div class="crm-two"><select class="sel" id="lfDia" aria-label="Dia da aula"></select><select class="sel" id="lfHora" aria-label="Turma"></select></div></div>
+                    <label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><textarea class="crm-in" id="lfNota" rows="2"></textarea></label>
+                  </div>
+                  <p class="crm-err" id="lfErr" role="alert"></p>
+                  <div class="msg-acts"><button class="mini-btn" type="submit">Salvar contato</button><button class="mini-btn ghost" type="button" id="lfCancel">Cancelar</button></div>
+                </form>
+                <!-- data-req: o dia e a turma que a pessoa pediu no site (o código do ingresso vem junto); data-slot: a aula marcada.
+                     data-phone: só dígitos, com DDD (números de exemplo, da série 90000); data-orig: de onde veio o contato -->
                 <div class="leads" id="leads">
-                  <div class="lead" data-first="Camila" data-art="a" data-prog="adulto" data-turma="Adulto" data-req="seg|19">
+                  <div class="lead" data-first="Camila" data-art="a" data-prog="adulto" data-turma="Adulto" data-req="seg|19" data-phone="15900000101" data-orig="site">
                     <span class="av">CS</span>
-                    <div><b>Camila Souza</b><span class="pill-s gold">Retornar hoje</span><small>Adulto · seg 19/10, 19h · EVO-ADU-1910-19H · pedido ontem, 21:14</small></div>
+                    <div><b><button class="nm-btn" type="button" data-ficha>Camila Souza</button></b><span class="pill-s gold">Retornar hoje</span><small>Pelo site · Adulto · seg 19/10, 19h · EVO-ADU-1910-19H · pedido ontem, 21:14</small></div>
                     <div class="acts"><select class="sel" aria-label="Status de Camila Souza"><option value="novo" selected>Novo</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
-                  <div class="lead" data-first="Rafael" data-art="o" data-prog="adulto" data-turma="Adulto" data-req="ter|8">
+                  <div class="lead" data-first="Rafael" data-art="o" data-prog="adulto" data-turma="Adulto" data-req="ter|8" data-phone="15900000102" data-orig="site">
                     <span class="av">RT</span>
-                    <div><b>Rafael Teixeira</b><span class="pill-s gold">Retornar hoje</span><small>Adulto · ter 20/10, 8h · EVO-ADU-2010-08H · pedido hoje, 07:02</small></div>
+                    <div><b><button class="nm-btn" type="button" data-ficha>Rafael Teixeira</button></b><span class="pill-s gold">Retornar hoje</span><small>Pelo site · Adulto · ter 20/10, 8h · EVO-ADU-2010-08H · pedido hoje, 07:02</small></div>
                     <div class="acts"><select class="sel" aria-label="Status de Rafael Teixeira"><option value="novo" selected>Novo</option><option value="atendimento">Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
-                  <div class="lead" data-first="Juliana" data-art="a" data-prog="feminino" data-turma="Feminino (junto com o Adulto)">
+                  <div class="lead" data-first="Juliana" data-art="a" data-prog="feminino" data-turma="Feminino (junto com o Adulto)" data-phone="15900000103" data-orig="site">
                     <span class="av">JM</span>
-                    <div><b>Juliana Martins</b><span class="pill-s warn">Retorno atrasado desde 14/10</span><small>Feminino · pediu dia 12</small></div>
+                    <div><b><button class="nm-btn" type="button" data-ficha>Juliana Martins</button></b><span class="pill-s warn">Retorno atrasado desde 14/10</span><small>Pelo site · Feminino · pediu dia 12</small></div>
                     <div class="acts"><select class="sel" aria-label="Status de Juliana Martins"><option value="novo">Novo</option><option value="atendimento" selected>Em atendimento</option><option value="agendado">Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
-                  <div class="lead" data-first="Pedro" data-art="o" data-prog="kids" data-turma="Kids" data-child="Theo" data-slot="seg|18">
+                  <div class="lead" data-first="Pedro" data-art="o" data-prog="kids" data-turma="Kids" data-child="Theo" data-slot="seg|18" data-phone="15900000104" data-age="7" data-orig="site">
                     <span class="av">PH</span>
-                    <div><b>Pedro Henrique</b><span class="pill-s in">Aula seg, 18h</span><small>Kids 18h, para o filho Theo, de 7 anos · pediu dia 13</small></div>
+                    <div><b><button class="nm-btn" type="button" data-ficha>Pedro Henrique</button></b><span class="pill-s in">Aula seg, 18h</span><small>Pelo site · Kids 18h, para o filho Theo, de 7 anos · pediu dia 13</small></div>
                     <div class="acts"><select class="sel" aria-label="Status de Pedro Henrique"><option value="novo">Novo</option><option value="atendimento">Em atendimento</option><option value="agendado" selected>Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
                 </div>
+                <p class="crm-empty" id="leadEmpty" hidden></p>
                 <div class="msg" id="leadMsg" hidden></div>
                 <button class="leads-closed" type="button" id="closedBtn" aria-expanded="false" aria-controls="closedBox"><span>Fechados</span><span><span id="closedN">6</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
                 <div class="closed-box" id="closedBox" hidden><ul id="closedList"></ul><p id="closedNote">Os 6 contatos fechados são de antes de hoje.</p></div>
@@ -507,7 +598,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
 
               <!-- Financeiro: mensalidades pelo Asaas, lembretes por um número de WhatsApp só de avisos (Evolution API) -->
               <section class="dv" data-v="fin" aria-labelledby="t-fin">
-                <div class="dv-h"><div><p class="dv-k">Outubro · valores de exemplo</p><h3 id="t-fin">Financeiro</h3></div><div class="fin-hd"><span class="pill-s in">WhatsApp de avisos · conectado</span><p>Mensalidades por Pix, boleto ou cartão, com lembretes automáticos pelo WhatsApp.</p></div></div>
+                <div class="dv-h"><div><p class="dv-k">Outubro · valores de exemplo</p><h3 id="t-fin">Financeiro</h3></div><div class="fin-hd"><span class="pill-s in" id="finWa">WhatsApp de avisos · conectado</span><p>Mensalidades por Pix, boleto ou cartão, com lembretes automáticos pelo WhatsApp.</p></div></div>
                 <!-- 31 adultos e 18 Kids pagos (R$ 200 e R$ 180), 5 adultos e 2 Kids a vencer, 2 adultos em atraso: 58 mensalidades -->
                 <div class="kpis">
                   <div class="kpi"><b id="fRec">R$ 9.440</b><span id="fRecS">recebidos em outubro · 49 de 58 mensalidades pagas</span></div>
@@ -564,6 +655,34 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
                 </div>
                 <!-- o canal técnico (Evolution API, número só de avisos) fica só neste comentário: na tela, "WhatsApp de avisos" -->
                 <p class="fin-how"><b>Como funciona:</b> o Asaas, serviço de cobrança, gera a mensalidade de cada mês e avisa o painel quando o pagamento cai. Os lembretes saem de um número de WhatsApp só para avisos, separado do atendimento do Studio. Se a conexão cair, o selo no topo fica vermelho e os lembretes esperam. Só o dono do Studio e quem ele autorizar veem esta aba.</p>
+              </section>
+
+              <!-- Configurações: só o professor dono. Cada integração mostra o status e as ações; as chaves ficam no servidor, nunca no site.
+                   Os cartões são montados pelo script (cfgCard) -->
+              <section class="dv" data-v="config" aria-labelledby="t-config">
+                <div class="dv-h"><div><p class="dv-k">Só o professor dono</p><h3 id="t-config">Configurações</h3></div><p>As integrações do Studio e os dados que o site e as mensagens usam.</p></div>
+                <p class="cfg-demo" id="cfgDemo">Demonstração: os status abaixo são de exemplo e nenhum botão fala com os serviços de verdade. Com o servidor do Studio ligado, esta tela mostra a conexão real.</p>
+                <div class="cfg-grid">
+                  <article class="cfg-card" data-int="asaas" aria-labelledby="cfgT-asaas"></article>
+                  <article class="cfg-card" data-int="wa" aria-labelledby="cfgT-wa"></article>
+                  <article class="cfg-card" data-int="site" aria-labelledby="cfgT-site"></article>
+                  <article class="cfg-card" data-int="supa" aria-labelledby="cfgT-supa"></article>
+                </div>
+                <p class="cfg-sec">As chaves das integrações ficam guardadas no servidor do Studio, nunca no site nem no celular. Depois de salvas, só aparecem os 4 últimos caracteres.</p>
+                <p class="cfg-h" id="cfgStudioT">Dados do Studio</p>
+                <form class="cfg-studio" id="cfgStudio" aria-labelledby="cfgStudioT" novalidate>
+                  <div class="crm-grid">
+                    <label class="crm-f"><span>Nome</span><input class="crm-in" id="csNome" value="Studio Evolution BJJ" autocomplete="off"></label>
+                    <label class="crm-f"><span>WhatsApp de atendimento</span><input class="crm-in" id="csFone" value="(15) 99674-1812" inputmode="tel" autocomplete="off"></label>
+                    <label class="crm-f wide"><span>Endereço</span><input class="crm-in" id="csEnd" value="Av. Getúlio Vargas, 400, sala 3, sobreloja, Jardim São Paulo, Sorocaba/SP" autocomplete="off"></label>
+                    <label class="crm-f"><span>Atendimento</span><input class="crm-in" id="csAtend" value="Segunda a sexta, das 8h às 21h" autocomplete="off"></label>
+                    <label class="crm-f"><span>Vagas por aula</span><input class="crm-in" id="csVagas" value="10" inputmode="numeric" maxlength="2" autocomplete="off"></label>
+                    <label class="crm-f wide"><span>Horários</span><input class="crm-in" id="csHoras" value="Segunda a sexta · Adulto 8h, 11h e 19h · Kids (4 a 12 anos) 10h e 18h · Feminino junto com o Adulto" autocomplete="off"></label>
+                  </div>
+                  <p class="crm-err" id="csErr" role="alert"></p>
+                  <div class="msg-acts"><button class="mini-btn" type="submit">Salvar dados</button></div>
+                  <p class="cfg-sec">Com o sistema ligado, o site, a TV do tatame e as mensagens prontas passam a usar estes dados.</p>
+                </form>
               </section>
 
               <!-- ficha do aluno: um diálogo por cima da lista, com rolagem própria (sem aria-modal: o resto da página continua clicável) -->
@@ -1562,6 +1681,10 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       '<div class="msg" hidden></div></div>' +
       '<div class="dr-acts">' + (p.grad ? '<button class="ap-btn" type="button" data-grad="' + id + '">Avaliar grau</button>' : "") +
       '<button class="mini-btn wa" type="button" data-drwa="' + id + '">WhatsApp' + (p.kid ? " da família" : "") + "</button></div>";
+    drawerIn();
+  }
+  /* a ficha já montada entra: a do aluno (openDrawer) e a do contato em Interessados (leadCard) */
+  function drawerIn() {
     drawer.scrollTop = 0;
     drawer.classList.add("on");
     scrim.classList.add("on");
@@ -1611,6 +1734,9 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     var b = e.target.closest("button");
     if (!b) return;
     if (b.classList.contains("dr-close")) closeDrawer();
+    else if (b.dataset.ldwa) leadMsg(+b.dataset.ldwa);
+    else if (b.dataset.ldsend) leadSend(leads[+b.dataset.ldsend], true);
+    else if (b.dataset.ldnote) leadNote(+b.dataset.ldnote);
     else if (b.dataset.drwa) {
       var box = $(".msg", drawer), m = careMsg(b.dataset.drwa);
       box.innerHTML = msgHTML(m.to, m.text, sendBtn("data-sendcare", b.dataset.drwa));
@@ -1972,6 +2098,22 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   var TURMAS = { adulto: ["8", "11", "19"], feminino: ["8", "11", "19"], kids: ["10", "18"] };
   /* st: o status em vigor; pend: matriculado ou sem interesse, ainda com "Desfazer"; closed: já em Fechados */
   var leads = $$("#leads .lead"), closedT = [];
+  /* o CRM: de onde veio o contato, a turma, as etapas e o histórico de cada um (o mais novo em cima).
+     O histórico dos contatos de exemplo vem do pedido do site; o resto o painel registra sozinho */
+  var ORIG = { site: "Pelo site", instagram: "Instagram", indicacao: "Indicação", visita: "Passou no Studio", whatsapp: "WhatsApp", google: "Google", outro: "Outro" };
+  var PROG = { adulto: "Adulto", feminino: "Feminino (junto com o Adulto)", kids: "Kids" };
+  var ST_TXT = { novo: "Novo", atendimento: "Em atendimento", agendado: "Aula agendada", matriculado: "Matriculado", perdido: "Sem interesse" };
+  var HIST0 = {
+    "15900000101": [["ontem, 21:14", "Pedido pelo site: aula experimental no Adulto, segunda 19/10, às 19h (ingresso EVO-ADU-1910-19H)"]],
+    "15900000102": [["hoje, 07:02", "Pedido pelo site: aula experimental no Adulto, terça 20/10, às 8h (ingresso EVO-ADU-2010-08H)"]],
+    "15900000103": [["13/10", "WhatsApp: primeira conversa. Ficou de ver o melhor horário e responder até 14/10"], ["12/10", "Pedido pelo site: aula experimental no Feminino"]],
+    "15900000104": [["15/10", "Aula experimental marcada: segunda, 18h"], ["13/10", "Pedido pelo site: Kids, para o filho Theo, de 7 anos"]]
+  };
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function inits(n) { var p = n.trim().split(/\s+/); return (p.length > 1 ? p[0][0] + p[p.length - 1][0] : p[0].slice(0, 2)).toUpperCase(); }
+  function digits(t) { var d = String(t).replace(/\D/g, ""); return d.length > 11 && d.indexOf("55") === 0 ? d.slice(2) : d; }
+  function foneTxt(d) { return d.length === 11 ? "(" + d.slice(0, 2) + ") " + d.slice(2, 7) + "-" + d.slice(7) : d.length === 10 ? "(" + d.slice(0, 2) + ") " + d.slice(2, 6) + "-" + d.slice(6) : d; }
+  function nowTxt() { return "hoje, " + $("#dClock").textContent; }
   function slotS(s) { var q = s.split("|"); return q[0] + ", " + q[1] + "h"; }
   function slotL(s) { var q = s.split("|"); return DAYS[q[0]][0] + ", " + DAYS[q[0]][1] + ", às " + q[1] + "h"; }
   function leadPill(row) {
@@ -2008,7 +2150,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   }
   /* devolve true se a linha estava saindo e voltou */
   function setLead(row, v) {
-    var d = row.dataset, back = leadBack(row);
+    var d = row.dataset, back = leadBack(row), was = d.pend || d.st;
     clearTimeout(row._t);
     $("select", row).value = v;
     if (v === "matriculado" || v === "perdido") d.pend = v;
@@ -2018,6 +2160,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       /* aula agendada para quem pediu pelo site: vale o dia e a turma do pedido, sem redigitar */
       if (v === "agendado" && !d.slot) d.slot = d.req;
     }
+    if (v !== was) logLead(row, "Etapa: " + ST_TXT[v] + (v === "agendado" && d.slot ? " (" + slotS(d.slot) + ")" : ""));
     paintLead(row);
     paintLeads();
     armOut(row);
@@ -2047,7 +2190,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     paintLeads();
     paintClosed();
     var who = d.child || d.first;
-    toast(v === "matriculado" ? who + " matriculad" + d.art + ". O cadastro e o plano d" + (d.art === "a" ? "ela" : "ele") + " se completam em Alunos." : d.first + " foi para Fechados.");
+    /* contato adicionado no painel não tem artigo guardado: a frase fica neutra */
+    toast(v === "matriculado" ? (d.art ? who + " matriculad" + d.art + ". O cadastro e o plano d" + (d.art === "a" ? "ela" : "ele") + " se completam em Alunos." : "Matrícula de " + who + " registrada. O cadastro e o plano se completam em Alunos.") : d.first + " foi para Fechados.");
     if (had) focusIn(nx ? $("select", nx) : $("#closedBtn"));
   }
   /* ao sair da aba: os status finais valem de vez, e a escolha de dia que ficou aberta é cancelada */
@@ -2082,7 +2226,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     var n = closedT.length;
     $("#closedN").textContent = 6 + n;
     $("#closedList").innerHTML = closedT.map(function (row) {
-      var nm = $("b", row).textContent;
+      var nm = esc($("b", row).textContent);
       return "<li><span>" + nm + "</span>" + (row.dataset.closed === "matriculado" ? '<span class="pill-s in">Matriculado</span>' : '<span class="pill-s">Sem interesse</span>') +
         '<button class="mini-btn ghost" type="button" data-reopen="' + leads.indexOf(row) + '" aria-label="Reabrir ' + nm + '">Reabrir</button></li>';
     }).join("");
@@ -2102,17 +2246,21 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   function closePick(row) { var box = $(".lead-pick", row); if (!box.hidden) morph(function () { box.hidden = true; }); }
   /* a mensagem muda com o status: confirmar o pedido, retomar a conversa ou lembrar a aula marcada */
   function leadText(row) {
-    var d = row.dataset, of = d.child ? " do " + d.child : "", hi = "Oi, " + d.first + "! Aqui é do Studio Evolution BJJ";
+    var d = row.dataset, of = d.child ? (d.art ? " do " : " de ") + d.child : "", hi = "Oi, " + d.first + "! Aqui é do Studio Evolution BJJ";
     if (d.st === "novo" && d.req) return hi + ". Recebi seu pedido de aula experimental" + of + " para " + slotL(d.req) + ", no " + d.turma + ". Está confirmado! Chegue alguns minutos antes; a gente empresta o kimono. Se esse dia não der, me fala que eu te passo outro.";
     if (d.st === "agendado") return hi + ". Confirmando a aula experimental" + of + " na " + slotL(d.slot) + ", no " + d.turma + ". Qualquer dúvida, é só chamar aqui.";
     var hs = TURMAS[d.prog].map(function (h) { return h + "h"; }), list = hs.slice(0, -1).join(", ") + " ou " + hs[hs.length - 1];
     var grp = d.prog === "feminino" ? "As alunas treinam junto com as turmas de adulto" : d.prog === "kids" ? "As turmas Kids treinam" : "As turmas de adulto treinam";
+    /* contato novo sem pedido do site (adicionado no painel): a primeira conversa */
+    if (d.st === "novo") return hi + ". Que bom que você quer conhecer o jiu-jitsu! " + grp + ", de segunda a sexta, às " + list + ". Qual horário fica melhor para " + (d.child ? "a aula experimental" + of : "a sua aula experimental") + "? A primeira aula é grátis e a gente empresta o kimono.";
     return hi + " de novo. " + grp + ", de segunda a sexta, às " + list + ". Qual horário fica melhor para " + (d.child ? "a aula experimental" + of : "a sua aula experimental") + "?";
   }
-  leads.forEach(function (row) {
-    var s = $("select", row), d = row.dataset;
+  function initLead(row) {
+    var s = $("select", row), d = row.dataset, nb = $(".nm-btn", row);
     d.st = d.st0 = s.value;
     row._pill0 = $(".pill-s", row).outerHTML;
+    row._hist = (HIST0[d.phone] || []).slice();
+    nb.setAttribute("aria-label", "Abrir a ficha de " + nb.textContent);
     $("[data-lead]", row).insertAdjacentHTML("afterend", '<button class="mini-btn ghost" type="button" data-lead-undo hidden>Desfazer</button>');
     row.insertAdjacentHTML("beforeend", '<div class="lead-pick" role="group" hidden></div>');
     paintLead(row);
@@ -2122,7 +2270,8 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       closePick(row);
       if (setLead(row, s.value)) toast("Desfeito: " + d.first + " continua na lista.");
     });
-  });
+  }
+  leads.forEach(initLead);
   /* foco dentro da linha segura o status final; ao sair, os 8 s recomeçam */
   $("#leads").addEventListener("focusin", function (e) { var r = e.target.closest(".lead"); if (r) clearTimeout(r._t); });
   $("#leads").addEventListener("focusout", function (e) { var r = e.target.closest(".lead"); if (r) setTimeout(function () { armOut(r); }, 0); });
@@ -2130,16 +2279,13 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
     var b = e.target.closest("button");
     if (!b) return;
     var d = b.dataset, row = b.closest(".lead"), box = $("#leadMsg"), r2, i;
-    if (d.lead !== undefined) {
+    if (d.ficha !== undefined) {
+      leadCard(row, b);
+    } else if (d.lead !== undefined) {
       i = leads.indexOf(row);
       openMsg(box, row.dataset.first, leadText(row), b, sendBtn("data-sendlead", i) + (row.dataset.slot || row.dataset.req ? '<button class="mini-btn ghost" type="button" data-other="' + i + '">Outro dia</button>' : ""));
     } else if (d.sendlead) {
-      /* "Confirmar" de quem é Novo: mandada a mensagem, a pessoa passa para Aula agendada, com o dia do pedido */
-      r2 = leads[+d.sendlead];
-      var conf = r2.dataset.st === "novo" && r2.dataset.req;
-      if (conf) setLead(r2, "agendado");
-      closeMsg(box);
-      toast("No app, abre o WhatsApp com a mensagem pronta." + (conf ? " " + r2.dataset.first + " passou para Aula agendada: " + slotS(r2.dataset.slot) + "." : ""));
+      leadSend(leads[+d.sendlead], false);
     } else if (d.other) {
       pick(leads[+d.other], true, function () { box.hidden = true; });
     } else if (d.pickOk !== undefined) {
@@ -2167,10 +2313,276 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
       r2 = leads[+d.reopen];
       /* a linha pode ainda estar saindo: leadBack cancela a saída */
       if (!leadBack(r2)) { closedT.splice(closedT.indexOf(r2), 1); delete r2.dataset.closed; }
+      logLead(r2, "Reaberto: volta para Em atendimento");
       morph(function () { r2.hidden = false; setLead(r2, "atendimento"); paintClosed(); }, r2);
       focusIn($("select", r2));
       toast(r2.dataset.first + " voltou para Em atendimento.");
     }
+  });
+
+  /* mandada a mensagem: "Confirmar" de quem é Novo passa a pessoa para Aula agendada, com o dia do pedido.
+     inDr: a mensagem saiu da ficha do contato */
+  function leadSend(row, inDr) {
+    var conf = row.dataset.st === "novo" && row.dataset.req, box = inDr ? $(".msg", drawer) : $("#leadMsg");
+    logLead(row, conf ? "WhatsApp: confirmação da aula de " + slotS(row.dataset.req) : "WhatsApp: mensagem enviada");
+    if (conf) setLead(row, "agendado");
+    if (inDr) { box.hidden = true; focusSoft($("[data-ldwa]", drawer), { preventScroll: true }); }
+    else closeMsg(box);
+    toast("No app, abre o WhatsApp com a mensagem pronta." + (conf ? " " + row.dataset.first + " passou para Aula agendada: " + slotS(row.dataset.slot) + "." : ""));
+  }
+
+  /* ---------- a ficha do contato: dados, anotação e histórico (pedido, conversas, etapas) ---------- */
+  function leadInfo(row) {
+    var d = row.dataset, st = d.closed || d.pend || d.st, r = [["WhatsApp", foneTxt(d.phone || "")], ["Etapa", ST_TXT[st]], ["Turma de interesse", d.prog === "kids" ? "Kids" : d.prog === "feminino" ? "Feminino" : "Adulto"]];
+    if (d.child) r.push(["Criança", d.child + (d.age ? ", " + d.age + " anos" : "")]);
+    if (st === "agendado" && d.slot) r.push(["Aula experimental", slotL(d.slot)]);
+    else if (d.req) r.push(["Pediu no site", slotL(d.req)]);
+    r.push(["Origem", ORIG[d.orig] || "—"]);
+    return r.map(function (x) { return "<div><dt>" + x[0] + "</dt><dd>" + esc(x[1]) + "</dd></div>"; }).join("");
+  }
+  function histHTML(row) { return row._hist.map(function (h) { return "<li><time>" + h[0] + "</time><div>" + esc(h[1]) + "</div></li>"; }).join(""); }
+  function leadCard(row, from) {
+    var i = leads.indexOf(row), nm = $("b", row).textContent;
+    drFrom = from || null;
+    drAt = from ? from.getBoundingClientRect().top : null;
+    drawer.dataset.id = "lead:" + i;
+    drawer.innerHTML =
+      '<div class="dr-top"><div class="dr-h"><span class="av">' + inits(nm) + '</span><div><h3 id="drName" tabindex="-1">' + esc(nm) + "</h3><p>Contato · " + (ORIG[row.dataset.orig] || "") + "</p></div></div>" +
+      '<button class="dr-close" type="button" aria-label="Fechar a ficha"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-x"/></svg></button></div>' +
+      '<div class="dr-body"><dl class="dr-info">' + leadInfo(row) + "</dl>" +
+      '<div class="dr-sec"><label class="k" for="ldNote">Anotação</label><div class="ld-note"><textarea class="crm-in" id="ldNote" rows="3" placeholder="Ex.: prefere o horário das 19h; vem com um amigo"></textarea>' +
+      '<button class="mini-btn" type="button" data-ldnote="' + i + '">Salvar no histórico</button></div></div>' +
+      '<div class="dr-sec"><p class="k">Histórico</p><ol class="ld-hist">' + histHTML(row) + "</ol></div>" +
+      '<div class="msg" hidden></div></div>' +
+      '<div class="dr-acts"><button class="mini-btn wa" type="button" data-ldwa="' + i + '">WhatsApp</button></div>';
+    drawerIn();
+  }
+  function refreshLeadCard(row) {
+    if (!drawer.classList.contains("on") || drawer.dataset.id !== "lead:" + leads.indexOf(row)) return;
+    $(".dr-info", drawer).innerHTML = leadInfo(row);
+    $(".ld-hist", drawer).innerHTML = histHTML(row);
+  }
+  function logLead(row, t) { row._hist.unshift([nowTxt(), t]); refreshLeadCard(row); }
+  function leadMsg(i) {
+    var row = leads[i], box = $(".msg", drawer);
+    box.innerHTML = msgHTML(row.dataset.first, leadText(row), sendBtn("data-ldsend", i));
+    box.hidden = false;
+    box._from = $("[data-ldwa]", drawer);
+    /* a mensagem aparece inteira dentro da ficha, acima das ações fixas */
+    var want = box.offsetTop + box.offsetHeight - (drawer.clientHeight - $(".dr-acts", drawer).offsetHeight) + 16;
+    if (want > drawer.scrollTop) drawer.scrollTo({ top: want, behavior: anim ? "smooth" : "auto" });
+  }
+  function leadNote(i) {
+    var row = leads[i], ta = $("#ldNote"), t = ta.value.trim();
+    if (!t) { focusSoft(ta, { preventScroll: true }); return; }
+    logLead(row, "Anotação: " + t);
+    ta.value = "";
+    focusSoft(ta, { preventScroll: true });
+    toast("Anotação salva no histórico de " + row.dataset.first + ".");
+  }
+
+  /* ---------- busca e filtro: escondem com .f-out (o hidden das linhas é dos que foram para Fechados) ---------- */
+  var leadF = "all", leadQ = $("#leadQ"), fChips = $$("#leadF button");
+  function filterLeads() {
+    var raw = leadQ.value.trim(), q = norm(raw), qd = raw.replace(/\D/g, ""), n = 0;
+    leads.forEach(function (row) {
+      var d = row.dataset, txt = norm($("b", row).textContent + " " + (d.child || ""));
+      var ok = (leadF === "all" || d.st === leadF) && (!q || txt.indexOf(q) >= 0 || (qd.length >= 3 && (d.phone || "").indexOf(qd) >= 0));
+      row.classList.toggle("f-out", !ok);
+      if (ok && !row.hidden) n++;
+    });
+    var e = $("#leadEmpty");
+    e.hidden = n > 0;
+    e.textContent = raw ? "Nenhum contato com “" + raw + "”." : "Nenhum contato nesta etapa agora.";
+  }
+  function setFilter(f) {
+    leadF = f;
+    fChips.forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.f === f ? "true" : "false"); });
+  }
+  fChips.forEach(function (c) { c.addEventListener("click", function () { setFilter(c.dataset.f); morph(filterLeads); }); });
+  leadQ.addEventListener("input", function () { morph(filterLeads); });
+
+  /* ---------- adicionar contato: entra no topo da lista, com a etapa escolhida e o histórico começado ---------- */
+  var lf = $("#leadForm"), lfBtn = $("#leadAdd"), lfErr = $("#lfErr");
+  function lfAula() {
+    var prog = $("#lfProg").value, dia = $("#lfDia").value || "seg", hs = TURMAS[prog];
+    $("#lfDia").innerHTML = Object.keys(DAYS).map(function (k) { return '<option value="' + k + '"' + (k === dia ? " selected" : "") + ">" + k + " " + DAYS[k][1] + "</option>"; }).join("");
+    $("#lfHora").innerHTML = hs.map(function (h) { return '<option value="' + h + '">' + (prog === "kids" ? "Kids " : "Adulto ") + h + "h</option>"; }).join("");
+  }
+  function lfSync() {
+    var kid = $("#lfProg").value === "kids";
+    $$(".lf-kid", lf).forEach(function (el) { el.hidden = !kid; });
+    $(".lf-aula", lf).hidden = $("#lfEtapa").value !== "agendado";
+  }
+  function lfBad(el, msg) {
+    $$(".crm-in", lf).forEach(function (f) { f.removeAttribute("aria-invalid"); });
+    lfErr.textContent = msg;
+    if (el) { el.setAttribute("aria-invalid", "true"); focusSoft(el, { preventScroll: true }); }
+  }
+  function lfReset() { lf.reset(); lfBad(null, ""); lfAula(); lfSync(); }
+  function lfOpen(open) {
+    lfBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    morph(function () { lf.hidden = !open; }, lf);
+    if (open) { focusSoft($("#lfNome"), { preventScroll: true }); showBox(lf); }
+    else focusSoft(lfBtn, { preventScroll: true });
+  }
+  lfAula();
+  lfBtn.addEventListener("click", function () { lfOpen(lf.hidden); });
+  $("#lfCancel").addEventListener("click", function () { lfReset(); lfOpen(false); });
+  $("#lfProg").addEventListener("change", function () { lfAula(); morph(lfSync); });
+  $("#lfEtapa").addEventListener("change", function () { morph(lfSync); });
+  $("#lfFone").addEventListener("blur", function () { var d = digits(this.value); if (d.length === 10 || d.length === 11) this.value = foneTxt(d); });
+  lf.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.stopPropagation(); lfReset(); lfOpen(false); } });
+  lf.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var nm = $("#lfNome").value.trim().replace(/\s+/g, " "), ph = digits($("#lfFone").value), prog = $("#lfProg").value, orig = $("#lfOrig").value, st = $("#lfEtapa").value;
+    var kid = prog === "kids", child = kid ? $("#lfFilho").value.trim().replace(/\s+/g, " ") : "", age = kid ? $("#lfIdade").value.replace(/\D/g, "") : "";
+    if (nm.length < 2) return lfBad($("#lfNome"), "Digite o nome do contato.");
+    if (ph.length !== 10 && ph.length !== 11) return lfBad($("#lfFone"), "Confira o WhatsApp: DDD e número, como (15) 99999-9999.");
+    var dup = leads.filter(function (l) { return l.dataset.phone === ph; })[0];
+    if (dup) return lfBad($("#lfFone"), "Esse WhatsApp já está em Interessados: " + $("b", dup).textContent + (dup.dataset.closed ? " (em Fechados)." : "."));
+    if (age && (+age < 4 || +age > 12)) return lfBad($("#lfIdade"), "O Kids é para crianças de 4 a 12 anos.");
+    var slot = st === "agendado" ? $("#lfDia").value + "|" + $("#lfHora").value : "", note = $("#lfNota").value.trim();
+    var row = document.createElement("div"), d = row.dataset;
+    row.className = "lead";
+    d.first = nm.split(" ")[0]; d.prog = prog; d.turma = PROG[prog]; d.phone = ph; d.orig = orig;
+    if (child) d.child = child;
+    if (age) d.age = age;
+    if (slot) d.slot = slot;
+    var what = kid ? "Kids" + (child ? ", para " + child + (age ? ", de " + age + " anos" : "") : "") : prog === "feminino" ? "Feminino" : "Adulto";
+    var pill = st === "agendado" ? '<span class="pill-s in">Aula ' + slotS(slot) + "</span>" : st === "atendimento" ? '<span class="pill-s">Em atendimento</span>' : '<span class="pill-s gold">Retornar hoje</span>';
+    row.innerHTML = '<span class="av">' + inits(nm) + '</span><div><b><button class="nm-btn" type="button" data-ficha>' + esc(nm) + "</button></b>" + pill +
+      "<small>" + esc(ORIG[orig] + " · " + what + " · adicionado " + nowTxt()) + "</small></div>" +
+      '<div class="acts"><select class="sel" aria-label="Status de ' + esc(nm) + '">' + Object.keys(ST_TXT).map(function (v) { return '<option value="' + v + '"' + (v === st ? " selected" : "") + ">" + ST_TXT[v] + "</option>"; }).join("") + "</select>" +
+      '<button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>';
+    /* no fim da lista de dados (os índices dos botões já pintados continuam valendo), no topo da tela */
+    $("#leads").insertBefore(row, $("#leads").firstChild);
+    leads.push(row);
+    initLead(row);
+    logLead(row, "Contato adicionado no painel · origem: " + ORIG[orig]);
+    if (note) logLead(row, "Anotação: " + note);
+    if (slot) logLead(row, "Aula experimental marcada: " + slotS(slot));
+    paintLeads();
+    lfReset();
+    lfBtn.setAttribute("aria-expanded", "false");
+    leadQ.value = "";
+    setFilter("all");
+    morph(function () { lf.hidden = true; filterLeads(); });
+    replayClass(row, "new");
+    focusIn($(".nm-btn", row));
+    toast("Contato salvo: " + d.first + " está em " + ST_TXT[st] + "." + (st === "novo" ? " Retorne hoje pelo WhatsApp." : ""));
+  });
+
+  /* ---------- Configurações: as integrações (na demonstração, status de exemplo) e os dados do Studio ---------- */
+  var PILL = { on: '<span class="pill-s in">Ligado</span>', off: '<span class="pill-s">Desligado</span>', demo: '<span class="pill-s gold">Demonstração</span>' };
+  /* os últimos registros batem com o resto do painel: o Pix do Thiago (09:12), o lembrete da Larissa (08:00), o pedido do Rafael (07:02) */
+  var INT = {
+    asaas: { h: "Mensalidades", s: "Asaas", what: "Gera a cobrança de cada mês (Pix, boleto ou cartão) e dá baixa sozinho quando o pagamento cai.", st: "on", key: "7Q2c", last: "hoje, 09:12 · Pix de Thiago Moreira" },
+    wa: { h: "WhatsApp de avisos", s: "Evolution API", what: "Manda os lembretes de mensalidade e os avisos do Studio por um número só de avisos, separado do atendimento.", st: "on", last: "hoje, 08:00 · lembrete para Larissa Mendes" },
+    site: { h: "Pedidos do site", s: "Página Agendar", what: "Cada pedido de aula experimental feito no site cai em Interessados, com o dia e a turma escolhidos.", st: "on", last: "hoje, 07:02 · Rafael Teixeira" },
+    supa: { h: "Login e dados do app", s: "Supabase", what: "Guarda as contas de alunos e professores e, com o sistema ligado, todos os dados do app.", st: Acesso.real ? "on" : "demo" }
+  };
+  var cfgUI = {};
+  function cfgRows(id) {
+    var c = INT[id], r = [];
+    if (id === "supa") return Acesso.real ? [["Login", "e-mail e senha"], ["Acessos", "criados em Acessos ao app"]] : [["Agora", "contas de demonstração (aluno e professor)"], ["Para ligar", "o passo a passo do guia do Studio"]];
+    if (c.st === "off") return [["Situação", id === "asaas" ? "cobranças automáticas paradas" : "lembretes parados, esperando a reconexão"]];
+    if (c.key) r.push(["Chave de acesso", "•••• " + c.key]);
+    if (id === "wa") r.push(["Número", "só de avisos · conectado"]);
+    r.push([id === "asaas" ? "Último pagamento" : id === "wa" ? "Último envio" : "Último pedido", c.last]);
+    if (c.test) r.push(["Último teste", c.test]);
+    return r;
+  }
+  function cfgActs(id) {
+    var c = INT[id], B = function (a, t, ghost) { return '<button class="mini-btn' + (ghost ? " ghost" : "") + '" type="button" data-cfg="' + a + '" data-id="' + id + '">' + t + "</button>"; };
+    if (id === "site") return '<button class="mini-btn ghost" type="button" data-goto-leads>Ver Interessados</button>';
+    if (id === "supa") return (Acesso.real ? "" : B("guia", "Como ligar", true)) + '<a class="mini-btn ghost" href="acessos.html" data-int>Acessos ao app</a>';
+    if (c.st === "off") return B(id === "asaas" ? "key" : "qr", "Conectar");
+    return B("test", id === "asaas" ? "Testar conexão" : "Mandar teste", true) + B(id === "asaas" ? "key" : "qr", id === "asaas" ? "Trocar chave" : "Reconectar", true) + B("ask", "Desconectar", true);
+  }
+  function cfgPanel(id, ui) {
+    var nm = INT[id].h;
+    if (ui === "ask") return '<div class="cfg-panel ask" role="group" aria-label="Confirmar"><p>Desconectar ' + (id === "asaas" ? "as mensalidades (Asaas)? As cobranças automáticas param" : "o WhatsApp de avisos? Os lembretes param") + " até você conectar de novo.</p>" +
+      '<div class="msg-acts"><button class="mini-btn" type="button" data-cfg="off" data-id="' + id + '">Desconectar</button><button class="mini-btn ghost" type="button" data-cfg="cancel" data-id="' + id + '">Manter</button></div></div>';
+    if (ui === "key") return '<div class="cfg-panel"><label class="crm-f"><span>Chave de acesso do Asaas</span><input class="crm-in" type="password" id="cfgKey" autocomplete="off" spellcheck="false"></label>' +
+      "<small>Fica guardada no servidor do Studio, nunca no site. Depois de salva, só aparecem os 4 últimos caracteres.</small>" +
+      '<p class="crm-err" id="cfgKeyErr" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="button" data-cfg="save" data-id="' + id + '">Salvar chave</button><button class="mini-btn ghost" type="button" data-cfg="cancel" data-id="' + id + '">Cancelar</button></div></div>';
+    return '<div class="cfg-panel"><div class="cfg-qr" role="img" aria-label="Lugar do QR Code">O QR Code aparece aqui com o servidor do Studio ligado.</div>' +
+      "<small>No celular de avisos: WhatsApp → Aparelhos conectados → Conectar um aparelho, e aponte a câmera para o código.</small>" +
+      '<div class="msg-acts"><button class="mini-btn" type="button" data-cfg="scanned" data-id="' + id + '">Já li o QR Code</button><button class="mini-btn ghost" type="button" data-cfg="cancel" data-id="' + id + '">Cancelar</button></div></div>';
+  }
+  function cfgCard(id) {
+    var c = INT[id], ui = cfgUI[id], el = $('.cfg-card[data-int="' + id + '"]');
+    el.dataset.st = c.st;
+    el.innerHTML = '<div class="cfg-top"><h4 id="cfgT-' + id + '">' + c.h + "<small>" + c.s + "</small></h4>" + PILL[c.st] + "</div>" +
+      '<p class="cfg-what">' + c.what + '</p><dl class="cfg-rows">' + cfgRows(id).map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") + "</dl>" +
+      (ui ? cfgPanel(id, ui) : "") + '<div class="cfg-acts">' + (ui ? "" : cfgActs(id)) + "</div>";
+    Site.paintLook(document.documentElement.getAttribute("data-look"));
+  }
+  /* troca o que o cartão mostra e põe o foco no lugar certo (o campo, o primeiro botão do painel ou a 1ª ação) */
+  function cfgSet(id, ui, focusSel) {
+    cfgUI[id] = ui || null;
+    var el = $('.cfg-card[data-int="' + id + '"]');
+    morph(function () { cfgCard(id); }, ui ? $(".cfg-panel", el) : null);
+    focusIn($(focusSel || (ui === "key" ? "#cfgKey" : ui ? ".cfg-panel button" : ".cfg-acts button, .cfg-acts a"), el));
+  }
+  function waPill() {
+    var on = INT.wa.st === "on", p = $("#finWa");
+    p.className = "pill-s " + (on ? "in" : "warn");
+    p.textContent = "WhatsApp de avisos · " + (on ? "conectado" : "desconectado");
+  }
+  Object.keys(INT).forEach(cfgCard);
+  $('.dv[data-v="config"]').addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.hasAttribute("data-goto-leads")) { go("leads", true); return; }
+    var a = b.dataset.cfg, id = b.dataset.id, c = INT[id];
+    if (!a) return;
+    if (a === "guia") toast("O dono cria o projeto no Supabase com o e-mail do Studio e convida a OPUS; a gente liga o login e os dados. O passo a passo está no guia do Studio (docs/supabase.md).");
+    else if (a === "ask" || a === "key" || a === "qr") cfgSet(id, a);
+    else if (a === "cancel") cfgSet(id, null);
+    else if (a === "test") {
+      b.disabled = true;
+      b.textContent = "Testando…";
+      setTimeout(function () {
+        c.test = nowTxt() + " · ok";
+        cfgSet(id, null, '[data-cfg="test"]');
+        toast(id === "asaas" ? "Teste ok: o Asaas respondeu." : "Mensagem de teste enviada para o WhatsApp do professor.");
+      }, 900);
+    } else if (a === "off") {
+      c.st = "off";
+      c.test = "";
+      if (id === "wa") waPill();
+      cfgSet(id, null);
+      toast(id === "asaas" ? "Mensalidades desconectadas: as cobranças automáticas pararam." : "WhatsApp de avisos desconectado: os lembretes esperam a reconexão. O selo do Financeiro ficou vermelho.");
+    } else if (a === "save") {
+      var k = $("#cfgKey").value.trim();
+      if (k.length < 20) { $("#cfgKeyErr").textContent = "Cole a chave inteira, como aparece no painel do Asaas."; $("#cfgKey").setAttribute("aria-invalid", "true"); focusSoft($("#cfgKey"), { preventScroll: true }); return; }
+      c.key = k.slice(-4);
+      $("#cfgKey").value = "";
+      c.st = "on";
+      cfgSet(id, null);
+      toast("Chave salva no servidor. Daqui em diante, só aparecem os 4 últimos caracteres.");
+    } else if (a === "scanned") {
+      c.st = "on";
+      c.last = nowTxt() + " · reconectado";
+      waPill();
+      cfgSet(id, null);
+      toast("WhatsApp de avisos conectado. Os lembretes voltam a sair no horário.");
+    }
+  });
+  $("#cfgStudio").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = $("#csErr"), bad = null, msg = "";
+    $$(".crm-in", this).forEach(function (f) { f.removeAttribute("aria-invalid"); });
+    var ph = digits($("#csFone").value), v = +$("#csVagas").value.replace(/\D/g, "");
+    if (!$("#csNome").value.trim()) { bad = $("#csNome"); msg = "Digite o nome do Studio."; }
+    else if (ph.length !== 10 && ph.length !== 11) { bad = $("#csFone"); msg = "Confira o WhatsApp: DDD e número."; }
+    else if (!v || v > 60) { bad = $("#csVagas"); msg = "Vagas por aula: um número de 1 a 60."; }
+    err.textContent = msg;
+    if (bad) { bad.setAttribute("aria-invalid", "true"); focusSoft(bad, { preventScroll: true }); return; }
+    $("#csFone").value = foneTxt(ph);
+    toast("Dados do Studio salvos.");
   });
 
   /* ---------- Modo tatame: a TV liga quando aparece na tela ---------- */
