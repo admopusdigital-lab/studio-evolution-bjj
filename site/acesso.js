@@ -76,6 +76,8 @@
     sessao: sessao,
     permite: permite,
     precarregar: function () { if (REAL) sb().catch(function () {}); },
+    /* o cliente do Supabase para os dados do app (movimentos.js); na demonstração não existe */
+    cliente: function () { return REAL ? sb() : Promise.reject(new Error("demonstracao")); },
 
     /* entrar: resolve { ok, papel, destino } ou { ok: false, msg, campo: "usuario" | "senha" } */
     entrar: function (usuario, senha, papel, manterConectado) {

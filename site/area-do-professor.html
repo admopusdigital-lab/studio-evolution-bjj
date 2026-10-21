@@ -295,6 +295,42 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 .ld-hist time { font: 500 11.5px/1.5 var(--mono, monospace); color: var(--gold-text); }
 @media (max-width: 600px) { .crm-grid { grid-template-columns: minmax(0, 1fr); } .crm-add { flex: 1 1 100%; justify-content: center; } }
 
+/* Movimentos: a lista por faixa (selos de vídeo, quiz e rascunho), quem estudou e o formulário com o quiz */
+.mv-list { display: grid; gap: 8px; margin-top: 18px; }
+.mv { display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 14px; background: var(--paper-2); }
+.mv.new { animation: arrive 1.6s var(--ease); }
+.mv-th { display: grid; place-items: center; aspect-ratio: 4 / 3; overflow: hidden; background: var(--paper); }
+.mv-th img { width: 100%; height: 100%; object-fit: cover; }
+.mv-th .ic { width: 20px; height: 20px; color: var(--ink-3); }
+.mv b { font-weight: 500; }
+.mv-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.mv-tags .pill-s { font-size: 10.5px; }
+.fx { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 999px; background: color-mix(in oklch, var(--ink) 7%, transparent); font-size: 10.5px; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+.fx i { width: 10px; height: 10px; border-radius: 50%; box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.25); }
+.mv small { display: block; margin-top: 6px; font-size: 12px; color: var(--ink-3); }
+.mv .acts { display: flex; gap: 8px; }
+.mv-who { grid-column: 2 / -1; font-size: 12.5px; color: var(--ink-2); }
+.mv-who ul { display: flex; flex-wrap: wrap; gap: 6px; }
+.mv-who li { padding: 4px 10px; border-radius: 999px; background: var(--paper); }
+.mf-vinfo { font-size: 11.5px; color: var(--ink-3); }
+.mf-vinfo.bad { color: var(--warn); }
+.mf-vinfo.ok { color: var(--ok); }
+.mf-quiz { margin-top: 16px; }
+.mf-quiz .fin-k small { font-weight: 400; letter-spacing: 0; text-transform: none; }
+.mf-q { display: grid; gap: 8px; margin-top: 10px; padding: 12px; border: 0; background: var(--paper); }
+.mf-q legend { float: left; width: 100%; margin-bottom: 2px; font: 600 12px/1.3 var(--sans); color: var(--ink); }
+.mf-alt { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; }
+.mf-ok { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--ink-3); cursor: pointer; }
+.mf-ok input { width: 16px; height: 16px; margin: 0; accent-color: var(--gold); }
+.mf-q .mini-btn[data-rmq] { justify-self: start; }
+#mfAddQ { margin-top: 10px; }
+.mf-pub { display: flex; align-items: flex-start; gap: 8px; margin-top: 16px; font-size: 13px; color: var(--ink); cursor: pointer; }
+.mf-pub input { width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--gold); }
+.mf-pub small { color: var(--ink-3); }
+.mf-del { margin-left: auto; color: var(--warn); }
+#mfDelAsk { margin-top: 10px; }
+@media (max-width: 860px) { .mv { grid-template-columns: 64px minmax(0, 1fr); } .mv .acts { grid-column: 1 / -1; justify-content: flex-end; } .mv-who { grid-column: 1 / -1; } }
+
 /* Configurações: um cartão por integração (status, o que faz, ações) e os dados do Studio */
 .cfg-demo { margin-top: 16px; padding: 12px 14px; background: color-mix(in oklch, var(--gold) 10%, transparent); font-size: 12.5px; color: var(--ink-2); }
 .cfg-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
@@ -438,10 +474,11 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
               <button type="button" data-go="hoje" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Hoje</button>
               <button type="button" data-go="alunos" aria-current="false" aria-label="Alunos, 3 ausentes"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-users"/></svg>Alunos<span class="badge">3</span></button>
               <button type="button" data-go="grad" aria-current="false" aria-label="Graduações, 3 para avaliar"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad">3</span></button>
+              <button type="button" data-go="mov" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
               <button type="button" data-go="leads" aria-current="false" aria-label="Interessados, 3 esperando retorno"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads">3</span></button>
               <button type="button" data-go="fin" aria-current="false" aria-label="Financeiro, 2 em atraso"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin">2</span></button>
               <button type="button" data-go="config" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-gear"/></svg>Configurações</button>
-              <div class="more"><p>Também no painel</p><ul><li>Movimentos e quizzes</li><li>Competências da faixa</li><li>Turmas e horários</li><li>Aprendizado por aluno</li><li>Cadastro rápido</li></ul></div>
+              <div class="more"><p>Também no painel</p><ul><li>Competências da faixa</li><li>Turmas e horários</li><li>Aprendizado por aluno</li><li>Cadastro rápido</li></ul></div>
               <div class="who"><span class="av">SE</span><span>Professor · dono<br><small>Studio Evolution</small></span></div>
             </nav>
             <div class="dash-main">
@@ -536,6 +573,41 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
               </section>
 
               <!-- Interessados -->
+              <!-- Movimentos: a biblioteca que os alunos estudam no app (movimentos.js). Lista e formulário montados pelo script -->
+              <section class="dv" data-v="mov" aria-labelledby="t-mov">
+                <div class="dv-h"><div><p class="dv-k">Biblioteca da academia</p><h3 id="t-mov">Movimentos</h3></div><p>Os vídeos e quizzes que os alunos veem no app, separados por faixa. O aluno assiste e, aos 90% do vídeo, faz o quiz.</p></div>
+                <div class="kpis">
+                  <div class="kpi"><b id="mvK1">0</b><span>publicados no app</span></div>
+                  <div class="kpi"><b id="mvK2">0</b><span>com vídeo</span></div>
+                  <div class="kpi"><b id="mvK3">0</b><span>esperando vídeo</span></div>
+                  <div class="kpi"><b id="mvK4">0</b><span>quizzes feitos pelos alunos</span></div>
+                </div>
+                <div class="crm-bar">
+                  <label class="crm-search"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-search"/></svg><span class="sr-only">Buscar movimento</span><input class="crm-in" type="search" id="mvQ" placeholder="Buscar movimento" autocomplete="off"></label>
+                  <div class="chips" id="mvF" role="group" aria-label="Mostrar por faixa"></div>
+                  <button class="mini-btn crm-add" type="button" id="mvAdd" aria-expanded="false" aria-controls="mvForm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Adicionar movimento</button>
+                </div>
+                <form class="crm-form" id="mvForm" aria-labelledby="mvFormT" novalidate hidden>
+                  <p class="fin-k" id="mvFormT">Novo movimento</p>
+                  <div class="crm-grid">
+                    <label class="crm-f"><span>Nome do movimento</span><input class="crm-in" id="mfNome" autocomplete="off"></label>
+                    <label class="crm-f"><span>Faixa</span><select class="sel" id="mfFaixa"></select></label>
+                    <label class="crm-f"><span>Tipo</span><select class="sel" id="mfCat"></select></label>
+                    <label class="crm-f"><span>Duração <small>(opcional, como 6:40)</small></span><input class="crm-in" id="mfDur" autocomplete="off"></label>
+                    <label class="crm-f wide"><span>Vídeo <small>(link do YouTube ou de um arquivo .mp4)</small></span><input class="crm-in" id="mfVideo" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://youtu.be/..." aria-describedby="mfVinfo"><small class="mf-vinfo" id="mfVinfo"></small></label>
+                    <label class="crm-f wide"><span>Pontos-chave <small>(um por linha)</small></span><textarea class="crm-in" id="mfPontos" rows="3"></textarea></label>
+                  </div>
+                  <div class="mf-quiz"><p class="fin-k">Quiz <small>· abre para o aluno aos 90% do vídeo</small></p><div id="mfQs"></div><button class="mini-btn ghost" type="button" id="mfAddQ">+ Pergunta</button></div>
+                  <label class="mf-pub"><input type="checkbox" id="mfPub" checked><span>Publicar no app agora <small>(sem marcar, fica como rascunho)</small></span></label>
+                  <p class="crm-err" id="mfErr" role="alert"></p>
+                  <div class="msg-acts"><button class="mini-btn" type="submit">Salvar movimento</button><button class="mini-btn ghost" type="button" id="mfCancel">Cancelar</button><button class="mini-btn ghost mf-del" type="button" id="mfDel" hidden>Apagar movimento</button></div>
+                  <div class="cfg-panel ask" id="mfDelAsk" hidden><p id="mfDelT"></p><div class="msg-acts"><button class="mini-btn" type="button" id="mfDelYes">Apagar</button><button class="mini-btn ghost" type="button" id="mfDelNo">Manter</button></div></div>
+                </form>
+                <ul class="mv-list" id="mvList"></ul>
+                <p class="crm-empty" id="mvEmpty" hidden></p>
+                <p class="fin-how"><b>Como publicar um vídeo:</b> no YouTube, envie o vídeo com a visibilidade <b>Não listado</b> (só assiste quem tem o link), copie o link e cole aqui. Também vale o link direto de um arquivo .mp4. Grave na horizontal, com a técnica inteira no quadro; de 3 a 8 minutos funciona bem no celular.</p>
+              </section>
+
               <section class="dv" data-v="leads" aria-labelledby="t-leads">
                 <div class="dv-h"><div><p class="dv-k">Pedidos e contatos</p><h3 id="t-leads">Interessados</h3></div><p>Pedidos do site e contatos adicionados aqui. Toque no nome para ver a ficha e o histórico; mude o status depois de cada contato.</p></div>
                 <div class="funnel" id="funnel" aria-label="Interessados por etapa">
@@ -808,6 +880,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="site.js"></script>
+<script src="movimentos.js"></script>
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$, focusSoft = Site.focusSoft;
@@ -2472,6 +2545,189 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     focusIn($(".nm-btn", row));
     toast("Contato salvo: " + d.first + " está em " + ST_TXT[st] + "." + (st === "novo" ? " Retorne hoje pelo WhatsApp." : ""));
   });
+
+  /* ---------- Movimentos: o professor cadastra o vídeo (YouTube, pode ser não listado, ou arquivo .mp4), os pontos-chave
+     e o quiz; os alunos da faixa veem no app. Na demonstração, fica guardado neste navegador (movimentos.js) ---------- */
+  var MV = [], mvF = "todas", mvEdit = null, mvEst = {}, mvForm = $("#mvForm"), mvAdd = $("#mvAdd");
+  function mvFaixa(f) { return '<span class="fx"><i style="background:' + BC[f] + '"></i>Faixa ' + Mov.FAIXAS[f].toLowerCase() + "</span>"; }
+  function mvCapa(m) { return m.video && m.video.poster ? m.video.poster : m.video && m.video.tipo === "youtube" ? "https://i.ytimg.com/vi/" + m.video.ref + "/mqdefault.jpg" : ""; }
+  function mvCarregar() {
+    return Mov.lista({ todos: true }).then(function (l) {
+      MV = l;
+      return Promise.all(l.map(function (m) { return Mov.estudaram(m.id).catch(function () { return []; }); }));
+    }).then(function (est) { mvEst = {}; est.forEach(function (n, i) { mvEst[MV[i].id] = n; }); mvPaint(); });
+  }
+  function mvPaint() {
+    var pub = MV.filter(function (m) { return m.publicado; });
+    $("#mvK1").textContent = pub.length;
+    $("#mvK2").textContent = pub.filter(function (m) { return m.video; }).length;
+    $("#mvK3").textContent = pub.filter(function (m) { return !m.video; }).length;
+    $("#mvK4").textContent = Object.keys(mvEst).reduce(function (a, k) { return a + mvEst[k].length; }, 0);
+    var fx = Mov.ORDEM.filter(function (f) { return MV.some(function (m) { return m.faixa === f; }); });
+    if (mvF !== "todas" && fx.indexOf(mvF) < 0) mvF = "todas";
+    $("#mvF").innerHTML = ["todas"].concat(fx).map(function (f) { return '<button type="button" data-f="' + f + '" aria-pressed="' + (f === mvF) + '">' + (f === "todas" ? "Todas" : Mov.FAIXAS[f]) + "</button>"; }).join("");
+    var q = norm($("#mvQ").value.trim()), vis = MV.filter(function (m) { return (mvF === "todas" || m.faixa === mvF) && (!q || norm(m.nome).indexOf(q) >= 0); });
+    $("#mvList").innerHTML = vis.map(function (m) {
+      var c = mvCapa(m), n = (mvEst[m.id] || []).length;
+      return '<li class="mv" data-id="' + m.id + '"><span class="mv-th">' + (c ? '<img src="' + c + '" alt="">' : '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>') + "</span>" +
+        "<div><b>" + esc(m.nome) + '</b><span class="mv-tags">' + mvFaixa(m.faixa) + '<span class="pill-s">' + Mov.CATS[m.cat] + "</span>" +
+        (!m.video ? '<span class="pill-s gold">Esperando vídeo</span>' : m.video.exemplo ? '<span class="pill-s gold">Vídeo de exemplo</span>' : '<span class="pill-s in">' + (m.video.tipo === "youtube" ? "YouTube" : "Vídeo") + "</span>") +
+        '<span class="pill-s">' + (m.quiz.length ? "Quiz: " + m.quiz.length + (m.quiz.length === 1 ? " pergunta" : " perguntas") : "Sem quiz") + "</span>" +
+        (m.publicado ? "" : '<span class="pill-s warn">Rascunho</span>') + "</span>" +
+        "<small>" + (n ? "Estudaram: " + n + (n === 1 ? " aluno" : " alunos") : "Ninguém fez o quiz ainda") + "</small></div>" +
+        '<div class="acts">' + (n ? '<button class="mini-btn ghost" type="button" data-mv-who aria-expanded="false">Quem estudou</button>' : "") +
+        '<button class="mini-btn" type="button" data-mv-edit aria-label="Editar ' + esc(m.nome) + '">Editar</button></div>' +
+        '<div class="mv-who" hidden><ul>' + (mvEst[m.id] || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div></li>";
+    }).join("");
+    $$("#mvList img").forEach(function (im) { im.onerror = function () { im.hidden = true; }; });
+    var e = $("#mvEmpty");
+    e.hidden = vis.length > 0;
+    e.textContent = q ? "Nenhum movimento com “" + $("#mvQ").value.trim() + "”." : "Nenhum movimento nesta faixa ainda.";
+  }
+  $("#mvF").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; mvF = b.dataset.f; morph(mvPaint); focusSoft($('#mvF [data-f="' + mvF + '"]'), { preventScroll: true }); });
+  $("#mvQ").addEventListener("input", function () { morph(mvPaint); });
+  $("#mvList").addEventListener("click", function (e) {
+    var b = e.target.closest("button"), li = b && b.closest(".mv");
+    if (!b || !li) return;
+    var m = MV.filter(function (x) { return x.id === li.dataset.id; })[0];
+    if (b.hasAttribute("data-mv-who")) {
+      var w = $(".mv-who", li), open = w.hidden;
+      morph(function () { w.hidden = !open; }, w);
+      b.setAttribute("aria-expanded", open ? "true" : "false");
+    } else if (b.hasAttribute("data-mv-edit") && m) mvAbrir(m);
+  });
+
+  /* ---------- o formulário: novo ou editar ---------- */
+  $("#mfFaixa").innerHTML = Mov.ORDEM.map(function (f) { return '<option value="' + f + '">' + Mov.FAIXAS[f] + "</option>"; }).join("");
+  $("#mfCat").innerHTML = Object.keys(Mov.CATS).map(function (k) { return '<option value="' + k + '">' + Mov.CATS[k] + "</option>"; }).join("");
+  function mfQ(i, d) {
+    d = d || { q: "", a: ["", "", ""], r: -1, dica: "" };
+    var L = "ABC";
+    return '<fieldset class="mf-q"><legend>Pergunta ' + (i + 1) + "</legend>" +
+      '<input class="crm-in" data-f="q" aria-label="Pergunta ' + (i + 1) + '" placeholder="A pergunta" value="' + esc(d.q) + '">' +
+      [0, 1, 2].map(function (k) {
+        return '<div class="mf-alt"><label class="mf-ok"><input type="radio" name="mfR' + i + '" value="' + k + '"' + (d.r === k ? " checked" : "") + ' aria-label="Alternativa ' + L[k] + ' é a certa"><span>certa</span></label>' +
+          '<input class="crm-in" data-f="a' + k + '" aria-label="Pergunta ' + (i + 1) + ", alternativa " + L[k] + '" placeholder="Alternativa ' + L[k] + '" value="' + esc(d.a[k] || "") + '"></div>';
+      }).join("") +
+      '<input class="crm-in" data-f="dica" aria-label="Pergunta ' + (i + 1) + ', dica para quem errar" placeholder="Dica para quem errar (opcional)" value="' + esc(d.dica || "") + '">' +
+      '<button class="mini-btn ghost" type="button" data-rmq>Remover pergunta</button></fieldset>';
+  }
+  /* lê as perguntas da tela (para remover uma sem perder o que foi digitado nas outras) */
+  function mfLer() {
+    return $$(".mf-q", mvForm).map(function (fs) {
+      var v = function (f) { return $('[data-f="' + f + '"]', fs).value.trim(); }, r = $("input[type=radio]:checked", fs);
+      return { q: v("q"), a: [v("a0"), v("a1"), v("a2")], r: r ? +r.value : -1, dica: v("dica"), el: fs };
+    });
+  }
+  function mfQs(lista) {
+    $("#mfQs").innerHTML = lista.map(function (d, i) { return mfQ(i, d); }).join("");
+    $("#mfAddQ").hidden = lista.length >= 5;
+  }
+  function mfVinfo() {
+    var t = $("#mfVideo").value.trim(), v = mvEdit && t === Mov.videoTexto(mvEdit.video) ? mvEdit.video : Mov.video(t), el = $("#mfVinfo");
+    el.className = "mf-vinfo" + (v === false ? " bad" : v ? " ok" : "");
+    el.textContent = v === false ? "Esse link não toca no app. Use um link do YouTube ou de um arquivo de vídeo (.mp4)."
+      : !v ? "Sem vídeo: o movimento aparece no app como “em gravação”, e o quiz espera o vídeo."
+      : v.exemplo ? "Vídeo de exemplo do Studio. Troque pelo link da aula quando ela estiver gravada."
+      : v.tipo === "youtube" ? "YouTube · vídeo " + v.ref + ". Deixe o vídeo como Não listado no YouTube." : "Arquivo de vídeo.";
+    return v;
+  }
+  $("#mfVideo").addEventListener("input", mfVinfo);
+  function mfErro(el, msg) {
+    $$("[aria-invalid]", mvForm).forEach(function (f) { f.removeAttribute("aria-invalid"); });
+    $("#mfErr").textContent = msg;
+    if (el) { el.setAttribute("aria-invalid", "true"); focusSoft(el, { preventScroll: true }); }
+  }
+  function mvAbrir(m) {
+    mvEdit = m || null;
+    $("#mvFormT").textContent = m ? "Editar movimento" : "Novo movimento";
+    $("#mfNome").value = m ? m.nome : "";
+    $("#mfFaixa").value = m ? m.faixa : (mvF !== "todas" ? mvF : "azul");
+    $("#mfCat").value = m ? m.cat : "raspagem";
+    $("#mfDur").value = m && m.video && m.video.dur ? m.video.dur : "";
+    $("#mfVideo").value = m ? Mov.videoTexto(m.video) : "";
+    $("#mfPontos").value = m ? m.pontos.join("\n") : "";
+    $("#mfPub").checked = m ? m.publicado : true;
+    mfQs(m && m.quiz.length ? m.quiz : [{ q: "", a: ["", "", ""], r: -1, dica: "" }]);
+    $("#mfDel").hidden = !m;
+    $("#mfDelAsk").hidden = true;
+    mfErro(null, "");
+    mfVinfo();
+    mvAdd.setAttribute("aria-expanded", "true");
+    morph(function () { mvForm.hidden = false; }, mvForm);
+    focusSoft($("#mfNome"), { preventScroll: true });
+    showBox(mvForm);
+  }
+  function mvFechar(foco) {
+    mvAdd.setAttribute("aria-expanded", "false");
+    morph(function () { mvForm.hidden = true; });
+    mvEdit = null;
+    if (foco) focusIn(foco);
+  }
+  mvAdd.addEventListener("click", function () { if (mvForm.hidden || mvEdit) mvAbrir(null); else mvFechar(mvAdd); });
+  $("#mfCancel").addEventListener("click", function () { var id = mvEdit && mvEdit.id; mvFechar(id ? $('#mvList .mv[data-id="' + id + '"] [data-mv-edit]') : mvAdd); });
+  mvForm.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.stopPropagation(); $("#mfCancel").click(); } });
+  $("#mfAddQ").addEventListener("click", function () {
+    var l = mfLer();
+    l.push({ q: "", a: ["", "", ""], r: -1, dica: "" });
+    morph(function () { mfQs(l); });
+    focusSoft($('.mf-q:last-of-type [data-f="q"]', mvForm), { preventScroll: true });
+  });
+  $("#mfQs").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-rmq]");
+    if (!b) return;
+    var l = mfLer(), i = l.map(function (x) { return x.el; }).indexOf(b.closest(".mf-q"));
+    l.splice(i, 1);
+    morph(function () { mfQs(l); });
+    focusSoft($("#mfAddQ").hidden ? $("#mfPub") : $("#mfAddQ"), { preventScroll: true });
+  });
+  mvForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var nome = $("#mfNome").value.trim().replace(/\s+/g, " "), dur = $("#mfDur").value.trim(), v = mfVinfo(), quiz = [], erro = null;
+    if (nome.length < 2) return mfErro($("#mfNome"), "Digite o nome do movimento.");
+    if (v === false) return mfErro($("#mfVideo"), "Esse link não toca no app. Use um link do YouTube ou de um arquivo de vídeo (.mp4).");
+    if (dur && !/^\d{1,3}:[0-5]\d$/.test(dur)) return mfErro($("#mfDur"), "Duração em minutos e segundos, como 6:40.");
+    mfLer().forEach(function (d, i) {
+      if (erro || (!d.q && !d.a.join("") && !d.dica)) return;  /* pergunta em branco: fica de fora */
+      var fs = d.el, n = "Pergunta " + (i + 1) + ": ";
+      if (!d.q) erro = [$('[data-f="q"]', fs), n + "escreva a pergunta."];
+      else if (d.a.some(function (a) { return !a; })) erro = [$('[data-f="a' + d.a.map(function (a) { return !!a; }).indexOf(false) + '"]', fs), n + "preencha as 3 alternativas."];
+      else if (d.r < 0) erro = [$("input[type=radio]", fs), n + "marque qual alternativa é a certa."];
+      else quiz.push({ q: d.q, a: d.a, r: d.r, dica: d.dica });
+    });
+    if (erro) return mfErro(erro[0], erro[1]);
+    if (v) { v = JSON.parse(JSON.stringify(v)); if (dur) v.dur = dur; else delete v.dur; }
+    var pub = $("#mfPub").checked, m = {
+      id: mvEdit ? mvEdit.id : undefined, nome: nome, faixa: $("#mfFaixa").value, cat: $("#mfCat").value, video: v || null,
+      pontos: $("#mfPontos").value.split("\n").map(function (t) { return t.trim(); }).filter(Boolean), quiz: quiz, publicado: pub
+    };
+    var era = mvEdit;
+    Mov.salvar(m).then(function (salvo) {
+      mvFechar(null);
+      if (mvF !== "todas" && mvF !== salvo.faixa) mvF = salvo.faixa;
+      return mvCarregar().then(function () {
+        var b = $('#mvList .mv[data-id="' + salvo.id + '"] [data-mv-edit]');
+        if (b) { replayClass(b.closest(".mv"), "new"); focusIn(b); }
+        var fx = "faixa " + Mov.FAIXAS[salvo.faixa].toLowerCase();
+        toast(!pub ? "Rascunho salvo: os alunos ainda não veem “" + salvo.nome + "”."
+          : (era ? "Movimento atualizado" : "Movimento salvo") + ": “" + salvo.nome + "” já aparece no app dos alunos da " + fx + "." + (salvo.video ? "" : " Sem vídeo, ele aparece como em gravação."));
+      });
+    }).catch(function () { mfErro(null, "Não deu para salvar agora. Confira a internet e tente de novo."); });
+  });
+  $("#mfDel").addEventListener("click", function () {
+    $("#mfDelT").textContent = "Apagar “" + mvEdit.nome + "”? Os alunos deixam de ver o movimento e o progresso dele some.";
+    morph(function () { $("#mfDelAsk").hidden = false; }, $("#mfDelAsk"));
+    focusSoft($("#mfDelNo"), { preventScroll: true });
+  });
+  $("#mfDelNo").addEventListener("click", function () { morph(function () { $("#mfDelAsk").hidden = true; }); focusSoft($("#mfDel"), { preventScroll: true }); });
+  $("#mfDelYes").addEventListener("click", function () {
+    var m = mvEdit;
+    Mov.apagar(m.id).then(function () {
+      mvFechar(null);
+      return mvCarregar();
+    }).then(function () { focusIn(viewH("mov")); toast("“" + m.nome + "” foi apagado."); });
+  });
+  mvCarregar();
 
   /* ---------- Configurações: as integrações (na demonstração, status de exemplo) e os dados do Studio ---------- */
   var PILL = { on: '<span class="pill-s in">Ligado</span>', off: '<span class="pill-s">Desligado</span>', demo: '<span class="pill-s gold">Demonstração</span>' };

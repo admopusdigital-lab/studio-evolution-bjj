@@ -16,12 +16,17 @@ O que já está pronto:
 | Módulo de acesso | `site/acesso.js` | Login, saída, conferência da sessão nas áreas, os dois modos |
 | Configuração | `site/supabase-config.js` | URL e chave publicável do projeto (vazias = demonstração) |
 | Banco | `supabase/migrations/20261019120000_perfis_e_acesso.sql` | Tabela `perfis` com as regras de segurança (RLS) |
+| Movimentos | `supabase/migrations/20261021120000_movimentos.sql` | Tabelas `movimentos` (vídeo, pontos-chave, quiz) e `estudos` (o progresso de cada aluno) |
+| Biblioteca no site | `site/movimentos.js` | Lê e grava os movimentos e o progresso; o app e o painel usam o mesmo módulo |
 | Função do servidor | `supabase/functions/criar-conta/index.ts` | Cria contas e gera senhas provisórias; só professor usa |
 
 As regras de segurança foram testadas num Postgres local imitando o Supabase:
 - O visitante sem login não vê nada.
 - O aluno vê só o próprio perfil. Ele não consegue virar professor, criar perfis nem apagar perfis.
 - O professor ativo vê e atualiza todos os perfis. O professor desativado perde esse poder.
+- Movimentos: quem está logado vê só os publicados; o professor ativo vê os rascunhos e cria, muda e apaga.
+- Progresso: cada aluno lê e grava só o próprio, e só de movimento publicado; o professor vê o de todos (quem estudou).
+  Apagar um movimento apaga o progresso dele.
 
 ## 1. Criar o projeto (dono da academia)
 
@@ -48,7 +53,7 @@ Com o convite aceito, a OPUS aplica a migration e publica a função:
 
 ```bash
 supabase link --project-ref <ref-do-projeto>
-supabase db push                                    # cria perfis + regras
+supabase db push                                    # cria perfis, movimentos, estudos + regras
 supabase functions deploy criar-conta --no-verify-jwt  # a função confere o login ela mesma
 ```
 
@@ -104,6 +109,16 @@ no site a chave secreta (`sb_secret_...` / `service_role`).
   - Se o perfil falhar, a conta é desfeita.
   - "Senha nova" gera outra senha provisória para um e-mail que já existe.
 - **Kids:** a conta é do responsável (e-mail e WhatsApp dele), com o nome da criança no perfil.
+
+## Os vídeos das aulas
+
+Os vídeos não ficam no Supabase: o professor sobe no YouTube como **Não listado** (só assiste quem tem o link) e cola o
+link na aba Movimentos do painel. O app toca pelo player oficial do YouTube e acompanha quanto foi assistido para
+liberar o quiz aos 90%. Também vale o link direto de um arquivo .mp4 (por exemplo, de um serviço de vídeo privado, se um
+dia o Studio quiser vídeos só para quem tem login).
+
+Os movimentos de exemplo da demonstração não vão para o banco: com o Supabase ligado, a biblioteca começa vazia e o
+professor cadastra a dele.
 
 ## O que fica para depois (precisa do banco ligado)
 

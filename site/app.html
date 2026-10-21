@@ -68,6 +68,46 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .app-sair { color: var(--warn); }
 .app-demo { margin-top: 12px; font-size: 11.5px; }
 .app-demo b { color: var(--gold-text); font-weight: 600; letter-spacing: 0.06em; }
+/* Movimentos: a biblioteca (a lista abre a aula) e a tela da aula, com o vídeo, os pontos-chave e o quiz */
+.ap-cats { display: flex; gap: 6px; margin: 16px -18px 0; padding: 0 18px 2px; overflow-x: auto; scrollbar-width: none; }
+.ap-cats::-webkit-scrollbar { display: none; }
+.ap-cats button { flex-shrink: 0; height: 30px; padding: 0 12px; border: 1px solid var(--rule); border-radius: 999px; background: none; color: var(--ink-2); font: 500 11.5px/1 var(--sans); cursor: pointer; }
+.ap-cats button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.ap-movs { margin-top: 8px; }
+.ap-movs > li { display: block; padding: 0; }
+.ap-mv { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 12px; align-items: center; width: 100%; padding: 9px 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.ap-mv .th { display: grid; place-items: center; aspect-ratio: 4 / 3; overflow: hidden; background: var(--paper-2); }
+.ap-mv .th img { width: 100%; height: 100%; object-fit: cover; }
+.ap-mv .th .ic { width: 18px; height: 18px; color: var(--ink-3); }
+.ap-mv b { display: block; font: 400 15px/1.2 var(--serif); }
+.ap-mv small { display: block; margin-top: 2px; font-size: 11px; color: var(--ink-3); }
+.ap-mv .pill-s { display: inline-block; margin-top: 5px; }
+.ap-cover img[hidden] { display: none; }
+.ap-back { display: inline-flex; align-items: center; gap: 4px; height: 32px; margin-left: -6px; padding: 0 6px; border: 0; background: none; color: var(--ink-2); font: 500 12.5px/1 var(--sans); cursor: pointer; }
+.ap-back .ic { width: 14px; height: 14px; }
+.ap-player { margin: 6px -18px 0; background: oklch(0.08 0.004 75); }
+.ap-player:empty { display: none; }
+.ap-player video { display: block; width: 100%; max-height: 340px; aspect-ratio: 16 / 9; background: oklch(0.08 0.004 75); }
+.ap-yt { aspect-ratio: 16 / 9; }
+.ap-yt > *, .ap-yt iframe { display: block; width: 100%; height: 100%; border: 0; }
+.ap-rec { display: grid; gap: 6px; padding: 22px 18px; background: var(--paper-2); color: var(--ink-2); font-size: 12.5px; }
+.ap-rec b { font: 400 18px/1.15 var(--serif); color: var(--ink); }
+.ap-rec .ap-btn { margin-top: 6px; text-decoration: none; }
+.ap-ex { margin-top: 8px; font-size: 11.5px; }
+.ap-pbar { margin-top: 10px; }
+.ap-pbar[hidden] { display: none; }
+.ap-pbar .pg { display: block; height: 3px; background: color-mix(in oklch, var(--ink) 12%, transparent); }
+.ap-pbar .pg span { display: block; width: 0; height: 100%; background: var(--gold); transition: width 300ms linear; }
+.ap-pbar p { margin-top: 6px; }
+.ap-pts { margin-top: 6px; counter-reset: pt; }
+.ap-pts li { position: relative; padding: 8px 0 8px 28px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); counter-increment: pt; }
+.ap-pts li::before { content: counter(pt); position: absolute; left: 0; top: 8px; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: var(--paper-2); font-size: 10.5px; font-weight: 600; color: var(--gold-text); }
+.ap-qlock { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding: 12px 14px; background: var(--paper-2); font-size: 12px; color: var(--ink-2); }
+.ap-qlock[hidden] { display: none; }
+.ap-qlock .ic { width: 16px; height: 16px; flex-shrink: 0; color: var(--gold-text); }
+.ap-redo { display: block; margin-top: 6px; padding: 6px 0; border: 0; background: none; color: var(--ink-2); font: 500 12px/1 var(--sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.ap-redo[hidden] { display: none; }
+#aNext { margin-top: 16px; }
 /* computador: ao lado do app, a marca e como instalar no celular */
 .app-aside { display: none; }
 @media (min-width: 1100px) {
@@ -93,6 +133,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     <symbol id="i-belt" viewBox="0 0 24 24"><path d="M2 9h7M15 9h7"/><rect x="9" y="6.5" width="6" height="5" rx="1"/><path d="M10.5 11.5L7.5 21M13.5 11.5l3 9.5"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-tri" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
     <!-- competências: conquistada é um check num círculo cheio; a conquistar, um círculo vazio (forma, não só cor) -->
     <symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><path d="M8 12.5l2.8 2.8L16.5 9" style="stroke:var(--paper)"/></symbol>
@@ -165,19 +207,30 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <div class="ap-done" id="apDone" hidden><b>18:55</b><p>Presença registrada. Meta da semana batida: 3 de 3.</p><div class="ap-goal"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
       </section>
 
-      <!-- Movimentos -->
+      <!-- Movimentos: a biblioteca da faixa do aluno (movimentos.js). Cada movimento abre a tela da aula -->
       <section class="ap-view" data-view="movimentos" aria-label="Tela Movimentos">
-        <p class="ap-lb" id="apMovLb">Faixa azul · <span id="apMov">5</span> de 12 movimentos</p>
+        <p class="ap-lb" id="apMovLb">Faixa azul</p>
         <p class="ap-hi">Movimentos</p>
-        <p class="ap-lb gold hide-q" style="margin-top:16px">Continue assistindo</p>
-        <button class="ap-cover pulse" type="button" id="apPlay" aria-label="Continuar o vídeo Raspagem de gancho">
-          <img src="img/programa-adulto-real.jpg" alt="" style="object-position:60% 50%">
-          <span class="play"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-tri"/></svg></span>
-          <span class="dur">6:40</span>
-          <span class="pg"><span id="apProg" style="width:62%"></span></span>
-        </button>
-        <p class="ap-ttl">Raspagem de gancho</p>
-        <p class="ap-mut" id="apProgTxt" style="margin-top:2px">62% assistido · o quiz abre aos 90%</p>
+        <div id="apCont" hidden>
+          <p class="ap-lb gold" style="margin-top:16px">Continue assistindo</p>
+          <button class="ap-cover" type="button" id="apPlay"><img id="apContImg" src="img/takes/guarda.jpg" alt=""><span class="play"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-tri"/></svg></span><span class="dur" id="apContDur"></span><span class="pg"><span id="apProg"></span></span></button>
+          <p class="ap-ttl" id="apContT"></p>
+          <p class="ap-mut" id="apProgTxt" style="margin-top:2px"></p>
+        </div>
+        <div class="ap-cats" id="apCats" role="group" aria-label="Mostrar por tipo"></div>
+        <ul class="ap-list ap-movs" id="apMovs"></ul>
+      </section>
+
+      <!-- a aula: o vídeo (arquivo ou YouTube), os pontos-chave e o quiz, que abre aos 90% assistidos -->
+      <section class="ap-view" data-view="aula" aria-label="Tela da aula">
+        <button class="ap-back" type="button" id="apBack"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-back"/></svg>Movimentos</button>
+        <div class="ap-player" id="apPlayer"></div>
+        <p class="ap-mut ap-ex" id="aEx" hidden>Vídeo de exemplo, gravado no Studio. A aula desta técnica entra quando o professor publicar.</p>
+        <p class="ap-lb gold" id="aCat" style="margin-top:14px"></p>
+        <p class="ap-hi" id="aNome"></p>
+        <div class="ap-pbar" id="aPbar"><span class="pg"><span id="aBar"></span></span><p class="ap-mut" id="aProg"></p></div>
+        <div id="aPts"><p class="ap-lb" style="margin-top:18px">Pontos-chave</p><ol class="ap-pts" id="aPtsL"></ol></div>
+        <p class="ap-qlock" id="aLock"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg><span>O quiz abre quando você assistir 90% do vídeo.</span></p>
         <div class="ap-quiz" id="apQuiz" hidden>
           <p class="ap-lb gold" id="apQn">Pergunta 1 de 2</p>
           <p class="q" id="apQt"></p>
@@ -185,14 +238,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <p class="fb" id="apFb" role="status"></p>
         </div>
         <p class="ap-doneline" id="apQdone" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span><b>Quiz feito</b> · movimento estudado</span></p>
-        <div id="apList">
-          <p class="ap-lb" style="margin-top:16px;margin-bottom:6px">Para sua faixa</p>
-          <ul class="ap-list">
-            <li id="apStudied" hidden><div class="th"><img src="img/programa-adulto-real.jpg" alt="" style="object-position:60% 50%"></div><div><b>Raspagem de gancho</b><small>Raspagem · 6:40</small><span class="pill-s in">Estudado</span></div></li>
-            <li><div class="th"><img src="img/treino-tecnica.webp" alt=""></div><div><b>Passagem toreando</b><small>Passagem · 5:20</small><span class="pill-s gold" id="apNext" hidden>Próximo</span></div></li>
-            <li><div class="th"><img src="img/programa-feminino-real.jpg" alt="" style="object-position:55% 60%"></div><div><b>Armlock da guarda fechada</b><small>Finalização · 7:05</small></div></li>
-          </ul>
-        </div>
+        <button class="ap-redo" type="button" id="aRedo" hidden>Refazer o quiz</button>
+        <button class="ap-btn ghost" type="button" id="aNext" hidden></button>
       </section>
 
       <!-- Perfil -->
@@ -230,6 +277,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <button class="ap-row ap-rowbtn" type="button" id="lookBtn"><span id="lookTxt">Versão clara</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
           <a class="ap-row ap-rowbtn" href="https://wa.me/5515996741812" target="_blank" rel="noopener" id="apWa"><span>Falar com o Studio</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></a>
           <a class="ap-row ap-rowbtn" href="index.html"><span>Site do Studio</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></a>
+          <button class="ap-row ap-rowbtn" type="button" id="apReset" hidden><span>Recomeçar a demonstração</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
           <a class="ap-row ap-rowbtn app-sair" href="entrar.html" data-sair><span>Sair</span></a>
           <p class="ap-mut app-demo" id="apDemoNote" hidden>Dados de exemplo: Marina é uma aluna fictícia. Com o sistema do Studio ligado, aparecem os seus.</p>
         </div>
@@ -269,6 +317,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="site.js"></script>
+<script src="movimentos.js"></script>
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$;
@@ -311,9 +360,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var had = screenOf(current).contains(a) || $("#apSheet").contains(a);
     closeSheet(false);
     if (name === "avisos") before = current;
+    if (current === "aula") pararAula();
     current = name;
     views.forEach(function (v) { v.classList.toggle("on", v.dataset.view === name); });
-    dockBtns.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
+    var tab = name === "aula" ? "movimentos" : name;
+    dockBtns.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === tab ? "true" : "false"); });
     bell.setAttribute("aria-pressed", name === "avisos" ? "true" : "false");
     syncInert();
     if (name === "avisos") {
@@ -355,6 +406,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $(".ap-hi", screenOf("perfil")).textContent = ses.nome;
   }
   $("#apCodeDemo").hidden = !demo;
+  $("#apReset").hidden = !demo;
+  $("#apReset").addEventListener("click", function () { Mov.recomecar(); location.reload(); });
   $("#apDemoNote").hidden = !demo;
 
   /* ---------- relógio da cena (dados de exemplo): 18:12 ao abrir; confirmar leva a 18:14 e registrar a 18:55 ---------- */
@@ -563,67 +616,285 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     toast(trained >= goal ? "Presença registrada. Meta da semana batida!" : "Presença registrada.");
   }
 
-  /* ---------- Movimentos: aos 90% abre o quiz; respondendo certo, o movimento conta como estudado ---------- */
-  var QUIZ = [
-    { q: "Para a raspagem funcionar, o que vem primeiro?", a: ["Fazer força com os braços", "Desequilibrar o parceiro", "Esperar o parceiro cair"], r: 1, hint: "Ainda não. Pense no que tira o parceiro da base." },
-    { q: "Onde fica o pé que faz o gancho?", a: ["Apoiado no chão, longe do parceiro", "Por fora do joelho do parceiro", "Por dentro da coxa do parceiro"], r: 2, hint: "Ainda não. O gancho levanta o parceiro por dentro da perna." }
-  ];
-  var watched = false, qi = 0, qErr = 0, quizDone = false, qLock = false;
+  /* ---------- Movimentos: a biblioteca da faixa (movimentos.js), a aula com o vídeo e o quiz aos 90% ---------- */
+  var MOVS = [], PROG = {}, FAIXA = "azul", catF = "todos", aula = null, trk = null, ytApi = null, ytP = null, ytT = null;
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function pr(id) { return PROG[id] || { visto: 0, quiz: false }; }
+  function estudado(id) { return !!pr(id).quiz; }
+  function pct(v) { return Math.round(v * 100); }
+  function faixaTxt() { return "faixa " + Mov.FAIXAS[FAIXA].toLowerCase(); }
+  function infoTxt(m) { return Mov.CATS[m.cat] + (m.video && m.video.dur ? " · " + m.video.dur : ""); }
+  function pillHTML(m) {
+    if (estudado(m.id)) return '<span class="pill-s in">Estudado</span>';
+    if (!m.video) return '<span class="pill-s">Em gravação</span>';
+    var v = pr(m.id).visto;
+    return '<span class="pill-s gold">' + (v >= 0.9 ? "Falta o quiz" : v > 0 ? pct(v) + "% assistido" : "Novo") + "</span>";
+  }
+  function capa(m) {
+    if (m.video && m.video.poster) return m.video.poster;
+    if (m.video && m.video.tipo === "youtube") return "https://i.ytimg.com/vi/" + m.video.ref + "/mqdefault.jpg";
+    return "";
+  }
+  /* o próximo a estudar: depois deste na lista, com vídeo e ainda não estudado */
+  function proximo(m) {
+    var i = MOVS.indexOf(m), pend = function (x) { return x !== m && x.video && !estudado(x.id); };
+    return MOVS.slice(i + 1).filter(pend)[0] || MOVS.filter(pend)[0] || null;
+  }
+  function paintLib() {
+    var n = MOVS.length, feitos = MOVS.filter(function (m) { return estudado(m.id); }).length;
+    $("#apMovLb").textContent = "Faixa " + Mov.FAIXAS[FAIXA].toLowerCase() + " · " + feitos + " de " + n + " estudados";
+    $("#apMov2").innerHTML = feitos + "<small> de " + n + "</small>";
+    /* continue assistindo: o último começado; sem nenhum começado, o primeiro com vídeo ainda não estudado */
+    var com = MOVS.filter(function (m) { return m.video && !estudado(m.id); });
+    var cont = com.filter(function (m) { return pr(m.id).visto > 0; }).sort(function (a, b) { return String(pr(b.id).em).localeCompare(String(pr(a.id).em)); })[0] || com[0];
+    $("#apCont").hidden = !cont;
+    if (cont) {
+      var v = pr(cont.id).visto, img = $("#apContImg"), c = capa(cont);
+      $("#apPlay").dataset.mov = cont.id;
+      $("#apPlay").setAttribute("aria-label", (v > 0 ? "Continuar o vídeo " : "Assistir ao vídeo ") + cont.nome);
+      img.hidden = !c;
+      if (c) img.src = c;
+      $("#apContDur").textContent = cont.video.dur || "";
+      $("#apContDur").hidden = !cont.video.dur;
+      $("#apProg").style.width = pct(v) + "%";
+      $("#apContT").textContent = cont.nome;
+      $("#apProgTxt").textContent = v >= 0.9 ? "Assistido · falta o quiz" : (v > 0 ? pct(v) + "% assistido" : "Novo") + " · o quiz abre aos 90%";
+    }
+    /* filtro por tipo: só os tipos que a faixa tem */
+    var cats = Object.keys(Mov.CATS).filter(function (k) { return MOVS.some(function (m) { return m.cat === k; }); });
+    if (catF !== "todos" && cats.indexOf(catF) < 0) catF = "todos";
+    $("#apCats").innerHTML = ["todos"].concat(cats).map(function (k) { return '<button type="button" data-cat="' + k + '" aria-pressed="' + (k === catF) + '">' + (k === "todos" ? "Todos" : Mov.CATS[k]) + "</button>"; }).join("");
+    $("#apMovs").innerHTML = MOVS.filter(function (m) { return catF === "todos" || m.cat === catF; }).map(function (m) {
+      var c = capa(m);
+      return '<li><button class="ap-mv" type="button" data-mov="' + m.id + '"><span class="th">' + (c ? '<img src="' + c + '" alt="">' : '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>') +
+        '</span><span class="tx"><b>' + esc(m.nome) + "</b><small>" + infoTxt(m) + "</small>" + pillHTML(m) + "</span></button></li>";
+    }).join("");
+    /* capa que não carrega (YouTube fora do ar, link apagado): fica o ícone */
+    $$("#apMovs img, #apContImg").forEach(function (im) { im.onerror = function () { im.hidden = true; }; });
+  }
+  function carregar() {
+    return Promise.all([Mov.minhaFaixa(), Mov.progresso()]).then(function (r) {
+      FAIXA = Mov.FAIXAS[r[0]] ? r[0] : "branca";
+      PROG = r[1] || {};
+      return Mov.lista({ faixa: FAIXA });
+    }).then(function (l) { MOVS = l; paintLib(); });
+  }
+  $("#apCats").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    catF = b.dataset.cat;
+    paintLib();
+    Site.focusSoft($('#apCats [data-cat="' + catF + '"]'), { preventScroll: true });
+  });
+  $("#apMovs").addEventListener("click", function (e) { var b = e.target.closest("[data-mov]"); if (b) abrir(b.dataset.mov); });
+  $("#apPlay").addEventListener("click", function () { abrir(this.dataset.mov); });
+  $("#apBack").addEventListener("click", function () { show("movimentos"); });
+
+  /* ---------- a aula ---------- */
+  function abrir(id) {
+    var m = MOVS.filter(function (x) { return x.id === id; })[0];
+    if (!m) return;
+    if (current === "aula") pararAula();
+    aula = m;
+    $("#aCat").textContent = Mov.CATS[m.cat] + " · " + faixaTxt();
+    $("#aNome").textContent = m.nome;
+    $("#aEx").hidden = !(m.video && m.video.exemplo);
+    $("#aPts").hidden = !m.pontos.length;
+    $("#aPtsL").innerHTML = m.pontos.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+    $("#aPbar").hidden = !m.video;
+    player(m);
+    estadoQuiz();
+    var nx = proximo(m);
+    $("#aNext").hidden = !nx;
+    if (nx) { $("#aNext").textContent = "Próximo: " + nx.nome; $("#aNext").dataset.mov = nx.id; }
+    show("aula");
+    screenOf("aula").scrollTop = 0;
+  }
+  function player(m) {
+    var box = $("#apPlayer");
+    trk = null;
+    if (!m.video) {
+      box.innerHTML = '<div class="ap-rec"><b>Vídeo em gravação</b><span>O professor está gravando esta aula. Ela aparece aqui assim que for publicada.</span><button class="ap-btn ghost" type="button" id="aAvise">Me avise quando chegar</button></div>';
+      return;
+    }
+    if (m.video.tipo === "youtube") return youtube(m, box);
+    box.innerHTML = '<video id="aVid" controls playsinline preload="metadata"' + (m.video.poster ? ' poster="' + m.video.poster + '"' : "") + '><source src="' + esc(m.video.ref) + '">' +
+      (m.video.alt ? '<source src="' + m.video.alt + '" type="video/webm">' : "") + "</video>";
+    var v = $("#aVid");
+    v.addEventListener("loadedmetadata", function () {
+      if (v.videoWidth) v.style.aspectRatio = v.videoWidth + " / " + v.videoHeight;
+      trkIni(v.duration);
+      var p0 = pr(m.id).visto;
+      if (p0 > 0 && p0 < 0.9) v.currentTime = p0 * v.duration;
+    });
+    v.addEventListener("timeupdate", function () { trkAt(v.currentTime, !v.paused && !v.seeking); });
+    v.addEventListener("seeking", function () { if (trk) trk.last = null; });
+    v.addEventListener("pause", salvarVisto);
+    v.addEventListener("ended", function () { trkFim(); salvarVisto(); });
+    $$("source", v).pop().addEventListener("error", function () {
+      box.innerHTML = '<div class="ap-rec"><b>O vídeo não abriu</b><span>Confira a internet e tente de novo. Se continuar, avise o Studio.</span></div>';
+    });
+  }
+  /* YouTube (pode ser não listado): o player oficial, para acompanhar quanto foi assistido */
+  function ytLoad() {
+    if (window.YT && YT.Player) return Promise.resolve();
+    if (!ytApi) ytApi = new Promise(function (ok, falha) {
+      var antes = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = function () { if (antes) antes(); ok(); };
+      var s = document.createElement("script");
+      s.src = "https://www.youtube.com/iframe_api";
+      s.onerror = function () { ytApi = null; falha(new Error("youtube")); };
+      document.head.appendChild(s);
+      setTimeout(function () { falha(new Error("tempo")); }, 10000);
+    });
+    return ytApi;
+  }
+  function youtube(m, box) {
+    box.innerHTML = '<div class="ap-yt"><div id="aYt"></div></div>';
+    ytLoad().then(function () {
+      if (aula !== m) return;
+      ytP = new YT.Player("aYt", { host: "https://www.youtube-nocookie.com", videoId: m.video.ref, playerVars: { playsinline: 1, rel: 0 },
+        events: { onStateChange: function (e) {
+          if (e.data === 1) ytTick();
+          else if (e.data === 0) { trkFim(); salvarVisto(); }
+          else if (e.data === 2) salvarVisto();
+        } } });
+    }).catch(function () {
+      if (aula !== m) return;
+      /* sem o player do YouTube (rede, bloqueio): assiste lá e volta; o quiz fica com a palavra do aluno */
+      box.innerHTML = '<div class="ap-rec"><b>O vídeo não abriu aqui</b><span>Assista no YouTube e volte para fazer o quiz.</span><a class="ap-btn ghost" href="https://youtu.be/' + m.video.ref + '" target="_blank" rel="noopener">Abrir no YouTube</a><button class="ap-btn ghost" type="button" id="aJaVi">Já assisti</button></div>';
+    });
+  }
+  function ytTick() {
+    clearInterval(ytT);
+    ytT = setInterval(function () {
+      if (!ytP || !ytP.getPlayerState) return;
+      if (!trk) trkIni(ytP.getDuration());
+      if (ytP.getPlayerState() !== 1) { clearInterval(ytT); if (trk) trk.last = null; return; }
+      trkAt(ytP.getCurrentTime(), true);
+    }, 250);
+  }
+  /* quanto foi assistido: a duração vira faixas (até 400); conta só o que tocou em sequência, então pular para o
+     fim não libera o quiz. O que já tinha sido visto conta como o começo do vídeo */
+  function trkIni(dur) {
+    if (!aula || !dur || !isFinite(dur)) return;
+    var n = Math.min(400, Math.max(20, Math.ceil(dur * 2))), b = new Uint8Array(n), k = Math.floor(pr(aula.id).visto * n);
+    for (var i = 0; i < k; i++) b[i] = 1;
+    trk = { id: aula.id, n: n, b: b, seen: k, dur: dur, last: null, lastT: 0, salvo: Date.now() };
+    paintProg();
+  }
+  function marca(a, z) { for (var x = Math.min(a, z); x <= Math.max(a, z); x++) if (!trk.b[x]) { trk.b[x] = 1; trk.seen++; } }
+  function trkAt(t, tocando) {
+    if (!trk) return;
+    if (!tocando) { trk.last = null; return; }
+    var i = Math.min(trk.n - 1, Math.floor(t / trk.dur * trk.n));
+    marca(trk.last === null || Math.abs(t - trk.lastT) > 1.6 ? i : trk.last, i);
+    trk.last = i;
+    trk.lastT = t;
+    paintProg();
+    if (Date.now() - trk.salvo > 5000) salvarVisto();
+  }
+  function trkFim() { if (trk && trk.last !== null) { marca(trk.last, trk.n - 1); paintProg(); } }
+  /* o que já estava salvo vale (os blocos arredondam para baixo: 62% de 20 blocos viraria 60%) */
+  function visto() { return !aula ? 0 : trk && trk.id === aula.id ? Math.max(pr(aula.id).visto, trk.seen / trk.n) : pr(aula.id).visto; }
+  function salvarVisto() {
+    if (!trk) return;
+    var id = trk.id, v = trk.seen / trk.n;
+    trk.salvo = Date.now();
+    if (v <= pr(id).visto) return;
+    PROG[id] = { visto: v, quiz: pr(id).quiz, em: new Date().toISOString() };
+    Mov.registrar(id, { visto: v }).catch(function () {});
+    paintLib();
+  }
+  function pararAula() {
+    var v = $("#aVid");
+    if (v && !v.paused) v.pause();
+    salvarVisto();
+    clearInterval(ytT);
+    if (ytP && ytP.destroy) { try { ytP.destroy(); } catch (e) {} }
+    ytP = null;
+    $("#apPlayer").innerHTML = "";
+    trk = null;
+  }
+  function paintProg() {
+    if (!aula) return;
+    var v = visto(), feito = estudado(aula.id);
+    $("#aBar").style.width = pct(feito ? Math.max(v, 0.9) : v) + "%";
+    $("#aProg").textContent = feito ? "Estudado · quiz feito" : v >= 0.9 ? pct(v) + "% assistido · quiz liberado" : pct(v) + "% assistido · o quiz abre aos 90%";
+    if (!feito && v >= 0.9 && !qOn) liberar(false);
+  }
+
+  /* ---------- o quiz do movimento ---------- */
+  var qi = 0, qErr = 0, qLock = false, qOn = false;
+  function estadoQuiz() {
+    var m = aula, feito = estudado(m.id);
+    qOn = false;
+    $("#apQuiz").hidden = true;
+    $("#apQdone").hidden = !feito;
+    $("#aRedo").hidden = !(feito && m.quiz.length);
+    $("#aLock").hidden = feito || !m.video || pr(m.id).visto >= 0.9;
+    paintProg();
+  }
   function renderQ() {
-    var Q = QUIZ[qi];
-    $("#apQn").textContent = "Pergunta " + (qi + 1) + " de " + QUIZ.length;
+    var Q = aula.quiz[qi];
+    $("#apQn").textContent = "Pergunta " + (qi + 1) + " de " + aula.quiz.length;
     $("#apQt").textContent = Q.q;
-    $("#apQa").innerHTML = Q.a.map(function (t, k) { return '<button type="button" data-k="' + k + '">' + t + "</button>"; }).join("");
+    $("#apQa").innerHTML = Q.a.map(function (t, k) { return '<button type="button" data-k="' + k + '">' + esc(t) + "</button>"; }).join("");
     $("#apFb").textContent = "";
     qLock = false;
     if (anim) gsap.from($$("#apQa button"), { y: 10, opacity: 0, duration: 0.6, stagger: 0.06, ease: "expo.out" });
   }
-  function openQuiz() {
-    screenOf("movimentos").classList.add("quiz");
-    $("#apList").hidden = true;
+  /* 90% assistido: abre o quiz; movimento sem quiz já conta como estudado */
+  function liberar(refazer) {
+    var m = aula;
+    qOn = true;
+    $("#aLock").hidden = true;
+    if (!m.quiz.length) { concluir(m, "Movimento assistido. Este ainda não tem quiz: conta como estudado."); return; }
+    qi = 0; qErr = 0;
+    $("#apQdone").hidden = true;
+    $("#aRedo").hidden = true;
     renderQ();
     $("#apQuiz").hidden = false;
-    if (anim) {
-      gsap.to("#apPlay", { height: 84, duration: 0.8, ease: "expo.inOut" });
-      gsap.from("#apQuiz", { y: 16, opacity: 0, duration: 0.8, ease: "expo.out", delay: 0.15 });
-    } else $("#apPlay").style.height = "84px";
+    if (anim) gsap.from("#apQuiz", { y: 16, opacity: 0, duration: 0.8, ease: "expo.out" });
+    if (!refazer) toast("Quiz liberado: " + m.quiz.length + (m.quiz.length === 1 ? " pergunta." : " perguntas."));
+    later(function () { into($("#apQuiz")); }, 300);
   }
-  function finishQuiz() {
+  function concluir(m, msg) {
+    var antes = estudado(m.id);
+    PROG[m.id] = { visto: Math.max(visto(), 0.9), quiz: true, em: new Date().toISOString() };
+    Mov.registrar(m.id, { visto: PROG[m.id].visto, quiz: true }).catch(function () {});
+    paintLib();
+    var n = MOVS.length, feitos = MOVS.filter(function (x) { return estudado(x.id); }).length;
+    if (msg) { toast(msg); fim(); return; }
+    $("#apFb").textContent = (qErr ? "Pronto!" : "Você acertou as " + m.quiz.length + " de primeira.") + (antes ? " Quiz refeito." : " Movimento estudado: agora são " + feitos + " de " + n + " da " + faixaTxt() + ".");
+    toast(antes ? "Quiz refeito." : "Movimento estudado.");
+    later(fim, 2600);
+  }
+  function fim() {
+    if (!aula) return;
     var quiz = $("#apQuiz"), line = $("#apQdone"), had = quiz.contains(document.activeElement);
     quiz.hidden = true;
     line.hidden = false;
-    $("#apProgTxt").textContent = "90% assistido";
-    $("#apStudied").hidden = false;
-    $("#apNext").hidden = false;
-    $("#apList").hidden = false;
+    $("#aRedo").hidden = !aula.quiz.length;
+    paintProg();
+    var nx = proximo(aula);
+    $("#aNext").hidden = !nx;
+    if (nx) { $("#aNext").textContent = "Próximo: " + nx.nome; $("#aNext").dataset.mov = nx.id; }
     if (had) Site.focusSoft(line, { preventScroll: true });
-    if (anim) gsap.from([line, "#apList"], { y: 12, opacity: 0, duration: 0.7, stagger: 0.08, ease: "expo.out" });
+    if (anim) gsap.from(line, { y: 12, opacity: 0, duration: 0.7, ease: "expo.out" });
+    into(nx ? $("#aNext") : line);
   }
-  function watch() {
-    show("movimentos");
-    if (watched) return;
-    watched = true;
-    $("#apPlay").classList.remove("pulse");
-    var p = 62;
-    var step = function () {
-      p = Math.min(90, p + 1);
-      $("#apProg").style.width = p + "%";
-      $("#apProgTxt").textContent = p < 90 ? p + "% assistido · o quiz abre aos 90%" : "90% assistido · quiz liberado";
-      if (p < 90) later(step, 45); else later(openQuiz, 250);
-    };
-    later(step, 300);
-  }
-  $("#apPlay").addEventListener("click", watch);
   $("#apQa").addEventListener("click", function (e) {
     var b = e.target.closest("button");
-    if (!b || quizDone || qLock || b.classList.contains("wrong")) return;
-    var Q = QUIZ[qi], fb = $("#apFb");
+    if (!b || !aula || qLock || b.classList.contains("wrong")) return;
+    var m = aula, Q = m.quiz[qi], fb = $("#apFb");
     if (+b.dataset.k === Q.r) {
       b.classList.add("right");
       qLock = true;
-      if (qi < QUIZ.length - 1) {
+      if (qi < m.quiz.length - 1) {
         fb.textContent = "";
         later(function () {
+          if (aula !== m) return;
           var had = $("#apQuiz").contains(document.activeElement);
           qi++;
           renderQ();
@@ -631,20 +902,24 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         }, 750);
         return;
       }
-      quizDone = true;
-      fb.textContent = (qErr ? "Pronto!" : "Você acertou as " + QUIZ.length + " de primeira.") + " Movimento estudado: agora são 6 de 12 da faixa azul.";
-      $("#apMov").textContent = "6";
-      $("#apMov2").innerHTML = "6<small> de 12</small>";
-      toast("Movimento estudado.");
-      later(finishQuiz, 2600);
+      concluir(m);
     } else {
       qErr++;
       b.classList.add("wrong");
       b.setAttribute("aria-disabled", "true");
       b.insertAdjacentHTML("beforeend", '<span class="sr-only"> (incorreta)</span>');
-      fb.textContent = Q.hint;
+      fb.textContent = Q.dica || "Ainda não. Reveja o vídeo e tente de novo.";
     }
   });
+  $("#aRedo").addEventListener("click", function () { liberar(true); Site.focusSoft($("#apQt"), { preventScroll: true }); });
+  $("#aNext").addEventListener("click", function () { abrir(this.dataset.mov); Site.focusSoft($("#aNome"), { preventScroll: true }); });
+  $("#apPlayer").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.id === "aAvise") { b.disabled = true; b.textContent = "Combinado"; toast("Combinado: quando o vídeo chegar, você recebe um aviso."); }
+    else if (b.id === "aJaVi" && aula) { PROG[aula.id] = { visto: 0.9, quiz: pr(aula.id).quiz, em: new Date().toISOString() }; Mov.registrar(aula.id, { visto: 0.9 }).catch(function () {}); liberar(false); }
+  });
+  carregar();
 
   /* ---------- Perfil: competências ---------- */
   function toggleComps(open) {
@@ -677,7 +952,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   var NOTE = {
     aula: function () { leave("inicio", confirmSpot, confBtn); },
     meta: function () { leave("inicio"); },
-    mov: function () { leave("movimentos"); }
+    mov: function () { leave("movimentos", function () { abrir("passagem-toreando"); }); }
   };
   $$(".ap-note[data-note]", noteV).forEach(function (n) { n.addEventListener("click", NOTE[n.dataset.note]); });
 

@@ -4,14 +4,15 @@
    - Imagens, fontes e bibliotecas com versão no endereço: usa a guardada e só busca na rede se não tiver.
    - Login e dados (Supabase) e vídeos: nunca passam pelo cache.
    Ao mudar a lista abaixo, suba a versão (VERSAO) para o celular trocar o cache antigo. */
-var VERSAO = "evo-app-v1";
+var VERSAO = "evo-app-v2";
 var TELAS = [
   "app.html", "area-do-professor.html", "entrar.html", "nova-senha.html", "acessos.html",
   "site.css", "app.css", "tema.css", "acesso.css",
-  "site.js", "acesso.js", "supabase-config.js", "manifest.webmanifest",
+  "site.js", "acesso.js", "movimentos.js", "supabase-config.js", "manifest.webmanifest",
   "img/logo-evolution-mask.webp",
   "img/app/icone-192.png", "img/app/favicon-32.png",
-  "img/programa-adulto-real.jpg", "img/programa-feminino-real.jpg", "img/treino-tecnica.webp"
+  "img/takes/guarda.jpg", "img/takes/tecnica.jpg", "img/takes/aquecimento.jpg", "img/takes/adulto.jpg",
+  "img/takes/abertura-1.jpg", "img/takes/abertura-2.jpg", "img/takes/abertura-3.jpg"
 ];
 var DE_FORA = /^https:\/\/(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|fonts\.googleapis\.com|fonts\.gstatic\.com)\//;
 
