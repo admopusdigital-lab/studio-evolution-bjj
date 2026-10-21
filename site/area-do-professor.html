@@ -295,6 +295,15 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 .ld-hist time { font: 500 11.5px/1.5 var(--mono, monospace); color: var(--gold-text); }
 @media (max-width: 600px) { .crm-grid { grid-template-columns: minmax(0, 1fr); } .crm-add { flex: 1 1 100%; justify-content: center; } }
 
+/* Modo tatame: na vitrine, a seção abaixo do painel; no modo painel, uma aba do menu, com tela cheia para a TV */
+.dash-side [data-go="tatame"] { display: none; }
+[data-mode="painel"] .dash-side [data-go="tatame"] { display: flex; }
+[data-mode="painel"] .tv-sec { display: none; }
+.tt-hd { display: grid; justify-items: start; gap: 10px; max-width: 46ch; }
+.dv[data-v="tatame"] .tv-stage { margin-top: 26px; }
+.dv[data-v="tatame"] .tv-ctrl { margin-top: 30px; }
+.tv-screen:fullscreen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
+
 /* Movimentos: a lista por faixa (selos de vídeo, quiz e rascunho), quem estudou e o formulário com o quiz */
 .mv-list { display: grid; gap: 8px; margin-top: 18px; }
 .mv { display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 14px; background: var(--paper-2); }
@@ -375,7 +384,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 .pn-top nav :is(a, button):hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 5%, transparent); }
 .pn-top nav .pn-sair { color: var(--warn); }
 @media (max-width: 860px) { [data-mode="painel"] .dash-in { min-height: 0; } .pn-top .pn-t { display: none; } }
-@media (max-width: 600px) { [data-mode="painel"] .pn-top { gap: 6px; } .pn-top .logo { width: 88px; } .pn-top nav :is(a, button) { padding: 0 8px; font-size: 12.5px; } .pn-top nav .pn-tv { display: none; } }
+@media (max-width: 600px) { [data-mode="painel"] .pn-top { gap: 6px; } .pn-top .logo { width: 88px; } .pn-top nav :is(a, button) { padding: 0 8px; font-size: 12.5px; } }
 </style>
 <link rel="stylesheet" href="tema.css">
 </head>
@@ -431,7 +440,6 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   <span class="logo" role="img" aria-label="Studio Evolution BJJ"></span>
   <span class="pn-t">Painel do professor</span>
   <nav aria-label="Atalhos do painel">
-    <a class="pn-tv" href="#tatame">Modo tatame</a>
     <a href="acessos.html" data-int>Acessos</a>
     <button type="button" id="pnLook">Versão clara</button>
     <a class="pn-sair" href="entrar.html#professor" data-sair>Sair</a>
@@ -472,6 +480,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
             <nav class="dash-side" aria-label="Menu do painel">
               <span class="logo" role="img" aria-label="Studio Evolution BJJ"></span>
               <button type="button" data-go="hoje" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Hoje</button>
+              <button type="button" data-go="tatame" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-code"/></svg>Modo tatame</button>
               <button type="button" data-go="alunos" aria-current="false" aria-label="Alunos, 3 ausentes"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-users"/></svg>Alunos<span class="badge">3</span></button>
               <button type="button" data-go="grad" aria-current="false" aria-label="Graduações, 3 para avaliar"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad">3</span></button>
               <button type="button" data-go="mov" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
@@ -573,6 +582,11 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
               </section>
 
               <!-- Interessados -->
+              <!-- Modo tatame (só no modo painel): a TV e os controles saem da seção de baixo e vêm para esta aba -->
+              <section class="dv" data-v="tatame" aria-labelledby="t-tatame">
+                <div class="dv-h"><div><p class="dv-k">Para a TV da academia</p><h3 id="t-tatame">Modo tatame</h3></div><div class="tt-hd"><p>O código da aula em letras grandes, com a lista de quem chegou. Abra este painel no navegador da TV e toque em Abrir na TV.</p><button class="mini-btn" type="button" id="tvFull">Abrir na TV (tela cheia)</button></div></div>
+              </section>
+
               <!-- Movimentos: a biblioteca que os alunos estudam no app (movimentos.js). Lista e formulário montados pelo script -->
               <section class="dv" data-v="mov" aria-labelledby="t-mov">
                 <div class="dv-h"><div><p class="dv-k">Biblioteca da academia</p><h3 id="t-mov">Movimentos</h3></div><p>Os vídeos e quizzes que os alunos veem no app, separados por faixa. O aluno assiste e, aos 90% do vídeo, faz o quiz.</p></div>
@@ -1046,6 +1060,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     if (name !== cur) {
       /* ao sair de Interessados, o status final (matriculado, sem interesse) vale de vez */
       if (cur === "leads") leadsLeave();
+      /* modo painel: a TV liga quando a aba Modo tatame abre (na vitrine, quando a seção aparece na tela) */
+      if (name === "tatame") powerOn();
       cur = name;
       morph(function () {
         views.forEach(function (v) { v.classList.toggle("on", v.dataset.v === name); });
@@ -1202,7 +1218,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     cd.className = "cd" + (flip && anim ? " flip" : "");
     cd.innerHTML = st.code.split("").map(function (ch, i) { return (i === 3 ? '<span class="sp"></span>' : "") + '<span style="animation-delay:' + i * 70 + 'ms">' + ch + "</span>"; }).join("");
     var note = $("#cdNote");
-    note.textContent = st.waitTV ? "A Marina vai digitar o código no celular ao lado da TV. Desça até o Modo tatame." : "Vale " + untilTxt() + ". Um código novo substitui este.";
+    note.textContent = st.waitTV ? "A Marina vai digitar o código no celular ao lado da TV. " + (document.documentElement.getAttribute("data-mode") === "painel" ? "Abra o Modo tatame no menu." : "Desça até o Modo tatame.") : "Vale " + untilTxt() + ". Um código novo substitui este.";
     note.classList.toggle("wait", st.waitTV);
     $("#noTvBtn").hidden = !st.waitTV;
     $("#cdActs").hidden = false;
@@ -1505,6 +1521,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
      Na tela baixa (celular deitado), título e meia TV não cabem juntos: a TV vai para logo abaixo da barra e o foco,
      para o título dentro dela */
   function showTV() {
+    if (document.documentElement.getAttribute("data-mode") === "painel") { go("tatame", true); return; }
     var tv = $("#tv"), h = $("#t-tv"), low = 100 + tv.getBoundingClientRect().top - h.getBoundingClientRect().top + tv.offsetHeight / 2 > innerHeight;
     focusSoft(low ? $(".tv-l h3") : h, { preventScroll: true });
     scrollPage(low ? tv : h, low ? -90 : -100);
@@ -2851,7 +2868,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
        Ligar a TV nunca zera a chamada: isso é só o "Recomeçar a demonstração" */
     setTimeout(function () { if (!st.code) generate(true); else startArrivals(); }, anim ? 650 : 0);
   }
-  if ("IntersectionObserver" in window) {
+  if (document.documentElement.getAttribute("data-mode") === "painel") { /* liga pela aba (go) */ }
+  else if ("IntersectionObserver" in window) {
     /* liga com metade da TV na tela (ou meia tela ocupada por ela, quando a TV é maior que a janela) */
     new IntersectionObserver(function (es, ob) {
       var e = es[0];
@@ -2873,6 +2891,18 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     pnLook.addEventListener("click", function () { Site.paintLook(document.documentElement.getAttribute("data-look") === "black" ? "light" : "black"); });
   }
   var painel = document.documentElement.getAttribute("data-mode") === "painel";
+  if (painel) {
+    var ttDv = $('.dv[data-v="tatame"]');
+    ttDv.appendChild($("#tatame .tv-stage"));
+    ttDv.appendChild($("#tatame .tv-ctrl"));
+  }
+  /* "Abrir na TV": a tela da TV ocupa a tela inteira (Esc ou o controle da TV saem) */
+  $("#tvFull").addEventListener("click", function () {
+    var sc = $("#tv .tv-screen"), fs = sc.requestFullscreen || sc.webkitRequestFullscreen;
+    powerOn();
+    if (fs) { var r = fs.call(sc); if (r && r.catch) r.catch(function () { toast("O navegador não deixou abrir em tela cheia. Use a tela cheia do próprio navegador (F11)."); }); }
+    else toast("O navegador não deixou abrir em tela cheia. Use a tela cheia do próprio navegador (F11).");
+  });
   /* o painel também abre como app instalado (sw.js guarda as telas) */
   if (painel && "serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {}
@@ -2906,8 +2936,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
       gsap.from("#dash", { y: 100, rotateX: 14, opacity: 0, transformPerspective: 2000, transformOrigin: "50% 0%", duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: "#dash", start: "top 88%", once: true } });
       /* a TV aparece desligada e liga quando chega na tela; o celular da aluna entra logo depois */
       if (!tvOn) gsap.set(".tv-in", { opacity: 0 });
-      gsap.from(".tv-screen", { y: 80, scale: 0.94, opacity: 0, duration: 1.5, ease: "expo.out", scrollTrigger: { trigger: "#tv", start: "top 88%", once: true } });
-      gsap.from("#pDevice", { y: 90, rotateY: 22, opacity: 0, transformPerspective: 1600, duration: 1.6, ease: "expo.out", delay: 0.2, scrollTrigger: { trigger: "#tv", start: "top 88%", once: true } });
+      if (!painel) gsap.from(".tv-screen", { y: 80, scale: 0.94, opacity: 0, duration: 1.5, ease: "expo.out", scrollTrigger: { trigger: "#tv", start: "top 88%", once: true } });
+      if (!painel) gsap.from("#pDevice", { y: 90, rotateY: 22, opacity: 0, transformPerspective: 1600, duration: 1.6, ease: "expo.out", delay: 0.2, scrollTrigger: { trigger: "#tv", start: "top 88%", once: true } });
     }
   });
 })();
