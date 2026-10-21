@@ -129,7 +129,10 @@ tela ao banco é a próxima etapa. Cada uma vira uma tabela com as mesmas regras
 - interessados (o CRM): contatos vindos do Agendar e os adicionados no painel, com anotações e histórico;
 - configurações: o status de cada integração e as chaves do Asaas e da Evolution API, guardadas só no servidor
   (segredos da função ou Vault do Supabase), nunca numa tabela que o site leia;
-- mensalidades, com o Asaas e os lembretes da Evolution API.
+- alunos cadastrados pelo professor (o cadastro já cria o login pela função `criar-conta`; os dados da ficha, como turma,
+  faixa, mensalidade e vencimento, ainda precisam de tabela);
+- mensalidades, com o Asaas e os lembretes da Evolution API;
+- despesas e a meta do mês (o BI do Financeiro passa a ler o histórico de verdade, mês a mês).
 
 O service worker do app (`site/sw.js`) não guarda nada do Supabase: login e dados vão sempre direto ao servidor.
 

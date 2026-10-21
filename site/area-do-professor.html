@@ -295,6 +295,89 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 .ld-hist time { font: 500 11.5px/1.5 var(--mono, monospace); color: var(--gold-text); }
 @media (max-width: 600px) { .crm-grid { grid-template-columns: minmax(0, 1fr); } .crm-add { flex: 1 1 100%; justify-content: center; } }
 
+/* Alunos: o botão de cadastro ao lado dos filtros */
+.al-bar .chips { margin-top: 0; }
+.al-bar { margin-top: 16px; }
+#tbl tr.new { animation: arrive 1.6s var(--ease); }
+
+/* Financeiro: as três partes (abas internas) */
+.fin-tabs { display: inline-flex; gap: 4px; margin-top: 18px; padding: 4px; border: 1px solid var(--rule); border-radius: 999px; }
+.fin-tabs button { min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--ink-2); font: 500 13px/1 var(--sans); cursor: pointer; }
+.fin-tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.fin-panel { margin-top: 4px; }
+/* BI: cores dos gráficos (validadas: entra = ouro, sai = azul; contraste e daltonismo nos dois temas) */
+.viz { --s-in: #ac731a; --s-out: #2a78d6; --v-grid: oklch(0.16 0.006 70 / 0.10); --v-proj: oklch(0.16 0.006 70 / 0.045); }
+:root[data-look="black"] .viz { --s-in: #bc8726; --s-out: #3987e5; --v-grid: oklch(1 0 0 / 0.09); --v-proj: oklch(1 0 0 / 0.035); }
+.bi-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kpi .bi-l { display: block; margin: 0 0 6px; font: 600 10.5px/1.3 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.kpi b small.up { margin-left: 8px; font: 600 11.5px/1 var(--sans); letter-spacing: 0; color: var(--ok); vertical-align: middle; }
+.bi-meta { margin-top: 14px; padding: 16px; background: var(--paper-2); border-top: 1px solid var(--gold); }
+.bi-meta .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bi-meta p { font-size: 13px; color: var(--ink-2); }
+.bi-meta .crm-grid { margin-top: 10px; }
+.meters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 12px; }
+.meter-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 12.5px; color: var(--ink-2); }
+.meter-h b { font-weight: 600; color: var(--ink); }
+.meter-t { position: relative; height: 8px; margin-top: 8px; border-radius: 4px; background: color-mix(in oklch, var(--s-in) 20%, var(--paper)); overflow: hidden; }
+.meter-t i { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: var(--s-in); transition: width 600ms var(--ease); }
+.meter-t i.prev { background: color-mix(in oklch, var(--s-in) 45%, var(--paper)); }
+.meter small { display: block; margin-top: 6px; font-size: 11.5px; color: var(--ink-3); }
+.bi-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+.bi-card { margin: 0; padding: 16px; background: var(--paper-2); }
+.bi-card.wide { grid-column: 1 / -1; }
+.bi-card h4 { margin: 0; font: 600 14px/1.3 var(--sans); }
+.bi-card figcaption p { margin-top: 3px; font-size: 12px; color: var(--ink-3); }
+.viz-leg { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: 12px; color: var(--ink-2); }
+.viz-leg span { display: inline-flex; align-items: center; gap: 6px; }
+.viz-leg .sw { width: 10px; height: 10px; border-radius: 2px; }
+.viz-leg .ln { width: 16px; height: 0; border-top: 2px solid; }
+.viz-leg .ln.dash { border-top-style: dashed; }
+.viz-leg .in { background: var(--s-in); border-color: var(--s-in); }
+.viz-leg .out { background: var(--s-out); border-color: var(--s-out); }
+.viz-leg .ln.in, .viz-leg .ln.out { background: none; }
+.viz-leg .ln.pj { border-color: var(--ink-2); }
+.viz-leg .ln.meta { border-top: 1px dotted var(--ink-2); }
+.viz-plot { position: relative; margin-top: 8px; border-radius: 4px; }
+.viz-plot:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.viz-plot svg { display: block; overflow: visible; }
+.viz-plot text { font: 500 11px/1 var(--sans); fill: var(--ink-3); }
+.viz-plot text.val { font-weight: 600; fill: var(--ink-2); }
+.viz-plot .grid { stroke: var(--v-grid); stroke-width: 1; }
+.viz-plot .base { stroke: var(--ink-3); stroke-width: 1; opacity: 0.5; }
+.viz-plot .proj { fill: var(--v-proj); }
+.viz-plot .ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.viz-plot .ln.dash { stroke-dasharray: 5 5; }
+.viz-plot .in { stroke: var(--s-in); }
+.viz-plot .out { stroke: var(--s-out); }
+.viz-plot .bar.in, .viz-plot .dot.in { fill: var(--s-in); }
+.viz-plot .bar.out, .viz-plot .dot.out { fill: var(--s-out); }
+.viz-plot .dot { stroke: var(--paper-2); stroke-width: 2; }
+.viz-plot .ref { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 1 3; }
+.viz-plot .cross { stroke: var(--ink-3); stroke-width: 1; }
+.viz-plot .bar { transition: opacity 200ms; }
+.viz-plot.hov .bar:not(.on) { opacity: 0.45; }
+.viz-tip { position: absolute; z-index: 5; min-width: 150px; padding: 9px 11px; border-radius: 8px; background: var(--paper); box-shadow: var(--shadow-lg), 0 0 0 1px var(--rule); font-size: 12px; color: var(--ink-2); pointer-events: none; }
+.viz-tip .t { display: block; margin-bottom: 4px; font-weight: 600; color: var(--ink); }
+.viz-tip .r { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+.viz-tip .r i { width: 12px; height: 0; border-top: 2px solid; flex-shrink: 0; }
+.viz-tip .r b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.viz-tab { margin-top: 10px; font-size: 12.5px; }
+.viz-tab summary { cursor: pointer; color: var(--ink-2); }
+.viz-tab .tbl { margin-top: 8px; font-variant-numeric: tabular-nums; }
+.hbars { display: grid; gap: 10px; margin: 14px 0 12px; }
+.hbars li { display: grid; grid-template-columns: minmax(110px, 190px) minmax(0, 1fr); gap: 12px; align-items: center; font-size: 12.5px; color: var(--ink-2); }
+.hbars .tr { display: flex; align-items: center; gap: 8px; }
+.hbars .tr i { height: 14px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--s-out); }
+.hbars .tr b { font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bi-proj { margin-top: 14px; padding: 14px 16px; border-left: 2px solid var(--s-in); background: var(--paper-2); font-size: 13px; color: var(--ink-2); }
+.bi-proj b { color: var(--ink); }
+#dTbl tr.new { animation: arrive 1.6s var(--ease); }
+#dTbl td small { display: block; font-size: 11.5px; color: var(--ink-3); }
+#dTbl .act { white-space: nowrap; }
+#dTbl .act .mini-btn + .mini-btn { margin-left: 6px; }
+@media (max-width: 1000px) { .bi-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bi-grid, .meters { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .fin-tabs { display: flex; } .fin-tabs button { flex: 1; padding: 0 8px; } .hbars li { grid-template-columns: minmax(0, 1fr); gap: 4px; } #dTbl td:nth-child(2) { padding-left: 0; } }
+
 /* Modo tatame: na vitrine, a seção abaixo do painel; no modo painel, uma aba do menu, com tela cheia para a TV */
 .dash-side [data-go="tatame"] { display: none; }
 [data-mode="painel"] .dash-side [data-go="tatame"] { display: flex; }
@@ -499,7 +582,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                   <p id="dNow">Agora: Kids 18h · Próxima: Adulto 19h</p>
                 </div>
                 <div class="kpis">
-                  <div class="kpi"><b>58<small class="delta" id="kNew">+3 em outubro</small></b><span>alunos ativos</span></div>
+                  <div class="kpi"><b><span id="kAtivos">58</span><small class="delta" id="kNew">+3 em outubro</small></b><span>alunos ativos</span></div>
                   <div class="kpi"><b id="kPres">146</b><span>presenças nos últimos 7 dias</span><span class="spark" id="spark" aria-hidden="true"><i class="wk"></i><i class="wk"></i><i></i><i></i><i></i><i></i><i class="today"></i></span></div>
                   <button class="kpi warn" type="button" data-goto="alunos" data-chip="aus"><b>3</b><span>sem treinar há 14 dias ou mais</span><span class="go-s">Ver quem<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
                   <button class="kpi" type="button" data-goto="leads"><b id="kLeads">3</b><span>interessados esperando retorno</span><span class="go-s">Abrir<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
@@ -518,12 +601,38 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 
               <!-- Alunos -->
               <section class="dv" data-v="alunos" aria-labelledby="t-alunos">
-                <div class="dv-h"><div><p class="dv-k">58 ativos</p><h3 id="t-alunos">Alunos</h3></div><p>Ausente: 14 dias ou mais sem treinar. Toque no nome para abrir a ficha.</p></div>
-                <div class="chips" id="chips" role="group" aria-label="Filtrar alunos">
-                  <button type="button" data-f="all" aria-pressed="true">Todos</button>
-                  <button type="button" data-f="aus" aria-pressed="false">Ausentes · 3</button>
-                  <button type="button" data-f="aval" aria-pressed="false" id="chipAval">Para avaliar · 3</button>
+                <div class="dv-h"><div><p class="dv-k" id="alK">58 ativos</p><h3 id="t-alunos">Alunos</h3></div><p>Ausente: 14 dias ou mais sem treinar. Toque no nome para abrir a ficha.</p></div>
+                <div class="crm-bar al-bar">
+                  <div class="chips" id="chips" role="group" aria-label="Filtrar alunos">
+                    <button type="button" data-f="all" aria-pressed="true">Todos</button>
+                    <button type="button" data-f="aus" aria-pressed="false">Ausentes · 3</button>
+                    <button type="button" data-f="aval" aria-pressed="false" id="chipAval">Para avaliar · 3</button>
+                  </div>
+                  <button class="mini-btn crm-add" type="button" id="alAdd" aria-expanded="false" aria-controls="alForm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Adicionar aluno</button>
                 </div>
+                <!-- cadastro: entra na lista, gera a primeira mensalidade (Financeiro) e pode criar o acesso ao app (acesso.js) -->
+                <form class="crm-form" id="alForm" aria-labelledby="alFormT" novalidate hidden>
+                  <p class="fin-k" id="alFormT">Novo aluno</p>
+                  <div class="crm-grid">
+                    <label class="crm-f"><span>Nome completo</span><input class="crm-in" id="afNome" autocomplete="off"></label>
+                    <label class="crm-f"><span>Tratamento nas mensagens</span><select class="sel" id="afArt"><option value="">Só o nome</option><option value="a">Feminino (a aluna)</option><option value="o">Masculino (o aluno)</option></select></label>
+                    <label class="crm-f"><span>Turma</span><select class="sel" id="afProg"><option value="adulto">Adulto</option><option value="feminino">Feminino (junto com o Adulto)</option><option value="kids">Kids (4 a 12 anos)</option></select></label>
+                    <label class="crm-f"><span>Horário</span><select class="sel" id="afHora"></select></label>
+                    <label class="crm-f af-kid" hidden><span>Responsável</span><input class="crm-in" id="afResp" autocomplete="off"></label>
+                    <label class="crm-f af-kid" hidden><span>Idade</span><input class="crm-in" id="afIdade" inputmode="numeric" maxlength="2" autocomplete="off"></label>
+                    <label class="crm-f"><span id="afFoneT">WhatsApp</span><input class="crm-in" id="afFone" inputmode="tel" placeholder="(15) 99999-9999" autocomplete="off"></label>
+                    <label class="crm-f"><span id="afEmailT">E-mail <small>(o login do app)</small></span><input class="crm-in" id="afEmail" type="email" autocomplete="off" spellcheck="false"></label>
+                    <label class="crm-f"><span>Faixa</span><select class="sel" id="afFaixa"></select></label>
+                    <label class="crm-f"><span>Graus</span><select class="sel" id="afGraus"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+                    <label class="crm-f"><span>Mensalidade (R$)</span><input class="crm-in" id="afValor" inputmode="numeric" autocomplete="off"></label>
+                    <label class="crm-f"><span>Dia do vencimento</span><select class="sel" id="afVenc"></select></label>
+                    <label class="crm-f"><span>Começa em</span><input class="crm-in" id="afIni" type="date" value="2026-10-16"></label>
+                    <label class="crm-f wide"><span>Anotação <small>(lesão, objetivo; opcional)</small></span><textarea class="crm-in" id="afNota" rows="2"></textarea></label>
+                  </div>
+                  <label class="mf-pub"><input type="checkbox" id="afApp" checked><span>Criar o acesso ao app e mandar pelo WhatsApp <small>(precisa do e-mail; no Kids, o acesso é do responsável)</small></span></label>
+                  <p class="crm-err" id="afErr" role="alert"></p>
+                  <div class="msg-acts"><button class="mini-btn" type="submit">Cadastrar aluno</button><button class="mini-btn ghost" type="button" id="afCancel">Cancelar</button></div>
+                </form>
                 <div class="tbl-wrap">
                   <table class="tbl" id="tbl">
                     <thead><tr><th>Aluno</th><th>Faixa</th><th>Última aula</th><th class="hide-s">Aulas no mês</th><th class="act">Ação</th></tr></thead>
@@ -684,11 +793,58 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 
               <!-- Financeiro: mensalidades pelo Asaas, lembretes por um número de WhatsApp só de avisos (Evolution API) -->
               <section class="dv" data-v="fin" aria-labelledby="t-fin">
-                <div class="dv-h"><div><p class="dv-k">Outubro · valores de exemplo</p><h3 id="t-fin">Financeiro</h3></div><div class="fin-hd"><span class="pill-s in" id="finWa">WhatsApp de avisos · conectado</span><p>Mensalidades por Pix, boleto ou cartão, com lembretes automáticos pelo WhatsApp.</p></div></div>
-                <!-- 31 adultos e 18 Kids pagos (R$ 200 e R$ 180), 5 adultos e 2 Kids a vencer, 2 adultos em atraso: 58 mensalidades -->
+                <div class="dv-h"><div><p class="dv-k">Outubro de 2026 · valores de exemplo</p><h3 id="t-fin">Financeiro</h3></div><div class="fin-hd"><span class="pill-s in" id="finWa">WhatsApp de avisos · conectado</span><p>Mensalidades por Pix, boleto ou cartão, com lembretes automáticos pelo WhatsApp.</p></div></div>
+                <div class="fin-tabs" role="tablist" aria-label="Partes do Financeiro">
+                  <button type="button" role="tab" id="ftGeral" aria-controls="fpGeral" aria-selected="true">Visão geral</button>
+                  <button type="button" role="tab" id="ftMens" aria-controls="fpMens" aria-selected="false" tabindex="-1">Mensalidades</button>
+                  <button type="button" role="tab" id="ftDesp" aria-controls="fpDesp" aria-selected="false" tabindex="-1">Despesas</button>
+                </div>
+
+                <!-- Visão geral: o BI do Studio. Números do mês, meta, receita x despesas, alunos que entraram e saíram, projeção.
+                     Os gráficos são SVG desenhados pelo script (biPaint), com a tabela de cada um logo abaixo -->
+                <div class="fin-panel viz" id="fpGeral" role="tabpanel" aria-labelledby="ftGeral">
+                  <div class="kpis bi-kpis">
+                    <div class="kpi"><span class="bi-l">Receita de outubro</span><b id="biRec">R$ 11.200</b><span id="biRecS"></span></div>
+                    <div class="kpi"><span class="bi-l">Despesas de outubro</span><b id="biDesp">R$ 7.925</b><span id="biDespS"></span></div>
+                    <div class="kpi"><span class="bi-l">Resultado</span><b id="biRes">R$ 3.275</b><span id="biResS"></span></div>
+                    <div class="kpi"><span class="bi-l">Alunos ativos</span><b id="biAti">58</b><span id="biAtiS"></span></div>
+                    <div class="kpi"><span class="bi-l">Ticket médio</span><b id="biTic">R$ 193</b><span>por aluno ativo, no mês</span></div>
+                    <button class="kpi" type="button" id="biInad"><span class="bi-l">Inadimplência</span><b id="biIna">3,6%</b><span id="biInaS"></span><span class="go-s">Ver quem<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+                  </div>
+                  <div class="bi-meta" id="biMeta"></div>
+                  <div class="bi-grid">
+                    <figure class="bi-card wide">
+                      <figcaption><h4>Receita e despesas</h4><p>Por mês: os últimos 12 meses e a projeção para os próximos 3.</p></figcaption>
+                      <div class="viz-leg" id="lgRec"></div>
+                      <div class="viz-plot" id="vRec" tabindex="0" role="img"></div>
+                      <details class="viz-tab"><summary>Ver em tabela</summary><div class="tbl-wrap" id="tRec"></div></details>
+                    </figure>
+                    <figure class="bi-card">
+                      <figcaption><h4>Alunos que entraram e saíram</h4><p>Matrículas e cancelamentos, mês a mês.</p></figcaption>
+                      <div class="viz-leg"><span><i class="sw in"></i>Entraram</span><span><i class="sw out"></i>Saíram</span></div>
+                      <div class="viz-plot" id="vAlu" tabindex="0" role="img"></div>
+                      <details class="viz-tab"><summary>Ver em tabela</summary><div class="tbl-wrap" id="tAlu"></div></details>
+                    </figure>
+                    <figure class="bi-card">
+                      <figcaption><h4>Alunos ativos</h4><p>No fim de cada mês, com a projeção para os próximos 3.</p></figcaption>
+                      <div class="viz-leg" id="lgAti"></div>
+                      <div class="viz-plot" id="vAti" tabindex="0" role="img"></div>
+                      <details class="viz-tab"><summary>Ver em tabela</summary><div class="tbl-wrap" id="tAti"></div></details>
+                    </figure>
+                    <figure class="bi-card wide">
+                      <figcaption><h4>Despesas de outubro por categoria</h4><p>De onde sai o dinheiro do Studio.</p></figcaption>
+                      <ul class="hbars" id="vCat"></ul>
+                      <button class="mini-btn ghost" type="button" id="biToDesp">Ver e lançar despesas</button>
+                    </figure>
+                  </div>
+                  <p class="bi-proj" id="biProj"></p>
+                </div>
+
+                <!-- Mensalidades: 31 adultos e 18 Kids pagos (R$ 200 e R$ 180), 5 adultos e 2 Kids a vencer, 2 adultos em atraso: 58 mensalidades -->
+                <div class="fin-panel" id="fpMens" role="tabpanel" aria-labelledby="ftMens" hidden>
                 <div class="kpis">
                   <div class="kpi"><b id="fRec">R$ 9.440</b><span id="fRecS">recebidos em outubro · 49 de 58 mensalidades pagas</span></div>
-                  <div class="kpi"><b>R$ 1.360</b><span>a vencer até o fim do mês · 7 mensalidades</span></div>
+                  <div class="kpi"><b id="fDue">R$ 1.360</b><span id="fDueS">a vencer até o fim do mês · 7 mensalidades</span></div>
                   <button class="kpi warn" type="button" data-ff-go="late"><b id="fLate">R$ 400</b><span id="fLateS">em atraso · 2 mensalidades</span><span class="go-s">Ver quem<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
                   <!-- já vencidas: as 49 pagas e as 2 atrasadas. Quem paga atrasado não muda a conta, só sai de "em atraso" -->
                   <div class="kpi"><b id="fOnTime">90%</b><span>pagas até o vencimento · 46 das 51 já vencidas</span></div>
@@ -741,6 +897,41 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                 </div>
                 <!-- o canal técnico (Evolution API, número só de avisos) fica só neste comentário: na tela, "WhatsApp de avisos" -->
                 <p class="fin-how"><b>Como funciona:</b> o Asaas, serviço de cobrança, gera a mensalidade de cada mês e avisa o painel quando o pagamento cai. Os lembretes saem de um número de WhatsApp só para avisos, separado do atendimento do Studio. Se a conexão cair, o selo no topo fica vermelho e os lembretes esperam. Só o dono do Studio e quem ele autorizar veem esta aba.</p>
+                </div>
+
+                <!-- Despesas: as contas do Studio no mês (fixas se repetem todo mês). Lista montada pelo script (despPaint) -->
+                <div class="fin-panel viz" id="fpDesp" role="tabpanel" aria-labelledby="ftDesp" hidden>
+                  <div class="kpis">
+                    <div class="kpi"><span class="bi-l">Total de outubro</span><b id="dTot">R$ 7.925</b><span id="dTotS"></span></div>
+                    <div class="kpi"><span class="bi-l">Fixas</span><b id="dFix">R$ 7.675</b><span>se repetem todo mês</span></div>
+                    <div class="kpi"><span class="bi-l">Variáveis</span><b id="dVar">R$ 250</b><span>só neste mês</span></div>
+                    <div class="kpi"><span class="bi-l">A pagar</span><b id="dPag">R$ 1.315</b><span id="dPagS"></span></div>
+                  </div>
+                  <div class="crm-bar">
+                    <div class="chips" id="dF" role="group" aria-label="Mostrar despesas"><button type="button" data-f="all" aria-pressed="true">Todas</button><button type="button" data-f="apagar" aria-pressed="false">A pagar</button><button type="button" data-f="paga" aria-pressed="false">Pagas</button></div>
+                    <button class="mini-btn crm-add" type="button" id="dAdd" aria-expanded="false" aria-controls="dForm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Adicionar despesa</button>
+                  </div>
+                  <form class="crm-form" id="dForm" aria-labelledby="dFormT" novalidate hidden>
+                    <p class="fin-k" id="dFormT">Nova despesa</p>
+                    <div class="crm-grid">
+                      <label class="crm-f wide"><span>Descrição</span><input class="crm-in" id="dfDesc" autocomplete="off" placeholder="Ex.: Conta de luz"></label>
+                      <label class="crm-f"><span>Categoria</span><select class="sel" id="dfCat"></select></label>
+                      <label class="crm-f"><span>Valor (R$)</span><input class="crm-in" id="dfValor" inputmode="decimal" autocomplete="off" placeholder="0,00"></label>
+                      <label class="crm-f"><span>Vencimento</span><input class="crm-in" id="dfData" type="date" value="2026-10-16" min="2026-10-01" max="2026-10-31"></label>
+                    </div>
+                    <label class="mf-pub"><input type="checkbox" id="dfRec"><span>Repete todo mês <small>(conta fixa: entra na projeção)</small></span></label>
+                    <label class="mf-pub"><input type="checkbox" id="dfPaga"><span>Já está paga</span></label>
+                    <p class="crm-err" id="dfErr" role="alert"></p>
+                    <div class="msg-acts"><button class="mini-btn" type="submit">Salvar despesa</button><button class="mini-btn ghost" type="button" id="dfCancel">Cancelar</button></div>
+                  </form>
+                  <div class="tbl-wrap">
+                    <table class="tbl" id="dTbl">
+                      <thead><tr><th>Despesa</th><th>Vencimento</th><th>Valor</th><th class="act">Situação</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                  <p class="fin-how">Os valores são de exemplo. Com o sistema ligado, as despesas ficam guardadas no banco do Studio, e as fixas entram sozinhas em cada mês novo.</p>
+                </div>
               </section>
 
               <!-- Configurações: só o professor dono. Cada integração mostra o status e as ações; as chaves ficam no servidor, nunca no site.
@@ -905,6 +1096,10 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   var tweenH = anim && Site.fine, MORPH_MS = tweenH ? 720 : 320;
   var dash = $("#dash"), main = $(".dash-main", dash), views = $$(".dv", dash), side = $$(".dash-side button[data-go]", dash);
   var drawer = $("#drawer"), scrim = $("#drScrim"), drFrom = null, drAt = null;
+  /* alunos ativos: os 58 do exemplo mais os cadastrados nesta visita. Entradas de outubro: as 3 do exemplo, os
+     cadastrados e as matrículas de Interessados ainda sem cadastro (matLeads - cadLead) */
+  var TOTAL = 58, cadastrados = 0, cadLead = 0, matLeads = 0, extraRec = 0, due = { v: 1360, n: 7 }, biOk = false;
+  function entOut() { return 3 + cadastrados + Math.max(0, matLeads - cadLead); }
 
   /* aviso do painel: mora no <body>, preso à janela (o painel passa da altura da tela), e só aparece com o
      painel à vista. Fica o tempo de ler (55 ms por letra, no mínimo 3,4 s) e espera o mouse ou o foco saírem */
@@ -1067,6 +1262,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
         views.forEach(function (v) { v.classList.toggle("on", v.dataset.v === name); });
         side.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
         if (name === "alunos" && needF) { needF = false; filter(curF); }
+        if (name === "fin" && biOk) biPaint();
       });
       sideTo(side.filter(function (b) { return b.dataset.go === name; })[0]);
       /* com o foco indo para a aba nova, o inert sai antes; senão, depois da pintura */
@@ -1629,7 +1825,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     $$("tr[data-id]", tb).forEach(function (tr) { var on = f === "all" || tr.dataset.f === f; tr.hidden = !on; if (on) n++; });
     emptyRow(tb, n ? "" : f === "aval" ? "Ninguém para avaliar agora." : "Ninguém sem treinar há 14 dias ou mais.");
     var who = n === 1 ? "1 aluno" : n + " alunos";
-    $("#tblMore").textContent = f === "all" ? "Mostrando " + n + " de 58 alunos." : !n ? "" : f === "aus" ? who + " sem treinar há 14 dias ou mais. A mensagem de WhatsApp já vem escrita: toque em WhatsApp para ver." : who + " com mais aulas desde o último grau. Quem decide é o professor.";
+    $("#tblMore").textContent = f === "all" ? "Mostrando " + n + " de " + TOTAL + " alunos." : !n ? "" : f === "aus" ? who + " sem treinar há 14 dias ou mais. A mensagem de WhatsApp já vem escrita: toque em WhatsApp para ver." : who + " com mais aulas desde o último grau. Quem decide é o professor.";
     $("#waMsg").hidden = true;
   }
   chips.forEach(function (c) { c.addEventListener("click", function () { morph(function () { filter(c.dataset.f); }); }); });
@@ -1827,6 +2023,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     else if (b.dataset.ldwa) leadMsg(+b.dataset.ldwa);
     else if (b.dataset.ldsend) leadSend(leads[+b.dataset.ldsend], true);
     else if (b.dataset.ldnote) leadNote(+b.dataset.ldnote);
+    else if (b.dataset.ld2al) { var lr = leads[+b.dataset.ld2al]; go("alunos"); alAbrir(preDe(lr)); }
     else if (b.dataset.drwa) {
       var box = $(".msg", drawer), m = careMsg(b.dataset.drwa);
       box.innerHTML = msgHTML(m.to, m.text, sendBtn("data-sendcare", b.dataset.drwa));
@@ -1861,7 +2058,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
      estiver atrasada. No Kids, a conversa é com o responsável. Quem vem normalmente recebe só a abertura */
   function careMsg(id) {
     var p = PEOPLE[id], nm = callOf(p);
-    if (p.kid) return { to: p.resp + ", responsável pel" + artOf(p) + " " + nm, text: "Oi, " + p.resp + "! Aqui é do Studio Evolution BJJ, sobre " + artOf(p) + " " + nm + "." };
+    if (p.kid) return { to: p.resp + ", responsável " + (p.neutro ? "por " : "pel" + artOf(p) + " ") + nm, text: "Oi, " + p.resp + "! Aqui é do Studio Evolution BJJ, sobre " + (p.neutro ? "" : artOf(p) + " ") + nm + "." };
     var t = "Oi, " + nm + "! Aqui é do Studio Evolution BJJ.";
     if (p.aus) {
       var hr = p.cls.split(" ")[1], alt = HRS.filter(function (h) { return h !== hr; });
@@ -1892,7 +2089,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     var back = inDr ? $("[data-drwa]", drawer) : $('.dv.on tr[data-id="' + id + '"] td.act', dash);
     if (inDr) box.hidden = true; else morph(function () { box.hidden = true; });
     focusIn(back);
-    var who = p.kid ? "O contato com a família d" + artOf(p) + " " + callOf(p) + " fica registrado hoje." : callOf(p) + " fica marcad" + artOf(p) + " como contatad" + artOf(p) + " hoje.";
+    var who = p.neutro ? "O contato com " + (p.kid ? "a família de " : "") + callOf(p) + " fica registrado hoje."
+      : p.kid ? "O contato com a família d" + artOf(p) + " " + callOf(p) + " fica registrado hoje." : callOf(p) + " fica marcad" + artOf(p) + " como contatad" + artOf(p) + " hoje.";
     toast("No app, abre o WhatsApp com a mensagem pronta. " + who);
   }
   /* depois da transição de altura, a caixa precisa estar inteira na tela */
@@ -1962,7 +2160,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   var EX = { d3: ["Bruno", "19/10"], d0: ["Larissa", "16/10"], a1: ["Patrícia", "11/10"], a5: ["Vitor"], ok: ["Thiago"] };
   function vr(s) { return s && '<span class="var">' + s + "</span>"; }
   var finMsg = $("#finMsg"), late = { n: 2, v: 400 }, rec = { v: 9440, n: 49 }, curFF = "all", kLate = $("[data-ff-go]", dash);
-  function brl(v) { return "R$ " + v.toLocaleString("pt-BR"); }
+  function brl(v) { return "R$ " + v.toLocaleString("pt-BR", v % 1 ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : {}); }
   function mens(n) { return n + (n === 1 ? " mensalidade" : " mensalidades"); }
   function finOpen(title, text, send, from, extra) {
     finMsg._from = from || null;
@@ -1984,9 +2182,9 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   /* a contagem abaixo da tabela acompanha o filtro e os pagamentos */
   function paintFinMore(n) {
     var el = $("#finMore");
-    el.textContent = curFF === "all" ? "Mostrando " + n + " de 58 mensalidades."
+    el.textContent = curFF === "all" ? "Mostrando " + n + " de " + TOTAL + " mensalidades."
       : curFF === "late" ? (late.n > 1 ? "As " + late.n + " mensalidades atrasadas." : late.n ? "A única mensalidade atrasada." : "")
-      : curFF === "due" ? n + " das 7 a vencer." : n + " das " + rec.n + " pagas.";
+      : curFF === "due" ? n + " das " + due.n + " a vencer." : n + " das " + rec.n + " pagas.";
     el.hidden = !el.textContent;
   }
   function finFilter(f) {
@@ -2023,7 +2221,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     $("#fLate").textContent = brl(late.v);
     $("#fLateS").textContent = late.n ? "em atraso · " + mens(late.n) : "nada em atraso";
     $("#fRec").textContent = brl(rec.v);
-    $("#fRecS").textContent = "recebidos em outubro · " + rec.n + " de 58 mensalidades pagas";
+    $("#fRecS").textContent = "recebidos em outubro · " + rec.n + " de " + TOTAL + " mensalidades pagas";
+    if (biOk) biPaint();
     $("#chipLate").textContent = "Atrasadas · " + late.n;
     badge($("#bFin"), late.n, "em atraso");
     /* sem atraso, o KPI perde a cor de alerta e o "Ver quem" */
@@ -2305,8 +2504,10 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
       b.textContent = n;
       if (anim) replayClass(b, "bump");
     });
-    /* matrícula: só o "+N em outubro" do Hoje muda; os 58 ativos não (o cadastro se completa em Alunos) */
-    $("#kNew").textContent = "+" + c.mat + " em outubro";
+    /* matrícula: só o "+N em outubro" do Hoje muda; os ativos, só com o cadastro em Alunos */
+    matLeads = c.mat - 3;
+    $("#kNew").textContent = "+" + entOut() + " em outubro";
+    if (biOk) biPaint();
     var wait = c.novo + c.atendimento;
     $("#kLeads").textContent = wait;
     badge($("#bLeads"), wait, "esperando retorno");
@@ -2318,6 +2519,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     $("#closedList").innerHTML = closedT.map(function (row) {
       var nm = esc($("b", row).textContent);
       return "<li><span>" + nm + "</span>" + (row.dataset.closed === "matriculado" ? '<span class="pill-s in">Matriculado</span>' : '<span class="pill-s">Sem interesse</span>') +
+        (row.dataset.closed === "matriculado" && !row.dataset.cad ? '<button class="mini-btn" type="button" data-cad="' + leads.indexOf(row) + '" aria-label="Cadastrar ' + nm + ' em Alunos">Cadastrar</button>' : "") +
         '<button class="mini-btn ghost" type="button" data-reopen="' + leads.indexOf(row) + '" aria-label="Reabrir ' + nm + '">Reabrir</button></li>';
     }).join("");
     $("#closedNote").textContent = n ? "Mais 6 contatos fechados antes de hoje." : "Os 6 contatos fechados são de antes de hoje.";
@@ -2398,6 +2600,9 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
       var cb = $("#closedBox"), open = cb.hidden;
       morph(function () { cb.hidden = !open; }, cb);
       b.setAttribute("aria-expanded", open ? "true" : "false");
+    } else if (d.cad) {
+      go("alunos");
+      alAbrir(preDe(leads[+d.cad]));
     } else if (d.reopen) {
       /* "Reabrir": a linha volta como Em atendimento, no mesmo lugar */
       r2 = leads[+d.reopen];
@@ -2444,7 +2649,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
       '<button class="mini-btn" type="button" data-ldnote="' + i + '">Salvar no histórico</button></div></div>' +
       '<div class="dr-sec"><p class="k">Histórico</p><ol class="ld-hist">' + histHTML(row) + "</ol></div>" +
       '<div class="msg" hidden></div></div>' +
-      '<div class="dr-acts"><button class="mini-btn wa" type="button" data-ldwa="' + i + '">WhatsApp</button></div>';
+      '<div class="dr-acts">' + (row.dataset.cad ? "" : '<button class="mini-btn" type="button" data-ld2al="' + i + '">Matricular como aluno</button>') +
+      '<button class="mini-btn wa" type="button" data-ldwa="' + i + '">WhatsApp</button></div>';
     drawerIn();
   }
   function refreshLeadCard(row) {
@@ -2562,6 +2768,531 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     focusIn($(".nm-btn", row));
     toast("Contato salvo: " + d.first + " está em " + ST_TXT[st] + "." + (st === "novo" ? " Retorne hoje pelo WhatsApp." : ""));
   });
+
+  /* ---------- Alunos: o professor cadastra o aluno. Ele entra na lista (com ficha), ganha a primeira mensalidade no
+     Financeiro e, se marcado, o acesso ao app (acesso.js: na demonstração, a senha é de exemplo) ---------- */
+  var alForm = $("#alForm"), alBtn = $("#alAdd"), alLead = null, alSeq = 0;
+  var HORAS = { adulto: ["8", "11", "19"], feminino: ["8", "11", "19"], kids: ["10", "18"] };
+  var FX_AD = ["branca", "azul", "roxa", "marrom", "preta"], FX_KD = ["branca", "cinza", "amarela", "laranja", "verde"];
+  var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  $("#afVenc").innerHTML = Array.apply(null, Array(28)).map(function (_, i) { return '<option value="' + (i + 1) + '"' + (i === 9 ? " selected" : "") + ">dia " + (i + 1) + "</option>"; }).join("");
+  function afSync() {
+    var prog = $("#afProg").value, kid = prog === "kids", h = $("#afHora").value, fx = $("#afFaixa").value, hs = HORAS[prog], fxs = kid ? FX_KD : FX_AD;
+    $("#afHora").innerHTML = hs.map(function (x) { return '<option value="' + x + '">' + (kid ? "Kids " : "Adulto ") + x + "h</option>"; }).join("");
+    $("#afHora").value = hs.indexOf(h) >= 0 ? h : hs[hs.length - 1];
+    $("#afFaixa").innerHTML = fxs.map(function (f) { return '<option value="' + f + '">' + NAMES[f] + "</option>"; }).join("");
+    $("#afFaixa").value = fxs.indexOf(fx) >= 0 ? fx : "branca";
+    $$(".af-kid", alForm).forEach(function (el) { el.hidden = !kid; });
+    $("#afFoneT").textContent = kid ? "WhatsApp do responsável" : "WhatsApp";
+    $("#afEmailT").innerHTML = (kid ? "E-mail do responsável" : "E-mail") + " <small>(o login do app)</small>";
+    if (!$("#afValor").dataset.mexeu) $("#afValor").value = kid ? "180" : "200";
+  }
+  function afErr(msg, el) {
+    $$("[aria-invalid]", alForm).forEach(function (f) { f.removeAttribute("aria-invalid"); });
+    $("#afErr").textContent = msg;
+    if (el) { el.setAttribute("aria-invalid", "true"); focusSoft(el, { preventScroll: true }); }
+  }
+  /* o interessado vira aluno: nome, WhatsApp, turma e horário vêm do contato. No Kids, o contato é o responsável */
+  function preDe(row) {
+    var d = row.dataset, nm = $("b", row).textContent, aula = (d.slot || d.req || "").split("|")[1];
+    return { row: row, prog: d.prog, nome: d.child || nm, resp: d.child ? nm : "", idade: d.age || "", fone: foneTxt(d.phone || ""), hora: aula };
+  }
+  function alAbrir(pre) {
+    alForm.reset();
+    $("#afHora").innerHTML = "";  /* o reset voltaria para a 1ª turma (8h): vazio, afSync escolhe a da noite */
+    delete $("#afValor").dataset.mexeu;
+    afErr("", null);
+    alLead = pre ? pre.row : null;
+    if (pre) $("#afProg").value = pre.prog;
+    afSync();
+    if (pre) {
+      $("#afNome").value = pre.nome;
+      $("#afFone").value = pre.fone;
+      $("#afResp").value = pre.resp;
+      $("#afIdade").value = pre.idade;
+      if (pre.hora && HORAS[pre.prog].indexOf(pre.hora) >= 0) $("#afHora").value = pre.hora;
+    }
+    $("#alFormT").textContent = pre ? "Matricular " + pre.nome : "Novo aluno";
+    alBtn.setAttribute("aria-expanded", "true");
+    morph(function () { alForm.hidden = false; }, alForm);
+    focusSoft($("#afNome"), { preventScroll: true });
+    showBox(alForm);
+  }
+  function alFechar(foco) {
+    alBtn.setAttribute("aria-expanded", "false");
+    alLead = null;
+    morph(function () { alForm.hidden = true; });
+    if (foco) focusIn(foco);
+  }
+  afSync();
+  alBtn.addEventListener("click", function () { if (alForm.hidden) alAbrir(null); else alFechar(alBtn); });
+  $("#afCancel").addEventListener("click", function () { alFechar(alBtn); });
+  $("#afProg").addEventListener("change", function () { morph(afSync); });
+  $("#afValor").addEventListener("input", function () { this.dataset.mexeu = "1"; });
+  $("#afFone").addEventListener("blur", function () { var d = digits(this.value); if (d.length === 10 || d.length === 11) this.value = foneTxt(d); });
+  alForm.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.stopPropagation(); alFechar(alBtn); } });
+  /* a primeira mensalidade vence no dia escolhido: neste mês, se o dia ainda não passou; senão, no mês que vem */
+  function primeiraParcela(ini, dia) {
+    var p = ini.split("-"), y = +p[0], m = +p[1] - 1;
+    if (dia < +p[2]) { m++; if (m > 11) { m = 0; y++; } }
+    return { txt: two(dia) + "/" + two(m + 1), outubro: y === 2026 && m === 9 };
+  }
+  function cleanNome(t) { return t.trim().replace(/\s+/g, " "); }
+  alForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var nome = cleanNome($("#afNome").value), prog = $("#afProg").value, kid = prog === "kids", resp = cleanNome($("#afResp").value), idade = $("#afIdade").value.replace(/\D/g, "");
+    var ph = digits($("#afFone").value), em = $("#afEmail").value.trim().toLowerCase(), valor = +$("#afValor").value.replace(/\D/g, ""), app = $("#afApp").checked, ini = $("#afIni").value;
+    if (nome.length < 5 || nome.indexOf(" ") < 0) return afErr("Digite o nome completo do aluno (nome e sobrenome).", $("#afNome"));
+    if (kid && resp.length < 3) return afErr("No Kids, digite o nome do responsável.", $("#afResp"));
+    if (kid && idade && (+idade < 4 || +idade > 12)) return afErr("O Kids é para crianças de 4 a 12 anos.", $("#afIdade"));
+    if (ph.length !== 10 && ph.length !== 11) return afErr("Confira o WhatsApp: DDD e número.", $("#afFone"));
+    if (em && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return afErr("Confira o e-mail.", $("#afEmail"));
+    if (app && !em) return afErr("Para criar o acesso ao app, digite o e-mail (ou desmarque o acesso).", $("#afEmail"));
+    if (!valor || valor > 5000) return afErr("Digite o valor da mensalidade.", $("#afValor"));
+    if (!/^\d{4}-\d\d-\d\d$/.test(ini)) return afErr("Escolha a data de início.", $("#afIni"));
+    var id = "novo" + (++alSeq), hora = $("#afHora").value, cls = (kid ? "Kids " : "Adulto ") + hora + "h", belt = $("#afFaixa").value, g = +$("#afGraus").value;
+    var parc = primeiraParcela(ini, +$("#afVenc").value), art = $("#afArt").value, ip = ini.split("-");
+    var pp = PEOPLE[id] = { n: nome, cls: cls, since: "no Studio desde " + MESES[+ip[1] - 1] + " de " + ip[0], belt: belt, g: g, total: 0, desde: 0, ult: "começou agora",
+      comp: [0, kid ? 6 : 8], days: [], skip: 0, last: "2000-01-01", nova: 1, fee: "primeira mensalidade vence " + parc.txt };
+    if (art) pp.art = art; else pp.neutro = 1;
+    if (kid) { pp.kid = 1; pp.resp = first(resp); if (idade) pp.age = idade + " anos"; }
+    /* a linha em Alunos: o nome abre a ficha, como nas outras */
+    var tb = $("#tbl tbody"), tr = document.createElement("tr");
+    tr.dataset.f = ""; tr.dataset.id = id; tr.className = "new";
+    tr.innerHTML = '<td><div class="nm"><span class="av">' + inits(nome) + "</span><div>" + esc(nome) + "<small>" + cls + (pp.age ? " · " + pp.age : "") + "</small></div></div></td>" +
+      '<td><span class="bl"><i class="belt-s" style="--b:var(--b-' + belt + ')"></i><span>' + beltTxt(belt, g) + "</span></span></td>" +
+      '<td><small class="cl" aria-hidden="true">Última aula</small>ainda não veio</td><td class="num hide-s">0</td><td class="act"><span class="pill-s in">Novo</span></td>';
+    tb.insertBefore(tr, tb.firstChild);
+    nameCell(tr);
+    ORIG[id] = { last: "ainda não veio", act: '<span class="pill-s in">Novo</span>', pres: false };
+    /* a primeira mensalidade no Financeiro */
+    var ft = $("#finTbl tbody"), fr = document.createElement("tr");
+    fr.dataset.st = "due"; fr.dataset.id = id; fr.dataset.v = valor; fr.className = "new";
+    fr.innerHTML = '<td><div class="nm"><span class="av">' + inits(nome) + "</span><div>" + esc(nome) + "<small>" + cls + " · primeira mensalidade · vence " + parc.txt + '<span class="fm"> · Pix ou boleto</span></small></div></div></td>' +
+      '<td><span class="pill-s gold">Primeira mensalidade</span></td><td class="num">' + brl(valor) + '</td><td class="hide-s">Pix ou boleto</td><td class="act"><span class="pill-s">Cobrança criada</span></td>';
+    ft.insertBefore(fr, ft.firstChild);
+    nameCell(fr);
+    [tr, fr].forEach(function (r) { r.setAttribute("role", "row"); $$("td", r).forEach(function (td) { td.setAttribute("role", "cell"); }); });
+    if (parc.outubro) {
+      due.v += valor; due.n++; extraRec += valor;
+      $("#fDue").textContent = brl(due.v);
+      $("#fDueS").textContent = "a vencer até o fim do mês · " + mens(due.n);
+    }
+    /* veio de Interessados: a matrícula fecha lá e não conta duas vezes */
+    var lr = alLead;
+    if (lr) {
+      lr.dataset.cad = id;
+      cadLead++;
+      if (lr.dataset.closed !== "matriculado") { setLead(lr, "matriculado"); leadOut(lr, true); }
+      logLead(lr, "Matriculado e cadastrado em Alunos");
+      paintClosed();
+    }
+    cadastrados++;
+    TOTAL++;
+    $("#kAtivos").textContent = TOTAL;
+    $("#alK").textContent = TOTAL + " ativos";
+    $("#kNew").textContent = "+" + entOut() + " em outubro";
+    var nota = $("#afNota").value.trim();
+    if (nota) pp.contact = { d: "hoje, " + $("#dClock").textContent, how: "anotação do cadastro: " + nota };
+    alFechar(null);
+    morph(function () { filter("all"); });
+    finFilter(curFF);
+    focusIn($(".nm-btn", tr));
+    toast("Aluno cadastrado: " + first(nome) + ", " + cls + ". A primeira mensalidade (" + brl(valor) + ") vence " + parc.txt + ".");
+    if (biOk) biPaint();
+    if (!app) return;
+    /* o acesso ao app: no Kids, a conta é do responsável (o perfil leva o nome da criança) */
+    var dono = kid ? resp : nome;
+    Acesso.conta({ acao: "criar", nome: dono, email: em, whatsapp: ph, papel: "aluno" }).then(function (r) {
+      if (!r.ok) { toast(r.msg); return; }
+      var link = new URL("entrar.html?app", location.href).href;
+      var txt = "Olá, " + first(dono) + "! Seu acesso ao app do Studio Evolution BJJ está pronto.\n\nEntre em: " + link + "\nLogin: " + r.email + "\nSenha provisória: " + r.senha +
+        "\n\nPara ter o app no celular: abra o link e toque em Instalar (Android) ou em Compartilhar e depois Adicionar à Tela de Início (iPhone).";
+      var wa = "https://wa.me/" + (ph.length <= 11 ? "55" + ph : ph) + "?text=" + encodeURIComponent(txt);
+      openMsg($("#waMsg"), first(dono) + " · acesso ao app", esc(txt).replace(/\n/g, "<br>"), $(".nm-btn", tr),
+        '<a class="mini-btn wa" href="' + wa + '" target="_blank" rel="noopener">Abrir no WhatsApp</a>');
+    });
+  });
+
+  /* ---------- Financeiro: as três partes ---------- */
+  var ftabs = $$(".fin-tabs [role=tab]");
+  function finTab(t, foco) {
+    ftabs.forEach(function (b) {
+      var on = b === t;
+      b.setAttribute("aria-selected", on ? "true" : "false");
+      b.tabIndex = on ? 0 : -1;
+      $("#" + b.getAttribute("aria-controls")).hidden = !on;
+    });
+    morph(function () { if (t.id === "ftGeral") biPaint(); if (t.id === "ftDesp") despPaint(); });
+    if (foco) t.focus();
+  }
+  ftabs.forEach(function (b, i) {
+    b.addEventListener("click", function () { finTab(b); });
+    b.addEventListener("keydown", function (e) {
+      var k = e.key, j = k === "ArrowRight" ? i + 1 : k === "ArrowLeft" ? i - 1 : k === "Home" ? 0 : k === "End" ? ftabs.length - 1 : null;
+      if (j === null) return;
+      e.preventDefault();
+      finTab(ftabs[(j + ftabs.length) % ftabs.length], true);
+    });
+  });
+  $("#biInad").addEventListener("click", function () { finTab($("#ftMens")); finFilter("late"); focusIn($("#ftMens")); });
+  $("#biToDesp").addEventListener("click", function () { finTab($("#ftDesp"), true); });
+
+  /* ---------- Financeiro · Visão geral (BI): 12 meses de histórico (exemplo), outubro ao vivo (mensalidades,
+     despesas e alunos desta tela) e a projeção dos 3 meses seguintes pela média dos últimos 6 ---------- */
+  var MES = ["nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26", "jun/26", "jul/26", "ago/26", "set/26", "out/26"], MES_P = ["nov/26", "dez/26", "jan/27"];
+  /* ativos no fim de cada mês = mês anterior + entradas - saídas (out/25 terminou com 33) */
+  var HIST = { ativos: [35, 33, 33, 39, 43, 45, 45, 46, 50, 52, 56], ent: [4, 2, 3, 7, 6, 4, 3, 3, 5, 4, 5], sai: [2, 4, 3, 1, 2, 2, 3, 2, 1, 2, 1],
+    desp: [7480, 9150, 7390, 8210, 7560, 7610, 7540, 7700, 9950, 7820, 7880] };
+  /* outubro: 38 adultos (R$ 200) e 20 Kids (R$ 180) = R$ 11.200. Meses passados: os ativos pelo ticket, menos 2% que ficou sem pagar */
+  var REC0 = 11200, TICKET0 = REC0 / 58;
+  function recHist(i) { return Math.round(HIST.ativos[i] * TICKET0 * 0.98 / 10) * 10; }
+  var DCAT = { aluguel: "Aluguel", contas: "Contas (luz, água, internet)", pessoal: "Pessoal", servicos: "Serviços", taxas: "Taxas", marketing: "Marketing", material: "Material", manutencao: "Manutenção", outros: "Outros" };
+  /* as despesas de outubro (exemplo). rec: se repete todo mês; ficam neste navegador na demonstração */
+  var DESP0 = [
+    { id: "d1", d: "Aluguel da sala", c: "aluguel", v: 3500, dt: "2026-10-05", rec: 1, paga: 1 },
+    { id: "d2", d: "Professor auxiliar", c: "pessoal", v: 1800, dt: "2026-10-05", rec: 1, paga: 1 },
+    { id: "d3", d: "Anúncios no Instagram", c: "marketing", v: 600, dt: "2026-10-01", rec: 1, paga: 1 },
+    { id: "d4", d: "Energia elétrica", c: "contas", v: 420, dt: "2026-10-12", rec: 1, paga: 1 },
+    { id: "d5", d: "Água", c: "contas", v: 110, dt: "2026-10-12", rec: 1, paga: 1 },
+    { id: "d6", d: "Internet", c: "contas", v: 120, dt: "2026-10-15", rec: 1, paga: 1 },
+    { id: "d7", d: "WhatsApp de avisos (servidor)", c: "servicos", v: 60, dt: "2026-10-10", rec: 1, paga: 1 },
+    { id: "d8", d: "Kimonos de empréstimo (2)", c: "material", v: 250, dt: "2026-10-18", rec: 0, paga: 0 },
+    { id: "d9", d: "Contador", c: "servicos", v: 350, dt: "2026-10-20", rec: 1, paga: 0 },
+    { id: "d10", d: "Limpeza", c: "pessoal", v: 600, dt: "2026-10-30", rec: 1, paga: 0 },
+    { id: "d11", d: "Taxas do Asaas", c: "taxas", v: 115, dt: "2026-10-31", rec: 1, paga: 0 }
+  ];
+  function guardado(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } }
+  function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  var DESP = guardado("evo-fin-desp-v1") || DESP0.map(function (d) { return Object.assign({}, d); });
+  var META = guardado("evo-fin-meta-v1"), metaEdit = false;
+  function soma(l, f) { return l.reduce(function (a, x) { return a + f(x); }, 0); }
+  function pct(x, casas) { return (x * 100).toFixed(casas || 0).replace(".", ",") + "%"; }
+  function mil(v) { return v === 0 ? "R$ 0" : v >= 1000 ? "R$ " + (v / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + " mil" : brl(v); }
+  function nums() {
+    var r = REC0 + extraRec, d = soma(DESP, function (x) { return x.v; }), pend = Math.max(0, matLeads - cadLead);
+    return { rec: r, recebido: rec.v, aReceber: r - rec.v, desp: d, pagas: soma(DESP, function (x) { return x.paga ? x.v : 0; }), fix: soma(DESP, function (x) { return x.rec ? x.v : 0; }),
+      res: r - d, ativos: TOTAL, ent: entOut(), sai: 1, pend: pend, ticket: r / TOTAL, inad: late.v / r };
+  }
+  /* projeção: o saldo médio de alunos dos últimos 6 meses, a receita pelo ticket de outubro e as despesas fixas */
+  function projecao(n) {
+    var ent = HIST.ent.concat([n.ent]), sai = HIST.sai.concat([n.sai]), saldo = 0;
+    for (var i = 6; i < 12; i++) saldo += ent[i] - sai[i];
+    saldo /= 6;
+    var at = [1, 2, 3].map(function (k) { return Math.round(n.ativos + saldo * k); });
+    return { saldo: saldo, at: at, rec: at.map(function (a) { return Math.round(a * n.ticket / 10) * 10; }), desp: [n.fix, n.fix, n.fix], ent: ent, sai: sai };
+  }
+
+  /* ---------- gráficos (SVG desenhado na largura real; a dica acompanha o mouse, o dedo e as setas do teclado) ---------- */
+  var NS = "http://www.w3.org/2000/svg";
+  /* inteiro: contagem de pessoas, sem passo de 2,5 */
+  function passo(max, nTicks, inteiro) {
+    var e = Math.pow(10, Math.floor(Math.log10(Math.max(max, 1) / nTicks))), c = inteiro && e < 10 ? [1, 2, 5, 10] : [1, 2, 2.5, 5, 10];
+    for (var i = 0; i < c.length; i++) if (Math.ceil(max / (c[i] * e)) <= nTicks) return c[i] * e;
+    return 10 * e;
+  }
+  function el(tag, at, txt) { var x = document.createElementNS(NS, tag); for (var k in at) x.setAttribute(k, at[k]); if (txt !== undefined) x.textContent = txt; return x; }
+  function dica(box) {
+    var t = $(".viz-tip", box);
+    if (!t) { t = document.createElement("div"); t.className = "viz-tip"; t.hidden = true; box.appendChild(t); }
+    return t;
+  }
+  function dicaShow(box, x, titulo, linhas) {
+    var t = dica(box);
+    t.textContent = "";
+    var h = document.createElement("span"); h.className = "t"; h.textContent = titulo; t.appendChild(h);
+    linhas.forEach(function (l) {
+      var r = document.createElement("span"), k = document.createElement("i"), b = document.createElement("b"), n = document.createElement("span");
+      r.className = "r"; b.textContent = l.v; n.textContent = l.n;
+      if (l.c) { k.style.borderColor = "var(--s-" + l.c + ")"; if (l.dash) k.style.borderTopStyle = "dashed"; r.appendChild(k); }
+      r.appendChild(b); r.appendChild(n); t.appendChild(r);
+    });
+    t.hidden = false;
+    var w = t.offsetWidth, bw = box.clientWidth;
+    t.style.left = Math.max(0, Math.min(bw - w, x + 14 > bw - w ? x - w - 14 : x + 14)) + "px";
+    t.style.top = "6px";
+  }
+  /* linhas: séries no mesmo eixo (mesma unidade). proj: o índice do 1º mês projetado (tracejado, faixa clara atrás) */
+  function vizLinha(box, c) {
+    var W = box.clientWidth;
+    if (!W) return;
+    var curto = W < 520, H = curto ? 200 : 230, m = { l: curto ? 46 : 54, r: 14, t: 22, b: 26 }, iw = W - m.l - m.r, ih = H - m.t - m.b, n = c.rot.length;
+    var todos = [].concat.apply([], c.series.map(function (s) { return s.v; })).concat(c.ref ? [c.ref.v] : []);
+    var st = passo(Math.max.apply(null, todos) * 1.04, 4, c.inteiro), top = st * Math.ceil(Math.max.apply(null, todos) * 1.04 / st);
+    var X = function (i) { return m.l + i * iw / (n - 1); }, Y = function (v) { return m.t + ih - v / top * ih; };
+    var svg = el("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, "aria-hidden": "true" });
+    if (c.proj < n) {
+      svg.appendChild(el("rect", { class: "proj", x: X(c.proj - 0.5), y: m.t - 14, width: X(n - 1) + 6 - X(c.proj - 0.5), height: ih + 14 }));
+      svg.appendChild(el("text", { x: X(n - 1) + 4, y: m.t - 4, "text-anchor": "end" }, "projeção"));
+    }
+    for (var v = 0; v <= top + 0.001; v += st) {
+      svg.appendChild(el("line", { class: v ? "grid" : "base", x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v) }));
+      svg.appendChild(el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, c.tick(v)));
+    }
+    var cada = curto ? 2 : 1;
+    c.rot.forEach(function (r, i) { if (i % cada === 0 || i === n - 1) svg.appendChild(el("text", { x: X(i), y: H - 6, "text-anchor": "middle" }, r.split("/")[0])); });
+    if (c.ref) {
+      svg.appendChild(el("line", { class: "ref", x1: m.l, x2: W - m.r, y1: Y(c.ref.v), y2: Y(c.ref.v) }));
+      svg.appendChild(el("text", { x: m.l + 6, y: Y(c.ref.v) - 6 }, c.ref.n));
+    }
+    var u = c.proj - 1;
+    c.series.forEach(function (s, k) {
+      var pts = s.v.map(function (v, i) { return X(i) + "," + Y(v); });
+      svg.appendChild(el("polyline", { class: "ln " + s.c, points: pts.slice(0, u + 1).join(" ") }));
+      if (u < n - 1) svg.appendChild(el("polyline", { class: "ln dash " + s.c, points: pts.slice(u).join(" ") }));
+      svg.appendChild(el("circle", { class: "dot " + s.c, cx: X(u), cy: Y(s.v[u]), r: 4 }));
+      /* o valor do mês atual: o da série de cima acima do ponto, o da de baixo abaixo (não se encostam) */
+      var acima = k === 0 || s.v[u] >= c.series[0].v[u];
+      svg.appendChild(el("text", { class: "val", x: X(u), y: Y(s.v[u]) + (acima ? -10 : 18), "text-anchor": "middle" }, c.fmt(s.v[u])));
+    });
+    var cruz = el("line", { class: "cross", x1: 0, x2: 0, y1: m.t - 14, y2: m.t + ih, visibility: "hidden" });
+    svg.appendChild(cruz);
+    box.textContent = "";
+    box.appendChild(svg);
+    box.setAttribute("aria-label", c.resumo);
+    var at = -1;
+    function mostra(i) {
+      at = Math.max(0, Math.min(n - 1, i));
+      cruz.setAttribute("x1", X(at)); cruz.setAttribute("x2", X(at)); cruz.setAttribute("visibility", "visible");
+      dicaShow(box, X(at), c.rotLongo[at] + (at >= c.proj ? " · projeção" : ""), c.series.map(function (s) { return { c: s.c, dash: at >= c.proj, v: c.fmt(s.v[at]), n: s.n }; }).concat(c.extra ? c.extra(at) : []));
+    }
+    function some() { at = -1; cruz.setAttribute("visibility", "hidden"); dica(box).hidden = true; }
+    svg.addEventListener("pointermove", function (e) { var r = svg.getBoundingClientRect(); mostra(Math.round((e.clientX - r.left - m.l) / iw * (n - 1))); });
+    svg.addEventListener("pointerleave", some);
+    box.onkeydown = function (e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); mostra(at < 0 ? c.proj - 1 : at + (e.key === "ArrowRight" ? 1 : -1)); }
+      else if (e.key === "Escape") some();
+    };
+    box.onblur = some;
+  }
+  /* colunas divergentes: entradas para cima, saídas para baixo, numa linha de zero só */
+  function barra(x, y0, y1, w, cima) {
+    var h = Math.abs(y1 - y0), r = Math.min(4, h, w / 2);
+    if (h < 0.5) return "";
+    return cima ? "M" + x + "," + y0 + "V" + (y1 + r) + "Q" + x + "," + y1 + " " + (x + r) + "," + y1 + "H" + (x + w - r) + "Q" + (x + w) + "," + y1 + " " + (x + w) + "," + (y1 + r) + "V" + y0 + "Z"
+      : "M" + x + "," + y0 + "V" + (y1 - r) + "Q" + x + "," + y1 + " " + (x + r) + "," + y1 + "H" + (x + w - r) + "Q" + (x + w) + "," + y1 + " " + (x + w) + "," + (y1 - r) + "V" + y0 + "Z";
+  }
+  function vizDiv(box, c) {
+    var W = box.clientWidth;
+    if (!W) return;
+    var curto = W < 520, H = curto ? 200 : 230, m = { l: 34, r: 10, t: 18, b: 26 }, iw = W - m.l - m.r, ih = H - m.t - m.b, n = c.rot.length;
+    var up = Math.max.apply(null, c.up), dn = Math.max.apply(null, c.dn), st = passo(up + dn, 4, true), tu = st * Math.ceil(up / st), td = st * Math.ceil(dn / st);
+    var Y = function (v) { return m.t + (tu - v) / (tu + td) * ih; }, slot = iw / n, bw = Math.min(24, slot * 0.56), y0 = Y(0);
+    var svg = el("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, "aria-hidden": "true" });
+    for (var v = -td; v <= tu + 0.001; v += st) {
+      svg.appendChild(el("line", { class: v ? "grid" : "base", x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v) }));
+      svg.appendChild(el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, v > 0 ? "+" + v : v < 0 ? "−" + -v : "0"));
+    }
+    var cols = c.rot.map(function (r, i) {
+      var x = m.l + i * slot + (slot - bw) / 2, g = el("g", {});
+      var pu = barra(x, y0 - 1, Y(c.up[i]), bw, true), pd = barra(x, y0 + 1, Y(-c.dn[i]), bw, false);
+      if (pu) g.appendChild(el("path", { class: "bar in", d: pu }));
+      if (pd) g.appendChild(el("path", { class: "bar out", d: pd }));
+      if ((curto ? i % 2 === 0 : true) || i === n - 1) svg.appendChild(el("text", { x: x + bw / 2, y: H - 6, "text-anchor": "middle" }, r.split("/")[0]));
+      svg.appendChild(g);
+      return { g: g, x: x + bw / 2 };
+    });
+    /* rótulo só no mês atual (o resto fica na dica e na tabela) */
+    var u = n - 1;
+    svg.appendChild(el("text", { class: "val", x: cols[u].x, y: Y(c.up[u]) - 6, "text-anchor": "middle" }, "+" + c.up[u]));
+    svg.appendChild(el("text", { class: "val", x: cols[u].x, y: Y(-c.dn[u]) + 14, "text-anchor": "middle" }, "−" + c.dn[u]));
+    box.textContent = "";
+    box.appendChild(svg);
+    box.setAttribute("aria-label", c.resumo);
+    var at = -1;
+    function mostra(i) {
+      at = Math.max(0, Math.min(n - 1, i));
+      box.classList.add("hov");
+      cols.forEach(function (k, j) { $$(".bar", k.g).forEach(function (b) { b.classList.toggle("on", j === at); }); });
+      var sd = c.up[at] - c.dn[at];
+      dicaShow(box, cols[at].x, c.rotLongo[at], [{ c: "in", v: String(c.up[at]), n: c.up[at] === 1 ? "entrou" : "entraram" }, { c: "out", v: String(c.dn[at]), n: c.dn[at] === 1 ? "saiu" : "saíram" },
+        { v: (sd > 0 ? "+" : sd < 0 ? "−" : "") + Math.abs(sd), n: "saldo do mês" }]);
+    }
+    function some() { at = -1; box.classList.remove("hov"); cols.forEach(function (k) { $$(".bar", k.g).forEach(function (b) { b.classList.remove("on"); }); }); dica(box).hidden = true; }
+    svg.addEventListener("pointermove", function (e) { var r = svg.getBoundingClientRect(); mostra(Math.floor((e.clientX - r.left - m.l) / slot)); });
+    svg.addEventListener("pointerleave", some);
+    box.onkeydown = function (e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); mostra(at < 0 ? n - 1 : at + (e.key === "ArrowRight" ? 1 : -1)); }
+      else if (e.key === "Escape") some();
+    };
+    box.onblur = some;
+  }
+  function tabela(cab, linhas) {
+    return '<table class="tbl"><thead><tr>' + cab.map(function (h) { return "<th>" + h + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      linhas.map(function (l) { return "<tr>" + l.map(function (x, i) { return "<td" + (i ? ' class="num"' : "") + ">" + x + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>";
+  }
+  var LONGO = { jan: "janeiro", fev: "fevereiro", mar: "março", abr: "abril", mai: "maio", jun: "junho", jul: "julho", ago: "agosto", set: "setembro", out: "outubro", nov: "novembro", dez: "dezembro" };
+  function longo(r) { var p = r.split("/"); return LONGO[p[0]] + " de 20" + p[1]; }
+
+  /* ---------- a meta do mês: o professor define; o painel acompanha ---------- */
+  function metaPaint(n) {
+    var box = $("#biMeta");
+    if (metaEdit) {
+      box.innerHTML = '<p class="fin-k">Meta de outubro</p><div class="crm-grid"><label class="crm-f"><span>Receita do mês (R$)</span><input class="crm-in" id="mtRec" inputmode="numeric" autocomplete="off" value="' + (META ? META.rec : "") + '"></label>' +
+        '<label class="crm-f"><span>Alunos ativos</span><input class="crm-in" id="mtAlu" inputmode="numeric" autocomplete="off" value="' + (META ? META.alu : "") + '"></label></div>' +
+        '<p class="crm-err" id="mtErr" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="button" data-meta="salvar">Salvar meta</button><button class="mini-btn ghost" type="button" data-meta="cancelar">Cancelar</button>' +
+        (META ? '<button class="mini-btn ghost" type="button" data-meta="tirar">Tirar a meta</button>' : "") + "</div>";
+      return;
+    }
+    if (!META) {
+      box.innerHTML = '<div class="head"><div><p class="fin-k">Meta de outubro</p><p>Ainda não definida. Diga quanto o Studio quer faturar e quantos alunos quer ter: o painel acompanha e mostra no gráfico.</p></div><button class="mini-btn" type="button" data-meta="editar">Definir meta</button></div>';
+      return;
+    }
+    var pr = Math.min(1, n.recebido / META.rec), pp = Math.min(1, n.rec / META.rec), pa = Math.min(1, n.ativos / META.alu), fr = META.rec - n.recebido, fa = META.alu - n.ativos;
+    box.innerHTML = '<div class="head"><p class="fin-k">Meta de outubro</p><button class="mini-btn ghost" type="button" data-meta="editar">Mudar meta</button></div><div class="meters">' +
+      '<div class="meter"><div class="meter-h"><span>Receita recebida</span><b>' + brl(n.recebido) + " de " + brl(META.rec) + "</b></div>" +
+      '<div class="meter-t" role="progressbar" aria-label="Receita recebida" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pr * 100) + '"><i class="prev" style="width:' + pp * 100 + '%"></i><i style="width:' + pr * 100 + '%"></i></div>' +
+      "<small>" + (fr > 0 ? "Faltam " + brl(fr) + ". Com o que ainda vai cair (" + brl(n.aReceber) + "), chega a " + pct(n.rec / META.rec) + " da meta." : "Meta batida!") + "</small></div>" +
+      '<div class="meter"><div class="meter-h"><span>Alunos ativos</span><b>' + n.ativos + " de " + META.alu + "</b></div>" +
+      '<div class="meter-t" role="progressbar" aria-label="Alunos ativos" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pa * 100) + '"><i style="width:' + pa * 100 + '%"></i></div>' +
+      "<small>" + (fa > 0 ? "Faltam " + fa + (fa === 1 ? " aluno" : " alunos") + ". Interessados esperando retorno: " + $("#kLeads").textContent + "." : "Meta batida!") + "</small></div></div>";
+  }
+  $("#biMeta").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-meta]");
+    if (!b) return;
+    var a = b.dataset.meta;
+    if (a === "editar") { metaEdit = true; morph(biPaint); focusSoft($("#mtRec"), { preventScroll: true }); }
+    else if (a === "cancelar") { metaEdit = false; morph(biPaint); focusSoft($('#biMeta [data-meta="editar"]'), { preventScroll: true }); }
+    else if (a === "tirar") { META = null; metaEdit = false; try { localStorage.removeItem("evo-fin-meta-v1"); } catch (x) {} morph(biPaint); toast("Meta retirada."); focusSoft($('#biMeta [data-meta="editar"]'), { preventScroll: true }); }
+    else if (a === "salvar") {
+      var r = +$("#mtRec").value.replace(/\D/g, ""), al = +$("#mtAlu").value.replace(/\D/g, "");
+      if (!r || r > 1000000) { $("#mtErr").textContent = "Digite a receita da meta, em reais."; focusSoft($("#mtRec"), { preventScroll: true }); return; }
+      if (!al || al > 2000) { $("#mtErr").textContent = "Digite quantos alunos ativos a meta pede."; focusSoft($("#mtAlu"), { preventScroll: true }); return; }
+      META = { rec: r, alu: al };
+      guardar("evo-fin-meta-v1", META);
+      metaEdit = false;
+      morph(biPaint);
+      focusSoft($('#biMeta [data-meta="editar"]'), { preventScroll: true });
+      toast("Meta salva: " + brl(r) + " e " + al + " alunos. Os gráficos mostram a linha da meta.");
+    }
+  });
+
+  /* ---------- desenha a Visão geral (só com ela na tela; senão, na próxima vez que abrir) ---------- */
+  function biPaint() {
+    var n = nums(), pj = projecao(n);
+    $("#biRec").textContent = brl(n.rec);
+    $("#biRecS").textContent = brl(n.recebido) + " recebidos · " + brl(n.aReceber) + " a receber";
+    $("#biDesp").textContent = brl(n.desp);
+    $("#biDespS").textContent = brl(n.pagas) + " pagas · " + brl(n.desp - n.pagas) + " a pagar";
+    $("#biRes").textContent = brl(n.res);
+    $("#biResS").textContent = "margem de " + pct(n.res / n.rec) + " · em setembro, " + brl(recHist(10) - HIST.desp[10]);
+    $("#biAti").textContent = n.ativos;
+    $("#biAtiS").textContent = "+" + n.ent + (n.ent === 1 ? " entrou" : " entraram") + " · " + n.sai + " saiu em outubro" + (n.pend ? " · " + n.pend + (n.pend === 1 ? " matrícula esperando cadastro" : " matrículas esperando cadastro") : "");
+    $("#biTic").textContent = brl(Math.round(n.ticket));
+    $("#biIna").textContent = pct(n.inad, 1);
+    $("#biInaS").textContent = late.n ? brl(late.v) + " em atraso · " + mens(late.n) : "nada em atraso";
+    metaPaint(n);
+    var vis = !$("#fpGeral").hidden && $("#fpGeral").offsetWidth > 0;
+    /* categorias (lista de barras) */
+    var cats = {};
+    DESP.forEach(function (d) { cats[d.c] = (cats[d.c] || 0) + d.v; });
+    var ord = Object.keys(cats).sort(function (a, b) { return cats[b] - cats[a]; }), mx = cats[ord[0]] || 1;
+    $("#vCat").innerHTML = ord.map(function (k) { return "<li><span>" + DCAT[k] + '</span><span class="tr"><i style="width:' + Math.max(1, cats[k] / mx * 100) * 0.82 + '%"></i><b>' + brl(cats[k]) + "</b></span></li>"; }).join("");
+    var recs = HIST.ativos.map(function (_, i) { return recHist(i); }).concat([n.rec]), desps = HIST.desp.concat([n.desp]), ativos = HIST.ativos.concat([n.ativos]);
+    var rot = MES.concat(MES_P), rotL = rot.map(longo);
+    $("#lgRec").innerHTML = '<span><i class="ln in"></i>Receita</span><span><i class="ln out"></i>Despesas</span><span><i class="ln dash pj"></i>Projeção</span>' + (META ? '<span><i class="ln meta"></i>Meta</span>' : "");
+    $("#lgAti").innerHTML = '<span><i class="ln dash pj"></i>Projeção</span>' + (META ? '<span><i class="ln meta"></i>Meta</span>' : "");
+    var R = recs.concat(pj.rec), D = desps.concat(pj.desp), A = ativos.concat(pj.at);
+    $("#tRec").innerHTML = tabela(["Mês", "Receita", "Despesas", "Resultado"], rot.map(function (r, i) { return [longo(r) + (i >= 12 ? " (projeção)" : ""), brl(R[i]), brl(D[i]), brl(R[i] - D[i])]; }));
+    $("#tAlu").innerHTML = tabela(["Mês", "Entraram", "Saíram", "Saldo"], MES.map(function (r, i) { var sd = pj.ent[i] - pj.sai[i]; return [longo(r), pj.ent[i], pj.sai[i], (sd > 0 ? "+" : "") + sd]; }));
+    $("#tAti").innerHTML = tabela(["Mês", "Alunos ativos"], rot.map(function (r, i) { return [longo(r) + (i >= 12 ? " (projeção)" : ""), A[i]]; }));
+    var jan = 14, resJan = R[jan] - D[jan];
+    $("#biProj").innerHTML = "<b>Projeção:</b> mantido o ritmo dos últimos 6 meses (saldo médio de " + (pj.saldo >= 0 ? "+" : "−") + Math.abs(pj.saldo).toFixed(1).replace(".", ",") +
+      " alunos por mês), o Studio chega a <b>" + A[jan] + " alunos</b> e <b>" + brl(R[jan]) + " de receita</b> em janeiro, com resultado de cerca de <b>" + brl(resJan) + "</b> por mês." +
+      " Atenção: dezembro e janeiro costumam ter mais saídas. No ano passado, " + (HIST.sai[1] + HIST.sai[2]) + " alunos saíram nesses dois meses." + (META ? " Meta de alunos: " + META.alu + (A[jan] >= META.alu ? ", alcançada até janeiro nesse ritmo." : ", ainda acima da projeção de janeiro.") : "");
+    biOk = true;
+    if (!vis) return;
+    vizLinha($("#vRec"), { rot: rot, rotLongo: rotL, proj: 12, series: [{ n: "receita", c: "in", v: R }, { n: "despesas", c: "out", v: D }], fmt: mil, tick: mil,
+      ref: META ? { v: META.rec, n: "meta " + mil(META.rec) } : null,
+      extra: function (i) { return [{ v: brl(R[i] - D[i]), n: "resultado" }]; },
+      resumo: "Receita e despesas por mês. Outubro: receita de " + brl(n.rec) + " e despesas de " + brl(n.desp) + ". Projeção para janeiro: receita de " + brl(R[jan]) + ". A tabela abaixo tem todos os meses." });
+    vizDiv($("#vAlu"), { rot: MES, rotLongo: MES.map(longo), up: pj.ent, dn: pj.sai,
+      resumo: "Alunos que entraram e saíram por mês. Outubro: " + n.ent + " entraram e " + n.sai + " saiu. A tabela abaixo tem todos os meses." });
+    vizLinha($("#vAti"), { rot: rot, rotLongo: rotL, proj: 12, series: [{ n: "alunos ativos", c: "in", v: A }], inteiro: true, fmt: String, tick: function (v) { return String(v); },
+      ref: META ? { v: META.alu, n: "meta " + META.alu } : null,
+      resumo: "Alunos ativos no fim de cada mês. Outubro: " + n.ativos + ". Projeção para janeiro: " + A[jan] + ". A tabela abaixo tem todos os meses." });
+  }
+  var rzT;
+  window.addEventListener("resize", function () { clearTimeout(rzT); rzT = setTimeout(function () { if (cur === "fin" && !$("#fpGeral").hidden) biPaint(); }, 150); });
+
+  /* ---------- Financeiro · Despesas: lançar, marcar como paga e apagar (na demonstração, ficam neste navegador) ---------- */
+  var dF = "all", dForm = $("#dForm"), dAdd = $("#dAdd");
+  $("#dfCat").innerHTML = Object.keys(DCAT).map(function (k) { return '<option value="' + k + '">' + DCAT[k] + "</option>"; }).join("");
+  function dataBR(iso) { var p = iso.split("-"); return p[2] + "/" + p[1]; }
+  function despPaint() {
+    var tot = soma(DESP, function (x) { return x.v; }), fix = soma(DESP, function (x) { return x.rec ? x.v : 0; }), apg = DESP.filter(function (x) { return !x.paga; });
+    $("#dTot").textContent = brl(tot);
+    $("#dTotS").textContent = DESP.length + (DESP.length === 1 ? " lançamento" : " lançamentos");
+    $("#dFix").textContent = brl(fix);
+    $("#dVar").textContent = brl(tot - fix);
+    $("#dPag").textContent = brl(soma(apg, function (x) { return x.v; }));
+    $("#dPagS").textContent = apg.length ? apg.length + (apg.length === 1 ? " conta até o fim do mês" : " contas até o fim do mês") : "tudo pago";
+    var l = DESP.filter(function (x) { return dF === "all" || (dF === "paga" ? x.paga : !x.paga); }).sort(function (a, b) { return a.dt < b.dt ? -1 : a.dt > b.dt ? 1 : 0; });
+    var tb = $("#dTbl tbody");
+    tb.innerHTML = l.map(function (x) {
+      return '<tr data-id="' + x.id + '"><td>' + esc(x.d) + "<small>" + DCAT[x.c] + " · " + (x.rec ? "fixa" : "só neste mês") + "</small></td><td>" + dataBR(x.dt) + '</td><td class="num">' + brl(x.v) + "</td>" +
+        '<td class="act">' + (x.paga ? '<span class="pill-s in">Paga</span>' : '<button class="mini-btn" type="button" data-dpay aria-label="Marcar ' + esc(x.d) + ' como paga">Marcar como paga</button>') +
+        '<button class="mini-btn ghost" type="button" data-ddel aria-label="Apagar ' + esc(x.d) + '">Apagar</button></td></tr>';
+    }).join("") || '<tr class="empty"><td colspan="4">' + (dF === "paga" ? "Nenhuma despesa paga ainda." : dF === "apagar" ? "Nada a pagar este mês." : "Nenhuma despesa lançada.") + "</td></tr>";
+    tblRoles($("#dTbl"));
+  }
+  $("#dF").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    dF = b.dataset.f;
+    $$("#dF button").forEach(function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+    morph(despPaint);
+  });
+  function dSalvar() { guardar("evo-fin-desp-v1", DESP); if (biOk) biPaint(); }
+  $("#dTbl").addEventListener("click", function (e) {
+    var b = e.target.closest("button"), tr = b && b.closest("tr");
+    if (!b || !tr) return;
+    var x = DESP.filter(function (d) { return d.id === tr.dataset.id; })[0];
+    if (!x) return;
+    if (b.hasAttribute("data-dpay")) {
+      x.paga = 1;
+      dSalvar();
+      morph(despPaint);
+      focusIn($('#dTbl tr[data-id="' + x.id + '"] [data-ddel]') || $("#dF button"));
+      toast("“" + x.d + "” marcada como paga.");
+    } else if (b.hasAttribute("data-ddel")) {
+      /* apagar pede o segundo toque: o botão vira "Apagar mesmo?" */
+      if (!b.dataset.sure) { b.dataset.sure = "1"; b.textContent = "Apagar mesmo?"; b.onblur = function () { delete b.dataset.sure; b.textContent = "Apagar"; }; return; }
+      DESP = DESP.filter(function (d) { return d !== x; });
+      dSalvar();
+      morph(despPaint);
+      focusIn($("#dAdd"));
+      toast("“" + x.d + "” foi apagada.");
+    }
+  });
+  function dAbrir(open) {
+    dAdd.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) { dForm.reset(); $("#dfErr").textContent = ""; }
+    morph(function () { dForm.hidden = !open; }, open ? dForm : null);
+    if (open) { focusSoft($("#dfDesc"), { preventScroll: true }); showBox(dForm); } else focusSoft(dAdd, { preventScroll: true });
+  }
+  dAdd.addEventListener("click", function () { dAbrir(dForm.hidden); });
+  $("#dfCancel").addEventListener("click", function () { dAbrir(false); });
+  dForm.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.stopPropagation(); dAbrir(false); } });
+  dForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var desc = cleanNome($("#dfDesc").value), raw = $("#dfValor").value.trim(), v = Math.round(+raw.replace(/[^\d,.]/g, "").replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".") * 100) / 100, dt = $("#dfData").value, err = $("#dfErr");
+    var bad = function (msg, f) { err.textContent = msg; focusSoft(f, { preventScroll: true }); };
+    if (desc.length < 2) return bad("Digite a descrição da despesa.", $("#dfDesc"));
+    if (!v || v <= 0 || v > 100000) return bad("Digite o valor, como 350 ou 1.250,90.", $("#dfValor"));
+    if (!/^2026-10-\d\d$/.test(dt)) return bad("Lance a despesa em outubro, o mês aberto.", $("#dfData"));
+    var x = { id: "d" + Date.now().toString(36), d: desc, c: $("#dfCat").value, v: v, dt: dt, rec: $("#dfRec").checked ? 1 : 0, paga: $("#dfPaga").checked ? 1 : 0 };
+    DESP.push(x);
+    dSalvar();
+    dAdd.setAttribute("aria-expanded", "false");
+    if (dF !== "all" && (dF === "paga") !== !!x.paga) { dF = "all"; $$("#dF button").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.f === "all" ? "true" : "false"); }); }
+    morph(function () { dForm.hidden = true; despPaint(); });
+    var tr = $('#dTbl tr[data-id="' + x.id + '"]');
+    if (tr) { replayClass(tr, "new"); focusIn($("button", tr)); }
+    toast("Despesa lançada: " + desc + ", " + brl(v) + (x.rec ? ". Ela entra na projeção dos próximos meses." : "."));
+  });
+  despPaint();
+  biPaint();
 
   /* ---------- Movimentos: o professor cadastra o vídeo (YouTube, pode ser não listado, ou arquivo .mp4), os pontos-chave
      e o quiz; os alunos da faixa veem no app. Na demonstração, fica guardado neste navegador (movimentos.js) ---------- */
