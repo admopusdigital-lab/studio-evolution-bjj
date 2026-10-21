@@ -63,7 +63,11 @@ GSAP 3.12.5 com ScrollTrigger (cdnjs) e Lenis 1.1.13 (jsDelivr). Fontes do Googl
 
 ## Dados reais do Studio (não inventar)
 
-- Aulas de segunda a sexta: Adulto às 8h, 11h e 19h; Kids (4 a 12 anos) às 10h e 18h; Feminino junto com as turmas de adulto. Até 10 alunos por aula.
+- Grade de aulas (a fonte única no código é `Site.GRADE`, em `site/site.js`):
+  - Adulto: segunda a sexta, às 8h, 11h, 19h e 20h30. O Feminino treina junto com as turmas de adulto.
+  - Kids 1: terça e quinta, às 9h e 18h. Kids 2: segunda e quarta, às 9h e 18h. Kids é para crianças de 4 a 12 anos.
+  - Open Mat: sábado, às 10h30.
+  - Até 10 alunos por aula.
 - WhatsApp (15) 99674-1812. Atendimento de segunda a sexta, das 8h às 21h.
 - Av. Getúlio Vargas, 400, sala 3, sobreloja, Jardim São Paulo, Sorocaba/SP, CEP 18051-480 (-23.5230709, -47.4940211).
 - O Studio faz parte da Equipe TRUE (https://bjjtrue.com).

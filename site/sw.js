@@ -4,7 +4,7 @@
    - Imagens, fontes e bibliotecas com versão no endereço: usa a guardada e só busca na rede se não tiver.
    - Login e dados (Supabase) e vídeos: nunca passam pelo cache.
    Ao mudar a lista abaixo, suba a versão (VERSAO) para o celular trocar o cache antigo. */
-var VERSAO = "evo-app-v2";
+var VERSAO = "evo-app-v3";
 var TELAS = [
   "app.html", "area-do-professor.html", "entrar.html", "nova-senha.html", "acessos.html",
   "site.css", "app.css", "tema.css", "acesso.css",

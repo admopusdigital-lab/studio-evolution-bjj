@@ -52,7 +52,7 @@
 
 /* 1 · programa: cartazes com a foto inteira e o nome por cima */
 .progs { display: grid; gap: 16px; margin-top: 28px; }
-@media (min-width: 700px) { .progs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 700px) { .progs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .progs .opt { aspect-ratio: 5 / 4; } }
 /* o cartaz tem camadas: a foto embaixo, o texto e o selo de escolhido flutuando à frente (site.js inclina o conjunto) */
 .opt { position: relative; display: block; aspect-ratio: 3 / 4; max-width: 100%; padding: 0; border: 0; border-radius: 6px; background: transparent; color: oklch(0.97 0.004 85); text-align: left; cursor: pointer; box-shadow: 0 0 0 1px var(--rule); transition: box-shadow 450ms var(--ease); }
 .opt .ph { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; background: var(--paper-2); }
@@ -234,30 +234,36 @@
     <div class="wrap ag-grid">
       <div>
         <div class="step" id="stepProgram">
-          <div class="step-h"><h2><span class="sn">1</span>Escolha a turma</h2><p>Adulto, Kids ou Feminino</p></div>
+          <div class="step-h"><h2><span class="sn">1</span>Escolha a turma</h2><p>Adulto, Kids 1, Kids 2 ou Feminino</p></div>
           <div class="progs" role="group" aria-label="Turma">
             <button class="opt" type="button" data-prog="adulto" aria-pressed="false" data-cursor="Escolher" data-tilt3d="10" data-glare>
               <span class="ph"><img src="img/programa-adulto-real.jpg" alt="" style="object-position:62% 50%"></span>
-              <span class="ob" data-z="48"><b>Adulto</b><small>Para todos os níveis, do iniciante ao avançado.</small><span class="tms">08:00 · 11:00 · 19:00</span></span>
+              <span class="ob" data-z="48"><b>Adulto</b><small>Para todos os níveis, do iniciante ao avançado.</small><span class="tms">Seg a sex · 08:00 · 11:00 · 19:00 · 20:30</span></span>
               <span class="tz" data-z="86"><span class="tick" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span></span>
             </button>
-            <button class="opt" type="button" data-prog="kids" aria-pressed="false" data-cursor="Escolher" data-tilt3d="10" data-glare>
+            <button class="opt" type="button" data-prog="kids1" aria-pressed="false" data-cursor="Escolher" data-tilt3d="10" data-glare>
               <span class="ph"><img src="img/programa-kids-real.jpg" alt="" style="object-position:50% 70%"></span>
-              <span class="ob" data-z="48"><b>Kids</b><small>Crianças de 4 a 12 anos, com foco em disciplina e diversão.</small><span class="tms">10:00 · 18:00</span></span>
+              <span class="ob" data-z="48"><b>Kids 1</b><small>Terça e quinta. Crianças de 4 a 12 anos, com foco em disciplina e diversão.</small><span class="tms">Ter e qui · 09:00 · 18:00</span></span>
+              <span class="tz" data-z="86"><span class="tick" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span></span>
+            </button>
+            <button class="opt" type="button" data-prog="kids2" aria-pressed="false" data-cursor="Escolher" data-tilt3d="10" data-glare>
+              <span class="ph"><img src="img/jiu-jitsu-kids.webp" alt="" style="object-position:50% 22%"></span>
+              <span class="ob" data-z="48"><b>Kids 2</b><small>Segunda e quarta. Crianças de 4 a 12 anos, com foco em disciplina e diversão.</small><span class="tms">Seg e qua · 09:00 · 18:00</span></span>
               <span class="tz" data-z="86"><span class="tick" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span></span>
             </button>
             <button class="opt" type="button" data-prog="feminino" aria-pressed="false" data-cursor="Escolher" data-tilt3d="10" data-glare>
               <span class="ph"><img src="img/programa-feminino-real.jpg" alt="" style="object-position:52% 60%"></span>
-              <span class="ob" data-z="48"><b>Feminino</b><small>Treina junto com as aulas de adulto, nos mesmos horários.</small><span class="tms">08:00 · 11:00 · 19:00</span></span>
+              <span class="ob" data-z="48"><b>Feminino</b><small>Treina junto com as aulas de adulto, nos mesmos horários.</small><span class="tms">Seg a sex · 08:00 · 11:00 · 19:00 · 20:30</span></span>
               <span class="tz" data-z="86"><span class="tick" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span></span>
             </button>
           </div>
+          <p class="hintline">Kids 1 ou Kids 2? Escolha os dias que encaixam melhor. O professor confirma a turma pela idade da criança.</p>
         </div>
 
         <div class="step" id="stepDate">
           <div class="step-h"><h2><span class="sn">2</span>Escolha a data</h2><p id="monthLabel"></p></div>
           <div class="dates-wrap"><div class="dates" id="dates" role="group" aria-label="Data da aula"></div></div>
-          <p class="hintline">As aulas acontecem de segunda a sexta.</p>
+          <p class="hintline" id="dateHint">As aulas acontecem de segunda a sexta. Aos sábados tem Open Mat, o treino livre dos alunos.</p>
         </div>
 
         <div class="step" id="stepTime">
@@ -307,7 +313,7 @@
           <dl class="contact">
             <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
             <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
-            <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
+            <div><dt>Aulas</dt><dd>Adulto: seg a sex, 8h, 11h, 19h e 20h30<br>Kids 1: ter e qui, 9h e 18h<br>Kids 2: seg e qua, 9h e 18h<br>Open Mat: sábado, 10h30</dd></div>
           </dl>
         </div>
         <figure class="cta-photo"><img src="img/hero-real.jpg" alt="Dois faixas-pretas de kimono branco sorrindo lado a lado" loading="lazy" width="1531" height="1027" style="object-position:50% 35%"></figure>
@@ -319,9 +325,9 @@
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Turma Adulto (o Feminino treina junto) e Kids, de 4 a 12 anos, de segunda a sexta.</p>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Adulto de segunda a sexta (o Feminino treina junto), Kids 1 e Kids 2 para crianças de 4 a 12 anos e Open Mat aos sábados.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · seg a sex, 8h, 11h, 19h e 20h30</li><li>Kids 1 · ter e qui, 9h e 18h</li><li>Kids 2 · seg e qua, 9h e 18h</li><li>Open Mat · sábado, 10h30</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
@@ -345,9 +351,10 @@
   var $ = Site.$, $$ = Site.$$;
   var anim = !!window.gsap && !Site.reduce;
   var PROGRAMS = {
-    adulto: { name: "Adulto", code: "ADU", times: ["08:00", "11:00", "19:00"] },
-    kids: { name: "Kids", code: "KID", times: ["10:00", "18:00"] },
-    feminino: { name: "Feminino", code: "FEM", times: ["08:00", "11:00", "19:00"] }
+    adulto: { name: "Adulto", code: "ADU", times: ["08:00", "11:00", "19:00", "20:30"], days: [1, 2, 3, 4, 5], when: "de segunda a sexta" },
+    kids1: { name: "Kids 1", code: "KD1", times: ["09:00", "18:00"], days: [2, 4], when: "às terças e quintas" },
+    kids2: { name: "Kids 2", code: "KD2", times: ["09:00", "18:00"], days: [1, 3], when: "às segundas e quartas" },
+    feminino: { name: "Feminino", code: "FEM", times: ["08:00", "11:00", "19:00", "20:30"], days: [1, 2, 3, 4, 5], when: "de segunda a sexta, junto com o Adulto" }
   };
   var WD_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   var MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
@@ -361,14 +368,28 @@
   var todayIso = iso(now);
   var nowMin = now.getHours() * 60 + now.getMinutes();
 
-  /* datas: os próximos dias de aula (segunda a sexta) */
-  var datesEl = $("#dates"), cursor = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  if (nowMin >= minutes("19:00")) cursor.setDate(cursor.getDate() + 1);
+  /* datas: os próximos dias de aula da turma escolhida (sem turma, segunda a sexta) */
+  var datesEl = $("#dates"), cursor;
+  var days = function () { return state.program ? PROGRAMS[state.program].days : [1, 2, 3, 4, 5]; };
+  /* a Kids da manhã e o Adulto antes dela, ou a Kids do fim da tarde e o Adulto logo depois */
+  var familyAdult = function () { return state.time === "09:00" ? "08:00" : "19:00"; };
+  function resetDates() {
+    var times = state.program ? PROGRAMS[state.program].times : PROGRAMS.adulto.times;
+    cursor = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (nowMin >= minutes(times[times.length - 1])) cursor.setDate(cursor.getDate() + 1);
+    datesEl.innerHTML = "";
+    addDates(12);
+    var b = state.date && $('.dt[data-iso="' + state.date + '"]', datesEl);
+    if (b) b.setAttribute("aria-pressed", "true"); else state.date = null;
+    var first = $(".dt", datesEl);
+    $("#monthLabel").textContent = first ? "A partir de " + first.getAttribute("aria-label").split(", ")[1] : "";
+    $("#dateHint").textContent = state.program ? PROGRAMS[state.program].name + ": aulas " + PROGRAMS[state.program].when + "." : "As aulas acontecem de segunda a sexta. Aos sábados tem Open Mat, o treino livre dos alunos.";
+  }
   function addDates(n) {
-    var html = "";
+    var html = "", ok = days();
     while (n > 0) {
       var wd = cursor.getDay();
-      if (wd !== 0 && wd !== 6) {
+      if (ok.indexOf(wd) >= 0) {
         var s = iso(cursor), isToday = s === todayIso;
         html += '<button class="dt" type="button" data-iso="' + s + '" aria-pressed="false" aria-label="' + weekdayLong(cursor) + ", " + cursor.getDate() + " de " + MONTHS[cursor.getMonth()] + '">' +
           (isToday ? '<i class="tg">Hoje</i>' : "") + '<span class="dw">' + WD_SHORT[wd] + "</span><b>" + cursor.getDate() + '</b><span class="dm">' + MONTHS[cursor.getMonth()].slice(0, 3) + "</span></button>";
@@ -379,9 +400,7 @@
     var more = $(".more", datesEl); if (more) more.remove();
     datesEl.insertAdjacentHTML("beforeend", html + '<button class="more" type="button">Mais datas</button>');
   }
-  addDates(12);
-  var first = $(".dt", datesEl);
-  $("#monthLabel").textContent = first ? "A partir de " + first.getAttribute("aria-label").split(", ")[1] : "";
+  resetDates();
   datesEl.addEventListener("click", function (e) {
     if (e.target.closest(".more")) {
       var count = $$(".dt", datesEl).length;
@@ -408,6 +427,7 @@
     $$(".opt").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.prog === id ? "true" : "false"); });
     if (animate) pop($('.opt[data-prog="' + id + '"]'));
     if (state.time && PROGRAMS[id].times.indexOf(state.time) < 0) state.time = null;
+    resetDates();
     renderTimes();
     update();
   }
@@ -421,7 +441,7 @@
     if (!state.program) { box.innerHTML = ""; empty.hidden = false; $("#timeHint").textContent = ""; return; }
     empty.hidden = true;
     var times = PROGRAMS[state.program].times;
-    $("#timeHint").textContent = PROGRAMS[state.program].name + (state.family && state.program === "kids" ? " · e o Adulto logo depois" : "");
+    $("#timeHint").textContent = PROGRAMS[state.program].name + (state.family ? " · com o Adulto " + (state.time === "09:00" ? "antes, às 8h" : state.time ? "logo depois, às 19h" : "antes ou logo depois") : "");
     box.innerHTML = times.map(function (t) {
       var ok = timeOk(t);
       return '<button class="tm" type="button" data-t="' + t + '" aria-pressed="' + (state.time === t ? "true" : "false") + '"' + (ok ? "" : " disabled") + "><b>" + t + "</b><small>" + (ok ? period(t) : nowMin < minutes(t) + 60 ? "Já começou" : "Já passou") + "</small></button>";
@@ -433,6 +453,7 @@
     state.time = b.dataset.t;
     $$(".tm").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
     pop(b);
+    if (state.family) renderTimes();
     update();
   });
   $("#nome").addEventListener("input", function (e) { state.name = e.target.value.trim(); update(); });
@@ -458,7 +479,7 @@
     $$("#agSteps li").forEach(function (li) { li.classList.toggle("done", done[li.dataset.s]); });
     $("#agFill").style.transform = "scaleX(" + n / 3 + ")";
     /* o código do ingresso nasce das escolhas: programa, dia e hora */
-    var code = "EVO" + (p ? "-" + p.code : "") + (d ? "-" + pad(d.getDate()) + pad(d.getMonth() + 1) : "") + (state.time ? "-" + state.time.slice(0, 2) + "H" : "");
+    var code = "EVO" + (p ? "-" + p.code : "") + (d ? "-" + pad(d.getDate()) + pad(d.getMonth() + 1) : "") + (state.time ? "-" + state.time.slice(0, 2) + "H" + (state.time.slice(3) !== "00" ? state.time.slice(3) : "") : "");
     $("#tkCode").textContent = n === 3 ? code : code + "-···";
     var btn = $("#waBtn"), ready = n === 3, tk = $("#ticket");
     btn.classList.toggle("ready", ready);
@@ -467,8 +488,8 @@
       var lines = ["Olá! Quero agendar uma aula experimental no Studio Evolution BJJ.", ""];
       if (state.name) lines.push("Nome: " + state.name);
       lines.push("Turma: " + p.name, "Data: " + weekdayLong(d) + ", " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear(), "Horário: " + state.time);
-      /* do quiz "para mim e uma criança": a aula de adulto logo depois da Kids vai no mesmo pedido */
-      if (state.family && state.program === "kids") lines.push("Também quero fazer a aula de Adulto das " + pad(parseInt(state.time, 10) + 1) + ":00, logo depois.");
+      /* do quiz "para mim e uma criança": a aula de adulto colada na Kids vai no mesmo pedido */
+      if (state.family) lines.push("Também quero fazer a aula de Adulto das " + familyAdult() + (familyAdult() === "08:00" ? ", antes da Kids." : ", logo depois."));
       /* o código do ingresso vai junto, para o professor conferir o pedido no painel */
       lines.push("Código do ingresso: " + code);
       btn.href = "https://wa.me/5515996741812?text=" + encodeURIComponent(lines.join("\n"));
@@ -492,7 +513,7 @@
     var parts = [];
     if (p) parts.push(p.short || p.name);
     if (d) parts.push(WD_SHORT[d.getDay()].toLowerCase() + " " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1));
-    if (state.time) parts.push(parseInt(state.time, 10) + "h");
+    if (state.time) parts.push(Site.hora(state.time));
     $("#agBarStep").textContent = ready ? "Tudo pronto" : "Passo " + (n + 1) + " de 3";
     $("#agBarSum").textContent = parts.length ? parts.join(" · ") : "Escolha a turma";
     var label = ready ? "Enviar" : !p ? "Escolher" : "Continuar", bt = $(".bt", barBtn);
@@ -520,14 +541,15 @@
   });
   function pop(el) { if (anim && el) gsap.fromTo(el, { scale: 0.96 }, { scale: 1, duration: 0.7, ease: "expo.out" }); }
 
-  /* turma (e horário) vindo de outra página: agendamento.html#kids ou, do quiz, agendamento.html#adulto-19;
-     #familia-18 marca a Kids das 18h e pede também a aula de adulto das 19h */
-  var fromHash = /^([a-z]+)(?:-(\d{1,2}))?$/.exec(location.hash.replace("#", ""));
-  if (fromHash && fromHash[1] === "familia") { fromHash[1] = "kids"; state.family = true; }
+  /* turma (e horário) vindo de outra página: agendamento.html#kids1 ou, do quiz, agendamento.html#adulto-19 e #adulto-2030;
+     #familia2-18 marca a Kids 2 das 18h e pede também a aula de adulto das 19h (#familia1-9: Kids 1 às 9h e Adulto às 8h) */
+  var fromHash = /^([a-z]+\d?)(?:-(\d{1,4}))?$/.exec(location.hash.replace("#", ""));
+  if (fromHash && /^familia[12]$/.test(fromHash[1])) { fromHash[1] = "kids" + fromHash[1].slice(-1); state.family = true; }
   if (fromHash && PROGRAMS[fromHash[1]]) {
+    var hh = fromHash[2] || "";
+    var wanted = hh ? (hh.length > 2 ? pad(+hh.slice(0, -2)) + ":" + hh.slice(-2) : pad(+hh) + ":00") : null;
+    if (wanted && PROGRAMS[fromHash[1]].times.indexOf(wanted) > -1) state.time = wanted;
     selectProgram(fromHash[1], false);
-    var wanted = fromHash[2] ? pad(+fromHash[2]) + ":00" : null;
-    if (wanted && PROGRAMS[fromHash[1]].times.indexOf(wanted) > -1) { state.time = wanted; renderTimes(); }
   }
   update();
   barCheck();

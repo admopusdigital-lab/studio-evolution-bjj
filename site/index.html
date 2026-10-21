@@ -393,6 +393,11 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 .sched-notes p { font-size: 15px; color: var(--ink-2); }
 .sched-notes b { display: block; font: 400 22px/1.2 var(--serif); color: var(--ink); margin-bottom: 4px; }
 .slist { display: none; }
+.day-label.sat { margin-top: 36px; }
+.sat-list { display: grid; }
+.sat-list li { display: flex; justify-content: space-between; align-items: baseline; padding-block: 16px; border-bottom: 1px solid var(--rule); }
+.sat-list .t { font: 400 32px/1 var(--serif); font-variant-numeric: tabular-nums; }
+.sat-list .n { font: 600 12px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-2); }
 @media (max-width: 760px) {
   .ruler { display: none; }
   .slist { display: grid; }
@@ -581,7 +586,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       </div>
       <div class="numbers">
         <div data-stand="76"><b class="count" data-to="15">15</b><span>unidades na rede da Equipe TRUE</span></div>
-        <div data-stand="76"><b class="count" data-to="5">5</b><span>aulas por dia, de segunda a sexta</span></div>
+        <div data-stand="76"><b class="count" data-to="4">4</b><span>aulas de adulto por dia, de segunda a sexta</span></div>
         <div data-stand="76"><b>4–12</b><span>anos na turma Kids</span></div>
         <div data-stand="76"><b>1<i class="ord">ª</i></b><span>aula por nossa conta, com kimono emprestado</span></div>
       </div>
@@ -677,14 +682,14 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <div class="panel-intro">
           <p class="label">Programas</p>
           <h2 class="h2 split" id="t-prog">Um caminho para <em>cada fase</em> da vida.</h2>
-          <p class="lead">Adulto, Kids e Feminino. Em todas, a técnica é ensinada com calma e ninguém é obrigado a competir.</p>
+          <p class="lead">Adulto, Kids 1, Kids 2 e Feminino. Em todas, a técnica é ensinada com calma e ninguém é obrigado a competir.</p>
           <p class="hint"><span class="hint-d">Continue rolando</span><span class="hint-m">Deslize para ver as turmas</span><svg class="ic"><use href="#i-arrow"/></svg></p>
         </div>
         <div class="prog-row" data-swipe>
         <article class="prog" data-vt-card data-cursor="Ver turma">
           <div class="p-img"><img src="img/takes/adulto.jpg" alt="Dois alunos adultos, de kimono preto e azul, treinando no chão do tatame" width="1080" height="1350"><video class="take" data-take="img/takes/adulto" poster="img/takes/adulto.jpg" muted loop playsinline preload="none" aria-hidden="true"></video></div>
           <div>
-            <div class="p-meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h</span></div>
+            <div class="p-meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h · 20h30</span></div>
             <h3>Adulto</h3>
             <p>Treino que respeita seu corpo e seu ritmo. Mais leveza, menos estresse e mais disposição para o dia a dia.</p>
             <a class="link" href="agendamento.html#adulto" data-int>Agendar na turma Adulto</a>
@@ -693,16 +698,16 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <article class="prog" data-vt-card data-cursor="Ver turma">
           <div class="p-img"><img src="img/programa-kids-real.jpg" alt="Professor sentado no tatame com duas crianças de kimono" width="768" height="1376" style="object-position:50% 78%"></div>
           <div>
-            <div class="p-meta"><span>4 a 12 anos</span><span class="tnum">10h · 18h</span></div>
+            <div class="p-meta"><span>4 a 12 anos</span><span class="tnum">9h · 18h</span></div>
             <h3><em>Kids</em></h3>
-            <p>Disciplina, foco e respeito para crianças de 4 a 12 anos, com brincadeiras que ajudam a gastar energia e a prestar atenção.</p>
+            <p>Disciplina, foco e respeito para crianças de 4 a 12 anos, com brincadeiras que ajudam a gastar energia e a prestar atenção. Kids 1 às terças e quintas, Kids 2 às segundas e quartas.</p>
             <a class="link" href="agendamento.html#kids" data-int>Agendar na turma Kids</a>
           </div>
         </article>
         <article class="prog" data-vt-card data-cursor="Ver turma">
           <div class="p-img"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame durante a aula" width="1264" height="848" style="object-position:52% 60%"></div>
           <div>
-            <div class="p-meta"><span>Junto com o adulto</span><span class="tnum">8h · 11h · 19h</span></div>
+            <div class="p-meta"><span>Junto com o adulto</span><span class="tnum">8h · 11h · 19h · 20h30</span></div>
             <h3>Feminino</h3>
             <p>As mulheres treinam nas aulas de adulto, nos mesmos horários e no ritmo de cada uma. Defesa pessoal, força e confiança.</p>
             <a class="link" href="agendamento.html#feminino" data-int>Agendar no Feminino</a>
@@ -815,23 +820,28 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     <div class="wrap sched">
       <div>
         <p class="label">Horários</p>
-        <h2 class="h2 split" id="t-hor">Cinco aulas por dia, <em>de segunda a sexta</em>.</h2>
-        <p class="lead">Adulto de manhã, no fim da manhã e à noite. Kids de manhã e no fim da tarde, logo antes de uma aula de adulto.</p>
+        <h2 class="h2 split" id="t-hor">Aula todo dia, <em>de segunda a sábado</em>.</h2>
+        <p class="lead">Adulto às 8h, 11h, 19h e 20h30, de segunda a sexta. Kids às 9h e 18h: Kids 1 às terças e quintas, Kids 2 às segundas e quartas. No sábado, Open Mat às 10h30.</p>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
       </div>
       <div>
-        <div class="day-label"><b>Segunda a sexta</b><span>Sem aulas no fim de semana</span></div>
-        <div class="ruler" id="ruler" role="img" aria-label="Aulas de segunda a sexta: Adulto às 8h, Kids às 10h, Adulto às 11h, Kids às 18h e Adulto às 19h"><span class="axis"></span></div>
+        <div class="day-label"><b>Segunda a sexta</b><span>Kids só de segunda a quinta</span></div>
+        <div class="ruler" id="ruler" role="img" aria-label="Aulas de segunda a sexta: Adulto às 8h, Kids às 9h, Adulto às 11h, Kids às 18h, Adulto às 19h e às 20h30. Kids 1 às terças e quintas, Kids 2 às segundas e quartas."><span class="axis"></span></div>
         <ol class="slist">
           <li><span class="t">08:00</span><span class="n">Adulto</span></li>
-          <li class="kids"><span class="t">10:00</span><span class="n">Kids</span></li>
+          <li class="kids"><span class="t">09:00</span><span class="n">Kids 1 e 2</span></li>
           <li><span class="t">11:00</span><span class="n">Adulto</span></li>
-          <li class="kids"><span class="t">18:00</span><span class="n">Kids</span></li>
+          <li class="kids"><span class="t">18:00</span><span class="n">Kids 1 e 2</span></li>
           <li><span class="t">19:00</span><span class="n">Adulto</span></li>
+          <li><span class="t">20:30</span><span class="n">Adulto</span></li>
+        </ol>
+        <div class="day-label sat"><b>Sábado</b><span>Treino livre dos alunos</span></div>
+        <ol class="slist sat-list">
+          <li><span class="t">10:30</span><span class="n">Open Mat</span></li>
         </ol>
         <div class="sched-notes">
+          <p><b>Kids 1 e Kids 2</b>Para crianças de 4 a 12 anos. Kids 1 às terças e quintas, Kids 2 às segundas e quartas.</p>
           <p><b>Feminino</b>Treina junto com as turmas de adulto.</p>
-          <p><b>Kids</b>Turmas para crianças de 4 a 12 anos.</p>
           <p><b>Vagas</b>Alunos confirmam pelo app, até 10 por aula.</p>
         </div>
       </div>
@@ -893,7 +903,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           <dl class="contact">
             <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
             <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
-            <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
+            <div><dt>Aulas</dt><dd>Adulto: seg a sex, 8h, 11h, 19h e 20h30<br>Kids 1: ter e qui, 9h e 18h<br>Kids 2: seg e qua, 9h e 18h<br>Open Mat: sábado, 10h30</dd></div>
           </dl>
         </div>
         <figure class="cta-map">
@@ -915,9 +925,9 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Turma Adulto (o Feminino treina junto) e Kids, de 4 a 12 anos, de segunda a sexta.</p>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Adulto de segunda a sexta (o Feminino treina junto), Kids 1 e Kids 2 para crianças de 4 a 12 anos e Open Mat aos sábados.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · seg a sex, 8h, 11h, 19h e 20h30</li><li>Kids 1 · ter e qui, 9h e 18h</li><li>Kids 2 · seg e qua, 9h e 18h</li><li>Open Mat · sábado, 10h30</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
@@ -936,17 +946,14 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 (function () {
   var $ = Site.$, $$ = Site.$$, fine = Site.fine;
 
-  /* abertura: a próxima aula de verdade, pela hora de quem está vendo (seg a sex: 8h, 10h Kids, 11h, 18h Kids, 19h) */
+  /* abertura: a próxima aula de verdade, pela hora de quem está vendo (grade em site.js) */
   (function () {
     var el = $("#nextClass");
     if (!el) return;
-    var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60, txt = "", now = false;
-    var CL = [[8, "Adulto"], [10, "Kids"], [11, "Adulto"], [18, "Kids"], [19, "Adulto"]];
-    if (wd >= 1 && wd <= 5) for (var i = 0; i < CL.length; i++) if (h < CL[i][0] + 1) { now = h >= CL[i][0]; txt = (now ? "" : "Hoje · ") + CL[i][1] + " " + CL[i][0] + "h"; break; }
-    if (!txt) txt = (wd === 5 || wd === 6 ? "Segunda" : "Amanhã") + " · Adulto 8h";
-    $("span", el).textContent = now ? "Aula agora" : "Próxima aula";
-    $("b", el).textContent = txt;
-    el.classList.toggle("live", now);
+    var n = Site.nextClass();
+    $("span", el).textContent = n.label;
+    $("b", el).textContent = n.text;
+    el.classList.toggle("live", n.now);
   })();
 
   /* Régua do dia (estática, sempre visível) */
@@ -954,9 +961,9 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
   if (ruler) {
     var start = 6, end = 22, pct = function (h) { return ((h - start) / (end - start)) * 100; }, html = "";
     for (var hr = start; hr <= end; hr += 2) html += '<span class="tick" style="left:' + pct(hr) + '%"></span><span class="hour" style="left:' + pct(hr) + '%">' + hr + "h</span>";
-    [[8, "Adulto", "up"], [10, "Kids", "down"], [11, "Adulto", "up"], [18, "Kids", "down"], [19, "Adulto", "up"]].forEach(function (c) {
-      var k = c[1] === "Kids" ? " kids" : "";
-      html += '<span class="pin' + k + '" style="left:' + pct(c[0]) + '%"></span><span class="cls ' + c[2] + k + '" style="left:' + pct(c[0]) + '%"><span class="t">' + String(c[0]).padStart(2, "0") + ':00</span><span class="n">' + c[1] + "</span></span>";
+    [["08:00", "Adulto", "up"], ["09:00", "Kids 1 e 2", "down"], ["11:00", "Adulto", "up"], ["18:00", "Kids 1 e 2", "down"], ["19:00", "Adulto", "up"], ["20:30", "Adulto", "down"]].forEach(function (c) {
+      var k = /Kids/.test(c[1]) ? " kids" : "", p = c[0].split(":"), at = pct(+p[0] + p[1] / 60);
+      html += '<span class="pin' + k + '" style="left:' + at + '%"></span><span class="cls ' + c[2] + k + '" style="left:' + at + '%"><span class="t">' + c[0] + '</span><span class="n">' + c[1] + "</span></span>";
     });
     ruler.insertAdjacentHTML("beforeend", html);
   }
@@ -967,9 +974,9 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     var nEl = $("#qzN"), back = $("#qzBack"), fill = $("#qzFill"), step = 1, a = {};
     var WHO = [["eu", "Para mim", "Turma Adulto ou Feminino"], ["crianca", "Para uma criança", "De 4 a 12 anos"], ["familia", "Para mim e uma criança", "Kids e Adulto, um depois do outro"]];
     var WHEN = {
-      eu: [["8", "De manhã", "Adulto às 8h"], ["11", "No fim da manhã", "Adulto às 11h"], ["19", "À noite", "Adulto às 19h"]],
-      crianca: [["10", "De manhã", "Kids às 10h"], ["18", "No fim da tarde", "Kids às 18h"]],
-      familia: [["10", "De manhã", "Kids às 10h e Adulto às 11h"], ["18", "No fim do dia", "Kids às 18h e Adulto às 19h"]]
+      eu: [["8", "De manhã", "Adulto às 8h"], ["11", "No fim da manhã", "Adulto às 11h"], ["19", "À noite", "Adulto às 19h"], ["2030", "Mais tarde", "Adulto às 20h30"]],
+      crianca: [["2-9", "Segunda e quarta, de manhã", "Kids 2 às 9h"], ["2-18", "Segunda e quarta, no fim da tarde", "Kids 2 às 18h"], ["1-9", "Terça e quinta, de manhã", "Kids 1 às 9h"], ["1-18", "Terça e quinta, no fim da tarde", "Kids 1 às 18h"]],
+      familia: [["2-9", "Segunda e quarta, de manhã", "Adulto às 8h e Kids 2 às 9h"], ["2-18", "Segunda e quarta, no fim do dia", "Kids 2 às 18h e Adulto às 19h"], ["1-9", "Terça e quinta, de manhã", "Adulto às 8h e Kids 1 às 9h"], ["1-18", "Terça e quinta, no fim do dia", "Kids 1 às 18h e Adulto às 19h"]]
     };
     var EXP_Q = { eu: "Você já treinou jiu-jitsu?", crianca: "A criança já treinou?", familia: "Vocês já treinaram?" };
     var EXP = [["novo", "Ainda não", "Vamos começar do zero"], ["exp", "Já, um pouco", "Tem alguma experiência"]];
@@ -980,10 +987,11 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     };
     var ask = function (legend, list) { return '<fieldset class="qz-q qz-in"><legend>' + legend + "</legend>" + opts(list) + "</fieldset>"; };
     var result = function () {
-      var t = +a.when, title, text, href;
-      if (a.who === "eu") { title = "Adulto, às <em>" + t + "h</em>."; text = "De segunda a sexta, numa turma para todos os níveis. Para mulheres, o Feminino treina junto, nos mesmos horários."; href = "agendamento.html#adulto-" + t; }
-      else if (a.who === "crianca") { title = "<em>Kids</em>, às " + t + "h."; text = "De segunda a sexta, para crianças de 4 a 12 anos, com foco em disciplina e diversão."; href = "agendamento.html#kids-" + t; }
-      else { title = "Kids às " + t + "h e <em>Adulto às " + (t + 1) + "h</em>."; text = "A criança treina primeiro e você logo depois, de segunda a sexta. Vocês vêm juntos e cada um treina na sua turma."; href = "agendamento.html#familia-" + t; }
+      var title, text, href, w = a.when.split("-"), tk = +w[1], dias = w[0] === "1" ? "Às terças e quintas" : "Às segundas e quartas";
+      if (a.who === "eu") { title = "Adulto, às <em>" + (a.when === "2030" ? "20h30" : a.when + "h") + "</em>."; text = "De segunda a sexta, numa turma para todos os níveis. Para mulheres, o Feminino treina junto, nos mesmos horários."; href = "agendamento.html#adulto-" + a.when; }
+      else if (a.who === "crianca") { title = "<em>Kids " + w[0] + "</em>, às " + tk + "h."; text = dias + ", para crianças de 4 a 12 anos, com foco em disciplina e diversão."; href = "agendamento.html#kids" + w[0] + "-" + tk; }
+      else if (tk === 9) { title = "Adulto às 8h e <em>Kids " + w[0] + " às 9h</em>."; text = dias + ": você treina primeiro e a criança logo depois. Vocês vêm juntos e cada um treina na sua turma."; href = "agendamento.html#familia" + w[0] + "-9"; }
+      else { title = "Kids " + w[0] + " às 18h e <em>Adulto às 19h</em>."; text = dias + ": a criança treina primeiro e você logo depois. Vocês vêm juntos e cada um treina na sua turma."; href = "agendamento.html#familia" + w[0] + "-18"; }
       var note = a.exp === "novo" ? "Primeira vez? Chegue alguns minutos antes. A gente empresta o kimono para a aula." : (a.who === "crianca" ? "Já treinou antes? Conte na conversa: o professor ajusta o treino ao nível da criança." : "Já treinou antes? Conte na conversa: o professor ajusta o treino ao seu nível.");
       return '<div class="qz-res qz-in"><p class="k">Sua turma</p><h3>' + title + "</h3><p>" + text + '</p><p class="note">' + note + '</p><div class="ctas"><a class="btn btn-ink" href="' + href + '" data-int>Agendar este horário<svg class="ic"><use href="#i-arrow"/></svg></a><button class="qz-redo" type="button">Refazer</button></div></div>';
     };

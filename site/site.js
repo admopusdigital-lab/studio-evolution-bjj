@@ -88,7 +88,7 @@
       return '<a href="' + a.getAttribute("href") + '" data-int><span>' + a.textContent.trim() + "</span></a>";
     }).join("");
     menu.innerHTML = "<nav aria-label=\"Menu\">" + items + '<a href="entrar.html" data-int><span><em>Área do aluno</em></span></a></nav>' +
-      '<div class="menu-foot"><b>(15) 99674-1812</b><span>Av. Getúlio Vargas, 400 · Jardim São Paulo, Sorocaba</span><span>Segunda a sexta · Adulto 8h, 11h e 19h · Kids 10h e 18h</span></div>';
+      '<div class="menu-foot"><b>(15) 99674-1812</b><span>Av. Getúlio Vargas, 400 · Jardim São Paulo, Sorocaba</span><span>Seg a sex · Adulto 8h, 11h, 19h e 20h30 · Kids 9h e 18h</span><span>Sábado · Open Mat 10h30</span></div>';
     document.body.appendChild(menu);
     menuBtn.setAttribute("aria-controls", "menu");
     paintLook(root.getAttribute("data-look"));
@@ -296,15 +296,36 @@
     a.addEventListener("playing", function () { btn.classList.remove("ask"); });
   };
 
+  /* ---------- grade de aulas: a fonte única dos horários (d = dias da semana, 0 = domingo) ---------- */
+  Site.GRADE = [
+    { t: "08:00", n: "Adulto", d: [1, 2, 3, 4, 5] },
+    { t: "09:00", n: "Kids 2", d: [1, 3] },
+    { t: "09:00", n: "Kids 1", d: [2, 4] },
+    { t: "10:30", n: "Open Mat", d: [6] },
+    { t: "11:00", n: "Adulto", d: [1, 2, 3, 4, 5] },
+    { t: "18:00", n: "Kids 2", d: [1, 3] },
+    { t: "18:00", n: "Kids 1", d: [2, 4] },
+    { t: "19:00", n: "Adulto", d: [1, 2, 3, 4, 5] },
+    { t: "20:30", n: "Adulto", d: [1, 2, 3, 4, 5] }
+  ];
+  Site.DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+  /* "08:00" -> "8h", "20:30" -> "20h30" */
+  Site.hora = function (t) { var p = t.split(":"); return +p[0] + "h" + (p[1] !== "00" ? p[1] : ""); };
+  Site.aulasDo = function (wd) { return Site.GRADE.filter(function (c) { return c.d.indexOf(wd) >= 0; }); };
+
   /* ---------- selos ao vivo: a próxima aula e o atendimento, pela hora de quem está vendo ---------- */
   Site.nextClass = function () {
     var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60;
-    var CL = [[8, "Adulto"], [10, "Kids"], [11, "Adulto"], [18, "Kids"], [19, "Adulto"]];
-    if (wd >= 1 && wd <= 5) for (var i = 0; i < CL.length; i++) if (h < CL[i][0] + 1) {
-      var now = h >= CL[i][0];
-      return { now: now, label: now ? "Aula agora" : "Próxima aula", text: (now ? "" : "Hoje · ") + CL[i][1] + " " + CL[i][0] + "h" };
+    var ini = function (c) { var p = c.t.split(":"); return +p[0] + p[1] / 60; };
+    var hoje = Site.aulasDo(wd);
+    for (var i = 0; i < hoje.length; i++) if (h < ini(hoje[i]) + 1) {
+      var now = h >= ini(hoje[i]);
+      return { now: now, label: now ? "Aula agora" : "Próxima aula", text: (now ? "" : "Hoje · ") + hoje[i].n + " " + Site.hora(hoje[i].t) };
     }
-    return { now: false, label: "Próxima aula", text: (wd === 5 || wd === 6 ? "Segunda" : "Amanhã") + " · Adulto 8h" };
+    for (var k = 1; k <= 7; k++) {
+      var dia = (wd + k) % 7, l = Site.aulasDo(dia);
+      if (l.length) return { now: false, label: "Próxima aula", text: (k === 1 ? "Amanhã" : Site.DIAS[dia]) + " · " + l[0].n + " " + Site.hora(l[0].t) };
+    }
   };
   Site.office = function () {
     var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60, week = wd >= 1 && wd <= 5;

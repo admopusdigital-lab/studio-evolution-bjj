@@ -181,6 +181,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
 #drName { scroll-margin-top: 96px; }
 @media (max-width: 600px) { .dr-top { padding-left: 16px; } .dr-body { padding-inline: 16px; } .drawer .dr-acts { padding-inline: 16px; } }
 /* o mapa de presenças entra célula por célula só com CSS (antes, 60 tweens a cada abertura) */
+.heat i.f { visibility: hidden; }
 .drawer.on .heat i { animation: pop 0.45s var(--ease) both; animation-delay: calc(var(--i) * 8ms + 300ms); }
 .drawer.on .heat i.t { animation: pop 0.45s var(--ease) both, hot 2.2s var(--ease) infinite; animation-delay: calc(var(--i) * 8ms + 300ms), 1s; }
 @keyframes pop { from { transform: scale(0.2); opacity: 0; } }
@@ -231,7 +232,7 @@ button.leads-closed[aria-expanded="true"] .ic { transform: rotate(90deg); }
   .codebox .cd:not(.hold) { font-size: clamp(28px, 9.5vw, 40px); white-space: nowrap; }
   /* as cinco aulas numa linha de chips com a hora. Turma e contagem continuam no nome do botão (só para leitor
      de tela); na tela, a aula de agora ganha fundo dourado e um ponto, e as que já acabaram, um check */
-  .dv[data-v="hoje"] .classes { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .dv[data-v="hoje"] .classes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .classes button { position: relative; display: flex; justify-content: center; align-items: center; min-height: 48px; padding: 0 2px; }
   .dv .classes button b { font-size: 17px; }
   .classes button span, .classes button small { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
@@ -578,22 +579,23 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
               <!-- Hoje -->
               <section class="dv on" data-v="hoje" aria-labelledby="t-hoje">
                 <div class="dv-h">
-                  <div><p class="dv-k">Sexta, 16 de outubro</p><h3 id="t-hoje">Boa noite. <em>Cinco aulas hoje.</em></h3></div>
-                  <p id="dNow">Agora: Kids 18h · Próxima: Adulto 19h</p>
+                  <div><p class="dv-k">Quinta, 15 de outubro</p><h3 id="t-hoje">Boa noite. <em>Seis aulas hoje.</em></h3></div>
+                  <p id="dNow">Agora: Kids 1 18h · Próxima: Adulto 19h</p>
                 </div>
                 <div class="kpis">
                   <div class="kpi"><b><span id="kAtivos">58</span><small class="delta" id="kNew">+3 em outubro</small></b><span>alunos ativos</span></div>
-                  <div class="kpi"><b id="kPres">146</b><span>presenças nos últimos 7 dias</span><span class="spark" id="spark" aria-hidden="true"><i class="wk"></i><i class="wk"></i><i></i><i></i><i></i><i></i><i class="today"></i></span></div>
+                  <div class="kpi"><b id="kPres">146</b><span>presenças nos últimos 7 dias</span><span class="spark" id="spark" aria-hidden="true"><i></i><i class="wk"></i><i class="wk"></i><i></i><i></i><i></i><i class="today"></i></span></div>
                   <button class="kpi warn" type="button" data-goto="alunos" data-chip="aus"><b>3</b><span>sem treinar há 14 dias ou mais</span><span class="go-s">Ver quem<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
                   <button class="kpi" type="button" data-goto="leads"><b id="kLeads">3</b><span>interessados esperando retorno</span><span class="go-s">Abrir<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
                 </div>
                 <div class="day-grid">
                   <div class="classes" id="classes" role="group" aria-label="Aulas de hoje">
                     <button type="button" class="past" data-c="a8" aria-pressed="false"><b>8h</b> <span>Adulto</span> <small>7 vieram</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
-                    <button type="button" class="past" data-c="k10" aria-pressed="false"><b>10h</b> <span>Kids</span> <small>9 vieram</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
+                    <button type="button" class="past" data-c="k9" aria-pressed="false"><b>9h</b> <span>Kids 1</span> <small>9 vieram</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
                     <button type="button" class="past" data-c="a11" aria-pressed="false"><b>11h</b> <span>Adulto</span> <small>6 vieram</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
-                    <button type="button" class="now" data-c="k18" aria-pressed="false"><b>18h</b> <span>Kids · agora</span> <small id="c18s">6 de 8 marcadas</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
+                    <button type="button" class="now" data-c="k18" aria-pressed="false"><b>18h</b> <span>Kids 1 · agora</span> <small id="c18s">6 de 8 marcadas</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
                     <button type="button" data-c="a19" aria-pressed="true"><b>19h</b> <span>Adulto</span> <small id="c19s">8 de 10</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
+                    <button type="button" data-c="a20" aria-pressed="false"><b>20h30</b> <span>Adulto</span> <small>6 de 10</small><svg class="ic ck" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></button>
                   </div>
                   <div class="room" id="room"></div>
                 </div>
@@ -616,7 +618,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                   <div class="crm-grid">
                     <label class="crm-f"><span>Nome completo</span><input class="crm-in" id="afNome" autocomplete="off"></label>
                     <label class="crm-f"><span>Tratamento nas mensagens</span><select class="sel" id="afArt"><option value="">Só o nome</option><option value="a">Feminino (a aluna)</option><option value="o">Masculino (o aluno)</option></select></label>
-                    <label class="crm-f"><span>Turma</span><select class="sel" id="afProg"><option value="adulto">Adulto</option><option value="feminino">Feminino (junto com o Adulto)</option><option value="kids">Kids (4 a 12 anos)</option></select></label>
+                    <label class="crm-f"><span>Turma</span><select class="sel" id="afProg"><option value="adulto">Adulto</option><option value="feminino">Feminino (junto com o Adulto)</option><option value="kids1">Kids 1 (terça e quinta)</option><option value="kids2">Kids 2 (segunda e quarta)</option></select></label>
                     <label class="crm-f"><span>Horário</span><select class="sel" id="afHora"></select></label>
                     <label class="crm-f af-kid" hidden><span>Responsável</span><input class="crm-in" id="afResp" autocomplete="off"></label>
                     <label class="crm-f af-kid" hidden><span>Idade</span><input class="crm-in" id="afIdade" inputmode="numeric" maxlength="2" autocomplete="off"></label>
@@ -640,12 +642,12 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                       <tr data-f="" data-id="marina"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 2 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>quarta</td><td class="num hide-s">6</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
                       <tr data-f="aval" data-id="thiago"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · 3 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>ontem</td><td class="num hide-s">5</td><td class="act"><button class="mini-btn" type="button" data-grad="thiago">Avaliar grau</button></td></tr>
                       <tr data-f="aval" data-id="ana"><td><div class="nm"><span class="av">AR</span><div>Ana Beatriz Rocha<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 4 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>hoje, 8h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="ana">Avaliar faixa</button></td></tr>
-                      <tr data-f="aval" data-id="joao"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · 9 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-cinza)"></i><span>Cinza · 3 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>hoje, 18h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="joao">Avaliar grau</button></td></tr>
+                      <tr data-f="aval" data-id="joao"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 1 18h · 9 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-cinza)"></i><span>Cinza · 3 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>hoje, 18h</td><td class="num hide-s">4</td><td class="act"><button class="mini-btn" type="button" data-grad="joao">Avaliar grau</button></td></tr>
                       <tr data-f="aus" data-id="diego"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-roxa)"></i><span>Roxa · 1 grau</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small><span class="pill-s warn">há 16 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-care="diego">WhatsApp</button></td></tr>
                       <tr data-f="aus" data-id="patricia"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 2 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small><span class="pill-s warn">há 21 dias</span></td><td class="num hide-s">0</td><td class="act"><button class="mini-btn wa" type="button" data-care="patricia">WhatsApp</button></td></tr>
                       <tr data-f="aus" data-id="caio"><td><div class="nm"><span class="av">CF</span><div>Caio Fernandes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-azul)"></i><span>Azul · sem grau</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small><span class="pill-s warn">há 15 dias</span></td><td class="num hide-s">1</td><td class="act"><button class="mini-btn wa" type="button" data-care="caio">WhatsApp</button></td></tr>
                       <tr data-f="" data-id="larissa"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-branca)"></i><span>Branca · 1 grau</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>ontem</td><td class="num hide-s">5</td><td class="act"><span class="pill-s">Confirmou hoje</span></td></tr>
-                      <tr data-f="" data-id="helena"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · 7 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-amarela)"></i><span>Amarela · 2 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>hoje, 10h</td><td class="num hide-s">6</td><td class="act"><span class="pill-s in">Veio hoje</span></td></tr>
+                      <tr data-f="" data-id="helena"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 1 9h · 7 anos</small></div></div></td><td><span class="bl"><i class="belt-s" style="--b:var(--b-amarela)"></i><span>Amarela · 2 graus</span></span></td><td><small class="cl" aria-hidden="true">Última aula</small>hoje, 10h</td><td class="num hide-s">6</td><td class="act"><span class="pill-s in">Veio hoje</span></td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -658,7 +660,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                 <div class="dv-h"><div><p class="dv-k">Para avaliar</p><h3 id="t-grad">Graduações</h3></div><p>Quem tem mais aulas desde o último grau. A decisão é sempre do professor.</p></div>
                 <div class="cards" id="cards">
                   <article class="gcard" data-id="joao" data-belt="cinza" data-graus="3" data-next="grau" data-first="João Pedro" data-kid="1">
-                    <h4>João Pedro Lima</h4><p class="meta">Kids 18h · 9 anos</p>
+                    <h4>João Pedro Lima</h4><p class="meta">Kids 1 18h · 9 anos</p>
                     <div class="belt"></div>
                     <dl><dt>Aulas desde o último grau</dt><dd>34</dd><dt>Competências da faixa</dt><dd>6 de 6</dd><dt>Último grau</dt><dd>14 de maio</dd></dl>
                     <div class="space"></div>
@@ -682,9 +684,9 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                 <div class="hist">
                   <p>Últimas graduações</p>
                   <ol id="hist">
-                    <li><i class="belt-s" style="--b:var(--b-amarela)"></i><div>Helena Prado<small>2º grau na faixa amarela · Kids 10h</small></div><time>9 de out</time></li>
+                    <li><i class="belt-s" style="--b:var(--b-amarela)"></i><div>Helena Prado<small>2º grau na faixa amarela · Kids 1 9h</small></div><time>9 de out</time></li>
                     <li><i class="belt-s" style="--b:var(--b-azul)"></i><div>Gabriel Duarte<small>Faixa azul · Adulto 11h</small></div><time>2 de out</time></li>
-                    <li><i class="belt-s" style="--b:var(--b-cinza)"></i><div>Laura Pinto<small>4º grau na faixa cinza · Kids 10h</small></div><time>25 de set</time></li>
+                    <li><i class="belt-s" style="--b:var(--b-cinza)"></i><div>Laura Pinto<small>4º grau na faixa cinza · Kids 1 9h</small></div><time>25 de set</time></li>
                     <li><i class="belt-s" style="--b:var(--b-azul)"></i><div>Fábio Lacerda<small>4º grau na faixa azul · Adulto 11h</small></div><time>18 de set</time></li>
                   </ol>
                 </div>
@@ -781,7 +783,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                   </div>
                   <div class="lead" data-first="Pedro" data-art="o" data-prog="kids" data-turma="Kids" data-child="Theo" data-slot="seg|18" data-phone="15900000104" data-age="7" data-orig="site">
                     <span class="av">PH</span>
-                    <div><b><button class="nm-btn" type="button" data-ficha>Pedro Henrique</button></b><span class="pill-s in">Aula seg, 18h</span><small>Pelo site · Kids 18h, para o filho Theo, de 7 anos · pediu dia 13</small></div>
+                    <div><b><button class="nm-btn" type="button" data-ficha>Pedro Henrique</button></b><span class="pill-s in">Aula seg, 18h</span><small>Pelo site · Kids 2 18h, para o filho Theo, de 7 anos · pediu dia 13</small></div>
                     <div class="acts"><select class="sel" aria-label="Status de Pedro Henrique"><option value="novo">Novo</option><option value="atendimento">Em atendimento</option><option value="agendado" selected>Aula agendada</option><option value="matriculado">Matriculado</option><option value="perdido">Sem interesse</option></select><button class="mini-btn wa" type="button" data-lead>WhatsApp</button></div>
                   </div>
                 </div>
@@ -862,10 +864,10 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                       <!-- sem treinar e em atraso: a ação principal é conversar; cobrar fica ao lado -->
                       <tr data-st="late" data-id="diego" data-v="200"><td><div class="nm"><span class="av">DR</span><div>Diego Ramos<small>Adulto 11h · venceu 10/10 · lembretes pausados<span class="fm"> · Pix ou boleto</span></small></div></div></td><td><span class="pill-s warn">Atrasada há 6 dias</span> <span class="pill-s warn aus">16 dias sem treinar</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act two"><button class="mini-btn wa" type="button" data-care="diego">Conversar</button> <button class="mini-btn ghost" type="button" data-fin="diego">Cobrar</button></td></tr>
                       <tr data-st="late" data-id="patricia" data-v="200"><td><div class="nm"><span class="av">PN</span><div>Patrícia Nunes<small>Adulto 8h · venceu 11/10 · último lembrete 12/10<span class="fm"> · Pix ou boleto</span></small></div></div></td><td><span class="pill-s warn">Atrasada há 5 dias</span> <span class="pill-s warn aus">21 dias sem treinar</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act two"><button class="mini-btn wa" type="button" data-care="patricia">Conversar</button> <button class="mini-btn ghost" type="button" data-fin="patricia">Cobrar</button></td></tr>
-                      <tr data-st="due" data-id="larissa" data-v="200"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h · vence 16/10<span class="fm"> · Pix ou boleto</span></small></div></div></td><td><span class="pill-s gold">Vence hoje · lembrada às 8h</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-fin="larissa">Ver lembrete</button></td></tr>
-                      <tr data-st="due" data-id="joao" data-v="180"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 18h · vence 19/10<span class="fm"> · Cartão automático</span></small></div></div></td><td><span class="pill-s">Vence em 3 dias</span></td><td class="num">R$ 180</td><td class="hide-s">Cartão automático</td><td class="act"><span class="pill-s in">Cobra sozinho</span></td></tr>
+                      <tr data-st="due" data-id="larissa" data-v="200"><td><div class="nm"><span class="av">LM</span><div>Larissa Mendes<small>Adulto 19h · vence 15/10<span class="fm"> · Pix ou boleto</span></small></div></div></td><td><span class="pill-s gold">Vence hoje · lembrada às 8h</span></td><td class="num">R$ 200</td><td class="hide-s">Pix ou boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-fin="larissa">Ver lembrete</button></td></tr>
+                      <tr data-st="due" data-id="joao" data-v="180"><td><div class="nm"><span class="av">JL</span><div>João Pedro Lima<small>Kids 1 18h · vence 19/10<span class="fm"> · Cartão automático</span></small></div></div></td><td><span class="pill-s">Vence em 3 dias</span></td><td class="num">R$ 180</td><td class="hide-s">Cartão automático</td><td class="act"><span class="pill-s in">Cobra sozinho</span></td></tr>
                       <tr data-st="paid" data-id="thiago" data-v="200"><td><div class="nm"><span class="av">TM</span><div>Thiago Moreira<small>Adulto 19h · pago hoje, 09:12<span class="fm"> · Pix</span></small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Pix</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Thiago">Recibo</button></td></tr>
-                      <tr data-st="paid" data-id="helena" data-v="180"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 10h · pago 10/10<span class="fm"> · Boleto</span></small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 180</td><td class="hide-s">Boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Helena">Recibo</button></td></tr>
+                      <tr data-st="paid" data-id="helena" data-v="180"><td><div class="nm"><span class="av">HP</span><div>Helena Prado<small>Kids 1 9h · pago 10/10<span class="fm"> · Boleto</span></small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 180</td><td class="hide-s">Boleto</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Helena">Recibo</button></td></tr>
                       <tr data-st="paid" data-id="marina" data-v="200"><td><div class="nm"><span class="av">MA</span><div>Marina Alves<small>Adulto 19h · pago 05/10<span class="fm"> · Cartão automático</span></small></div></div></td><td><span class="pill-s in">Paga</span></td><td class="num">R$ 200</td><td class="hide-s">Cartão automático</td><td class="act"><button class="mini-btn ghost" type="button" data-rcb="Marina">Recibo</button></td></tr>
                     </tbody>
                   </table>
@@ -917,7 +919,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                       <label class="crm-f wide"><span>Descrição</span><input class="crm-in" id="dfDesc" autocomplete="off" placeholder="Ex.: Conta de luz"></label>
                       <label class="crm-f"><span>Categoria</span><select class="sel" id="dfCat"></select></label>
                       <label class="crm-f"><span>Valor (R$)</span><input class="crm-in" id="dfValor" inputmode="decimal" autocomplete="off" placeholder="0,00"></label>
-                      <label class="crm-f"><span>Vencimento</span><input class="crm-in" id="dfData" type="date" value="2026-10-16" min="2026-10-01" max="2026-10-31"></label>
+                      <label class="crm-f"><span>Vencimento</span><input class="crm-in" id="dfData" type="date" value="2026-10-15" min="2026-10-01" max="2026-10-31"></label>
                     </div>
                     <label class="mf-pub"><input type="checkbox" id="dfRec"><span>Repete todo mês <small>(conta fixa: entra na projeção)</small></span></label>
                     <label class="mf-pub"><input type="checkbox" id="dfPaga"><span>Já está paga</span></label>
@@ -954,7 +956,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                     <label class="crm-f wide"><span>Endereço</span><input class="crm-in" id="csEnd" value="Av. Getúlio Vargas, 400, sala 3, sobreloja, Jardim São Paulo, Sorocaba/SP" autocomplete="off"></label>
                     <label class="crm-f"><span>Atendimento</span><input class="crm-in" id="csAtend" value="Segunda a sexta, das 8h às 21h" autocomplete="off"></label>
                     <label class="crm-f"><span>Vagas por aula</span><input class="crm-in" id="csVagas" value="10" inputmode="numeric" maxlength="2" autocomplete="off"></label>
-                    <label class="crm-f wide"><span>Horários</span><input class="crm-in" id="csHoras" value="Segunda a sexta · Adulto 8h, 11h e 19h · Kids (4 a 12 anos) 10h e 18h · Feminino junto com o Adulto" autocomplete="off"></label>
+                    <label class="crm-f wide"><span>Horários</span><input class="crm-in" id="csHoras" value="Adulto seg a sex 8h, 11h, 19h e 20h30 · Kids 1 ter e qui 9h e 18h · Kids 2 seg e qua 9h e 18h · Open Mat sáb 10h30 · Feminino junto com o Adulto" autocomplete="off"></label>
                   </div>
                   <p class="crm-err" id="csErr" role="alert"></p>
                   <div class="msg-acts"><button class="mini-btn" type="submit">Salvar dados</button></div>
@@ -1012,7 +1014,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
                 <section class="ap-view on" aria-label="Tela Presença no celular da aluna">
                   <p class="ap-lb">Presença</p>
                   <p class="ap-hi">Aula das 19h</p>
-                  <p class="ap-mut" style="margin-top:4px">Adulto · sexta, 16 de outubro</p>
+                  <p class="ap-mut" style="margin-top:4px">Adulto · quinta, 15 de outubro</p>
                   <ol class="ap-steps">
                     <li class="done"><span class="ap-mk"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><div><p class="ap-st">Vaga confirmada</p><p>Às 18:14 · 8 de 10 vagas</p></div></li>
                     <li class="now" id="pStep2"><span class="ap-mk">2</span><div><p class="ap-st" id="pStep2h">Digite o código da aula</p><p id="pStep2t">Está na TV do tatame.</p>
@@ -1071,7 +1073,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta, e Open Mat aos sábados.</p>
       <div><p class="foot-h">Site</p><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
       <div><p class="foot-h">App</p><ul><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
       <div><p class="foot-h">Contato</p><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
@@ -1202,9 +1204,9 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
      de Studio; fee: a mensalidade, como a ficha mostra; contact: o último contato (automático ou manual) */
   var PEOPLE = {
     marina: { n: "Marina Alves", art: "a", cls: "Adulto 19h", since: "aluna desde março de 2025", belt: "azul", g: 2, total: 142, desde: 21, ult: "14 de agosto", comp: [3, 8], days: [0, 2, 4], skip: 0.12, gap: [5], last: "2026-10-14", force: ["2026-10-12"], conf: 1 },
-    thiago: { n: "Thiago Moreira", cls: "Adulto 19h", since: "aluno desde 2023", belt: "azul", g: 3, total: 312, desde: 31, ult: "19 de junho", comp: [6, 8], days: [1, 3, 4], skip: 0.35, last: "2026-10-15", conf: 1, grad: 1, contact: { d: "hoje, 09:12", how: "recibo automático do Pix" } },
+    thiago: { n: "Thiago Moreira", cls: "Adulto 19h", since: "aluno desde 2023", belt: "azul", g: 3, total: 312, desde: 31, ult: "19 de junho", comp: [6, 8], days: [1, 3, 4], skip: 0.35, last: "2026-10-13", conf: 1, grad: 1, contact: { d: "hoje, 09:12", how: "recibo automático do Pix" } },
     ana: { n: "Ana Beatriz Rocha", call: "Ana Beatriz", art: "a", cls: "Adulto 8h", since: "aluna desde 2024", belt: "branca", g: 4, total: 118, desde: 41, ult: "2 de abril", comp: [8, 8], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", grad: 1 },
-    joao: { n: "João Pedro Lima", call: "João Pedro", resp: "Carla", cls: "Kids 18h", age: "9 anos", since: "no Studio desde 2024", belt: "cinza", g: 3, total: 126, desde: 34, ult: "14 de maio", comp: [6, 6], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", kid: 1, grad: 1 },
+    joao: { n: "João Pedro Lima", call: "João Pedro", resp: "Carla", cls: "Kids 1 18h", age: "9 anos", since: "no Studio desde 2024", belt: "cinza", g: 3, total: 126, desde: 34, ult: "14 de maio", comp: [6, 6], days: [0, 2, 4], skip: 0.45, last: "2026-10-16", kid: 1, grad: 1 },
     diego: { n: "Diego Ramos", cls: "Adulto 11h", since: "aluno desde 2022", belt: "roxa", g: 1, total: 205, desde: 17, ult: "18 de agosto", comp: [4, 10], days: [1, 2, 3], skip: 0.25, last: "2026-09-30", aus: 16,
       fee: "em atraso desde 10/10 · lembretes automáticos pausados", contact: { d: "11/10", how: "lembrete automático “1 dia depois”" } },
     patricia: { n: "Patrícia Nunes", art: "a", nova: 1, cls: "Adulto 8h", since: "aluna desde maio de 2026", belt: "branca", g: 2, total: 38, desde: 3, ult: "11 de setembro", comp: [2, 8], days: [1, 4], skip: 0.3, last: "2026-09-25", aus: 21,
@@ -1212,7 +1214,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     caio: { n: "Caio Fernandes", cls: "Adulto 19h", since: "aluno desde 2025", belt: "azul", g: 0, total: 64, desde: 18, ult: "1º de julho", comp: [1, 8], days: [0, 3], skip: 0.3, last: "2026-10-01", aus: 15 },
     larissa: { n: "Larissa Mendes", art: "a", cls: "Adulto 19h", since: "aluna desde junho de 2026", belt: "branca", g: 1, total: 31, desde: 10, ult: "8 de setembro", comp: [2, 8], days: [1, 3], skip: 0.1, last: "2026-10-15", conf: 1,
       fee: "vence hoje", contact: { d: "hoje, 08:00", how: "lembrete automático “No dia do vencimento”" } },
-    helena: { n: "Helena Prado", art: "a", resp: "Marcos", cls: "Kids 10h", age: "7 anos", since: "no Studio desde 2025", belt: "amarela", g: 2, total: 88, desde: 2, ult: "9 de outubro", comp: [4, 6], days: [0, 2, 4], skip: 0.12, last: "2026-10-16", kid: 1 }
+    helena: { n: "Helena Prado", art: "a", resp: "Marcos", cls: "Kids 1 9h", age: "7 anos", since: "no Studio desde 2025", belt: "amarela", g: 2, total: 88, desde: 2, ult: "9 de outubro", comp: [4, 6], days: [0, 2, 4], skip: 0.12, last: "2026-10-16", kid: 1 }
   };
   function pid(name) { for (var id in PEOPLE) if (PEOPLE[id].n === name) return id; return null; }
   function callOf(p) { return p.call || first(p.n); }
@@ -1289,11 +1291,13 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   /* ---------- Hoje: as aulas do dia, a chamada da aula das 19h e o Kids por chamada ---------- */
   var PAST = {
     a8: { t: "Adulto · 8h", s: "Aula encerrada", p: ["Ana Beatriz Rocha|branca|4", "Rodrigo Faria|azul|2", "Vinícius Teles|branca|3", "Bianca Lopes|roxa|0", "Otávio Reis|branca|1", "Sérgio Matos|marrom|2", "Paula Dias|azul|1"] },
-    k10: { t: "Kids · 10h", s: "Aula encerrada", p: ["Helena Prado|amarela|2", "Davi Souza|cinza|1", "Alice Martins|branca|3", "Arthur Gomes|amarela|0", "Laura Pinto|cinza|4", "Gael Ribeiro|branca|2", "Cecília Araújo|laranja|1", "Benício Castro|branca|0", "Sofia Barros|cinza|2"] },
+    k9: { t: "Kids 1 · 9h", s: "Aula encerrada", p: ["Helena Prado|amarela|2", "Davi Souza|cinza|1", "Alice Martins|branca|3", "Arthur Gomes|amarela|0", "Laura Pinto|cinza|4", "Gael Ribeiro|branca|2", "Cecília Araújo|laranja|1", "Benício Castro|branca|0", "Sofia Barros|cinza|2"] },
     a11: { t: "Adulto · 11h", s: "Aula encerrada", p: ["Henrique Assis|roxa|2", "Fábio Lacerda|azul|4", "Mariana Queiroz|branca|2", "Gabriel Duarte|azul|0", "Tatiane Lins|branca|1", "Wagner Prates|preta|1"] },
-    k18: { t: "Kids · 18h", s: "Agora, até as 19:00", p: ["João Pedro Lima|cinza|3", "Miguel Torres|branca|2", "Lorenzo Vieira|amarela|1", "Valentina Melo|cinza|0", "Heitor Cunha|branca|4", "Manuela Freitas|laranja|2", "Bernardo Lopes|branca|1", "Isabela Rocha|amarela|3"] }
+    k18: { t: "Kids 1 · 18h", s: "Agora, até as 19:00", p: ["João Pedro Lima|cinza|3", "Miguel Torres|branca|2", "Lorenzo Vieira|amarela|1", "Valentina Melo|cinza|0", "Heitor Cunha|branca|4", "Manuela Freitas|laranja|2", "Bernardo Lopes|branca|1", "Isabela Rocha|amarela|3"] }
   };
-  /* no Kids, a chamada é do professor: no Kids 18h, 6 crianças já foram marcadas e 2 ainda não */
+  /* a aula das 20h30: as reservas de quem vem depois (a chamada abre quando ela começa) */
+  var NEXT20 = { t: "Adulto · 20h30", p: ["Rafael Nunes|azul|0", "Camila Rocha|branca|2", "Juliana Freire|azul|3", "Marcos Vidal|branca|0", "Sandro Leite|marrom|2", "Priscila Moura|branca|1"] };
+  /* no Kids, a chamada é do professor: no Kids 1 18h, 6 crianças já foram marcadas e 2 ainda não */
   var KIDS_LEFT = ["Bernardo Lopes", "Isabela Rocha"];
   /* 7 reservas até as 18:00 (o app da aluna diz "ainda há 3 vagas"); a Marina é a 8ª, às 18:14 */
   var CONF = [["Felipe Antunes", "azul", 1, "17:40"], ["Larissa Mendes", "branca", 1, "16:05"], ["Gustavo Lima", "roxa", 0, "17:52"], ["Thiago Moreira", "azul", 3, "12:31"],
@@ -1305,8 +1309,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   var WALK = [["Leandro Pires", "azul", 0, "da turma"], ["Marcelo Tavares", "branca", 2, "da turma"], ["Bianca Lopes", "roxa", 0, "Adulto 8h"], ["Fábio Lacerda", "azul", 4, "Adulto 11h"]];
   var CODES = ["KTR482", "BMX731", "FJN259", "QWD846", "HPZ513"];
   var START = mins("18:50"), END18 = mins("19:00");
-  /* sáb a sex; o 28 de hoje cresce com cada chegada e com as crianças do Kids 18h que faltam marcar */
-  var SPARK = [0, 0, 31, 29, 33, 25, 28], PRES0 = 146;
+  /* sex a qui (no sábado, só o Open Mat; domingo sem aula); o 28 de hoje cresce com cada chegada e com as crianças do Kids 1 18h que faltam marcar */
+  var SPARK = [22, 6, 0, 30, 29, 31, 28], PRES0 = 146;
   /* arrived: hora de cada adulto presente; by: 'app' ou 'prof'; order: ordem de chegada; walk: quem veio sem confirmar;
      kids: hora das crianças marcadas agora; waitTV: a fila espera a TV ligar para a Marina digitar no celular */
   var st = { code: null, ci: -1, start: START, valid: 30, arrived: {}, by: {}, order: [], walk: [], kids: {}, idx: 0, timer: null, clock: START, mine: null, waitTV: false, fresh: null, ask: null, q: "" };
@@ -1443,12 +1447,12 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   function paintNow() {
     var after = st.clock >= END18, k = $('#classes [data-c="k18"]'), a = $('#classes [data-c="a19"]');
     PAST.k18.s = after ? "Aula encerrada" : "Agora, até as 19:00";
-    $("#dNow").textContent = after ? "Agora: Adulto 19h" : "Agora: Kids 18h · Próxima: Adulto 19h";
+    $("#dNow").textContent = after ? "Agora: Adulto 19h · Próxima: Adulto 20h30" : "Agora: Kids 1 18h · Próxima: Adulto 19h";
     k.classList.toggle("past", after);
     /* .now: no celular, o chip da aula de agora ganha fundo dourado e um ponto */
     k.classList.toggle("now", !after);
     a.classList.toggle("now", after);
-    $("span", k).textContent = after ? "Kids" : "Kids · agora";
+    $("span", k).textContent = after ? "Kids 1" : "Kids 1 · agora";
     $("span", a).textContent = after ? "Adulto · agora" : "Adulto";
     $("#c18s").innerHTML = kidsTxt(true);
     if (k.getAttribute("aria-pressed") === "true") $("#room .room-h p").textContent = roomSub("k18");
@@ -1624,7 +1628,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     if (had) focusSoft(li, { preventScroll: true });
     return li;
   }
-  /* Kids 18h: o professor marca cada criança (ou desfaz); depois das 19:00, a marcação diz "depois da aula" */
+  /* Kids 1 18h: o professor marca cada criança (ou desfaz); depois das 19:00, a marcação diz "depois da aula" */
   function setKid(name, t) {
     if (t) st.kids[name] = t; else delete st.kids[name];
     var li = $('#room li[data-n="' + name + '"]'), s = PAST.k18.p.filter(function (x) { return x.split("|")[0] === name; })[0];
@@ -1698,6 +1702,11 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   function renderRoom(id) {
     var room = $("#room");
     if (id === "a19") { room.innerHTML = room19(); paint19(); return; }
+    if (id === "a20") {
+      room.innerHTML = '<div class="room-h"><div><h4>' + NEXT20.t + "</h4><p>Depois da aula das 19h · " + NEXT20.p.length + ' de 10 vagas confirmadas</p></div></div><p class="kids-note">A chamada desta aula abre quando ela começar.</p>' +
+        '<ul class="roster">' + NEXT20.p.map(function (q) { q = q.split("|"); return personLi(q[0], q[1], +q[2], '<span class="pill-s">Confirmou</span>', "", ""); }).join("") + "</ul>";
+      return;
+    }
     var c = PAST[id];
     room.innerHTML = '<div class="room-h"><div><h4>' + c.t + "</h4><p>" + roomSub(id) + "</p></div></div>" +
       (id === "k18" ? '<p class="kids-note">No Kids, a chamada é do professor: um toque por criança.</p>' : "") +
@@ -1835,7 +1844,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     for (var i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
     return function () { h += 0x6D2B79F5; var t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   }
-  var TODAY = "2026-10-16", WD = ["seg", "ter", "qua", "qui", "sex"], WDL = ["segunda", "terça", "quarta", "quinta", "sexta"], MON = { 1: "ago", 6: "set", 10: "out" }, HEAT = {};
+  var TODAY = "2026-10-15", WD = ["seg", "ter", "qua", "qui", "sex"], WDL = ["segunda", "terça", "quarta", "quinta", "sexta"], MON = { 1: "ago", 6: "set", 10: "out" }, HEAT = {};
   function isoOf(w, d) { var dt = new Date(2026, 6, 27 + w * 7 + d); return dt.getFullYear() + "-" + two(dt.getMonth() + 1) + "-" + two(dt.getDate()); }
   /* long: o dia por extenso ("quarta, 14/10"), para o leitor de tela */
   function dl(k, long) { if (k === TODAY) return "hoje"; var p = k.split("-"), dt = new Date(+p[0], +p[1] - 1, +p[2]); return (long ? WDL : WD)[(dt.getDay() + 6) % 7] + ", " + p[2] + "/" + p[1]; }
@@ -1845,7 +1854,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     var p = PEOPLE[id], rnd = rng(id), out = [];
     for (var w = 0; w < 12; w++) for (var d = 0; d < 5; d++) {
       var k = isoOf(w, d), s;
-      if (k === TODAY) s = p.last === k || p.came ? "y" : p.conf ? "t" : "n";
+      if (k > TODAY) s = "f";
+      else if (k === TODAY) s = p.last === k || p.came ? "y" : p.conf ? "t" : "n";
       else if (k > p.last) s = "n";
       else if (k === p.last || (p.force || []).indexOf(k) > -1) s = "y";
       else if ((p.gap || []).indexOf(w) > -1) s = "n";
@@ -2140,7 +2150,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   /* ---------- Financeiro: o Asaas cobra, a Evolution API lembra por um número de WhatsApp só de avisos ---------- */
   var FIN = {
     diego: { n: "Diego Ramos", due: "10/10" }, patricia: { n: "Patrícia Nunes", due: "11/10" },
-    larissa: { n: "Larissa Mendes", due: "16/10" }, joao: { n: "João Pedro Lima", due: "19/10", kid: 1 }
+    larissa: { n: "Larissa Mendes", due: "15/10" }, joao: { n: "João Pedro Lima", due: "19/10", kid: 1 }
   };
   /* links de exemplo: o de pagamento e o do recibo são diferentes */
   var LINK = '<b class="lk">asaas.com/i/7kq2mz</b>', RCB = '<b class="lk">asaas.com/comprovantes/4h8tq1</b>';
@@ -2157,7 +2167,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   var RULE_T = { d3: "3 dias antes", d0: "No dia do vencimento", a1: "1 dia depois", a5: "5 dias depois", ok: "Pagamento confirmado" };
   /* prévias: cada etapa com um caso que bate com a tabela. Bruno (Pix ou boleto, vence 19/10) está entre os 7 a vencer;
      o "5 dias depois" não tem ninguém hoje (a Patrícia está pausada), então o exemplo é inventado e sem data */
-  var EX = { d3: ["Bruno", "19/10"], d0: ["Larissa", "16/10"], a1: ["Patrícia", "11/10"], a5: ["Vitor"], ok: ["Thiago"] };
+  var EX = { d3: ["Bruno", "19/10"], d0: ["Larissa", "15/10"], a1: ["Patrícia", "11/10"], a5: ["Vitor"], ok: ["Thiago"] };
   function vr(s) { return s && '<span class="var">' + s + "</span>"; }
   var finMsg = $("#finMsg"), late = { n: 2, v: 400 }, rec = { v: 9440, n: 49 }, curFF = "all", kLate = $("[data-ff-go]", dash);
   function brl(v) { return "R$ " + v.toLocaleString("pt-BR", v % 1 ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : {}); }
@@ -2384,7 +2394,13 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   /* ---------- Interessados: o pedido do site, a confirmação, o status e o funil do mês ---------- */
   /* a semana da aula experimental e as turmas de cada programa (o feminino treina junto com o adulto) */
   var DAYS = { seg: ["segunda", "19/10"], ter: ["terça", "20/10"], qua: ["quarta", "21/10"], qui: ["quinta", "22/10"], sex: ["sexta", "23/10"] };
-  var TURMAS = { adulto: ["8", "11", "19"], feminino: ["8", "11", "19"], kids: ["10", "18"] };
+  var TURMAS = { adulto: ["8", "11", "19", "20:30"], feminino: ["8", "11", "19", "20:30"], kids: ["9", "18"] };
+  /* "8" -> "8h", "20:30" -> "20h30" */
+  function hx(h) { return /:/.test(h) ? h.replace(":", "h") : h + "h"; }
+  /* o Kids 1 treina às terças e quintas, o Kids 2 às segundas e quartas; sexta não tem Kids */
+  function kidsDe(dia) { return dia === "ter" || dia === "qui" ? "Kids 1" : "Kids 2"; }
+  function diasDe(prog) { return Object.keys(DAYS).filter(function (k) { return prog !== "kids" || k !== "sex"; }); }
+  function turmaDe(d, slot) { return d.prog === "kids" && slot ? kidsDe(slot.split("|")[0]) : d.turma; }
   /* st: o status em vigor; pend: matriculado ou sem interesse, ainda com "Desfazer"; closed: já em Fechados */
   var leads = $$("#leads .lead"), closedT = [];
   /* o CRM: de onde veio o contato, a turma, as etapas e o histórico de cada um (o mais novo em cima).
@@ -2403,8 +2419,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   function digits(t) { var d = String(t).replace(/\D/g, ""); return d.length > 11 && d.indexOf("55") === 0 ? d.slice(2) : d; }
   function foneTxt(d) { return d.length === 11 ? "(" + d.slice(0, 2) + ") " + d.slice(2, 7) + "-" + d.slice(7) : d.length === 10 ? "(" + d.slice(0, 2) + ") " + d.slice(2, 6) + "-" + d.slice(6) : d; }
   function nowTxt() { return "hoje, " + $("#dClock").textContent; }
-  function slotS(s) { var q = s.split("|"); return q[0] + ", " + q[1] + "h"; }
-  function slotL(s) { var q = s.split("|"); return DAYS[q[0]][0] + ", " + DAYS[q[0]][1] + ", às " + q[1] + "h"; }
+  function slotS(s) { var q = s.split("|"); return q[0] + ", " + hx(q[1]); }
+  function slotL(s) { var q = s.split("|"); return DAYS[q[0]][0] + ", " + DAYS[q[0]][1] + ", às " + hx(q[1]); }
   function leadPill(row) {
     var d = row.dataset, v = d.pend || d.st;
     if (v === "matriculado") return '<span class="pill-s in">Matriculado</span>';
@@ -2526,12 +2542,12 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   }
   /* "Outro dia" (ou aula agendada sem pedido do site): dia e turma na própria linha */
   function pick(row, focus, pre) {
-    var d = row.dataset, box = $(".lead-pick", row), hs = TURMAS[d.prog], at = (d.slot || d.req || "seg|" + hs[hs.length - 1]).split("|");
+    var d = row.dataset, box = $(".lead-pick", row), hs = TURMAS[d.prog], at = (d.slot || d.req || "seg|" + (hs.indexOf("19") >= 0 ? "19" : hs[hs.length - 1])).split("|");
     box.setAttribute("aria-label", "Dia e turma da aula de " + (d.child || d.first));
-    box.innerHTML = '<select class="sel" data-pk="d" aria-label="Dia da aula">' + Object.keys(DAYS).map(function (k) { return '<option value="' + k + '"' + (k === at[0] ? " selected" : "") + ">" + k + " " + DAYS[k][1] + "</option>"; }).join("") + "</select>" +
-      '<select class="sel" data-pk="h" aria-label="Turma">' + hs.map(function (h) { return '<option value="' + h + '"' + (h === at[1] ? " selected" : "") + ">" + (d.prog === "kids" ? "Kids " : "Adulto ") + h + "h</option>"; }).join("") + "</select>" +
+    box.innerHTML = '<select class="sel" data-pk="d" aria-label="Dia da aula">' + diasDe(d.prog).map(function (k) { return '<option value="' + k + '"' + (k === at[0] ? " selected" : "") + ">" + k + " " + DAYS[k][1] + "</option>"; }).join("") + "</select>" +
+      '<select class="sel" data-pk="h" aria-label="Turma">' + hs.map(function (h) { return '<option value="' + h + '"' + (h === at[1] ? " selected" : "") + ">" + (d.prog === "kids" ? "Kids " : "Adulto ") + hx(h) + "</option>"; }).join("") + "</select>" +
       '<button class="mini-btn" type="button" data-pick-ok>Marcar</button><button class="mini-btn ghost" type="button" data-pick-no>Cancelar</button>' +
-      (d.prog === "feminino" ? "<small>O feminino treina junto com o adulto.</small>" : "");
+      (d.prog === "feminino" ? "<small>O feminino treina junto com o adulto.</small>" : d.prog === "kids" ? "<small>Seg e qua: Kids 2. Ter e qui: Kids 1.</small>" : "");
     morph(function () { if (pre) pre(); box.hidden = false; }, box);
     if (focus) focusSoft($("select", box), { preventScroll: true });
   }
@@ -2539,13 +2555,13 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   /* a mensagem muda com o status: confirmar o pedido, retomar a conversa ou lembrar a aula marcada */
   function leadText(row) {
     var d = row.dataset, of = d.child ? (d.art ? " do " : " de ") + d.child : "", hi = "Oi, " + d.first + "! Aqui é do Studio Evolution BJJ";
-    if (d.st === "novo" && d.req) return hi + ". Recebi seu pedido de aula experimental" + of + " para " + slotL(d.req) + ", no " + d.turma + ". Está confirmado! Chegue alguns minutos antes; a gente empresta o kimono. Se esse dia não der, me fala que eu te passo outro.";
-    if (d.st === "agendado") return hi + ". Confirmando a aula experimental" + of + " na " + slotL(d.slot) + ", no " + d.turma + ". Qualquer dúvida, é só chamar aqui.";
-    var hs = TURMAS[d.prog].map(function (h) { return h + "h"; }), list = hs.slice(0, -1).join(", ") + " ou " + hs[hs.length - 1];
-    var grp = d.prog === "feminino" ? "As alunas treinam junto com as turmas de adulto" : d.prog === "kids" ? "As turmas Kids treinam" : "As turmas de adulto treinam";
+    if (d.st === "novo" && d.req) return hi + ". Recebi seu pedido de aula experimental" + of + " para " + slotL(d.req) + ", no " + turmaDe(d, d.req) + ". Está confirmado! Chegue alguns minutos antes; a gente empresta o kimono. Se esse dia não der, me fala que eu te passo outro.";
+    if (d.st === "agendado") return hi + ". Confirmando a aula experimental" + of + " na " + slotL(d.slot) + ", no " + turmaDe(d, d.slot) + ". Qualquer dúvida, é só chamar aqui.";
+    var hs = TURMAS[d.prog].map(hx), list = hs.slice(0, -1).join(", ") + " ou " + hs[hs.length - 1];
+    var grp = d.prog === "kids" ? "As turmas Kids treinam às 9h e às 18h: o Kids 1 às terças e quintas, o Kids 2 às segundas e quartas" : (d.prog === "feminino" ? "As alunas treinam junto com as turmas de adulto" : "As turmas de adulto treinam") + ", de segunda a sexta, às " + list;
     /* contato novo sem pedido do site (adicionado no painel): a primeira conversa */
-    if (d.st === "novo") return hi + ". Que bom que você quer conhecer o jiu-jitsu! " + grp + ", de segunda a sexta, às " + list + ". Qual horário fica melhor para " + (d.child ? "a aula experimental" + of : "a sua aula experimental") + "? A primeira aula é grátis e a gente empresta o kimono.";
-    return hi + " de novo. " + grp + ", de segunda a sexta, às " + list + ". Qual horário fica melhor para " + (d.child ? "a aula experimental" + of : "a sua aula experimental") + "?";
+    if (d.st === "novo") return hi + ". Que bom que você quer conhecer o jiu-jitsu! " + grp + ". Qual horário fica melhor para " + (d.child ? "a aula experimental" + of : "a sua aula experimental") + "? A primeira aula é grátis e a gente empresta o kimono.";
+    return hi + " de novo. " + grp + ". Qual horário fica melhor para " + (d.child ? "a aula experimental" + of : "a sua aula experimental") + "?";
   }
   function initLead(row) {
     var s = $("select", row), d = row.dataset, nb = $(".nm-btn", row);
@@ -2702,8 +2718,8 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   var lf = $("#leadForm"), lfBtn = $("#leadAdd"), lfErr = $("#lfErr");
   function lfAula() {
     var prog = $("#lfProg").value, dia = $("#lfDia").value || "seg", hs = TURMAS[prog];
-    $("#lfDia").innerHTML = Object.keys(DAYS).map(function (k) { return '<option value="' + k + '"' + (k === dia ? " selected" : "") + ">" + k + " " + DAYS[k][1] + "</option>"; }).join("");
-    $("#lfHora").innerHTML = hs.map(function (h) { return '<option value="' + h + '">' + (prog === "kids" ? "Kids " : "Adulto ") + h + "h</option>"; }).join("");
+    $("#lfDia").innerHTML = diasDe(prog).map(function (k) { return '<option value="' + k + '"' + (k === dia ? " selected" : "") + ">" + k + " " + DAYS[k][1] + "</option>"; }).join("");
+    $("#lfHora").innerHTML = hs.map(function (h) { return '<option value="' + h + '">' + (prog === "kids" ? "Kids " : "Adulto ") + hx(h) + "</option>"; }).join("");
   }
   function lfSync() {
     var kid = $("#lfProg").value === "kids";
@@ -2772,14 +2788,16 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   /* ---------- Alunos: o professor cadastra o aluno. Ele entra na lista (com ficha), ganha a primeira mensalidade no
      Financeiro e, se marcado, o acesso ao app (acesso.js: na demonstração, a senha é de exemplo) ---------- */
   var alForm = $("#alForm"), alBtn = $("#alAdd"), alLead = null, alSeq = 0;
-  var HORAS = { adulto: ["8", "11", "19"], feminino: ["8", "11", "19"], kids: ["10", "18"] };
+  var HORAS = { adulto: ["8", "11", "19", "20:30"], feminino: ["8", "11", "19", "20:30"], kids1: ["9", "18"], kids2: ["9", "18"] };
+  /* "Kids 1 " ou "Adulto " antes da hora */
+  function turmaTx(prog) { return /^kids/.test(prog) ? "Kids " + prog.slice(-1) + " " : "Adulto "; }
   var FX_AD = ["branca", "azul", "roxa", "marrom", "preta"], FX_KD = ["branca", "cinza", "amarela", "laranja", "verde"];
   var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   $("#afVenc").innerHTML = Array.apply(null, Array(28)).map(function (_, i) { return '<option value="' + (i + 1) + '"' + (i === 9 ? " selected" : "") + ">dia " + (i + 1) + "</option>"; }).join("");
   function afSync() {
-    var prog = $("#afProg").value, kid = prog === "kids", h = $("#afHora").value, fx = $("#afFaixa").value, hs = HORAS[prog], fxs = kid ? FX_KD : FX_AD;
-    $("#afHora").innerHTML = hs.map(function (x) { return '<option value="' + x + '">' + (kid ? "Kids " : "Adulto ") + x + "h</option>"; }).join("");
-    $("#afHora").value = hs.indexOf(h) >= 0 ? h : hs[hs.length - 1];
+    var prog = $("#afProg").value, kid = /^kids/.test(prog), h = $("#afHora").value, fx = $("#afFaixa").value, hs = HORAS[prog], fxs = kid ? FX_KD : FX_AD;
+    $("#afHora").innerHTML = hs.map(function (x) { return '<option value="' + x + '">' + turmaTx(prog) + hx(x) + "</option>"; }).join("");
+    $("#afHora").value = hs.indexOf(h) >= 0 ? h : hs.indexOf("19") >= 0 ? "19" : hs[hs.length - 1];
     $("#afFaixa").innerHTML = fxs.map(function (f) { return '<option value="' + f + '">' + NAMES[f] + "</option>"; }).join("");
     $("#afFaixa").value = fxs.indexOf(fx) >= 0 ? fx : "branca";
     $$(".af-kid", alForm).forEach(function (el) { el.hidden = !kid; });
@@ -2794,8 +2812,10 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   }
   /* o interessado vira aluno: nome, WhatsApp, turma e horário vêm do contato. No Kids, o contato é o responsável */
   function preDe(row) {
-    var d = row.dataset, nm = $("b", row).textContent, aula = (d.slot || d.req || "").split("|")[1];
-    return { row: row, prog: d.prog, nome: d.child || nm, resp: d.child ? nm : "", idade: d.age || "", fone: foneTxt(d.phone || ""), hora: aula };
+    var d = row.dataset, nm = $("b", row).textContent, sl = (d.slot || d.req || "").split("|"), aula = sl[1];
+    /* do interesse no Kids, a turma sai do dia da aula experimental (sem dia, o Kids 1) */
+    var prog = d.prog === "kids" ? (sl[0] && kidsDe(sl[0]) === "Kids 2" ? "kids2" : "kids1") : d.prog;
+    return { row: row, prog: prog, nome: d.child || nm, resp: d.child ? nm : "", idade: d.age || "", fone: foneTxt(d.phone || ""), hora: aula };
   }
   function alAbrir(pre) {
     alForm.reset();
@@ -2840,7 +2860,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
   function cleanNome(t) { return t.trim().replace(/\s+/g, " "); }
   alForm.addEventListener("submit", function (e) {
     e.preventDefault();
-    var nome = cleanNome($("#afNome").value), prog = $("#afProg").value, kid = prog === "kids", resp = cleanNome($("#afResp").value), idade = $("#afIdade").value.replace(/\D/g, "");
+    var nome = cleanNome($("#afNome").value), prog = $("#afProg").value, kid = /^kids/.test(prog), resp = cleanNome($("#afResp").value), idade = $("#afIdade").value.replace(/\D/g, "");
     var ph = digits($("#afFone").value), em = $("#afEmail").value.trim().toLowerCase(), valor = +$("#afValor").value.replace(/\D/g, ""), app = $("#afApp").checked, ini = $("#afIni").value;
     if (nome.length < 5 || nome.indexOf(" ") < 0) return afErr("Digite o nome completo do aluno (nome e sobrenome).", $("#afNome"));
     if (kid && resp.length < 3) return afErr("No Kids, digite o nome do responsável.", $("#afResp"));
@@ -2850,7 +2870,7 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
     if (app && !em) return afErr("Para criar o acesso ao app, digite o e-mail (ou desmarque o acesso).", $("#afEmail"));
     if (!valor || valor > 5000) return afErr("Digite o valor da mensalidade.", $("#afValor"));
     if (!/^\d{4}-\d\d-\d\d$/.test(ini)) return afErr("Escolha a data de início.", $("#afIni"));
-    var id = "novo" + (++alSeq), hora = $("#afHora").value, cls = (kid ? "Kids " : "Adulto ") + hora + "h", belt = $("#afFaixa").value, g = +$("#afGraus").value;
+    var id = "novo" + (++alSeq), hora = $("#afHora").value, cls = turmaTx(prog) + hx(hora), belt = $("#afFaixa").value, g = +$("#afGraus").value;
     var parc = primeiraParcela(ini, +$("#afVenc").value), art = $("#afArt").value, ip = ini.split("-");
     var pp = PEOPLE[id] = { n: nome, cls: cls, since: "no Studio desde " + MESES[+ip[1] - 1] + " de " + ip[0], belt: belt, g: g, total: 0, desde: 0, ult: "começou agora",
       comp: [0, kid ? 6 : 8], days: [], skip: 0, last: "2000-01-01", nova: 1, fee: "primeira mensalidade vence " + parc.txt };
