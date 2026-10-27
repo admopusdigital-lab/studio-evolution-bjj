@@ -38,8 +38,10 @@ As regras de segurança foram testadas num Postgres local imitando o Supabase:
    - Com essa conta como Administrator, o Supabase poderia impedir a reativação do projeto.
 5. Em **Authentication → Sign In / Providers → Email**, desligar **Allow new users to sign up**. Só o Studio cria contas.
 6. Em **Authentication → URL Configuration**:
-   - **Site URL**: o domínio do site, por exemplo `https://studioevolutionbjj.com.br`.
-   - **Redirect URLs**: incluir `https://<domínio>/nova-senha.html`.
+   - **Site URL**: o endereço do site. Enquanto não houver domínio, o do Cloudflare Pages
+     (`https://<projeto>.pages.dev`); depois, o domínio do Studio.
+   - **Redirect URLs**: incluir `https://<projeto>.pages.dev/nova-senha.html` e, quando houver,
+     `https://<domínio>/nova-senha.html`.
 7. Para o "Esqueci a senha" por e-mail, configurar o SMTP em **Authentication → Emails → SMTP Settings** (por exemplo
    Resend ou Brevo, os dois têm plano grátis).
    - O e-mail padrão do Supabase só entrega para membros da equipe e tem limite baixo.

@@ -39,9 +39,32 @@ Versão publicada (privada): https://claude.ai/artifact/7PbBFQCkuSw1SPbBvzXHuw
 - `tools/simbolo-true.py`: vetoriza o símbolo da Equipe TRUE a partir de `tools/fontes/logo-true.png` (logo oficial, baixada de bjjtrue.com) e gera `site/img/true-simbolo.svg`. O mesmo desenho vai embutido na seção "Equipe TRUE", onde a rolagem o desenha e enche de ouro.
 - `area-do-aluno-evolution.html`: estudo inicial de direções para a Área do Aluno.
 
-## Publicar (GitHub Pages)
+## Publicar
 
-`.github/workflows/pages.yml` publica a pasta `site/` a cada push na branch `main-kr1apn` (ou à mão, em Actions → Publicar o site → Run workflow). Antes, o Pages precisa estar ligado em **Settings → Pages → Source: GitHub Actions**. O fluxo acrescenta o esqueleto ao `index.html` e um `robots.txt` que deixa o endereço de teste fora do Google; ao passar para o domínio do Studio, apague essa linha do fluxo.
+`scripts/montar-site.sh` monta a pasta `_site/`: copia `site/`, acrescenta o esqueleto ao `index.html` e escreve um
+`robots.txt` que deixa o endereço de teste fora do Google. Com `PUBLICO=1`, o `robots.txt` libera a indexação (use no
+domínio definitivo do Studio). `site/_headers` traz os cabeçalhos do Cloudflare (o service worker sem cache).
+
+### Cloudflare Pages (principal)
+
+Ligado direto no GitHub, sem chave de API: cada push na branch publica sozinho.
+
+1. No painel do Cloudflare: **Workers & Pages → Create → Pages → Connect to Git**.
+2. Autorizar o GitHub e escolher o repositório `admopusdigital-lab/studio-evolution-bjj`.
+3. Configurar o build:
+   - **Production branch:** `main-kr1apn`
+   - **Framework preset:** None
+   - **Build command:** `bash scripts/montar-site.sh`
+   - **Build output directory:** `_site`
+4. **Save and Deploy.** O endereço fica `https://<nome-do-projeto>.pages.dev`.
+5. No domínio definitivo: **Custom domains → Set up a domain**, e em **Settings → Variables** criar `PUBLICO` = `1`
+   para liberar o Google.
+
+### GitHub Pages (reserva)
+
+`.github/workflows/pages.yml` roda o mesmo script a cada push na branch `main-kr1apn`. Para funcionar, o ambiente
+`github-pages` precisa aceitar a branch: **Settings → Environments → github-pages → Deployment branches** → adicionar
+`main-kr1apn`.
 
 ## Ver localmente
 
