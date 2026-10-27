@@ -59,7 +59,12 @@ supabase db push                                    # cria perfis, movimentos, e
 supabase functions deploy criar-conta --no-verify-jwt  # a função confere o login ela mesma
 ```
 
-Também dá para colar o SQL da migration no **SQL Editor** do painel, se preferir.
+Sem o convite, o dono faz o mesmo pelo painel:
+1. **SQL Editor → New query**: colar todo o `supabase/instalar-banco.sql` (as duas migrations juntas) e clicar em **Run**.
+   Rodar uma vez só, no projeto vazio.
+2. **Edge Functions → Deploy a new function → Via Editor**: nome `criar-conta`, colar o
+   `supabase/functions/criar-conta/index.ts` e, em **Advanced settings**, desligar **Verify JWT** (a função confere o
+   login ela mesma). Clicar em **Deploy function**.
 
 A função usa os segredos padrão do Supabase (`SUPABASE_URL` e `SUPABASE_SECRET_KEYS`, ou `SUPABASE_SERVICE_ROLE_KEY`
 nos projetos antigos). Não é preciso cadastrar nenhum segredo à mão.

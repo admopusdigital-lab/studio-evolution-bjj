@@ -12,7 +12,7 @@ create table public.perfis (
   papel         text not null check (papel in ('aluno', 'professor')),
   nome          text not null check (char_length(nome) between 2 and 120),
   whatsapp      text check (whatsapp ~ '^[0-9]{10,13}$'),
-  turma         text check (turma in ('adulto', 'kids')),
+  turma         text check (turma in ('adulto', 'feminino', 'kids1', 'kids2')),
   faixa         text check (faixa in ('branca', 'cinza', 'amarela', 'laranja', 'verde', 'azul', 'roxa', 'marrom', 'preta')),
   graus         smallint not null default 0 check (graus between 0 and 6),
   ativo         boolean not null default true,
