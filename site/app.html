@@ -67,6 +67,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .app-conta a.ap-rowbtn { display: flex; text-decoration: none; }
 .app-sair { color: var(--warn); }
 .app-demo { margin-top: 12px; font-size: 11.5px; }
+.ap-row .warn { color: var(--warn); }
+.ap-wk.seis { grid-template-columns: repeat(6, 1fr); }
+.app-notes-none { margin-top: 14px; padding: 14px; background: var(--paper-2); font-size: 12px; color: var(--ink-2); text-align: center; }
 .app-demo b { color: var(--gold-text); font-weight: 600; letter-spacing: 0.06em; }
 /* Movimentos: a biblioteca (a lista abre a aula) e a tela da aula, com o vídeo, os pontos-chave e o quiz */
 .ap-cats { display: flex; gap: 6px; margin: 16px -18px 0; padding: 0 18px 2px; overflow-x: auto; scrollbar-width: none; }
@@ -212,7 +215,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <div class="ap-wkh"><p class="ap-lb">Semana · <span id="apWeek">2 de 3</span> treinos</p><button class="ap-wkb" type="button" id="apGoal" aria-label="Mudar a meta da semana">mudar</button></div>
         <!-- o ponto de quem treinou leva o texto para o leitor de tela; o de hoje só aparece depois da presença -->
         <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
-        <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r">segunda, 19 de outubro, 19h</span></div>
+        <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r" id="apNext">segunda, 19 de outubro, 19h</span></div>
         <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
       </section>
 
@@ -304,7 +307,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <div class="ap-row" style="border-top:0;padding-bottom:0"><span style="font:400 19px/1 var(--serif)">Faixa azul</span><span class="r">2 de 4 graus</span></div>
         <div class="ap-degs"><i class="on"></i><i class="on"></i><i></i><i></i></div>
         <!-- "aulas desde o último grau" conta as presenças registradas: a de hoje leva 21 a 22 (register) -->
-        <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b>6</b><span>semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
+        <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b id="apStreak">6</b><span id="apStreakT">semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
         <button class="ap-row pulse" type="button" id="apCompBtn" aria-expanded="false" aria-controls="apComp" style="width:100%;margin-top:12px;border-left:0;border-right:0;border-bottom:0;background:none;color:inherit;font:inherit;cursor:pointer"><span>Competências da faixa</span><span class="r">3 de 8<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
         <!-- as 8 da faixa azul: 3 conquistadas e 5 a conquistar (as três últimas são exemplo) -->
         <ul class="ap-comp" id="apComp" aria-label="3 de 8 competências conquistadas" hidden>
@@ -647,14 +650,14 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   function carregarReal() {
     return Acesso.cliente().then(function (sb) {
-      return sb.from("alunos").select("id, nome, turma, horario, faixa, graus").maybeSingle();
+      return sb.from("alunos").select("id, nome, artigo, turma, horario, faixa, graus, inicio, mensalidade, vencimento").maybeSingle();
     }).then(function (r) {
       if (r.error || !r.data) return semCadastro();
       ALUNO = r.data;
       AULA = proximaAula(ALUNO.turma, ALUNO.horario);
       if (!AULA) { AULA = { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 }; return semCadastro(); }
       paintAula();
-      return atualizarQuem();
+      return Promise.all([atualizarQuem(), extrasReal()]);
     }).catch(function () { toast("Sem conexão com o Studio. Confira a internet."); });
   }
   if (!demo) {
@@ -671,8 +674,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     g.innerHTML = Array.apply(null, Array(goal)).map(function (_, i) { return '<i' + (i < trained ? ' class="on"' : "") + "></i>"; }).join("");
     $("p", $("#apDone")).textContent = "Presença registrada. " + (trained >= goal ? "Meta da semana batida: " + trained + " de " + goal + "." : "Faltam " + (goal - trained) + " para a meta da semana.");
   }
+  if (!demo) { try { goal = +localStorage.getItem("evo-meta-semana") || 3; } catch (e) {} }
   $("#apGoal").addEventListener("click", function () {
     goal = goal % 5 + 1;
+    if (!demo) { try { localStorage.setItem("evo-meta-semana", String(goal)); } catch (e) {} if (window.paintAvisosReal) paintAvisosReal(); }
     paintGoal();
     toast("Meta da semana: " + goal + (goal === 1 ? " treino." : " treinos."));
   });
@@ -839,8 +844,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     }
     if (anim) gsap.to(wrap, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: fold });
     else later(fold, 0);
-    $("#apToday").hidden = false;
-    $("#apSince").textContent = "22";
+    if (demo) { $("#apToday").hidden = false; $("#apSince").textContent = "22"; }
+    else extrasReal();
     var g = $(".ap-goal", done);
     g.classList.remove("burst"); void g.offsetWidth; g.classList.add("burst");
     if (anim) gsap.from(done, { y: 18, opacity: 0, duration: 0.8, ease: "expo.out" });
@@ -1188,6 +1193,141 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     mov: function () { leave("movimentos", function () { abrir("passagem-toreando"); }); }
   };
   $$(".ap-note[data-note]", noteV).forEach(function (n) { n.addEventListener("click", NOTE[n.dataset.note]); });
+
+  /* ---------- modo Supabase: a semana, a mensalidade, o perfil e os avisos com os dados do aluno ---------- */
+  var MEUS = { pres: [], mens: [], grads: [] };
+  var BC = { branca: "oklch(0.96 0.004 90)", cinza: "oklch(0.66 0.012 260)", amarela: "oklch(0.85 0.15 95)", laranja: "oklch(0.72 0.16 55)", verde: "oklch(0.58 0.13 150)", azul: "oklch(0.55 0.17 258)", roxa: "oklch(0.45 0.15 305)", marrom: "oklch(0.42 0.07 50)", preta: "oklch(0.2 0.006 285)" };
+  var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  function diaDe(iso) { var q = String(iso).slice(0, 10).split("-"); return new Date(+q[0], +q[1] - 1, +q[2]); }
+  function br(iso) { var q = String(iso).slice(0, 10).split("-"); return q[2] + "/" + q[1]; }
+  function brl(v) { v = Number(v) || 0; return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: v % 1 ? 2 : 0 }); }
+  function extrasReal() {
+    if (demo || !ALUNO || !ALUNO.id) return Promise.resolve();
+    return Acesso.cliente().then(function (sb) {
+      return Promise.all([
+        sb.from("presencas").select("data, hora").order("data", { ascending: false }).limit(1000),
+        sb.from("mensalidades").select("competencia, valor, vencimento, pago_em, forma").order("competencia", { ascending: false }).limit(6),
+        sb.from("graduacoes").select("faixa, graus, data").order("data", { ascending: false })
+      ]);
+    }).then(function (r) {
+      MEUS.pres = r[0].data || []; MEUS.mens = r[1].data || []; MEUS.grads = r[2].data || [];
+      paintSemana(); paintMens(); paintPerfil(); paintAvisosReal();
+    }).catch(function () {});
+  }
+  /* a próxima aula da turma depois da que está no Início */
+  function proximaDepois() {
+    if (!AULA || !AULA.data) return null;
+    var nome = AULA.turma, d0 = diaDe(AULA.data);
+    for (var k = 0; k < 9; k++) {
+      var dia = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate() + k);
+      var l = Site.aulasDo(dia.getDay()).filter(function (c) { return c.n === nome && (k > 0 || mins(c.t) > mins(AULA.hora)); });
+      var pref = ALUNO.horario ? l.filter(function (c) { return c.t === ALUNO.horario; }) : [];
+      if (pref.length) l = pref;
+      if (l.length) return { dia: dia, hora: l[0].t };
+    }
+    return null;
+  }
+  function paintSemana() {
+    var hoje = new Date(), seg = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - ((hoje.getDay() + 6) % 7)), dias = {}, n = 0, html = "";
+    MEUS.pres.forEach(function (x) { dias[x.data] = 1; });
+    ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].forEach(function (nm, i) {
+      var d = new Date(seg); d.setDate(seg.getDate() + i);
+      var k = isoDia(d), t = k === isoDia(hoje), v = dias[k];
+      if (v) n++;
+      html += "<div" + (t ? ' class="today"' : "") + "><span>" + nm + "</span><b>" + d.getDate() + "</b>" + (t ? '<span class="sr-only">, hoje</span>' : "") + (v ? '<i><span class="sr-only">, treinou</span></i>' : "") + "</div>";
+    });
+    var wk = $(".ap-wk", screenOf("inicio"));
+    wk.innerHTML = html;
+    wk.classList.add("seis");
+    trained = n;
+    paintGoal();
+    var p = proximaDepois();
+    $("#apNext").textContent = p ? new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(p.dia) + ", " + Site.hora(p.hora) : "—";
+  }
+  function paintMens() {
+    var agora = new Date(), comp = isoDia(agora).slice(0, 8) + "01", m = MEUS.mens.filter(function (x) { return x.competencia === comp; })[0], hoje = isoDia(agora);
+    var fee = $("#apFee"), st;
+    $("span", fee).textContent = "Mensalidade de " + MESES[agora.getMonth()];
+    if (!m) st = '<span class="ap-mut">Sem cobrança</span>';
+    else if (m.pago_em) st = '<span class="ok">Em dia</span>';
+    else if (m.vencimento < hoje) st = '<span class="warn">Atrasada</span>';
+    else st = "<span>Vence " + br(m.vencimento) + "</span>";
+    $(".r", fee).innerHTML = st + '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg>';
+    var sh = $("#apSheet");
+    $("#apSheetT").textContent = "Mensalidade";
+    $("#apSheetT").nextElementSibling.textContent = ALUNO.mensalidade != null ? brl(ALUNO.mensalidade) + " · vence todo dia " + (ALUNO.vencimento || 10) : "Valor combinado com o Studio";
+    $$(".ap-row", sh).forEach(function (r) { r.remove(); });
+    var rows = MEUS.mens.slice(0, 4).map(function (x) {
+      var d = diaDe(x.competencia), nm = MESES[d.getMonth()].charAt(0).toUpperCase() + MESES[d.getMonth()].slice(1);
+      var s2 = x.pago_em ? '<span class="r ok">Pago em ' + br(x.pago_em) + "</span>" : x.vencimento < hoje ? '<span class="r warn">Venceu em ' + br(x.vencimento) + "</span>" : '<span class="r">Vence ' + br(x.vencimento) + "</span>";
+      return '<div class="ap-row"><span>' + nm + " · " + brl(x.valor) + "</span>" + s2 + "</div>";
+    }).join("") || '<div class="ap-row"><span>Nenhuma mensalidade lançada</span></div>';
+    $("#apReceipt").insertAdjacentHTML("beforebegin", rows.replace('class="ap-row"', 'class="ap-row" style="margin-top:12px"'));
+    $("#apReceipt").hidden = true;
+  }
+  function semanas() {
+    /* semanas (de segunda) com pelo menos um treino: a sequência até agora e o recorde */
+    var set = {};
+    MEUS.pres.forEach(function (x) { var d = diaDe(x.data); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); set[isoDia(d)] = 1; });
+    var hoje = new Date(), seg = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - ((hoje.getDay() + 6) % 7)), atual = 0, k = 0;
+    if (!set[isoDia(seg)]) k = 1;
+    for (; k < 200; k++) { var d = new Date(seg); d.setDate(seg.getDate() - 7 * k); if (set[isoDia(d)]) atual++; else break; }
+    var lista = Object.keys(set).sort(), rec = 0, run = 0, prev = null;
+    lista.forEach(function (w) { var d = diaDe(w); run = prev && (d - prev) / 864e5 === 7 ? run + 1 : 1; prev = d; rec = Math.max(rec, run); });
+    return { atual: atual, rec: rec };
+  }
+  function paintPerfil() {
+    var pf = screenOf("perfil"), a = ALUNO, g = MEUS.grads[0], fx = a.faixa || "branca", graus = a.graus || 0, d = diaDe(a.inicio || isoDia(new Date()));
+    $(".ap-hi", pf).textContent = a.nome;
+    $(".ap-hi", pf).nextElementSibling.textContent = (a.artigo === "a" ? "Aluna" : "Aluno") + " desde " + MESES[d.getMonth()] + " de " + d.getFullYear() + " · " + (TURMA[a.turma] || "Adulto") + (a.horario ? " " + Site.hora(a.horario) : "");
+    var barra = fx === "preta" ? "oklch(0.55 0.2 27)" : "oklch(0.2 0.006 285)", st = "";
+    for (var i = 0; i < Math.min(graus, 4); i++) st += '<rect x="' + (196 + i * 12.5) + '" y="1.5" width="5" height="31" fill="oklch(0.97 0.003 264)"/>';
+    var nomeF = BELT[fx] || "Branca";
+    $(".ap-belt", pf).outerHTML = '<svg class="ap-belt" viewBox="0 0 264 34" role="img" aria-label="Faixa ' + nomeF.toLowerCase() + ", " + (graus ? graus + (graus === 1 ? " grau" : " graus") : "sem grau") + '"><rect x=".5" y=".5" width="263" height="33" rx="2" fill="' + BC[fx] + '" stroke="oklch(0 0 0 / .12)"/>' +
+      '<g stroke="oklch(0 0 0 / .14)" stroke-width=".7"><line x1="2" x2="262" y1="7" y2="7"/><line x1="2" x2="262" y1="13" y2="13"/><line x1="2" x2="262" y1="20" y2="20"/><line x1="2" x2="262" y1="27" y2="27"/></g>' +
+      '<rect x="190" y=".5" width="58" height="33" fill="' + barra + '"/>' + st + "</svg>";
+    var row = $(".ap-belt", pf).nextElementSibling;
+    $("span", row).textContent = "Faixa " + nomeF.toLowerCase();
+    $(".r", row).textContent = graus + " de 4 graus";
+    $(".ap-degs", pf).innerHTML = [0, 1, 2, 3].map(function (i) { return "<i" + (i < graus ? ' class="on"' : "") + "></i>"; }).join("");
+    var desde = g ? MEUS.pres.filter(function (x) { return x.data > g.data; }).length : MEUS.pres.length, s = semanas();
+    $("#apSince").textContent = desde;
+    $("#apStreak").textContent = s.atual;
+    $("#apStreakT").textContent = (s.atual === 1 ? "semana seguida" : "semanas seguidas") + " · recorde " + s.rec;
+    $("#apCompBtn").hidden = true;
+    $("#apComp").hidden = true;
+    $("#apNote").textContent = "O próximo grau é decisão do professor. Treinar com frequência e estudar os movimentos da faixa ajudam.";
+  }
+  /* os avisos nascem dos dados: a aula de hoje sem vaga confirmada, a mensalidade, a meta da semana e o grau novo */
+  function paintAvisosReal() {
+    if (demo || !ALUNO) return;
+    var hoje = isoDia(new Date()), l = [], comp = hoje.slice(0, 8) + "01", m = MEUS.mens.filter(function (x) { return x.competencia === comp; })[0];
+    if (AULA && AULA.k === 0 && !semAula && !confirmed && !registered) l.push(["aula", "Sua aula é hoje, às " + Site.hora(AULA.hora), AULA.turma + " · " + (10 - ocupadas()) + " vagas livres. Toque para confirmar."]);
+    if (m && !m.pago_em && m.vencimento < hoje) l.push(["fee", "Mensalidade em atraso", "Venceu em " + br(m.vencimento) + ". Se já pagou, mande o comprovante pelo WhatsApp do Studio."]);
+    else if (m && !m.pago_em && (diaDe(m.vencimento) - diaDe(hoje)) / 864e5 <= 3) l.push(["fee", "A mensalidade vence em " + br(m.vencimento), brl(m.valor) + ". Toque para ver."]);
+    if (trained < goal) l.push(["meta", "Faltam " + (goal - trained) + (goal - trained === 1 ? " treino" : " treinos") + " para a meta da semana", "Meta: " + goal + (goal === 1 ? " treino" : " treinos") + ". Se não der, tudo bem."]);
+    var g = MEUS.grads[0];
+    if (g && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push(["perfil", "Parabéns pelo grau!", (BELT[g.faixa] || "") + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + "."]);
+    var box = $(".app-notes", noteV);
+    box.innerHTML = l.map(function (x) {
+      return '<button class="ap-note" type="button" data-note="' + x[0] + '"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>' + esc(x[1]) + '</b><span class="tx">' + esc(x[2]) + "</span></span></button>";
+    }).join("") || '<p class="app-notes-none">Nenhum aviso agora.</p>';
+    var badge = $("#apBadge"), vendo = current === "avisos";
+    badge.textContent = l.length;
+    badge.hidden = !l.length || vendo;
+    bell.setAttribute("aria-label", l.length && !vendo ? "Avisos, " + l.length + (l.length === 1 ? " novo" : " novos") : "Avisos");
+    if (vendo) notes();
+  }
+  window.paintAvisosReal = paintAvisosReal;
+  if (!demo) noteV.addEventListener("click", function (e) {
+    var b = e.target.closest(".ap-note[data-note]");
+    if (!b) return;
+    var k = b.dataset.note;
+    if (k === "aula") leave("inicio", confirmSpot, confBtn);
+    else if (k === "fee") leave("inicio", openSheet);
+    else if (k === "perfil") leave("perfil");
+    else leave("inicio");
+  });
 
   /* ---------- instalar: Android e Chrome mostram o pedido do navegador; no iPhone, a instrução do Safari ---------- */
   var inst = $("#apInstall"), pedido = null;

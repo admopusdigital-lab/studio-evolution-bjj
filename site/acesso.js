@@ -14,7 +14,8 @@
   var MANTER = "evo-manter";       /* "1": a sessão fica no localStorage (sobrevive ao fechar o navegador) */
   /* depois de entrar, cada um cai no seu app: o do aluno (app.html) ou o painel em tela cheia (a área do professor com ?painel).
      As vitrines (area-do-aluno.html e area-do-professor.html) continuam abertas para quem tem login */
-  var AREA = { aluno: "app.html", professor: "area-do-professor.html?painel" };
+  /* no modo Supabase, o professor vai para o painel de verdade (painel.html); na demonstração, para o painel de exemplo */
+  var AREA = { aluno: "app.html", professor: REAL ? "painel.html" : "area-do-professor.html?painel" };
   var DEMO_SENHA = "evolution";
 
   /* armazenamento: sessionStorage por padrão, localStorage com "Manter conectado"; aba privada sem nenhum dos dois não quebra */

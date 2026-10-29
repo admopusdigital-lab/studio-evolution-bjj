@@ -127,19 +127,37 @@ dia o Studio quiser vídeos só para quem tem login).
 Os movimentos de exemplo da demonstração não vão para o banco: com o Supabase ligado, a biblioteca começa vazia e o
 professor cadastra a dele.
 
-## O que fica para depois (precisa do banco ligado)
+## Gestão do Studio (instalada)
 
-As áreas do aluno e do professor ainda mostram dados de exemplo (Marina, a turma das 19h, o financeiro). Ligar cada
-tela ao banco é a próxima etapa. Cada uma vira uma tabela com as mesmas regras de segurança:
-- presenças e vagas;
-- faixas e graus;
-- interessados (o CRM): contatos vindos do Agendar e os adicionados no painel, com anotações e histórico;
-- configurações: o status de cada integração e as chaves do Asaas e da Evolution API, guardadas só no servidor
-  (segredos da função ou Vault do Supabase), nunca numa tabela que o site leia;
-- alunos cadastrados pelo professor (o cadastro já cria o login pela função `criar-conta`; os dados da ficha, como turma,
-  faixa, mensalidade e vencimento, ainda precisam de tabela);
-- mensalidades, com o Asaas e os lembretes da Evolution API;
-- despesas e a meta do mês (o BI do Financeiro passa a ler o histórico de verdade, mês a mês).
+`supabase/migrations/20261029120000_gestao.sql` (ou `supabase/instalar-gestao.sql`, que já traz a limpeza dos testes)
+cria as tabelas que o painel e o app usam:
+
+| Tabela | O que guarda | Quem lê / muda |
+|---|---|---|
+| `alunos` | o cadastro (turma, horário, faixa, mensalidade, vencimento, responsável no Kids) | professor; o aluno lê o dele |
+| `chamadas` | o código da aula (3 letras e 3 números) e até quando vale | professor |
+| `presencas` | quem treinou em cada aula, pelo app ou marcado pelo professor | professor; o aluno lê as dele |
+| `reservas` | a vaga confirmada no app (até 10 por aula) | professor; o aluno lê e cancela a dele |
+| `graduacoes` | cada grau e faixa (a última vira a faixa do cadastro) | professor; o aluno lê as dele |
+| `mensalidades` | uma por aluno por mês, com a baixa e a forma | professor; o aluno lê as dele |
+| `despesas`, `metas` | as despesas do Studio e a meta de cada mês | professor |
+| `leads`, `lead_eventos` | Interessados e o histórico de cada um | professor |
+| `configuracoes` | os dados do Studio (WhatsApp, Pix, endereço) | professor |
+
+Funções que o app e o site chamam:
+- `registrar_presenca(codigo)`: o aluno marca a presença com o código da TV, só na aula aberta e dentro do prazo.
+- `reservar(data, hora)` e `vagas_aula(data, hora)`: a vaga, com o limite de 10.
+- `confirmados_aula(data, hora)`: quem vai na aula (primeiro nome, inicial e faixa), para a tela de Presença.
+- `pedido_site(...)`: o pedido de aula experimental do Agendar entra em Interessados (sem login, até 30 por hora).
+
+Uma conta de aluno criada em Acessos (ou pela ficha do aluno no painel) liga sozinha ao cadastro com o mesmo e-mail.
+
+O painel de verdade é `site/painel.html` (com `painel.js` e uma parte por aba: `painel-hoje.js`, `painel-alunos.js`,
+`painel-crm.js`, `painel-fin.js`, `painel-mov.js`). Com o Supabase ligado, o login de professor leva para lá; a
+página `area-do-professor.html` continua como vitrine e demonstração, com dados de exemplo.
+
+Ainda não ligado: a cobrança automática (Asaas) e o WhatsApp de avisos (Evolution API). As chaves desses serviços
+ficam só no servidor (segredos da função ou Vault do Supabase), nunca numa tabela que o site leia.
 
 O service worker do app (`site/sw.js`) não guarda nada do Supabase: login e dados vão sempre direto ao servidor.
 

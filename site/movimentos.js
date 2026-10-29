@@ -184,8 +184,13 @@
     /* a faixa de quem está usando: na demonstração, a da Marina */
     minhaFaixa: function () {
       if (!REAL) return Promise.resolve("azul");
-      return cli().then(function (c) { return eu(c).then(function (id) { return c.from("perfis").select("faixa").eq("id", id).single().then(ok); }); })
-        .then(function (r) { return r.faixa || "branca"; });
+      /* a faixa mora no cadastro do aluno (alunos, ligado à conta); sem cadastro, a do perfil */
+      return cli().then(function (c) {
+        return c.from("alunos").select("faixa").maybeSingle().then(function (r) {
+          if (r.data && r.data.faixa) return r.data.faixa;
+          return eu(c).then(function (id) { return c.from("perfis").select("faixa").eq("id", id).single().then(ok); }).then(function (x) { return x.faixa || "branca"; });
+        });
+      });
     },
     /* demonstração: volta a biblioteca e o progresso ao começo */
     recomecar: function () { var a = store("localStorage"), b = store("sessionStorage"); try { if (a) a.removeItem(CAT_K); if (b) b.removeItem(PROG_K); } catch (e) {} }
