@@ -1,7 +1,9 @@
-// Cloudflare Workers (site estático): o build roda scripts/montar-site.sh e publica a pasta _site/
+// Cloudflare Workers (site estático): o "npx wrangler deploy" roda scripts/montar-site.sh e publica a pasta _site/.
+// Funciona com a configuração padrão do painel, sem build command.
 {
   "name": "studio-evolution-bjj",
   "compatibility_date": "2026-10-01",
+  "build": { "command": "bash scripts/montar-site.sh" },
   "assets": {
     "directory": "./_site"
   }
