@@ -5,6 +5,6 @@
    em Project Settings → API Keys. As duas são públicas por natureza: quem protege os dados são as regras do
    banco (RLS) em supabase/migrations. Nunca coloque aqui a chave secreta (secret / service_role). */
 window.EVO_SUPABASE = {
-  url: "",   /* ex.: "https://abcdefghijklmnop.supabase.co" */
-  chave: ""  /* ex.: "sb_publishable_..." (ou a chave anon antiga) */
+  url: "https://nkscqdhczfeykrtexyzs.supabase.co",
+  chave: "sb_publishable_wL9OUbiefbAJtEetkVJ-Fg_avW1ztCM"
 };
