@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Contato · Redesign Studio Evolution</title>
+<title>Contato · Studio Evolution BJJ</title>
 <script>
 (function () {
   var d = document.documentElement, l = "black";
@@ -45,6 +45,9 @@
 .c-row h3 i { font-style: normal; color: var(--gold-text); }
 .c-row > div { min-width: 0; padding-left: 18px; }
 @media (min-width: 700px) { .c-row > div { padding-left: 0; } }
+.c-fach { margin-top: 24px; }
+.c-fach img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; box-shadow: 0 0 0 1px var(--rule), 0 24px 48px -28px oklch(0 0 0 / 0.6); }
+.c-fach figcaption { margin-top: 12px; font-size: 13.5px; line-height: 1.5; color: var(--ink-3); }
 .c-row .big { font: 700 clamp(20px, 1.9vw, 30px)/1.2 var(--sans); letter-spacing: -0.02em; }
 .c-row .big.tel { font: 400 clamp(30px, 3vw, 46px)/1.05 var(--serif); letter-spacing: -0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
@@ -123,7 +126,6 @@
   <div class="wrap nav-in">
     <div class="brandrow">
       <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
-      <a class="tagp" href="area-do-aluno.html" data-int title="Esta página é uma proposta de redesign. Ver também a Área do Aluno"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
     </div>
     <nav class="links" aria-label="Menu principal">
       <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
@@ -135,7 +137,7 @@
     <div class="nav-right">
       <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
       <div class="nav-cta">
-        <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="roll" href="entrar.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
       </div>
     </div>
@@ -144,17 +146,16 @@
 
 <main>
   <section class="phero cin cine c-hero" data-dark aria-labelledby="t-c">
-    <div class="cin-bg c-hero-pic" aria-hidden="true"><img src="img/professores-evolution.webp" alt="" width="1200" height="800"></div>
+    <div class="cin-bg c-hero-pic" aria-hidden="true"><picture><source media="(max-aspect-ratio: 4/5)" srcset="img/takes/chega.jpg" width="1080" height="1350"><img src="img/tatame-familia.webp" alt="" width="1200" height="787"></picture></div>
     <div class="cin-shade" aria-hidden="true"></div>
-    <canvas class="cin-gl" aria-hidden="true"></canvas>
     <span class="cin-ghost" aria-hidden="true">道場</span>
     <div class="wrap">
       <div class="phero-top" data-in><p class="label gold">Onde estamos</p><p class="phero-meta">Jardim São Paulo · Sorocaba/SP</p></div>
       <h1 class="phero-title" id="t-c">Venha <span class="o">conhecer o</span> <em class="gl">Studio Evolution BJJ.</em></h1>
-      <p class="lede" data-in>Estamos no Jardim São Paulo, em Sorocaba, com fácil acesso e estrutura preparada para receber você e sua família.</p>
+      <p class="lede" data-in>Estamos na Av. Getúlio Vargas, no Jardim São Paulo, em Sorocaba. Venha conhecer o tatame, sozinho ou com a família.</p>
       <div class="cin-row">
         <a class="btn btn-ink" data-magnetic href="https://www.google.com/maps/search/?api=1&amp;query=Av.%20Get%C3%BAlio%20Vargas%2C%20400%2C%20Jardim%20S%C3%A3o%20Paulo%2C%20Sorocaba%20SP" target="_blank" rel="noopener">Como chegar<svg class="ic"><use href="#i-arrow"/></svg></a>
-        <a class="link" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener">Falar no WhatsApp</a>
+        <a class="link" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20queria%20tirar%20uma%20d%C3%BAvida." target="_blank" rel="noopener">Falar no WhatsApp</a>
         <p class="pill-live" data-office><i aria-hidden="true"></i><span>Atendimento</span><b>Seg a sex · 8h às 21h</b></p>
       </div>
       <div class="cin-data">
@@ -183,11 +184,15 @@
             <h3><i>01</i>Endereço</h3>
             <div>
               <p class="big">Av. Getúlio Vargas, 400, sala 3, sobreloja</p>
-              <p class="sub">Jardim São Paulo · Sorocaba - SP · CEP 18051-480</p>
+              <p class="sub">Jardim São Paulo · Sorocaba/SP · CEP 18051-480</p>
               <div class="c-acts">
                 <a class="chipbtn" href="https://www.google.com/maps/search/?api=1&amp;query=Av.%20Get%C3%BAlio%20Vargas%2C%20400%2C%20Jardim%20S%C3%A3o%20Paulo%2C%20Sorocaba%20SP" target="_blank" rel="noopener"><svg class="ic"><use href="#i-pin"/></svg>Google Maps</a>
                 <a class="chipbtn" href="https://waze.com/ul?ll=-23.5230709%2C-47.4940211&amp;navigate=yes" target="_blank" rel="noopener"><svg class="ic"><use href="#i-nav"/></svg>Waze</a>
               </div>
+              <figure class="c-fach">
+                <img src="img/fachada-studio.webp" alt="Prédio da Av. Getúlio Vargas, 400, visto do alto: no andar de cima, a placa preta e dourada do Studio Evolution BJJ; embaixo, a Drogaria Madeleine" loading="lazy" width="1280" height="720">
+                <figcaption>O Studio fica no andar de cima do nº 400, com a placa preta e dourada. Embaixo, a Drogaria Madeleine.</figcaption>
+              </figure>
             </div>
           </div>
           <div class="c-row">
@@ -195,7 +200,7 @@
             <div>
               <p class="big tel" id="phone">(15) 99674-1812</p>
               <div class="c-acts">
-                <a class="chipbtn" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg>Abrir conversa</a>
+                <a class="chipbtn" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20queria%20tirar%20uma%20d%C3%BAvida." target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg>Abrir conversa</a>
                 <button class="chipbtn" type="button" id="copyBtn"><svg class="ic"><use href="#i-copy"/></svg>Copiar número</button>
               </div>
             </div>
@@ -203,8 +208,10 @@
           <div class="c-row">
             <h3><i>03</i>Horários das aulas</h3>
             <div class="sched">
-              <div><b>Adulto</b><span>Seg a sex · 8h, 11h e 19h</span></div>
-              <div><b><em>Kids</em> · 4 a 12 anos</b><span>Seg a sex · 10h e 18h</span></div>
+              <div><b>Adulto</b><span>Seg a sex · 8h, 11h, 19h e 20h30</span></div>
+              <div><b><em>Kids 1</em> · 4 a 12 anos</b><span>Ter e qui · 9h e 18h</span></div>
+              <div><b><em>Kids 2</em> · 4 a 12 anos</b><span>Seg e qua · 9h e 18h</span></div>
+              <div><b>Open Mat</b><span>Sábado · 10h30</span></div>
               <div><b>Feminino</b><span>Junto com o adulto</span></div>
             </div>
           </div>
@@ -212,7 +219,7 @@
             <h3><i>04</i>Atendimento</h3>
             <div>
               <p class="big">Segunda a sexta, das 8h às 21h</p>
-              <p class="sub">Sem aulas no fim de semana.</p>
+              <p class="sub">No sábado, só o Open Mat das 10h30, para os alunos.</p>
               <p class="pill-live" data-office><i aria-hidden="true"></i><span>Atendimento</span><b>Seg a sex · 8h às 21h</b></p>
             </div>
           </div>
@@ -250,15 +257,15 @@
         <div>
           <p class="label">Primeira aula grátis</p>
           <h2 class="h2 split" id="t-cta">A gente te espera <em>no tatame</em>.</h2>
-          <p class="lead">Mande uma mensagem no WhatsApp e agende sua aula experimental. Kimono emprestado, atenção individual e zero pressão para começar.</p>
+          <p class="lead">Mande uma mensagem e escolha o horário da sua aula experimental. O kimono a gente empresta.</p>
           <a class="btn btn-gold" data-magnetic href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener">Agendar pelo WhatsApp<svg class="ic"><use href="#i-arrow"/></svg></a>
           <dl class="contact">
             <div><dt>Ou escolha o horário</dt><dd><a href="agendamento.html" data-int>Agendar pelo site</a></dd></div>
             <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
-            <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
+            <div><dt>Aulas</dt><dd>Adulto: seg a sex, 8h, 11h, 19h e 20h30<br>Kids 1: ter e qui, 9h e 18h<br>Kids 2: seg e qua, 9h e 18h<br>Open Mat: sábado, 10h30</dd></div>
           </dl>
         </div>
-        <figure class="cta-photo"><img src="img/ambiente-studio.webp" alt="Painel dourado do Studio Evolution BJJ na parede preta da academia" loading="lazy" width="1200" height="800"></figure>
+        <figure class="cta-photo"><img src="img/takes/resenha.jpg" alt="Aluno de kimono azul rindo ao lado de um faixa-preta, os dois sentados no tatame" loading="lazy" width="1080" height="1350" style="object-position:50% 45%"></figure>
       </div>
     </div>
   </section>
@@ -267,13 +274,13 @@
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Adulto de segunda a sexta (o Feminino treina junto), Kids 1 e Kids 2 para crianças de 4 a 12 anos e Open Mat aos sábados.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · seg a sex, 8h, 11h, 19h e 20h30</li><li>Kids 1 · ter e qui, 9h e 18h</li><li>Kids 2 · seg e qua, 9h e 18h</li><li>Open Mat · sábado, 10h30</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
-    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Proposta de redesign · versão para aprovação</span></div>
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Academia da Equipe TRUE · Sorocaba/SP</span></div>
   </div>
 </footer>
 

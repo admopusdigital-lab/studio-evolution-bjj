@@ -1,0 +1,93 @@
+/* Studio Evolution BJJ · telas de acesso: entrar.html, nova-senha.html e acessos.html.
+   No computador, o vídeo do Studio de um lado e o cartão do outro; no celular, o vídeo fica ao fundo, bem
+   escurecido, e o cartão vem por cima. A lógica do login está em acesso.js. */
+[data-page="entrar"] .nav-cta .roll, [data-page="nova-senha"] .nav-cta .roll { color: var(--gold-text); }
+/* border-radius: no tema Claro, os capítulos escuros ganham cantos (site.css); esta tela é inteira, de ponta a ponta */
+.login { position: relative; min-height: 100vh; min-height: 100svh; display: grid; isolation: isolate; overflow: hidden; border-radius: 0 !important; }
+@media (min-width: 1000px) { .login { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); } }
+
+/* o vídeo do Studio, com o lema da Equipe TRUE */
+.lg-media { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: var(--cine-bg); }
+.lg-media video, .lg-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; opacity: 0.5; filter: contrast(1.05) brightness(0.85) saturate(0.95); }
+.lg-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 70%, transparent) 0%, color-mix(in oklch, var(--cine-bg) 82%, transparent) 40%, var(--cine-bg) 100%); }
+.lg-ghost { position: absolute; z-index: 1; right: -6vw; top: 50%; translate: 0 -50%; font: 500 min(78vh, 60vw)/0.9 var(--mincho); color: transparent; -webkit-text-stroke: 1px oklch(0.83 0.13 84 / 0.16); pointer-events: none; user-select: none; }
+.lg-media-in { display: none; }
+@media (min-width: 1000px) {
+  .lg-media { position: relative; inset: auto; z-index: 0; }
+  .lg-media video, .lg-media img { opacity: 0.62; }
+  .lg-media::after { background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 60%, transparent) 0%, transparent 26%, transparent 52%, var(--cine-bg) 100%), linear-gradient(90deg, transparent 70%, var(--cine-bg) 100%); }
+  .lg-ghost { right: 4vw; font-size: min(70vh, 30vw); }
+  .lg-media-in { position: absolute; z-index: 2; left: var(--gut); right: 6vw; bottom: clamp(40px, 9vh, 104px); display: block; }
+  .lg-lema { margin-top: 22px; max-width: 17ch; font: 400 clamp(30px, 3vw, 54px)/0.96 var(--serif); letter-spacing: -0.02em; text-transform: uppercase; }
+  .lg-lema em { display: block; font-style: normal; }
+}
+
+/* o formulário */
+.lg-panel { position: relative; z-index: 1; display: grid; align-content: center; padding: calc(116px + env(safe-area-inset-top, 0px)) var(--gut-r) 64px var(--gut); }
+@media (min-width: 1000px) { .lg-panel { padding-left: clamp(32px, 4vw, 80px); } }
+.lg-card { width: 100%; max-width: 440px; justify-self: center; }
+.lg-title { margin-top: 24px; font-size: clamp(42px, 4.4vw, 70px); line-height: 0.92; }
+.lg-sub { margin-top: 18px; color: var(--ink-2); font-size: 16.5px; max-width: 38ch; }
+
+/* aluno ou professor: duas pílulas, a escolhida em ouro */
+.role { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 30px 0 0; padding: 4px; border: 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--rule); }
+.role label { position: relative; display: grid; place-items: center; height: 46px; border-radius: 999px; font: 600 12px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); cursor: pointer; transition: color 300ms var(--ease), background-color 300ms var(--ease); }
+.role input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.role label:has(input:checked) { background: var(--gold); color: oklch(0.13 0.005 70); }
+.role label:has(input:focus-visible) { outline: 2px solid var(--gold-text); outline-offset: 3px; }
+
+.field { position: relative; margin-top: 22px; }
+.field input { width: 100%; height: 60px; padding: 22px 0 6px; border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; background: transparent; color: var(--ink); font: 500 19px/1 var(--sans); letter-spacing: -0.01em; outline: none; transition: border-color 300ms var(--ease); }
+.field input:focus { border-bottom-color: var(--gold); }
+.field input[aria-invalid="true"] { border-bottom-color: var(--warn); }
+.field label { position: absolute; left: 0; top: 22px; font-size: 16px; color: var(--ink-3); pointer-events: none; transform-origin: left top; transition: transform 400ms var(--ease), color 300ms; }
+.field input:focus + label, .field input:not(:placeholder-shown) + label { transform: translateY(-20px) scale(0.78); color: var(--gold-text); }
+.field input:-webkit-autofill { -webkit-text-fill-color: var(--ink); transition: background-color 9999s; }
+.field.pw input { padding-right: 84px; }
+.pw-tg { position: absolute; right: 0; bottom: 8px; height: 36px; padding: 0 4px; border: 0; background: none; color: var(--ink-2); font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+.pw-tg:hover { color: var(--gold-text); }
+
+.lg-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 20px; margin-top: 22px; font-size: 14.5px; color: var(--ink-2); }
+.lg-row a { color: var(--ink); text-underline-offset: 4px; text-decoration-color: color-mix(in oklch, var(--gold) 70%, transparent); }
+.lg-row a:hover { color: var(--gold-text); }
+.chk { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.chk input { appearance: none; -webkit-appearance: none; display: grid; place-items: center; width: 20px; height: 20px; margin: 0; border-radius: 5px; box-shadow: inset 0 0 0 1.5px var(--ink-3); cursor: pointer; transition: background-color 200ms var(--ease), box-shadow 200ms var(--ease); }
+.chk input::after { content: ""; width: 10px; height: 6px; margin-top: -2px; border: solid oklch(0.13 0.005 70); border-width: 0 0 2px 2px; transform: rotate(-45deg) scale(0); transition: transform 200ms var(--ease); }
+.chk input:checked { background: var(--gold); box-shadow: none; }
+.chk input:checked::after { transform: rotate(-45deg) scale(1); }
+
+.lg-err { min-height: 1.5em; margin-top: 14px; font-size: 14.5px; color: var(--warn); }
+.lg-err.ok { color: var(--ok); }
+.lg-err a { color: inherit; text-underline-offset: 3px; }
+.lg-card .btn { width: 100%; margin-top: 8px; }
+.lg-card .btn[aria-busy="true"] { pointer-events: none; opacity: 0.8; }
+.lg-foot { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--rule); font-size: 15px; color: var(--ink-2); }
+.lg-foot a { color: var(--gold-text); text-underline-offset: 4px; }
+.lg-note { margin-top: 10px; font-size: 13.5px; color: var(--ink-3); }
+
+/* já conectado: um aviso no lugar do formulário, com continuar e sair */
+.lg-on { margin-top: 26px; padding: 18px 20px; border-radius: 6px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule), inset 0 2px 0 var(--gold); }
+.lg-on p { color: var(--ink-2); font-size: 15px; }
+.lg-on b { color: var(--ink); }
+.lg-on .ctas { margin-top: 14px; gap: 12px 24px; }
+.lg-on .btn { width: auto; margin: 0; min-height: 48px; }
+.lg-on button.link { border: 0; color: var(--ink); cursor: pointer; }
+
+.foot-slim { padding-top: 0; }
+.foot-slim .foot-bottom { border-top: 0; }
+@media (prefers-reduced-motion: reduce) { .lg-media video { display: none; } }
+
+/* acessos.html: o resultado com o login e a senha provisória, pronto para mandar pelo WhatsApp */
+.ac-demo { margin-top: 22px; padding: 12px 16px; border-radius: 6px; font-size: 13.5px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--rule); }
+.ac-demo b { color: var(--gold-text); font-weight: 600; }
+.ac-res { margin-top: 26px; padding: 20px; border-radius: 6px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule), inset 0 2px 0 var(--gold); }
+.ac-res h2 { font: 400 22px/1.15 var(--serif); letter-spacing: -0.01em; text-transform: none; }
+.ac-res dl { display: grid; gap: 12px; margin-top: 16px; }
+.ac-res dt { font: 500 11px/1.4 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.ac-res dd { margin: 4px 0 0; font-size: 16px; color: var(--ink); word-break: break-all; }
+.ac-res .senha { font: 600 24px/1.1 var(--mono); letter-spacing: 0.08em; color: var(--gold-text); }
+.ac-res .ctas { margin-top: 18px; gap: 12px 24px; }
+.ac-res .btn { width: auto; margin: 0; min-height: 48px; }
+.ac-res button.link { border: 0; color: var(--ink); cursor: pointer; background: none; }
+.ac-res .lg-note { margin-top: 14px; }
+.lg-back { display: inline-block; margin-top: 26px; }

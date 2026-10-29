@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Aulas · Redesign Studio Evolution</title>
+<title>Aulas · Studio Evolution BJJ</title>
 <script>
 (function () {
   var d = document.documentElement, l = "black";
@@ -96,6 +96,11 @@
 .a-space { position: relative; min-height: 96vh; display: grid; align-items: end; overflow: hidden; isolation: isolate; }
 .a-space .bgimg { position: absolute; inset: -12% 0; z-index: -3; }
 .a-space .bgimg img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; filter: brightness(0.85) contrast(1.08); }
+/* computador: o painel inteiro à direita do cartão, com as bordas da foto se dissolvendo no preto */
+@media (min-width: 900px) {
+  .a-space .bgimg { left: 40%; }
+  .a-space .bgimg img { object-fit: contain; object-position: 50% 42%; -webkit-mask-image: radial-gradient(ellipse 52% 31% at 50% 46%, #000 58%, transparent); mask-image: radial-gradient(ellipse 52% 31% at 50% 46%, #000 58%, transparent); }
+}
 .a-space::before { content: ""; position: absolute; inset: 0; z-index: -2; background: linear-gradient(0deg, oklch(0.1 0.004 70 / 0.9), transparent 62%), radial-gradient(ellipse at 70% 25%, transparent, oklch(0.1 0.004 70 / 0.55)); }
 .sp-ghost { position: absolute; z-index: -1; right: -3vw; top: 4vh; font: 500 min(36vw, 520px)/0.9 var(--mincho); color: transparent; -webkit-text-stroke: 1.5px oklch(0.83 0.13 84 / 0.42); pointer-events: none; user-select: none; will-change: transform; }
 .a-space .wrap { position: relative; padding-block: clamp(60px, 8vw, 120px); }
@@ -126,7 +131,6 @@
   <div class="wrap nav-in">
     <div class="brandrow">
       <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
-      <a class="tagp" href="area-do-aluno.html" data-int title="Esta página é uma proposta de redesign. Ver também a Área do Aluno"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
     </div>
     <nav class="links" aria-label="Menu principal">
       <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
@@ -138,7 +142,7 @@
     <div class="nav-right">
       <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
       <div class="nav-cta">
-        <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="roll" href="entrar.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
       </div>
     </div>
@@ -147,12 +151,11 @@
 
 <main>
   <section class="phero cin cine" data-dark aria-labelledby="t-aulas">
-    <div class="cin-bg a-hero-pic" aria-hidden="true"><img src="img/treino-tecnica.webp" alt="" width="1200" height="800"></div>
+    <div class="cin-bg a-hero-pic" aria-hidden="true"><picture><source media="(max-aspect-ratio: 4/5)" srcset="img/takes/guarda.jpg" width="1080" height="1350"><img src="img/treino-tecnica.webp" alt="" width="1200" height="800"></picture></div>
     <div class="cin-shade" aria-hidden="true"></div>
-    <canvas class="cin-gl" aria-hidden="true"></canvas>
     <span class="cin-ghost" aria-hidden="true">稽古</span>
     <div class="wrap">
-      <div class="phero-top" data-in><p class="label gold">Aulas em Sorocaba</p><p class="phero-meta">Adulto, Kids e Feminino · segunda a sexta</p></div>
+      <div class="phero-top" data-in><p class="label gold">Aulas em Sorocaba</p><p class="phero-meta">Adulto, Kids e Feminino · segunda a sábado</p></div>
       <h1 class="phero-title" id="t-aulas">Aulas que melhoram <span class="o">postura,</span> <em class="gl">confiança e saúde.</em></h1>
       <p class="lede" data-in>No Studio Evolution BJJ, cada treino é uma oportunidade de cuidar do corpo, acalmar a mente e ganhar uma confiança que se leva para casa, para o trabalho e para a família.</p>
       <div class="cin-row">
@@ -161,8 +164,8 @@
         <p class="pill-live" data-next><i aria-hidden="true"></i><span>Próxima aula</span><b>Adulto · 19h</b></p>
       </div>
       <div class="cin-data">
-        <div><b>Seg a sex</b><span>Treino todo dia útil</span></div>
-        <div><b>5 turmas</b><span>8h · 10h · 11h · 18h · 19h</span></div>
+        <div><b>Seg a sáb</b><span>Open Mat no sábado, 10h30</span></div>
+        <div><b>4 aulas de adulto</b><span>8h · 11h · 19h · 20h30</span></div>
         <div><b>Até 10</b><span>Alunos por aula</span></div>
         <div><b>1ª aula</b><span>Grátis, com kimono emprestado</span></div>
       </div>
@@ -197,14 +200,14 @@
           <article class="bi on" data-n="01">
             <p class="bi-sub">Menos dor, mais presença</p>
             <h3>Postura <em>alinhada</em></h3>
-            <p>O Jiu-Jitsu fortalece o core, alonga a coluna e corrige desvios causados por horas na frente do computador.</p>
+            <p>O jiu-jitsu fortalece abdômen e costas, o que ajuda a postura de quem passa o dia sentado.</p>
             <ul class="bi-pts">
-              <li><svg class="ic"><use href="#i-check"/></svg>Fortalecimento do abdômen e costas</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Fortalecimento do abdômen e das costas</li>
               <li><svg class="ic"><use href="#i-check"/></svg>Mobilidade de quadril e ombros</li>
               <li><svg class="ic"><use href="#i-check"/></svg>Consciência corporal no dia a dia</li>
-              <li><svg class="ic"><use href="#i-check"/></svg>Redução de dores na coluna</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Mais consciência da postura</li>
             </ul>
-            <div class="rimg bi-photo"><img src="img/treino-tecnica.webp" alt="Professor corrigindo a postura de um aluno no tatame" loading="lazy" width="1200" height="800"></div>
+            <div class="rimg bi-photo"><img src="img/treino-tecnica.webp" alt="Dois alunos treinando técnica no chão do tatame" loading="lazy" width="1200" height="800"></div>
           </article>
           <article class="bi" data-n="02">
             <p class="bi-sub">Segurança que se sente fora do tatame</p>
@@ -228,7 +231,7 @@
               <li><svg class="ic"><use href="#i-check"/></svg>Melhor sono e disposição</li>
               <li><svg class="ic"><use href="#i-check"/></svg>Coordenação motora em constante evolução</li>
             </ul>
-            <div class="rimg bi-photo"><img src="img/programa-feminino-real.jpg" alt="Aula de jiu-jitsu feminino no Studio Evolution" loading="lazy" width="1264" height="848"></div>
+            <div class="rimg bi-photo"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando durante a aula de adulto" loading="lazy" width="1264" height="848"></div>
           </article>
         </div>
       </div>
@@ -245,22 +248,22 @@
         <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#adulto" data-int data-tilt3d="10" data-glare>
           <div class="rimg"><img src="img/programa-adulto-real.jpg" alt="Aluno adulto trabalhando a guarda no tatame" loading="lazy" width="1264" height="848" style="object-position:62% 50%"></div>
           <div class="pc-tx" data-z="64">
-            <div class="meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h</span></div>
+            <div class="meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h · 20h30</span></div>
             <div><h3>Adulto</h3><p>Treino progressivo que respeita seu condicionamento.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
           </div>
         </a>
         <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#kids" data-int data-tilt3d="10" data-glare>
-          <div class="rimg"><img src="img/programa-kids-real.jpg" alt="Professor sentado no tatame com duas crianças de kimono" loading="lazy" width="768" height="1376" style="object-position:50% 70%"></div>
+          <div class="rimg"><img src="img/jiu-jitsu-kids.webp" alt="Professor sentado no tatame com uma criança nos ombros" loading="lazy" width="741" height="1100" style="object-position:50% 18%"></div>
           <div class="pc-tx" data-z="64">
-            <div class="meta"><span>4 a 12 anos</span><span class="tnum">10h · 18h</span></div>
-            <div><h3><em>Kids</em> &amp; Família</h3><p>Disciplina, foco e diversão para crianças de 4 a 12 anos.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+            <div class="meta"><span>4 a 12 anos</span><span class="tnum">9h · 18h</span></div>
+            <div><h3><em>Kids</em></h3><p>Disciplina, foco e diversão para crianças de 4 a 12 anos. Kids 1 às terças e quintas, Kids 2 às segundas e quartas.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
           </div>
         </a>
         <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#feminino" data-int data-tilt3d="10" data-glare>
           <div class="rimg"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame" loading="lazy" width="1264" height="848" style="object-position:52% 60%"></div>
           <div class="pc-tx" data-z="64">
-            <div class="meta"><span>Junto com o adulto</span><span class="tnum">8h · 11h · 19h</span></div>
-            <div><h3>Feminino</h3><p>Integrado às aulas adultas. Espaço seguro para fortalecer corpo, voz e confiança.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+            <div class="meta"><span>Junto com o adulto</span><span class="tnum">8h · 11h · 19h · 20h30</span></div>
+            <div><h3>Feminino</h3><p>As mulheres treinam nas aulas de adulto, nos mesmos horários e no ritmo de cada uma.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
           </div>
         </a>
       </div>
@@ -301,15 +304,15 @@
         <div>
           <p class="label">Primeira aula grátis</p>
           <h2 class="h2 split" id="t-cta">Sinta na pele o que o Jiu-Jitsu pode fazer <em>por você</em>.</h2>
-          <p class="lead">Venha conhecer o Studio Evolution BJJ no Jardim São Paulo. Kimono emprestado, atenção individual e nenhuma pressão para começar.</p>
+          <p class="lead">Venha conhecer o Studio Evolution BJJ no Jardim São Paulo. A primeira aula é grátis, com kimono emprestado.</p>
           <a class="btn btn-gold" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
           <dl class="contact">
             <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
             <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
-            <div><dt>Aulas</dt><dd>Segunda a sexta<br>Adulto 8h, 11h e 19h<br>Kids 10h e 18h</dd></div>
+            <div><dt>Aulas</dt><dd>Adulto: seg a sex, 8h, 11h, 19h e 20h30<br>Kids 1: ter e qui, 9h e 18h<br>Kids 2: seg e qua, 9h e 18h<br>Open Mat: sábado, 10h30</dd></div>
           </dl>
         </div>
-        <figure class="cta-photo"><img src="img/equipe-evolution.webp" alt="Fundadores do Studio Evolution BJJ em frente ao painel dourado da academia" loading="lazy" width="713" height="1100" style="object-position:50% 60%"></figure>
+        <figure class="cta-photo"><img src="img/equipe-evolution.webp" alt="Uma mulher e um faixa-preta de kimono branco em frente ao painel dourado do Studio Evolution BJJ" loading="lazy" width="713" height="1100" style="object-position:50% 60%"></figure>
       </div>
     </div>
   </section>
@@ -318,13 +321,13 @@
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Adulto de segunda a sexta (o Feminino treina junto), Kids 1 e Kids 2 para crianças de 4 a 12 anos e Open Mat aos sábados.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · seg a sex, 8h, 11h, 19h e 20h30</li><li>Kids 1 · ter e qui, 9h e 18h</li><li>Kids 2 · seg e qua, 9h e 18h</li><li>Open Mat · sábado, 10h30</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
-    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Proposta de redesign · versão para aprovação</span></div>
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Academia da Equipe TRUE · Sorocaba/SP</span></div>
   </div>
 </footer>
 

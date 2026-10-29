@@ -32,14 +32,13 @@
 
   /* ---------- Versão Black (padrão) / Claro ---------- */
   var lookBtn = $("#lookBtn"), lookTxt = $("#lookTxt");
+  /* o nome do botão é o próprio texto ("Versão clara"): quem usa comando de voz fala o que vê.
+     Onde não cabe, o texto sai da tela pelo CSS, mas continua sendo o nome. */
+  if (lookBtn) { lookBtn.removeAttribute("aria-pressed"); lookBtn.removeAttribute("aria-label"); }
   function paintLook(l) {
     var black = l === "black";
     root.setAttribute("data-look", l);
-    if (lookBtn) {
-      lookBtn.setAttribute("aria-pressed", black ? "true" : "false");
-      lookBtn.setAttribute("aria-label", black ? "Mudar para a versão clara" : "Mudar para a versão black");
-    }
-    if (lookTxt) lookTxt.textContent = black ? "Claro" : "Black";
+    if (lookTxt) lookTxt.textContent = black ? "Versão clara" : "Versão black";
     /* sem armazenamento no navegador, a versão clara segue de página em página pelo #claro */
     $$("a[data-int]").forEach(function (a) {
       var base = a.getAttribute("data-base") || a.getAttribute("href");
@@ -88,8 +87,8 @@
     var items = $$(".links a", nav).map(function (a) {
       return '<a href="' + a.getAttribute("href") + '" data-int><span>' + a.textContent.trim() + "</span></a>";
     }).join("");
-    menu.innerHTML = "<nav aria-label=\"Menu\">" + items + '<a href="area-do-aluno.html" data-int><span><em>Área do aluno</em></span></a></nav>' +
-      '<div class="menu-foot"><b>(15) 99674-1812</b><span>Av. Getúlio Vargas, 400 · Jardim São Paulo, Sorocaba</span><span>Segunda a sexta · Adulto 8h, 11h e 19h · Kids 10h e 18h</span></div>';
+    menu.innerHTML = "<nav aria-label=\"Menu\">" + items + '<a href="entrar.html" data-int><span><em>Área do aluno</em></span></a></nav>' +
+      '<div class="menu-foot"><b>(15) 99674-1812</b><span>Av. Getúlio Vargas, 400 · Jardim São Paulo, Sorocaba</span><span>Seg a sex · Adulto 8h, 11h, 19h e 20h30 · Kids 9h e 18h</span><span>Sábado · Open Mat 10h30</span></div>';
     document.body.appendChild(menu);
     menuBtn.setAttribute("aria-controls", "menu");
     paintLook(root.getAttribute("data-look"));
@@ -131,7 +130,8 @@
   }
   function navTone() {
     if (!nav || !darks) return;
-    nav.classList.toggle("on-dark", over(40) && !menuOpen);
+    /* o menu aberto é sempre escuro: a barra fica clara por cima dele, nos dois temas */
+    nav.classList.toggle("on-dark", menuOpen || over(40));
     if (waBtn) waBtn.classList.toggle("on-dark", over(window.innerHeight - 50));
   }
   if (nav && darks.length) {
@@ -220,72 +220,112 @@
 
   var saveData = !!(navigator.connection && navigator.connection.saveData);
 
-  /* ---------- fumaça de ouro em WebGL: sobe do chão e acende onde o mouse passa; pausa fora da tela.
-     Só com mouse (computador), sem "reduzir movimento" e sem economia de dados. ---------- */
-  Site.smoke = function (c, area) {
-    if (!c || !fine || reduce || saveData || !window.gsap) return null;
-    var gl = c.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, depth: false });
-    if (!gl) return null;
-    var VS = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
-    var FS = [
-      "precision mediump float;uniform vec2 r;uniform float t;uniform vec2 m;",
-      "float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}",
-      "float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}",
-      "float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}",
-      "void main(){vec2 uv=gl_FragCoord.xy/r;vec2 p=uv*vec2(r.x/r.y,1.)*2.2;float tt=t*.045;",
-      "vec2 q=vec2(fbm(p+vec2(0.,-tt)),fbm(p+vec2(5.2,1.3)+tt*.6));",
-      "vec2 w=vec2(fbm(p+3.*q+vec2(1.7,9.2)+tt*1.3),fbm(p+3.*q+vec2(8.3,2.8)-tt));",
-      "float f=fbm(p+3.2*w+vec2(0.,-tt*2.));",
-      "float base=1.-smoothstep(0.,.98,uv.y);",
-      "float smoke=smoothstep(.52,.96,f)*(.25+.75*base);",
-      "vec2 d=(uv-m)*vec2(r.x/r.y,1.);float glow=exp(-dot(d,d)*5.)*.42;",
-      "float a=clamp(smoke*.75+glow*(.2+smoke*1.4),0.,.9);",
-      "vec3 col=mix(vec3(.78,.52,.2),vec3(1.,.86,.55),clamp(smoke*1.4,0.,1.));",
-      "gl_FragColor=vec4(col*a,a);}"
-    ].join("\n");
-    var mk = function (type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
-    var vs = mk(gl.VERTEX_SHADER, VS), fs = mk(gl.FRAGMENT_SHADER, FS);
-    if (!vs || !fs) return null;
-    var pr = gl.createProgram();
-    gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
-    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
-    gl.useProgram(pr);
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    var loc = gl.getAttribLocation(pr, "p");
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    var uR = gl.getUniformLocation(pr, "r"), uT = gl.getUniformLocation(pr, "t"), uM = gl.getUniformLocation(pr, "m");
-    var mx = 0.7, my = 0.35, tx = 0.7, ty = 0.35, vis = true, t0 = performance.now();
-    var size = function () {
-      var w = Math.max(2, Math.round(c.clientWidth * 0.5)), hh = Math.max(2, Math.round(c.clientHeight * 0.5));
-      if (c.width !== w || c.height !== hh) { c.width = w; c.height = hh; gl.viewport(0, 0, w, hh); }
-      gl.uniform2f(uR, w, hh);
+  /* ---------- trilha: tenta tocar ao abrir; quando o navegador bloqueia som automático, começa no primeiro
+     toque, clique ou tecla. O botão no canto liga e desliga, a escolha fica guardada, e a música continua
+     do mesmo ponto ao trocar de página. Com economia de dados, só toca se a pessoa pedir.
+     O botão segue a regra do WhatsApp: aparece depois da primeira tela e some perto do convite final,
+     para nunca cobrir um botão ou um texto importante. ---------- */
+  Site.music = function (src) {
+    if (!src || $(".snd")) return;
+    var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+    var sess = function (k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } };
+    var a = new Audio(), VOL = 0.5, fadeT = 0, wanted = store("evo-som") !== "off" && !saveData, loaded = false;
+    a.loop = true; a.preload = "none";
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "snd";
+    btn.innerHTML = '<span class="snd-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>';
+    document.body.appendChild(btn);
+    var end = $(".cta") || $(".foot");
+    var place = function () {
+      var show = window.scrollY > window.innerHeight * 0.55;
+      if (show && end && end.getBoundingClientRect().top < window.innerHeight * 0.9) show = false;
+      btn.classList.toggle("shown", show);
     };
-    size();
-    window.addEventListener("resize", size);
-    (area || c.parentElement).addEventListener("mousemove", function (e) { var r = c.getBoundingClientRect(); tx = (e.clientX - r.left) / r.width; ty = 1 - (e.clientY - r.top) / r.height; });
-    new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }).observe(c);
-    gsap.ticker.add(function () {
-      if (!vis) return;
-      mx += (tx - mx) * 0.05; my += (ty - my) * 0.05;
-      gl.uniform1f(uT, (performance.now() - t0) / 1000);
-      gl.uniform2f(uM, mx, my);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    window.addEventListener("scroll", place, { passive: true });
+    window.addEventListener("resize", place);
+    place();
+    function paint(on) {
+      btn.classList.toggle("on", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.setAttribute("aria-label", on ? "Desligar a música" : "Ligar a música");
+    }
+    function fade(to, ms, done) {
+      clearInterval(fadeT);
+      var from = a.volume, t0 = performance.now();
+      fadeT = setInterval(function () {
+        var k = Math.min(1, (performance.now() - t0) / ms);
+        a.volume = Math.max(0, Math.min(1, from + (to - from) * k));
+        if (k >= 1) { clearInterval(fadeT); if (done) done(); }
+      }, 40);
+    }
+    function load() {
+      if (loaded) return;
+      loaded = true; a.src = src;
+      var t = parseFloat(sess("evo-som-t"));
+      if (t > 0) a.addEventListener("loadedmetadata", function () { try { a.currentTime = t % (a.duration || 1e9); } catch (e) {} }, { once: true });
+    }
+    function play() {
+      load();
+      a.volume = 0;
+      var p = a.play();
+      if (p && p.then) return p.then(function () { paint(true); fade(VOL, 2500); return true; }, function () { paint(false); return false; });
+      paint(true); fade(VOL, 2500); return Promise.resolve(true);
+    }
+    function stop() { paint(false); fade(0, 600, function () { a.pause(); }); }
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (btn.classList.contains("on")) { wanted = false; store("evo-som", "off"); stop(); }
+      else { wanted = true; store("evo-som", "on"); play(); }
     });
-    c.classList.add("on");
-    return { canvas: c };
+    /* o primeiro gesto da pessoa libera o som, se ela não tiver desligado */
+    function firstGesture(e) {
+      if (e && e.target && e.target.closest && e.target.closest(".snd")) return;
+      ["pointerdown", "keydown", "touchend"].forEach(function (n) { window.removeEventListener(n, firstGesture, true); });
+      if (wanted && a.paused) play();
+    }
+    paint(false);
+    if (wanted) play().then(function (ok) {
+      if (!ok) { btn.classList.add("ask"); ["pointerdown", "keydown", "touchend"].forEach(function (n) { window.addEventListener(n, firstGesture, true); }); }
+    });
+    /* guarda o ponto da música para a próxima página; pausa com a aba escondida */
+    window.addEventListener("pagehide", function () { if (!a.paused) sess("evo-som-t", String(a.currentTime)); });
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) { if (!a.paused) { a.pause(); a.dataset.resume = "1"; } }
+      else if (a.dataset.resume) { delete a.dataset.resume; a.play().catch(function () {}); }
+    });
+    a.addEventListener("playing", function () { btn.classList.remove("ask"); });
   };
+
+  /* ---------- grade de aulas: a fonte única dos horários (d = dias da semana, 0 = domingo) ---------- */
+  Site.GRADE = [
+    { t: "08:00", n: "Adulto", d: [1, 2, 3, 4, 5] },
+    { t: "09:00", n: "Kids 2", d: [1, 3] },
+    { t: "09:00", n: "Kids 1", d: [2, 4] },
+    { t: "10:30", n: "Open Mat", d: [6] },
+    { t: "11:00", n: "Adulto", d: [1, 2, 3, 4, 5] },
+    { t: "18:00", n: "Kids 2", d: [1, 3] },
+    { t: "18:00", n: "Kids 1", d: [2, 4] },
+    { t: "19:00", n: "Adulto", d: [1, 2, 3, 4, 5] },
+    { t: "20:30", n: "Adulto", d: [1, 2, 3, 4, 5] }
+  ];
+  Site.DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+  /* "08:00" -> "8h", "20:30" -> "20h30" */
+  Site.hora = function (t) { var p = t.split(":"); return +p[0] + "h" + (p[1] !== "00" ? p[1] : ""); };
+  Site.aulasDo = function (wd) { return Site.GRADE.filter(function (c) { return c.d.indexOf(wd) >= 0; }); };
 
   /* ---------- selos ao vivo: a próxima aula e o atendimento, pela hora de quem está vendo ---------- */
   Site.nextClass = function () {
     var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60;
-    var CL = [[8, "Adulto"], [10, "Kids"], [11, "Adulto"], [18, "Kids"], [19, "Adulto"]];
-    if (wd >= 1 && wd <= 5) for (var i = 0; i < CL.length; i++) if (h < CL[i][0] + 1) {
-      var now = h >= CL[i][0];
-      return { now: now, label: now ? "Aula agora" : "Próxima aula", text: (now ? "" : "Hoje · ") + CL[i][1] + " " + CL[i][0] + "h" };
+    var ini = function (c) { var p = c.t.split(":"); return +p[0] + p[1] / 60; };
+    var hoje = Site.aulasDo(wd);
+    for (var i = 0; i < hoje.length; i++) if (h < ini(hoje[i]) + 1) {
+      var now = h >= ini(hoje[i]);
+      return { now: now, label: now ? "Aula agora" : "Próxima aula", text: (now ? "" : "Hoje · ") + hoje[i].n + " " + Site.hora(hoje[i].t) };
     }
-    return { now: false, label: "Próxima aula", text: (wd === 5 || wd === 6 ? "Segunda" : "Amanhã") + " · Adulto 8h" };
+    for (var k = 1; k <= 7; k++) {
+      var dia = (wd + k) % 7, l = Site.aulasDo(dia);
+      if (l.length) return { now: false, label: "Próxima aula", text: (k === 1 ? "Amanhã" : Site.DIAS[dia]) + " · " + l[0].n + " " + Site.hora(l[0].t) };
+    }
   };
   Site.office = function () {
     var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60, week = wd >= 1 && wd <= 5;
@@ -334,14 +374,45 @@
     });
   }
 
-  /* rola até um elemento descontando a barra fixa: Lenis no computador, rolagem nativa no celular */
-  Site.scrollTo = function (target, offset) {
-    var el = typeof target === "string" ? $(target) : target;
-    if (!el) return;
+  /* rola até um elemento descontando a barra fixa: Lenis no computador, rolagem nativa no celular.
+     cb (opcional) roda uma vez quando a rolagem termina; se nada avisar o fim, roda em 1,7 s */
+  Site.scrollTo = function (target, offset, cb) {
+    var el = typeof target === "string" ? $(target) : target, done = false;
+    var end = function () { if (done) return; done = true; window.removeEventListener("scrollend", end); if (cb) cb(); };
+    if (!el) { end(); return; }
     offset = offset === undefined ? -90 : offset;
-    if (Site.lenis) Site.lenis.scrollTo(el, { offset: offset, duration: 1.4 });
-    else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: reduce ? "auto" : "smooth" });
+    var top = el.getBoundingClientRect().top + window.scrollY + offset;
+    if (Math.abs(top - window.scrollY) < 2) { end(); return; }
+    if (cb) setTimeout(end, 1700);
+    if (Site.lenis) { Site.lenis.scrollTo(el, { offset: offset, duration: 1.4, onComplete: end }); return; }
+    if (cb && "onscrollend" in window) window.addEventListener("scrollend", end);
+    window.scrollTo({ top: top, behavior: reduce ? "auto" : "smooth" });
   };
+
+  /* move o foco para el sem deixá-lo cair no body. Regra: quem esconde ou troca o elemento focado
+     chama isto com o próximo lugar. Título, célula ou nota ganham tabindex=-1 (focáveis só pelo script).
+     opts vai direto para focus() (ex.: { preventScroll: true }). Devolve true se o foco chegou lá:
+     um elemento escondido ou dentro de [inert] não recebe foco, então tire o inert antes de chamar. */
+  Site.focusSoft = function (el, opts) {
+    el = typeof el === "string" ? $(el) : el;
+    if (!el) return false;
+    if (!el.matches("a[href], button, input, select, textarea, summary, [tabindex], [contenteditable]")) el.setAttribute("tabindex", "-1");
+    el.focus(opts);
+    return document.activeElement === el;
+  };
+
+  /* animações sem fim (pulsos do celular, brilho da logo do rodapé) só rodam com o elemento na tela:
+     .live liga e desliga a animação pelo CSS. Sem IntersectionObserver, ficam sempre ligadas */
+  function liveFx() {
+    var els = $$(".device, .foot-logo-wrap, [data-live]");
+    if (!els.length) return;
+    if (!("IntersectionObserver" in window)) { els.forEach(function (el) { el.classList.add("live"); }); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { e.target.classList.toggle("live", e.isIntersecting); });
+    }, { rootMargin: "80px 0px" });
+    els.forEach(function (el) { io.observe(el); });
+  }
+  liveFx();
 
   /* WhatsApp: ícone redondo no celular; aparece depois da primeira tela e some perto do convite final,
      para nunca ficar por cima de um botão ou de um texto importante */
@@ -411,6 +482,7 @@
     toTop();
     window.addEventListener("load", toTop);
     whatsapp(); swipers(); videos();
+    Site.music(opts.music === undefined ? "audio/trilha.mp3" : opts.music);
     /* depois que a primeira tela carrega, as outras fotos já baixam em segundo plano:
        assim nenhuma caixa aparece vazia quando a pessoa rola rápido (exceto no modo de economia de dados) */
     if (!saveData) window.addEventListener("load", function () {
@@ -418,6 +490,7 @@
     });
     if (reduce || !window.gsap || !window.ScrollTrigger) {
       root.classList.remove("entering", "entering-img");
+      root.classList.add("intro-go");
       if (loader) loader.remove();
       $$("video[autoplay]").forEach(function (v) { if (reduce) { v.removeAttribute("autoplay"); v.pause(); v.controls = true; } });
       if (opts.basic) opts.basic(Site);
@@ -433,7 +506,15 @@
       /* rolagem suave só com mouse e trackpad; no toque, a rolagem nativa do celular é mais leve e natural */
       var lenis = null;
       if (window.Lenis && fine) {
-        lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 0.95 });
+        /* uma tela que rola por dentro (as telas do celular simulado, ou [data-scroll-own]) recebe a roda
+           enquanto ainda tem para onde rolar; no fim dela, a página volta a rolar suave */
+        var ownScroll = function (v) {
+          var t = v.event && v.event.target, dy = v.deltaY;
+          var box = dy && t && t.closest ? t.closest(".ap-view, [data-scroll-own]") : null;
+          if (!box || box.scrollHeight <= box.clientHeight + 1) return true;
+          return !(dy > 0 ? box.scrollTop + box.clientHeight < box.scrollHeight - 1 : box.scrollTop > 0);
+        };
+        lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 0.95, virtualScroll: ownScroll });
         lenis.on("scroll", ScrollTrigger.update);
         gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
         gsap.ticker.lagSmoothing(0);
@@ -508,7 +589,12 @@
       pointerFx(lenis);
       bandsFx(lenis);
 
-      var play = function () { tl.play(0); };
+      /* a abertura só começa com a fonte de títulos pronta (ou depois de 1 s): se ela chega com o título
+         já na tela, as linhas mudam de largura e a página salta (CLS). .intro-go mostra o topo das áreas do app */
+      var fontsIn = document.fonts && document.fonts.load ?
+        Promise.race([document.fonts.load('400 1em "Archivo Black"'), new Promise(function (r) { setTimeout(r, 1000); })]) : Promise.resolve();
+      var go = function () { root.classList.add("intro-go"); tl.play(0); };
+      var play = function () { fontsIn.then(go, go); };
       session("evo-seen", "1");
       if (loader && opts.loader && getComputedStyle(loader).display !== "none") {
         if (lenis) lenis.stop();
@@ -542,6 +628,7 @@
       window.addEventListener("load", function () { ScrollTrigger.refresh(); });
     } catch (err) {
       root.classList.remove("entering", "entering-img");
+      root.classList.add("intro-go");
       if (loader && loader.parentNode) loader.remove();
       if (window.gsap) gsap.set(".wi, .fw, .nav-in, [data-in], [data-in-media]", { clearProps: "all" });
       console.error(err);
@@ -702,8 +789,6 @@
           if (trY) { trY(mx * 16); trx(-my * 9); }
         });
       }
-      var c = $(".cin-gl", h);
-      if (c) Site.smoke(c, h);
     });
     /* títulos: as palavras sobem por trás de uma máscara, esticadas, e assentam */
     $$(".split").forEach(function (h) {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Perguntas · Redesign Studio Evolution</title>
+<title>Perguntas · Studio Evolution BJJ</title>
 <script>
 (function () {
   var d = document.documentElement, l = "black";
@@ -20,9 +20,9 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
-<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
 <link rel="stylesheet" href="site.css">
 <style>
 /* Perguntas: abertura de cinema com uma interrogação em camadas que gira em 3D com o mouse, busca de vidro
@@ -141,7 +141,6 @@
   <div class="wrap nav-in">
     <div class="brandrow">
       <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
-      <a class="tagp" href="area-do-aluno.html" data-int title="Esta página é uma proposta de redesign. Ver também a Área do Aluno"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
     </div>
     <nav class="links" aria-label="Menu principal">
       <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
@@ -151,9 +150,9 @@
       <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
     </nav>
     <div class="nav-right">
-      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
       <div class="nav-cta">
-        <a class="roll" href="area-do-aluno.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="roll" href="entrar.html" data-int><span data-t="Área do aluno">Área do aluno</span></a>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
       </div>
     </div>
@@ -162,9 +161,8 @@
 
 <main>
   <section class="phero cin cin-s cine q-hero" data-dark aria-labelledby="t-q">
-    <div class="cin-bg q-hero-pic" aria-hidden="true"><img src="img/comunidade-evolution.webp" alt="" width="1200" height="684"></div>
+    <div class="cin-bg q-hero-pic" aria-hidden="true"><picture><source media="(max-aspect-ratio: 4/5)" srcset="img/takes/resenha.jpg" width="1080" height="1350"><img src="img/comunidade-evolution.webp" alt="" width="1200" height="684"></picture></div>
     <div class="cin-shade" aria-hidden="true"></div>
-    <canvas class="cin-gl" aria-hidden="true"></canvas>
     <div class="q-mark-wrap" aria-hidden="true"><span class="q-mark" id="qMark"><i>?</i><i>?</i><i>?</i><i>?</i><i>?</i><i>?</i></span></div>
     <div class="wrap">
       <div class="phero-top" data-in><p class="label gold">Tire suas dúvidas</p><p class="phero-meta">15 respostas em 4 temas</p></div>
@@ -208,9 +206,9 @@
           <span class="q-gnum" aria-hidden="true">01</span>
           <h2 class="q-gt" id="g-aulas"><span class="gn">01</span>Aulas e <em>horários</em></h2>
           <div class="q-list">
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r1" id="q1"><span class="qt">Quais são os horários das aulas?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r1" role="region" aria-labelledby="q1" hidden><p>Adulto: segunda a sexta às 8h, 11h e 19h. Kids: segunda a sexta às 10h e 18h. O programa feminino acontece junto com as aulas adultas.</p></div></div>
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r2" id="q2"><span class="qt">Preciso ter experiência para começar?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r2" role="region" aria-labelledby="q2" hidden><p>Não. A metodologia do Studio Evolution BJJ respeita cada nível. As aulas são divididas por faixa e o professor acompanha os iniciantes com atenção individual.</p></div></div>
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r3" id="q3"><span class="qt">O que preciso levar na primeira aula?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r3" role="region" aria-labelledby="q3" hidden><p>Somente roupas leves e água. A primeira aula é gratuita e nós disponibilizamos o kimono. Depois, indicamos o melhor equipamento conforme seu comprometimento.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r1" id="q1"><span class="qt">Quais são os horários das aulas?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r1" role="region" aria-labelledby="q1" hidden><p>Adulto: segunda a sexta às 8h, 11h, 19h e 20h30. Kids 1: terça e quinta às 9h e 18h. Kids 2: segunda e quarta às 9h e 18h. Open Mat: sábado às 10h30. O Feminino treina junto com as aulas de adulto, nos mesmos horários.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r2" id="q2"><span class="qt">Preciso ter experiência para começar?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r2" role="region" aria-labelledby="q2" hidden><p>Não. As turmas recebem todos os níveis, do iniciante ao avançado, e o professor adapta o treino para quem está começando.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r3" id="q3"><span class="qt">O que preciso levar na primeira aula?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r3" role="region" aria-labelledby="q3" hidden><p>Só roupas leves e uma garrafa de água. A primeira aula é grátis e a gente empresta o kimono. Se decidir continuar, o professor ajuda você a escolher o seu.</p></div></div>
             <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r4" id="q4"><span class="qt">Como é a primeira aula de jiu-jitsu?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r4" role="region" aria-labelledby="q4" hidden><p>Você chega alguns minutos antes, conhece o professor e faz o aquecimento com a turma. Depois aprende movimentos básicos no seu ritmo, sem luta pesada. A primeira aula é grátis.</p></div></div>
             <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r5" id="q5"><span class="qt">Posso treinar mais de uma vez ao dia?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r5" role="region" aria-labelledby="q5" hidden><p>Sim. Os planos Mensal e Anual incluem aulas ilimitadas, então você pode participar de quantos horários quiser, respeitando a capacidade das turmas.</p></div></div>
           </div>
@@ -221,9 +219,9 @@
           <h2 class="q-gt" id="g-kids"><span class="gn">02</span><em>Kids</em> e família</h2>
           <div class="q-list">
             <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r6" id="q6"><span class="qt">Qual a idade mínima para as aulas infantis?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r6" role="region" aria-labelledby="q6" hidden><p>O programa Kids é indicado para crianças de 4 a 12 anos. A turma é dividida por faixa etária e desenvolvimento motor para garantir segurança e evolução.</p></div></div>
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r7" id="q7"><span class="qt">O que inclui o programa Kids?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r7" role="region" aria-labelledby="q7" hidden><p>Disciplina leve, foco, coordenação motora, técnicas de defesa pessoal infantil, trabalho em equipe, respeito e muita diversão. Também acompanhamos crianças com hiperatividade com exercícios que desenvolvem atenção e limites.</p></div></div>
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r8" id="q8"><span class="qt">Posso treinar junto com meu filho?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r8" role="region" aria-labelledby="q8" hidden><p>Sim. Muitos pais aproveitam os horários Kids &amp; Família para iniciar ou retomar a prática. Temos turmas adultas nos mesmos períodos para que toda a família evolua junto.</p></div></div>
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r9" id="q9"><span class="qt">As aulas para crianças são seguras?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r9" role="region" aria-labelledby="q9" hidden><p>Totalmente. O tatame é limpo e apropriado, as turmas têm capacidade limitada e os professores são treinados para ensinar de forma gradual e respeitosa.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r7" id="q7"><span class="qt">O que inclui o programa Kids?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r7" role="region" aria-labelledby="q7" hidden><p>Disciplina leve, foco, coordenação motora, técnicas de defesa pessoal infantil, trabalho em equipe, respeito e muita diversão. Para crianças agitadas, as brincadeiras ajudam a gastar energia e a desenvolver atenção e limites.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r8" id="q8"><span class="qt">Posso treinar junto com meu filho?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r8" role="region" aria-labelledby="q8" hidden><p>Quase: os horários são colados. De manhã, você treina no Adulto das 8h e a criança na Kids das 9h; no fim do dia, a criança treina na Kids das 18h e você no Adulto das 19h. Vocês vêm juntos e cada um treina na sua turma.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r9" id="q9"><span class="qt">As aulas para crianças são seguras?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r9" role="region" aria-labelledby="q9" hidden><p>Sim. O tatame é limpo e apropriado, as turmas têm capacidade limitada e os professores são treinados para ensinar de forma gradual e respeitosa.</p></div></div>
           </div>
         </section>
 
@@ -233,7 +231,7 @@
           <div class="q-list">
             <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r10" id="q10"><span class="qt">Quanto custa a aula de jiu-jitsu no Studio Evolution?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r10" role="region" aria-labelledby="q10" hidden><p>Converse com a gente pelo WhatsApp para conhecer os planos e encontrar o melhor caminho para você.</p></div></div>
             <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r11" id="q11"><span class="qt">Existe fidelidade ou taxa de matrícula?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r11" role="region" aria-labelledby="q11" hidden><p>Não cobramos fidelidade no plano Mensal. O Anual tem compromisso anual com pagamento parcelado ou à vista. A primeira aula experimental é grátis e sem compromisso.</p></div></div>
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r12" id="q12"><span class="qt">Como funciona o app do aluno?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r12" role="region" aria-labelledby="q12" hidden><p>O app registra frequência, acompanha progresso por turma, libera a biblioteca de movimentos por faixa e permite confirmar presença nas aulas do dia.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r12" id="q12"><span class="qt">Como funciona o app do aluno?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r12" role="region" aria-labelledby="q12" hidden><p>O app registra frequência, acompanha progresso por turma, libera a biblioteca de movimentos por faixa e permite confirmar a vaga nas aulas do dia.</p></div></div>
           </div>
         </section>
 
@@ -241,8 +239,8 @@
           <span class="q-gnum" aria-hidden="true">04</span>
           <h2 class="q-gt" id="g-local"><span class="gn">04</span>Local e <em>estrutura</em></h2>
           <div class="q-list">
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r13" id="q13"><span class="qt">Onde fica a academia?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r13" role="region" aria-labelledby="q13" hidden><p>Estamos na Av. Getúlio Vargas, 400, sala 3, sobreloja, no bairro Jardim São Paulo, em Sorocaba - SP, CEP 18051-480.</p></div></div>
-            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r14" id="q14"><span class="qt">Como faço para agendar uma aula experimental?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r14" role="region" aria-labelledby="q14" hidden><p>É só clicar no botão de WhatsApp ou acessar a página de Agendamento. Escolha o programa, o horário e a data que enviamos tudo confirmado pela conversa.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r13" id="q13"><span class="qt">Onde fica a academia?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r13" role="region" aria-labelledby="q13" hidden><p>Estamos na Av. Getúlio Vargas, 400, sala 3, sobreloja, no bairro Jardim São Paulo, em Sorocaba/SP, CEP 18051-480.</p></div></div>
+            <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r14" id="q14"><span class="qt">Como faço para agendar uma aula experimental?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r14" role="region" aria-labelledby="q14" hidden><p>Pelo WhatsApp ou pela página Agendar: escolha a turma, a data e o horário, e o site monta a mensagem. É só enviar, e a gente responde confirmando a vaga.</p></div></div>
             <div class="q-item"><h3><button class="q-btn" type="button" aria-expanded="false" aria-controls="r15" id="q15"><span class="qt">O tatame é limpo?</span><i class="pm" aria-hidden="true"></i></button></h3><div class="q-ans" id="r15" role="region" aria-labelledby="q15" hidden><p>Sim. Higienizamos o espaço diariamente, mantemos ventilação adequada e exigimos kimono limpo para garantir a saúde de todos.</p></div></div>
           </div>
         </section>
@@ -257,7 +255,7 @@
         <div>
           <p class="label">Ainda tem dúvida?</p>
           <h2 class="h2 split" id="t-cta">Fale direto com a gente <em>no WhatsApp</em>.</h2>
-          <p class="lead">Responderemos sobre horários, turmas, planos ou qualquer outra questão. Nossa equipe atende de segunda a sexta, das 8h às 21h.</p>
+          <p class="lead">Pergunte o que quiser sobre horários, turmas e planos. A gente responde de segunda a sexta, das 8h às 21h.</p>
           <a class="btn btn-gold" data-magnetic href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20tenho%20algumas%20d%C3%BAvidas.%20Poderia%20me%20ajudar%3F" target="_blank" rel="noopener">Enviar mensagem<svg class="ic"><use href="#i-arrow"/></svg></a>
           <dl class="contact">
             <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
@@ -265,7 +263,7 @@
             <div><dt>Atendimento</dt><dd>Segunda a sexta<br>das 8h às 21h</dd></div>
           </dl>
         </div>
-        <figure class="cta-photo"><img src="img/programa-familia-real.jpg" alt="Alunos adultos de kimono em frente ao painel do Studio Evolution" loading="lazy" width="1264" height="848" style="object-position:50% 50%"></figure>
+        <figure class="cta-photo"><img src="img/takes/chega.jpg" alt="Professor de kimono branco conversando com um aluno no tatame" loading="lazy" width="1080" height="1350" style="object-position:60% 40%"></figure>
       </div>
     </div>
   </section>
@@ -274,13 +272,13 @@
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Adulto de segunda a sexta (o Feminino treina junto), Kids 1 e Kids 2 para crianças de 4 a 12 anos e Open Mat aos sábados.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>Aulas</h4><ul><li>Adulto · 8h, 11h e 19h</li><li>Kids · 10h e 18h</li><li>Feminino · com o adulto</li><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · seg a sex, 8h, 11h, 19h e 20h30</li><li>Kids 1 · ter e qui, 9h e 18h</li><li>Kids 2 · seg e qua, 9h e 18h</li><li>Open Mat · sábado, 10h30</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
-    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Proposta de redesign · versão para aprovação</span></div>
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Academia da Equipe TRUE · Sorocaba/SP</span></div>
   </div>
 </footer>
 

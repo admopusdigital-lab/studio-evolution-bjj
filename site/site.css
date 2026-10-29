@@ -8,7 +8,7 @@
   --paper-2: oklch(0.945 0.004 85);
   --ink: oklch(0.16 0.006 70);
   --ink-2: oklch(0.38 0.008 70);
-  --ink-3: oklch(0.55 0.008 70);
+  --ink-3: oklch(0.50 0.008 70);  /* 4,5:1 ou mais sobre --paper-2, onde ficam os textos pequenos dos painéis */
   --rule: oklch(0.16 0.006 70 / 0.14);
   --gold: oklch(0.74 0.13 80);
   --gold-deep: oklch(0.58 0.12 70);
@@ -26,14 +26,17 @@
   --btn-glow: 0 14px 34px -16px oklch(0.16 0.006 70 / 0.55);
   --glass: color-mix(in oklch, white 80%, transparent);
   --field: white;
-  --ok: oklch(0.55 0.14 150);
-  --warn: oklch(0.58 0.17 40);
+  /* verde e laranja escuros o bastante para texto de 11 px (pílulas de status) no fundo claro */
+  --ok: oklch(0.45 0.13 150);
+  --warn: oklch(0.48 0.16 40);
   --wa: oklch(0.72 0.17 150);
   --dim-color: oklch(0.1 0.005 75);
   --shadow-lg: 0 40px 80px -40px oklch(0.15 0.02 70 / 0.45), 0 12px 24px -16px oklch(0.15 0.02 70 / 0.25);
   --grain-op: 0.06;
   --grain-blend: multiply;
-  --gold-metal: linear-gradient(100deg, var(--gold-deep) 0%, var(--gold) 26%, oklch(0.96 0.07 92) 46%, var(--gold) 62%, var(--gold-deep) 100%);
+  /* ouro metálico: no papel claro, um ouro mais escuro (o brilho claro apagava letras); no escuro, o ouro aceso */
+  --gold-metal: linear-gradient(100deg, oklch(0.45 0.1 68) 0%, oklch(0.56 0.12 72) 26%, oklch(0.66 0.13 80) 46%, oklch(0.56 0.12 72) 62%, oklch(0.45 0.1 68) 100%);
+  --gold-metal-lit: linear-gradient(100deg, oklch(0.62 0.12 72) 0%, oklch(0.82 0.13 84) 26%, oklch(0.96 0.07 92) 46%, oklch(0.82 0.13 84) 62%, oklch(0.62 0.12 72) 100%);
   --cta-bg: linear-gradient(115deg, oklch(0.7 0.12 76) 0%, oklch(0.85 0.13 87) 46%, oklch(0.74 0.125 80) 100%);
   --cta-fg: oklch(0.13 0.005 70);
   --logo-fill: linear-gradient(110deg, var(--ink) 0%, var(--ink) 42%, var(--gold) 50%, var(--ink) 58%, var(--ink) 100%);
@@ -82,12 +85,13 @@
   --shadow-lg: 0 50px 90px -40px oklch(0 0 0 / 0.9), 0 16px 30px -18px oklch(0 0 0 / 0.65);
   --grain-op: 0.08;
   --grain-blend: overlay;
+  --gold-metal: var(--gold-metal-lit);
   --logo-fill: linear-gradient(110deg, var(--gold-deep) 0%, var(--gold) 22%, var(--gold-deep) 40%, oklch(0.97 0.05 90) 50%, var(--gold-deep) 60%, var(--gold) 78%, var(--gold-deep) 100%);
 }
 
 /* base */
 * { box-sizing: border-box; }
-html { background: var(--paper); }
+html { background: var(--paper); scroll-padding-top: calc(88px + env(safe-area-inset-top, 0px)); scroll-padding-bottom: 24px; }  /* o item focado com Tab nunca fica sob a barra fixa */
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-stopped { overflow: hidden; }
@@ -110,7 +114,10 @@ button { font: inherit; }
 a, button, label, input { -webkit-tap-highlight-color: transparent; }
 html.menu-open, html.menu-open body { overflow: hidden; }
 [hidden] { display: none !important; }
-:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+/* anel de foco no ouro de texto: o token muda com o tema e com os capítulos escuros (5,4:1 no Claro) */
+:focus-visible { outline: 2px solid var(--gold-text); outline-offset: 3px; }
+/* fica fora da tela, mas o leitor de tela lê */
+.sr-only { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 .wrap { width: 100%; max-width: 1560px; margin-inline: auto; padding-left: var(--gut); padding-right: var(--gut-r); }
 /* rótulos em mono, com um quadradinho de ouro aceso */
 .label { display: flex; align-items: center; gap: 12px; font: 500 11.5px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-2); }
@@ -118,7 +125,8 @@ html.menu-open, html.menu-open body { overflow: hidden; }
 .label.gold { color: var(--gold-text); }
 .mono { font-family: var(--mono); }
 .tnum { font-variant-numeric: tabular-nums; }
-.h2 { font-size: clamp(36px, 5.2vw, 92px); line-height: 0.92; letter-spacing: -0.02em; }
+/* para de crescer junto com o .wrap (1560px): em tela larga o título não invade a coluna ao lado */
+.h2 { font-size: clamp(36px, 5.2vw, 76px); line-height: 0.92; letter-spacing: -0.02em; }
 .lead { color: var(--ink-2); font-size: 18px; max-width: 44ch; }
 .ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .sec-head { display: grid; gap: 24px; }
@@ -130,19 +138,24 @@ html.menu-open, html.menu-open body { overflow: hidden; }
   --btn-bg: var(--cine-gold); --btn-fg: oklch(0.13 0.005 70); --btn-hover: var(--cine-fg); --btn-hover-fg: oklch(0.13 0.005 70);
   --btn-glow: 0 0 0 1px oklch(0.83 0.13 84 / 0.35), 0 18px 44px -14px oklch(0.83 0.13 84 / 0.5);
   --glass: color-mix(in oklch, oklch(0.2 0.006 70) 78%, transparent); --logo-fill: var(--cine-logo); --field: oklch(0.19 0.006 70);
-  --ok: oklch(0.76 0.16 150); --warn: oklch(0.76 0.14 52);
+  --ok: oklch(0.76 0.16 150); --warn: oklch(0.76 0.14 52); --gold-metal: var(--gold-metal-lit);
   --shadow-lg: 0 50px 90px -40px oklch(0 0 0 / 0.9), 0 16px 30px -18px oklch(0 0 0 / 0.65);
   background: var(--paper); color: var(--ink); color-scheme: dark; }
 
-/* logo (máscara: a cor vem dos tokens, com um brilho que passa) */
+/* tema Claro: os capítulos escuros do meio da página ganham cantos arredondados, para o corte entre o preto e o
+   branco não ficar seco. Sem margem lateral: as seções presas na rolagem (GSAP pin) medem a largura cheia */
+:root:not([data-look="black"]) main > .cine:not(.hero):not(.phero), :root:not([data-look="black"]) main > .quote { border-radius: clamp(18px, 2.4vw, 34px); }
+
+/* logo (máscara: a cor vem dos tokens, com um brilho que passa). A máscara só usa o canal alfa:
+   o WebP sem perda tem 41 KB, contra 263 KB do PNG colorido */
 .logo { display: block; aspect-ratio: 16 / 5; background: var(--logo-fill); background-size: 300% 100%; background-position: 100% 0;
-  -webkit-mask: url("img/logo-evolution-refinada.png") center / contain no-repeat; mask: url("img/logo-evolution-refinada.png") center / contain no-repeat; }
+  -webkit-mask: url("img/logo-evolution-mask.webp") center / contain no-repeat; mask: url("img/logo-evolution-mask.webp") center / contain no-repeat; }
 .shine:hover .logo { animation: shine 1.4s var(--ease); }
 @keyframes shine { from { background-position: 100% 0; } to { background-position: 0% 0; } }
 
 /* divisões feitas pelo script: cada palavra inteira numa máscara (folga em cima para acentos, embaixo para descendentes) */
 .w { display: inline-block; overflow: hidden; vertical-align: top; white-space: nowrap; padding: 0.14em 0.1em 0.14em; margin: -0.14em -0.1em -0.14em; perspective: 520px; }
-.wi { display: inline-block; will-change: transform; }
+.wi { display: inline-block; }  /* sem will-change: o GSAP promove a camada só durante o movimento */
 .hy { position: relative; color: transparent; }
 .hy::after { content: ""; position: absolute; left: 0.06em; right: 0.06em; top: 50%; height: max(3px, 0.1em); background: var(--ink); }
 
@@ -195,7 +208,8 @@ html.entering-img::after, .enter-cover { background-color: var(--cine-bg); backg
 /* botões: caixa-alta, peso e um brilho de ouro por baixo */
 .btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 58px; padding: 0 30px; border: 0; border-radius: 999px; font: 700 13px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; text-decoration: none; cursor: pointer; overflow: hidden; isolation: isolate; transition: color 400ms var(--ease), box-shadow 500ms var(--ease); }
 @media (max-width: 520px) { .btn { min-height: 54px; padding: 0 22px; gap: 12px; font-size: 12.5px; letter-spacing: 0.12em; } }
-@media (hover: none) { .btn { transition: color 400ms var(--ease), transform 250ms var(--ease); } .btn:active { transform: scale(0.97); } }
+/* no toque, o aperto usa a propriedade scale: transition em transform brigava com o GSAP e deixava o botão 24px abaixo */
+@media (hover: none) { .btn { transition: color 400ms var(--ease), scale 250ms var(--ease); } .btn:active { scale: 0.97; } }
 .btn::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; transform: translateY(101%); transition: transform 550ms var(--ease); }
 .btn:hover::before { transform: none; }
 .btn svg { width: 18px; height: 18px; transition: transform 400ms var(--ease); }
@@ -222,11 +236,11 @@ html.entering-img::after, .enter-cover { background-color: var(--cine-bg); backg
 .nav.scrolled { background: color-mix(in oklch, var(--paper) 78%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); border-bottom-color: var(--rule); }
 /* sobre um capítulo escuro, a navegação troca para tinta clara */
 .nav.on-dark { --paper: var(--cine-bg); --ink: var(--cine-fg); --ink-2: var(--cine-fg-2); --ink-3: var(--cine-fg-3); --rule: oklch(1 0 0 / 0.18); --gold: var(--cine-gold); --gold-text: var(--cine-gold);
-  --btn-bg: var(--cine-gold); --btn-fg: oklch(0.13 0.005 70); --btn-hover: var(--cine-fg); --btn-hover-fg: oklch(0.13 0.005 70); --btn-glow: 0 0 0 1px oklch(0.83 0.13 84 / 0.35), 0 14px 34px -14px oklch(0.83 0.13 84 / 0.5); --logo-fill: var(--cine-logo); color: var(--ink); }
+  --btn-bg: var(--cine-gold); --btn-fg: oklch(0.13 0.005 70); --btn-hover: var(--cine-fg); --btn-hover-fg: oklch(0.13 0.005 70); --btn-glow: 0 0 0 1px oklch(0.83 0.13 84 / 0.35), 0 14px 34px -14px oklch(0.83 0.13 84 / 0.5); --logo-fill: var(--cine-logo); --gold-metal: var(--gold-metal-lit); color: var(--ink); }
 .nav .roll, .nav .look, .nav .tagp, .nav .menu-btn { transition: color 400ms var(--ease), border-color 400ms var(--ease); }
 .nav.hide { transform: translateY(-100%); }
 .nav-in { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 80px; }
-.brandrow { display: flex; align-items: center; gap: 16px; }
+.brandrow { display: flex; align-items: center; gap: 16px; min-width: 0; }
 .brand { display: block; text-decoration: none; }
 .brand .logo { height: 44px; }
 .tagp { display: inline-flex; padding: 7px 11px; border: 1px solid var(--rule); border-radius: 999px; font: 500 10px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; text-decoration: none; }
@@ -240,7 +254,7 @@ html.entering-img::after, .enter-cover { background-color: var(--cine-bg); backg
 .links .roll::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--gold); box-shadow: 0 0 10px var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 500ms var(--ease); }
 [data-page="inicio"] .links [data-nav="inicio"], [data-page="aulas"] .links [data-nav="aulas"], [data-page="agendar"] .links [data-nav="agendar"], [data-page="perguntas"] .links [data-nav="perguntas"], [data-page="contato"] .links [data-nav="contato"] { color: var(--gold-text); }
 [data-page="inicio"] .links [data-nav="inicio"]::after, [data-page="aulas"] .links [data-nav="aulas"]::after, [data-page="agendar"] .links [data-nav="agendar"]::after, [data-page="perguntas"] .links [data-nav="perguntas"]::after, [data-page="contato"] .links [data-nav="contato"]::after { transform: scaleX(1); }
-.nav-right { display: flex; align-items: center; gap: 18px; }
+.nav-right { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
 .nav-cta { display: flex; align-items: center; gap: 22px; }
 .nav-cta .btn { min-height: 46px; padding: 0 22px; font-size: 12px; }
 .look { display: inline-flex; align-items: center; gap: 10px; height: 42px; padding: 0 14px 0 6px; border-radius: 999px; border: 1px solid var(--rule); background: transparent; color: var(--ink); font: 500 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: border-color 300ms var(--ease); }
@@ -254,13 +268,20 @@ html.entering-img::after, .enter-cover { background-color: var(--cine-bg); backg
 .menu-btn i:last-child { top: 25px; }
 .menu-open .menu-btn i:first-child { top: 21px; transform: rotate(45deg); }
 .menu-open .menu-btn i:last-child { top: 21px; transform: rotate(-45deg); }
-@media (max-width: 1180px) { .links { display: none; } .menu-btn { display: inline-block; } }
+/* tablet e celular: os links vão para o menu de tela cheia, que também tem "Área do aluno" */
+@media (max-width: 1180px) { .links { display: none; } .menu-btn { display: inline-block; } .nav-cta .roll { display: none; } }
 /* notebooks (1181 a 1400px): o menu completo cabe numa linha, sem espremer o botão "Aula grátis" */
 .nav-cta .btn, .nav-cta .roll, .look { flex-shrink: 0; white-space: nowrap; }
 @media (min-width: 1181px) and (max-width: 1400px) { .tagp .lg { display: none; } .tagp .sm { display: inline; } .links { gap: 22px; } .nav-right { gap: 14px; } .nav-cta { gap: 18px; } }
-@media (min-width: 1181px) and (max-width: 1280px) { .look { padding: 0 6px; } .look .lk-txt { display: none; } }
+/* sem espaço, a troca de versão fica só com a bolinha; o texto sai da tela, mas continua sendo o nome do botão */
+@media (min-width: 1181px) and (max-width: 1280px), (max-width: 1023px) {
+  .look { padding: 0 6px; }
+  .look .lk-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+/* iPad em retrato (761 a 1023px): selo curto, para o menu e "Aula grátis" caberem inteiros */
+@media (max-width: 1023px) { .tagp .lg { display: none; } .tagp .sm { display: inline; } }
 @media (max-width: 760px) { .nav-cta { display: none; } }
-@media (max-width: 520px) { .brand .logo { height: 34px; } .tagp .lg { display: none; } .tagp .sm { display: inline; } .brandrow { gap: 10px; } .nav-right { gap: 10px; } .look { padding: 0 6px; } .look .lk-txt { display: none; } }
+@media (max-width: 520px) { .brand .logo { height: 34px; } .brandrow { gap: 10px; } .nav-right { gap: 10px; } }
 
 /* menu em tela cheia (celular e tablet) */
 .menu { position: fixed; inset: 0; z-index: 79; display: grid; align-content: space-between; gap: 32px; padding: calc(110px + env(safe-area-inset-top, 0px)) var(--gut-r) calc(36px + env(safe-area-inset-bottom, 0px)) var(--gut); background: var(--cine-bg); color: var(--cine-fg); clip-path: circle(0% at 100% 0%); visibility: hidden; }
@@ -318,7 +339,7 @@ html.entering-img::after, .enter-cover { background-color: var(--cine-bg); backg
 /* rodapé */
 .foot { position: relative; padding-top: clamp(80px, 9vw, 140px); overflow: hidden; }
 .foot-grid { display: grid; gap: 40px; grid-template-columns: minmax(0, 5fr) repeat(3, minmax(0, 2fr)); }
-.foot h4 { margin: 0 0 14px; font: 500 11px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-text); }
+.foot h4, .foot .foot-h { margin: 0 0 14px; font: 500 11px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-text); }
 .foot li { font-size: 15px; color: var(--ink-2); padding-block: 3px; }
 .foot li a { text-decoration: none; transition: color 300ms var(--ease); }
 .foot li a:hover { color: var(--gold-text); }
@@ -326,12 +347,30 @@ html.entering-img::after, .enter-cover { background-color: var(--cine-bg); backg
 @media (max-width: 900px) { .foot-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .foot-grid > :first-child, .foot-grid > :last-child { grid-column: 1 / -1; } }
 .foot-logo-wrap { margin-top: clamp(60px, 8vw, 120px); padding-bottom: clamp(28px, 4vw, 56px); }
 .foot-logo { width: 100%; clip-path: inset(0% 0% 0% 0%); filter: drop-shadow(0 0 40px color-mix(in oklch, var(--gold) 22%, transparent)); }
-@media (prefers-reduced-motion: no-preference) { .foot-logo { animation: shine-loop 7s var(--ease) 2s infinite; } }
+/* o brilho só roda com a logo na tela: site.js liga .live no .foot-logo-wrap enquanto ele aparece */
+@media (prefers-reduced-motion: no-preference) { .foot-logo-wrap.live .foot-logo { animation: shine-loop 7s var(--ease) 2s infinite; } }
 @keyframes shine-loop { 0%, 70% { background-position: 100% 0; } 100% { background-position: 0% 0; } }
 .foot-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-block: 22px max(28px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--rule); font: 500 11px/1.5 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
 
 /* elementos fixos */
 .wa-float { position: fixed; z-index: 70; right: calc(20px + env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 24px 0 20px; border-radius: 27px; background: var(--btn-bg); color: var(--btn-fg); font: 700 12.5px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; box-shadow: 0 18px 36px -18px oklch(0.1 0.01 75 / 0.7); }
+/* botão da trilha: redondo, no canto oposto ao WhatsApp; as barras dançam com o som ligado.
+   Aparece depois da primeira tela e some perto do convite final (site.js: Site.music) */
+.snd { position: fixed; z-index: 70; left: calc(20px + env(safe-area-inset-left, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%; background: color-mix(in oklch, var(--paper) 74%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px var(--rule), 0 12px 28px -16px oklch(0 0 0 / 0.6); color: var(--ink-2); cursor: pointer;
+  opacity: 0; visibility: hidden; transform: translateY(18px) scale(0.94); transition: opacity 400ms var(--ease), transform 600ms var(--ease), visibility 0s linear 600ms, color 300ms var(--ease); }
+.snd.shown { opacity: 1; visibility: visible; transform: none; transition: opacity 400ms var(--ease), transform 600ms var(--ease), visibility 0s, color 300ms var(--ease); }
+.snd:hover { color: var(--ink); }
+.snd-bars { display: flex; align-items: flex-end; gap: 2px; width: 16px; height: 14px; }
+.snd-bars i { flex: 1; height: 3px; background: currentColor; border-radius: 1px; transition: height 300ms var(--ease); }
+.snd.on { color: var(--gold-text); }
+.snd.on .snd-bars i { animation: snd-eq 900ms ease-in-out infinite alternate; }
+.snd.on .snd-bars i:nth-child(2) { animation-delay: -300ms; } .snd.on .snd-bars i:nth-child(3) { animation-delay: -600ms; } .snd.on .snd-bars i:nth-child(4) { animation-delay: -150ms; }
+@keyframes snd-eq { from { height: 3px; } to { height: 14px; } }
+/* quando o navegador bloqueou o som automático: um anel de ouro convida a tocar */
+.snd.ask { box-shadow: inset 0 0 0 1.5px var(--gold), 0 12px 28px -16px oklch(0 0 0 / 0.6); }
+@media (prefers-reduced-motion: reduce) { .snd.on .snd-bars i { animation: none; height: 10px; } }
+/* com a barra fixa do Agendar (celular e tablet), o botão sobe para não ficar embaixo dela */
+body:has(.ag-bar.on) .snd { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 .wa-float i { width: 9px; height: 9px; border-radius: 50%; background: var(--wa); box-shadow: 0 0 0 4px color-mix(in oklch, var(--wa) 25%, transparent); }
 .wa-float .wa-ic { display: none; }
 .wa-float { transition: background-color 400ms var(--ease), color 400ms var(--ease); }
@@ -346,7 +385,7 @@ html.wa-js .wa-float.on { opacity: 1; visibility: visible; transform: none; tran
   .wa-float i { position: absolute; top: 10px; right: 10px; width: 10px; height: 10px; box-shadow: 0 0 0 2.5px var(--btn-bg); }
 }
 
-/* ---------- abertura de cinema das páginas internas: foto ao fundo, fumaça de ouro, kanji em contorno ---------- */
+/* ---------- abertura de cinema das páginas internas: foto ao fundo e kanji em contorno ---------- */
 .cin { display: flex; flex-direction: column; justify-content: flex-end; min-height: min(100svh, 1000px); padding-top: clamp(118px, 15vh, 170px); padding-bottom: 0; isolation: isolate; }
 .cin .lede { margin-top: 24px; }
 .cin .phero-title { margin-top: clamp(20px, 3vh, 40px); }
@@ -356,13 +395,10 @@ html.wa-js .wa-float.on { opacity: 1; visibility: visible; transform: none; tran
 .cin-shade { position: absolute; inset: 0; z-index: -3; pointer-events: none;
   background: radial-gradient(ellipse 110% 90% at 72% 28%, transparent 0%, color-mix(in oklch, var(--cine-bg) 55%, transparent) 55%, var(--cine-bg) 100%),
               linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 78%, transparent) 0%, transparent 30%, transparent 42%, var(--cine-bg) 100%); }
-.cin-gl { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity 1.8s var(--ease); }
-.cin-gl.on { opacity: 1; }
 .cin-ghost { position: absolute; z-index: -1; right: -2vw; top: 50%; translate: 0 -50%; writing-mode: vertical-rl; font: 500 min(64vh, 38vw)/0.9 var(--mincho); color: transparent; -webkit-text-stroke: 1px oklch(0.83 0.13 84 / 0.22); pointer-events: none; user-select: none; will-change: transform; }
 .cin .phero-title { max-width: 18ch; }
 @media (min-width: 601px) { .cin .phero-title { font-size: clamp(44px, min(6.6vw, 11vh), 132px); } }
 .cin .phero-title .o { color: transparent; -webkit-text-stroke: 0.022em var(--ink); }
-.cin .phero-title em .wi, .cin .phero-title em:not(:has(.wi)) { filter: drop-shadow(0 0 30px oklch(0.83 0.13 84 / 0.25)); }
 .cin .lede { text-shadow: 0 1px 18px oklch(0 0 0 / 0.8); }
 .cin-row { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; margin-top: 30px; }
 /* faixa de dados no pé da abertura, como a ficha técnica de um evento */
@@ -389,17 +425,44 @@ html.wa-js .wa-float.on { opacity: 1; visibility: visible; transform: none; tran
 .pill-live.closed i { background: var(--ink-3); } .pill-live.closed i::after { display: none; }
 .pill-live b { color: var(--ink); font-weight: 600; }
 
-/* fitas cruzadas: duas faixas em sentidos opostos que aceleram com a rolagem e invertem quando a página sobe */
-.bands { position: relative; height: clamp(160px, 18vw, 290px); overflow: hidden; perspective: 1100px; }
-.band { position: absolute; left: -10%; right: -10%; top: 50%; overflow: hidden; padding-block: clamp(10px, 1.1vw, 18px); }
-/* as duas fitas se cruzam em profundidade: a dourada vem para a frente, a escura vai para trás */
-.band.b1 { z-index: 2; transform: translateY(-64%) rotate(-3deg) rotateY(-9deg) translateZ(30px); background: var(--cta-bg); color: oklch(0.13 0.005 70); box-shadow: 0 24px 60px -24px oklch(0 0 0 / 0.7); }
-.band.b2 { transform: translateY(-24%) rotate(2.4deg) rotateY(11deg) translateZ(-60px); background: var(--cine-bg-2); color: var(--cine-fg); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.08), inset 0 -1px 0 oklch(1 0 0 / 0.08); }
+/* fitas cruzadas: duas faixas pretas de jiu-jitsu em sentidos opostos, que aceleram com a rolagem e invertem
+   quando a página sobe. O tecido (trama e fileiras de costura) vem de img/faixa-preta.webp, gerado por
+   tools/faixa-texturas.py, e anda junto com o bordado; a luz fica parada por cima, como num tecido de verdade. */
+.bands { position: relative; height: clamp(170px, 19vw, 300px); overflow: hidden; perspective: 1100px; }
+.band { position: absolute; left: -10%; right: -10%; top: 50%; overflow: hidden; border-radius: 3px; }
+/* as duas faixas se cruzam em profundidade: uma vem para a frente, a outra fica atrás, mais escura */
+.band.b1 { z-index: 2; transform: translateY(-72%) rotate(-3deg) rotateY(-9deg) translateZ(30px); box-shadow: 0 26px 50px -22px oklch(0 0 0 / 0.85), 0 2px 0 oklch(0 0 0 / 0.5); }
+.band.b2 { left: -25%; right: -25%; transform: translateY(-10%) rotate(2.4deg) rotateY(11deg) translateZ(-60px); filter: brightness(0.66); box-shadow: 0 18px 40px -20px oklch(0 0 0 / 0.8); }
 .band .mq-track { display: flex; width: max-content; will-change: transform; }
-.band .mq-item { display: flex; align-items: center; gap: 0.5em; padding-right: 0.5em; font: 400 clamp(30px, 4.4vw, 80px)/1 var(--serif); letter-spacing: -0.01em; text-transform: uppercase; white-space: nowrap; }
-.band .mq-item .o { color: transparent; -webkit-text-stroke: 1.5px currentColor; }
-.band .mq-item .k { font: 500 0.62em/1 var(--mincho); color: var(--cine-gold); }
-.band.b1 .mq-item .k { color: oklch(0.13 0.005 70 / 0.6); }
+.band .mq-item { --h: clamp(56px, 6.2vw, 112px); display: flex; align-items: center; gap: 0.55em; height: var(--h); padding-left: 0.6em;
+  font: 400 clamp(26px, 3.4vw, 60px)/1 var(--serif); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
+  background: #0d0d0e url("img/faixa-preta.webp") 0 0 / auto 100% repeat-x; }
+/* bordado em fio dourado: o ponto cheio aparece em diagonal dentro das letras, com relevo */
+.band .mq-item > span { color: transparent; background: repeating-linear-gradient(112deg, oklch(0.9 0.11 88) 0 2px, oklch(0.8 0.12 82) 2px 3px, oklch(0.62 0.12 72) 3px 4px);
+  -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 1px 0 oklch(0 0 0 / 0.85)) drop-shadow(0 -1px 0 oklch(1 0 0 / 0.08)); }
+.band .mq-item > span.o { background: none; -webkit-text-stroke: 1.4px oklch(0.8 0.12 82); }
+.band .mq-item > span.k { background: none; color: oklch(0.83 0.13 84 / 0.8); font: 500 0.7em/1 var(--mincho); }
+/* a ponteira da faixa preta: vermelha, com quatro graus em fita branca e as fileiras de costura */
+.band .mq-item::after { content: ""; align-self: stretch; flex: 0 0 3.2em; margin-left: 0.5em; margin-right: 0.1em;
+  background:
+    linear-gradient(90deg, transparent 0 34%, oklch(0.95 0 0) 34% 40%, transparent 40% 49%, oklch(0.95 0 0) 49% 55%, transparent 55% 64%, oklch(0.95 0 0) 64% 70%, transparent 70% 79%, oklch(0.95 0 0) 79% 85%, transparent 85%),
+    linear-gradient(180deg, oklch(1 0 0 / 0.14), transparent 30%, oklch(0 0 0 / 0.32)),
+    repeating-linear-gradient(180deg, transparent 0 calc(var(--h) / 10 - 1px), oklch(0 0 0 / 0.22) calc(var(--h) / 10 - 1px) calc(var(--h) / 10)),
+    oklch(0.5 0.19 27);
+  box-shadow: inset 2px 0 0 oklch(0 0 0 / 0.35), inset -2px 0 0 oklch(0 0 0 / 0.35); }
+/* luz fixa sobre o tecido que passa: brilho na borda de cima e sombra embaixo, como numa faixa de verdade */
+.band::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(180deg, oklch(1 0 0 / 0.14) 0%, oklch(1 0 0 / 0.03) 9%, transparent 22%, transparent 70%, oklch(0 0 0 / 0.5) 100%); }
+/* um reflexo atravessa a faixa da frente de tempos em tempos */
+.band::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 22%; z-index: 3; pointer-events: none; transform: translateX(-120%);
+  background: linear-gradient(100deg, transparent, oklch(1 0 0 / 0.07) 45%, oklch(1 0 0 / 0.13) 50%, oklch(1 0 0 / 0.07) 55%, transparent); }
+@media (prefers-reduced-motion: no-preference) { .band.b1::before { animation: belt-sheen 7s cubic-bezier(.6, 0, .2, 1) 1.2s infinite; } }
+@keyframes belt-sheen { 0% { transform: translateX(-120%); } 38%, 100% { transform: translateX(560%); } }
+@media (max-width: 700px) {
+  .bands { height: 200px; }
+  .band.b1 { transform: translateY(-92%) rotate(-6deg) translateZ(30px); }
+  .band.b2 { transform: translateY(8%) rotate(5deg) translateZ(-40px); }
+}
 .bands.one { height: clamp(110px, 12vw, 180px); }
 .bands.one .band.b1 { transform: translateY(-50%) rotate(-2deg) rotateY(-10deg); }
 

@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Área do Aluno · Redesign Studio Evolution</title>
+<title>Área do Aluno · Studio Evolution BJJ</title>
+<script src="supabase-config.js"></script>
+<script src="acesso.js"></script>
+<script>
+/* esta área só abre com login (entrar.html); a sessão de professor também abre esta área. Roda antes de tudo, para a cortina da troca de
+   página seguir para a tela de entrada; no modo Supabase, a sessão é conferida com o servidor logo depois (acesso.js) */
+Acesso.portao("aluno");
+</script>
 <script>
 (function () {
   var d = document.documentElement, l = "black";
@@ -20,9 +27,8 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&family=JetBrains+Mono:wght@400..600&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
-<link rel="preload" as="image" href="img/logo-evolution-refinada.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="app.css">
 <style>
@@ -33,6 +39,27 @@
 .hc.c2 { top: 9%; }  /* acima das alunas, sobre a parede, para não cobrir os rostos */
 @media (max-width: 1023px) { .hc.c2 { top: auto; bottom: 64px; } }  /* no celular, sobre o tatame, entre os outros dois cartões */
 .diff { background: var(--paper-2); }
+.hc small { color: var(--cine-fg-2); }  /* no celular, o cartão de cima fica sobre o brilho dourado: o cinza mais claro mantém 4,5:1 */
+
+/* as peças das telas do celular (Início, Presença, Movimentos, Perfil, Avisos e a folha da mensalidade) estão em app.css,
+   divididas com o app de verdade (app.html) */
+/* capítulo 05: exemplo do aviso de grau, no desenho da notificação da tela bloqueada */
+.note-ex { margin-top: 26px; max-width: 46ch; }
+.note-ex .ap-note { margin-top: 12px; opacity: 1; transform: none; background: var(--cine-bg-2); color: var(--cine-fg); box-shadow: 0 0 0 1px var(--rule), 0 24px 40px -28px oklch(0 0 0 / 0.6); }
+
+/* abas no celular: a faixa rola de lado e esmaece na ponta enquanto houver aba escondida.
+   A aba ativa sempre aparece inteira: show() rola só a faixa, nunca a página */
+@media (max-width: 860px) {
+  .demo-tabs { scroll-snap-type: x proximity; scroll-padding-inline: var(--gut) var(--gut-r); -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .demo-tabs button { scroll-snap-align: start; }
+  .demo-tabs.at-end { -webkit-mask-image: none; mask-image: none; }
+}
+/* toque: abas, atalhos dos capítulos e a troca Aluno/Professor com 44 px de altura */
+@media (pointer: coarse) {
+  .demo-tabs button, .dch .try { min-height: 44px; }
+  .ar-switch a { display: flex; align-items: center; min-height: 44px; }  /* tema.css usa 12 px: a altura não depende da fonte */
+}
+
 </style>
 <link rel="stylesheet" href="tema.css">
 </head>
@@ -46,6 +73,10 @@
     <symbol id="i-belt" viewBox="0 0 24 24"><path d="M2 9h7M15 9h7"/><rect x="9" y="6.5" width="6" height="5" rx="1"/><path d="M10.5 11.5L7.5 21M13.5 11.5l3 9.5"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-tri" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <!-- competências: conquistada é um check num círculo cheio; a conquistar, um círculo vazio (forma, não só cor) -->
+    <symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><path d="M8 12.5l2.8 2.8L16.5 9" style="stroke:var(--paper)"/></symbol>
+    <symbol id="i-todo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/></symbol>
     <symbol id="i-touch" viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 9.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3l-1.6-2.9a1.5 1.5 0 0 1 2.6-1.5L9 15"/></symbol>
   </defs>
 </svg>
@@ -57,7 +88,7 @@
   <div class="wrap nav-in">
     <div class="brandrow">
       <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
-      <a class="tagp" href="index.html" data-int title="Esta página é uma proposta de redesign"><span class="lg">Proposta de redesign</span><span class="sm">Proposta</span></a>
+      <a class="tagp" href="entrar.html" data-sair>Sair</a>
     </div>
     <nav class="links" aria-label="Menu principal">
       <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
@@ -67,7 +98,7 @@
       <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
     </nav>
     <div class="nav-right">
-      <button class="look" id="lookBtn" type="button" aria-pressed="false" aria-label="Mudar para a versão black"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Black</span></button>
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
       <div class="nav-cta">
         <a class="roll" href="area-do-aluno.html" data-int aria-current="page"><span data-t="Área do aluno">Área do aluno</span></a>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
@@ -85,13 +116,13 @@
         <h1 class="ar-title" id="t-hero">Seu treino, <em>na palma da mão</em>.</h1>
         <p class="ar-lede">Confirmar a vaga, registrar a presença com o código da aula, assistir aos movimentos da sua faixa e acompanhar cada grau. Role a página e use o celular: ele funciona.</p>
         <nav class="ar-switch" aria-label="Escolher a área"><a href="area-do-aluno.html" aria-current="page" data-int>Aluno</a><a href="area-do-professor.html" data-int>Professor</a></nav>
-        <div class="ctas"><a class="btn btn-ink" href="#demo">Experimentar o app<svg class="ic"><use href="#i-arrow"/></svg></a></div>
+        <div class="ctas"><a class="btn btn-ink" href="#demo">Experimentar o app<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a></div>
       </div>
       <div class="ar-visual" aria-hidden="true">
         <figure class="ar-photo" data-depth="20"><img src="img/programa-feminino-real.jpg" alt="" width="1264" height="848"></figure>
-        <div class="hc c1" data-depth="60"><span class="dot"><svg class="ic"><use href="#i-check"/></svg></span><span><small>Hoje, 19h · Adulto</small><b>Vaga confirmada</b></span></div>
+        <div class="hc c1" data-depth="60"><span class="dot"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><span><small>Hoje, 19h · Adulto</small><b>Vaga confirmada</b></span></div>
         <div class="hc c2" data-depth="100"><span><small>Faixa azul</small><b>2 de 4 graus</b></span><span class="beltm"></span></div>
-        <div class="hc c3" data-depth="80"><span class="dot"><svg class="ic"><use href="#i-play"/></svg></span><span><small>Raspagem de gancho</small><b>Quiz liberado</b></span></div>
+        <div class="hc c3" data-depth="80"><span class="dot"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></span><span><small>Raspagem de gancho</small><b>Quiz liberado</b></span></div>
       </div>
     </div>
   </section>
@@ -99,50 +130,67 @@
   <section class="demo" id="demo" aria-labelledby="t-demo">
     <div class="demo-head">
       <p class="label">Experimente</p>
-      <h2 id="t-demo">Quatro abas, <em>uma prioridade</em> em cada.</h2>
-      <p>Cada parte do app responde uma pergunta da aluna. Toque nos botões do celular como se fosse o seu.</p>
-      <div class="demo-tabs" id="demoTabs" role="tablist" aria-label="Partes do app">
-        <button type="button" role="tab" data-view="inicio" aria-selected="true">Início</button>
-        <button type="button" role="tab" data-view="presenca" aria-selected="false">Presença</button>
-        <button type="button" role="tab" data-view="movimentos" aria-selected="false">Movimentos</button>
-        <button type="button" role="tab" data-view="perfil" aria-selected="false">Perfil</button>
-        <button type="button" role="tab" data-view="avisos" aria-selected="false">Avisos</button>
+      <h2 id="t-demo">Quatro abas e os avisos. <em>Uma pergunta</em> em cada.</h2>
+      <p>Cada parte do app responde a uma pergunta da aluna. Toque nos botões do celular como se fosse o seu.</p>
+      <!-- botões com aria-current, como o trilho do computador: o papel de aba prometia setas e painel que eles não têm -->
+      <div class="demo-tabs" id="demoTabs" role="group" aria-label="Partes do app">
+        <button type="button" data-view="inicio" aria-current="true">Início</button>
+        <button type="button" data-view="presenca" aria-current="false">Presença</button>
+        <button type="button" data-view="movimentos" aria-current="false">Movimentos</button>
+        <button type="button" data-view="perfil" aria-current="false">Perfil</button>
+        <button type="button" data-view="avisos" aria-current="false">Avisos</button>
       </div>
     </div>
     <div class="wrap demo-grid">
       <div class="demo-dev">
         <div class="device" id="device">
           <div class="ap" id="ap">
-            <div class="ap-sbar"><span id="apClock">18:12</span><span>5G</span></div>
-            <div class="ap-toast" id="apToast" role="status" aria-live="polite"><svg class="ic"><use href="#i-check"/></svg><span></span></div>
+            <div class="ap-sbar" aria-hidden="true"><span id="apClock">18:12</span><span>5G</span></div>
+            <div class="ap-toast" id="apToast" role="status" aria-live="polite"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span></span></div>
             <div class="ap-views">
               <!-- Início -->
               <section class="ap-view on" data-view="inicio" aria-label="Tela Início">
-                <p class="ap-lb">Sexta, 16 de outubro</p>
+                <p class="ap-lb">Quinta, 15 de outubro</p>
                 <p class="ap-hi">Boa noite, Marina.</p>
                 <div class="ap-card">
                   <p class="ap-lb gold">Sua aula de hoje</p>
                   <div class="ap-big"><b>19h</b><span>Adulto</span></div>
                   <p class="ap-sub" id="apVagas">Começa em 48 min · 7 de 10 vagas ocupadas</p>
                   <div class="ap-dots" id="apDots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
-                  <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic"><use href="#i-check"/></svg><span>Confirmar presença</span></button>
+                  <div class="ap-btnrow" id="apBtnRow">
+                    <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span>Confirmar vaga</span></button>
+                    <button class="ap-link" type="button" id="apRelease" hidden>Liberar a vaga</button>
+                  </div>
+                  <div class="ap-ask" id="apAsk" hidden>
+                    <p>Liberar sua vaga das 19h?</p>
+                    <div class="ap-btnrow"><button class="ap-btn" type="button" id="apRelYes">Liberar</button><button class="ap-btn ghost" type="button" id="apRelNo">Manter</button></div>
+                  </div>
                 </div>
-                <p class="ap-lb" style="margin-top:18px">Sua semana · <span id="apWeek">2 de 3</span> treinos</p>
-                <div class="ap-wk"><div><span>Seg</span><b>12</b><i></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><i id="apToday" hidden></i></div></div>
-                <div class="ap-row" style="margin-top:10px"><span>Outros horários hoje</span><span class="r">08:00 · 11:00</span></div>
-                <div class="ap-row"><span>Mensalidade de outubro</span><span class="r ok">Em dia</span></div>
+                <div class="ap-wkh"><p class="ap-lb">Semana · <span id="apWeek">2 de 3</span> treinos</p><button class="ap-wkb" type="button" id="apGoal" aria-label="Mudar a meta da semana">mudar</button></div>
+                <!-- o ponto de quem treinou leva o texto para o leitor de tela; o de hoje só aparece depois da presença -->
+                <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
+                <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r">segunda, 19 de outubro, 19h</span></div>
+                <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
               </section>
 
               <!-- Presença -->
               <section class="ap-view" data-view="presenca" aria-label="Tela Presença">
                 <p class="ap-lb">Presença</p>
                 <p class="ap-hi">Aula das 19h</p>
-                <p class="ap-mut" style="margin-top:4px">Adulto · sexta, 16 de outubro</p>
+                <p class="ap-mut" style="margin-top:4px">Adulto · quinta, 15 de outubro</p>
                 <ol class="ap-steps">
-                  <li class="done" id="apStep1"><span class="ap-mk"><svg class="ic"><use href="#i-check"/></svg></span><div><p class="ap-st">Vaga confirmada</p><p>Às 18:14 · 8 de 10 vagas</p></div></li>
-                  <li class="now" id="apStep2"><span class="ap-mk">2</span><div><p class="ap-st" id="apStep2h">Digite o código da aula</p><p id="apStep2t">3 letras e 3 números, mostrados no tatame.</p>
-                    <div id="apCodeWrap" style="overflow:hidden"><div class="ap-code pulse" id="apCode" aria-label="Código da aula"><b class="caret"></b><b></b><b></b><b></b><b></b><b></b></div>
-                    <button class="ap-btn off" type="button" id="apRegister" aria-disabled="true">Registrar presença</button></div></div></li>
+                  <li class="now" id="apStep1"><span class="ap-mk">1</span><div><p class="ap-st" id="apStep1h">Confirme sua vaga</p><p id="apStep1t">Na tela Início, um toque.</p></div></li>
+                  <li id="apStep2"><span class="ap-mk">2</span><div><p class="ap-st" id="apStep2h">Digite o código da aula</p><p id="apCodeHelp">3 letras e 3 números, mostrados na TV do tatame.</p>
+                    <div id="apCodeWrap" style="overflow:hidden">
+                      <div class="ap-codef">
+                        <label class="sr-only" for="apCodeIn">Código da aula</label>
+                        <input id="apCodeIn" type="text" inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="20" aria-describedby="apCodeHelp apCodeErr">
+                        <div class="ap-code pulse" id="apCode" aria-hidden="true"><b class="caret"></b><b></b><b></b><b></b><b></b><b></b></div>
+                      </div>
+                      <p class="ap-err" id="apCodeErr" role="alert"></p>
+                      <button class="ap-btn off" type="button" id="apRegister" aria-disabled="true">Registrar presença</button>
+                      <button class="ap-link" type="button" id="apWrong">Testar um código errado</button>
+                    </div></div></li>
                   <li class="later" id="apStep3"><span class="ap-mk">3</span><div><p class="ap-st">Presença registrada</p><p>Conta para a meta da semana.</p></div></li>
                 </ol>
                 <div class="ap-done" id="apDone" hidden><b>18:55</b><p>Presença registrada. Meta da semana batida: 3 de 3.</p><div class="ap-goal"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
@@ -150,12 +198,12 @@
 
               <!-- Movimentos -->
               <section class="ap-view" data-view="movimentos" aria-label="Tela Movimentos">
-                <p class="ap-lb">Faixa azul · <span id="apMov">5</span> de 12</p>
+                <p class="ap-lb" id="apMovLb">Faixa azul · <span id="apMov">5</span> de 12 movimentos</p>
                 <p class="ap-hi">Movimentos</p>
                 <p class="ap-lb gold hide-q" style="margin-top:16px">Continue assistindo</p>
                 <button class="ap-cover pulse" type="button" id="apPlay" aria-label="Continuar o vídeo Raspagem de gancho">
                   <img src="img/programa-adulto-real.jpg" alt="" style="object-position:60% 50%">
-                  <span class="play"><svg viewBox="0 0 24 24"><use href="#i-tri"/></svg></span>
+                  <span class="play"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-tri"/></svg></span>
                   <span class="dur">6:40</span>
                   <span class="pg"><span id="apProg" style="width:62%"></span></span>
                 </button>
@@ -165,12 +213,14 @@
                   <p class="ap-lb gold" id="apQn">Pergunta 1 de 2</p>
                   <p class="q" id="apQt"></p>
                   <div id="apQa"></div>
-                  <p class="fb" id="apFb" hidden></p>
+                  <p class="fb" id="apFb" role="status"></p>
                 </div>
+                <p class="ap-doneline" id="apQdone" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span><b>Quiz feito</b> · movimento estudado</span></p>
                 <div id="apList">
                   <p class="ap-lb" style="margin-top:16px;margin-bottom:6px">Para sua faixa</p>
                   <ul class="ap-list">
-                    <li><div class="th"><img src="img/treino-tecnica.webp" alt=""></div><div><b>Passagem toreando</b><small>Passagem · 5:20</small></div></li>
+                    <li id="apStudied" hidden><div class="th"><img src="img/programa-adulto-real.jpg" alt="" style="object-position:60% 50%"></div><div><b>Raspagem de gancho</b><small>Raspagem · 6:40</small><span class="pill-s in">Estudado</span></div></li>
+                    <li><div class="th"><img src="img/treino-tecnica.webp" alt=""></div><div><b>Passagem toreando</b><small>Passagem · 5:20</small><span class="pill-s gold" id="apNext" hidden>Próximo</span></div></li>
                     <li><div class="th"><img src="img/programa-feminino-real.jpg" alt="" style="object-position:55% 60%"></div><div><b>Armlock da guarda fechada</b><small>Finalização · 7:05</small></div></li>
                   </ul>
                 </div>
@@ -190,36 +240,53 @@
                 </svg>
                 <div class="ap-row" style="border-top:0;padding-bottom:0"><span style="font:400 19px/1 var(--serif)">Faixa azul</span><span class="r">2 de 4 graus</span></div>
                 <div class="ap-degs"><i class="on"></i><i class="on"></i><i></i><i></i></div>
-                <div class="ap-trio"><div><b>21</b><span>aulas desde o último grau</span></div><div><b>6</b><span>semanas seguidas · recorde 9</span></div><div><b id="apMov2">5/12</b><span>movimentos da faixa</span></div></div>
-                <button class="ap-row pulse" type="button" id="apCompBtn" aria-expanded="false" style="width:100%;margin-top:12px;border-left:0;border-right:0;border-bottom:0;background:none;color:inherit;font:inherit;cursor:pointer"><span>Competências para graduar</span><span class="r">3 de 8<svg class="ic"><use href="#i-chev"/></svg></span></button>
-                <ul class="ap-comp" id="apComp" hidden>
-                  <li class="got"><svg class="ic"><use href="#i-check"/></svg>Fuga de montada</li>
-                  <li class="got"><svg class="ic"><use href="#i-check"/></svg>Raspagem de gancho</li>
-                  <li class="got"><svg class="ic"><use href="#i-check"/></svg>Passagem toreando</li>
-                  <li><svg class="ic"><use href="#i-check"/></svg>Armlock da guarda fechada</li>
-                  <li><svg class="ic"><use href="#i-check"/></svg>Triângulo da guarda</li>
+                <!-- "aulas desde o último grau" conta as presenças registradas: a de hoje leva 21 a 22 (register) -->
+                <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b>6</b><span>semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
+                <button class="ap-row pulse" type="button" id="apCompBtn" aria-expanded="false" aria-controls="apComp" style="width:100%;margin-top:12px;border-left:0;border-right:0;border-bottom:0;background:none;color:inherit;font:inherit;cursor:pointer"><span>Competências da faixa</span><span class="r">3 de 8<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+                <!-- as 8 da faixa azul: 3 conquistadas e 5 a conquistar (as três últimas são exemplo) -->
+                <ul class="ap-comp" id="apComp" aria-label="3 de 8 competências conquistadas" hidden>
+                  <li class="got"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-done"/></svg>Fuga de montada<span class="sr-only"> · conquistada</span></li>
+                  <li class="got"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-done"/></svg>Raspagem de gancho<span class="sr-only"> · conquistada</span></li>
+                  <li class="got"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-done"/></svg>Passagem toreando<span class="sr-only"> · conquistada</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Armlock da guarda fechada<span class="sr-only"> · a conquistar</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Triângulo da guarda<span class="sr-only"> · a conquistar</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Defesa do estrangulamento<span class="sr-only"> · a conquistar</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Raspagem tesoura<span class="sr-only"> · a conquistar</span></li>
+                  <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Fuga de lateral<span class="sr-only"> · a conquistar</span></li>
                 </ul>
-                <p class="ap-mut" id="apNote" style="font:italic 400 13px/1.4 var(--sans);margin-top:12px">O próximo grau é decisão do professor, olhando seu treino no tatame.</p>
+                <p class="ap-mut" id="apNote" style="font:italic 400 13px/1.4 var(--sans);margin-top:12px">Competência é o que o professor vê no tatame; o vídeo é para estudar. O próximo grau é decisão do professor.</p>
               </section>
 
               <!-- Avisos -->
               <section class="ap-view lockv" data-view="avisos" aria-label="Avisos na tela bloqueada">
                 <div class="ap-lock">
-                  <p class="clock">18:00</p>
-                  <p class="date">sexta-feira, 16 de outubro</p>
+                  <button class="clock" type="button" id="apLockClock" aria-label="18:00, voltar ao Início">18:00</button>
+                  <p class="date">quinta-feira, 15 de outubro</p>
                   <div class="ap-notes">
-                    <div class="ap-note"><span class="ico"><span></span></span><div><p class="hd"><span>Studio Evolution</span><span>agora</span></p><b>Sua aula começa em 1 hora</b><p>Adulto 19h · ainda há 3 vagas. Toque para confirmar.</p></div></div>
-                    <div class="ap-note"><span class="ico"><span></span></span><div><p class="hd"><span>Studio Evolution</span><span>ontem</span></p><b>Falta 1 treino para a meta</b><p>Você treinou 2 de 3 nesta semana. Amanhã, às 19h, você fecha a meta.</p></div></div>
-                    <div class="ap-note"><span class="ico"><span></span></span><div><p class="hd"><span>Studio Evolution</span><span>seg</span></p><b>Movimento novo na sua faixa</b><p>“Passagem toreando” já está em Movimentos.</p></div></div>
+                    <button class="ap-note" type="button" data-note="aula"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>Sua aula começa em 1 hora</b><span class="tx">Adulto 19h · ainda há 3 vagas. Toque para confirmar.</span></span></button>
+                    <button class="ap-note" type="button" data-note="meta"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>ontem</span></span><b>Falta 1 treino para a meta</b><span class="tx">Se der, amanhã às 19h você fecha a semana. Se não der, tudo bem.</span></span></button>
+                    <button class="ap-note" type="button" data-note="mov"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>seg</span></span><b>Movimento novo na sua faixa</b><span class="tx">“Passagem toreando” já está em Movimentos.</span></span></button>
                   </div>
                 </div>
               </section>
             </div>
+            <!-- mensalidade: a folha que abre ao tocar na linha do Início (valores de exemplo, iguais aos da Marina no Financeiro) -->
+            <div class="ap-scrim" id="apScrim" aria-hidden="true"></div>
+            <div class="ap-sheet" id="apSheet" role="dialog" aria-labelledby="apSheetT">
+              <div class="ap-sheet-h"><p class="ap-lb">Mensalidade</p><button class="ap-x" type="button" id="apSheetX" aria-label="Fechar"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-x"/></svg></button></div>
+              <p class="ap-hi" id="apSheetT">Plano Mensal</p>
+              <p class="ap-mut" style="margin-top:4px">Cartão automático · valores de exemplo</p>
+              <div class="ap-row" style="margin-top:12px"><span>Próxima cobrança</span><span class="r">05/11 · R$ 200</span></div>
+              <div class="ap-row"><span>Outubro</span><span class="r ok">Pago em 05/10</span></div>
+              <button class="ap-btn" type="button" id="apReceipt">Recibo de outubro</button>
+              <button class="ap-btn ghost" type="button" id="apTalk">Falar sobre meu plano</button>
+            </div>
+            <!-- na ordem dos capítulos: rolando a página, o destaque anda da esquerda para a direita -->
             <nav class="ap-dock" id="apDock" aria-label="Abas do app">
-              <button type="button" data-go="inicio" aria-current="true"><svg class="ic"><use href="#i-home"/></svg>Início</button>
-              <button type="button" data-go="movimentos" aria-current="false"><svg class="ic"><use href="#i-play"/></svg>Movimentos</button>
-              <button type="button" data-go="presenca" aria-current="false"><svg class="ic"><use href="#i-check"/></svg>Presença</button>
-              <button type="button" data-go="perfil" aria-current="false"><svg class="ic"><use href="#i-belt"/></svg>Perfil</button>
+              <button type="button" data-go="inicio" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Início</button>
+              <button type="button" data-go="presenca" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Presença</button>
+              <button type="button" data-go="movimentos" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
+              <button type="button" data-go="perfil" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Perfil</button>
             </nav>
             <i class="ap-glare" aria-hidden="true"></i>
           </div>
@@ -237,57 +304,61 @@
         <article class="dch on" data-view="inicio">
           <p class="label">01 · Início</p>
           <h2>Uma pergunta: <em>vou treinar hoje?</em></h2>
-          <p>A aula da turma da aluna aparece em destaque, com quanto falta e quantas vagas restam. Confirmar leva um toque.</p>
+          <p>A aula da turma da aluna aparece em destaque, com quanto falta e quantas vagas restam. Confirmar a vaga leva um toque.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>Só a turma dela, sem as aulas Kids no meio</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Vagas contadas com todo mundo, até 10 por aula</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>A semana à vista, com a meta de 3 treinos</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Só a turma dela, sem as aulas Kids no meio</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Vagas da turma inteira, até 10 por aula</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>A semana à vista, com a meta que ela escolheu</li>
           </ul>
-          <button class="try" type="button" data-act="confirm"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Confirmar a presença no celular</span></button>
+          <button class="try" type="button" data-act="confirm"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Confirmar a vaga no celular</span></button>
         </article>
         <article class="dch" data-view="presenca">
           <p class="label">02 · Presença</p>
           <h2>Três passos, <em>uma tela só</em>.</h2>
-          <p>No tatame, o professor mostra o código da aula: três letras e três números. A aluna digita, e a presença entra na hora, contando para a meta da semana.</p>
+          <p>No tatame, o professor mostra o código da aula na TV: três letras e três números. A aluna digita, e a presença entra na hora, contando para a meta da semana. Na TV de hoje, o código é <b>KTR 482</b>.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>O botão só acende com o código completo</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>O código vale só para aquela aula, pelo tempo que o professor escolher</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Cada passo mostra o horário em que aconteceu</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>O botão só acende com o código completo</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>O código vale só para aquela aula, pelo tempo que o professor escolher</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Cada passo mostra o horário em que aconteceu</li>
           </ul>
-          <button class="try" type="button" data-act="checkin"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Digitar o código e registrar</span></button>
+          <button class="try" type="button" data-act="checkin"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Digitar o código e registrar</span></button>
         </article>
         <article class="dch" data-view="movimentos">
           <p class="label">03 · Movimentos</p>
           <h2>Continue <em>de onde parou</em>.</h2>
-          <p>O vídeo em andamento vem primeiro. Aos 90%, abre um quiz curto; acertando tudo, o movimento conta como concluído.</p>
+          <p>O vídeo em andamento vem primeiro. Aos 90%, abre um quiz curto; respondendo certo, o movimento conta como estudado.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>Só os movimentos da faixa dela</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Capas com fotos reais do Studio</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Errou? Tenta de novo, quantas vezes quiser</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Só os movimentos da faixa dela</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Capas com fotos reais do Studio</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Errou? Tente de novo, quantas vezes quiser</li>
           </ul>
-          <button class="try" type="button" data-act="watch"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Assistir até os 90% e abrir o quiz</span></button>
+          <button class="try" type="button" data-act="watch"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Assistir até os 90% e abrir o quiz</span></button>
         </article>
         <article class="dch" data-view="perfil">
           <p class="label">04 · Perfil</p>
           <h2>A faixa <em>em primeiro lugar</em>.</h2>
           <p>A faixa com os graus de verdade, três números que importam e o caminho até o próximo grau, sem prometer datas: quem decide é o professor.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>Aulas desde o último grau</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Semanas seguidas de treino, com o recorde</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Competências que o professor observa</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Aulas desde o último grau</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Semanas seguidas com pelo menos um treino, com o recorde</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Competências que o professor observa</li>
           </ul>
-          <button class="try" type="button" data-act="comps"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Ver as competências da faixa</span></button>
+          <button class="try" type="button" data-act="comps"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Ver as competências da faixa</span></button>
         </article>
         <article class="dch" data-view="avisos">
           <p class="label">05 · Avisos</p>
           <h2>O app <em>lembra por você</em>.</h2>
-          <p>Um aviso uma hora antes da aula, um lembrete para fechar a meta da semana e os movimentos novos da faixa. Quando o professor registra um grau, a notícia chega no mesmo dia.</p>
+          <p>Um aviso uma hora antes da aula, um lembrete para fechar a meta da semana e os movimentos novos da faixa. Quando o professor registra um grau, a notícia chega no celular depois da aula ou na entrega, como o professor preferir.</p>
           <ul>
-            <li><svg class="ic"><use href="#i-check"/></svg>Lembrete da aula com as vagas que restam</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>Um empurrão para fechar a meta da semana</li>
-            <li><svg class="ic"><use href="#i-check"/></svg>O grau novo chega no celular no mesmo dia</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Lembrete da aula com as vagas que restam</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Um lembrete, só quando ainda dá para fechar a meta da semana</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>O grau novo chega no celular na hora que o professor escolher</li>
           </ul>
-          <button class="try" type="button" data-act="notes"><i><svg class="ic"><use href="#i-touch"/></svg></i><span>Mostrar os avisos</span></button>
+          <figure class="note-ex">
+            <figcaption class="label">Exemplo do aviso de grau</figcaption>
+            <div class="ap-note"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>Grau novo!</b><span class="tx">Seu 3º grau na faixa azul foi registrado. O professor destacou: “passagem com pressão, sem pressa”.</span></span></div>
+          </figure>
+          <button class="try" type="button" data-act="notes"><i><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-touch"/></svg></i><span>Mostrar os avisos</span></button>
         </article>
       </div>
     </div>
@@ -298,12 +369,12 @@
       <p class="label">Antes e depois</p>
       <h2 class="split" id="t-diff">O que mudou no app <em>e por quê</em>.</h2>
       <ul class="diff-grid" data-rise>
-        <li><h3>Só a turma do aluno</h3><p>A tela inicial destaca a aula do aluno e resume os outros horários numa linha.</p><span class="was">Antes: todas as turmas do dia, Kids incluído, cada uma com um botão.</span></li>
+        <li><h3>Só a turma do aluno</h3><p>A tela inicial destaca a aula do aluno e mostra o próximo treino numa linha.</p><span class="was">Antes: todas as turmas do dia, Kids incluído, cada uma com um botão.</span></li>
         <li><h3>Vagas de verdade</h3><p>O contador soma as reservas de todos os alunos da turma.</p><span class="was">Antes: o aluno só enxergava a própria reserva, e a turma parecia sempre vazia.</span></li>
-        <li><h3>Mensalidade como status</h3><p>Uma linha diz se está em dia. O detalhe fica no Financeiro.</p><span class="was">Antes: valores em aberto e em atraso no meio do resumo de treino.</span></li>
-        <li><h3>Presença numa tela</h3><p>Confirmar, digitar o código e registrar, nessa ordem.</p><span class="was">Antes: “Presença do dia” e “Check-in” em itens separados do menu.</span></li>
-        <li><h3>Uma faixa só</h3><p>O mesmo desenho no Início, no Perfil e nos movimentos.</p><span class="was">Antes: uma barra no Início e uma faixa em 3D no Perfil, cada uma de um jeito.</span></li>
-        <li><h3>Avisos que ajudam</h3><p>Lembrete da aula, grau novo e movimento novo, nada além disso.</p><span class="was">Antes: sem avisos; era preciso abrir o app para saber de tudo.</span></li>
+        <li><h3>Mensalidade como status</h3><p>Uma linha diz se está em dia. Um toque mostra o plano, a próxima cobrança e o recibo.</p><span class="was">Antes: valores em aberto e em atraso no meio do resumo de treino.</span></li>
+        <li><h3>Presença numa tela</h3><p>Confirmar a vaga, digitar o código e registrar, nessa ordem.</p><span class="was">Antes: “Presença do dia” e “Check-in” em itens separados do menu.</span></li>
+        <li><h3>Uma faixa só</h3><p>O mesmo desenho no Perfil do aluno e na ficha e nas Graduações do professor.</p><span class="was">Antes: uma barra no Início e uma faixa em 3D no Perfil, cada uma de um jeito.</span></li>
+        <li><h3>Avisos que ajudam</h3><p>Lembrete da aula, um toque para fechar a meta da semana, movimento novo e grau novo. Nada além disso.</p><span class="was">Antes: sem avisos; era preciso abrir o app para saber de tudo.</span></li>
       </ul>
     </div>
   </section>
@@ -312,7 +383,7 @@
     <div class="wrap">
       <a href="area-do-professor.html" data-int>
         <div><p class="label">Do outro lado do tatame</p><h2>Agora veja a <em>Área do Professor</em>.</h2></div>
-        <span class="go"><svg class="ic"><use href="#i-arrow"/></svg></span>
+        <span class="go"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></span>
       </a>
     </div>
   </section>
@@ -321,13 +392,13 @@
 <footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
-      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta.</p>
-      <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>App</h4><ul><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
-      <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
+      <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Aulas para adultos, crianças e mulheres, de segunda a sexta, e Open Mat aos sábados.</p>
+      <div><p class="foot-h">Site</p><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
+      <div><p class="foot-h">App</p><ul><li><a href="area-do-aluno.html" data-int>Área do aluno</a></li><li><a href="area-do-professor.html" data-int>Área do professor</a></li></ul></div>
+      <div><p class="foot-h">Contato</p><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
-    <div class="foot-bottom"><span>Dados de exemplo: Marina Alves é uma aluna fictícia, e os nomes dos vídeos são ilustrativos.</span><span>Proposta de redesign · versão para aprovação</span></div>
+    <div class="foot-bottom"><span>Dados de exemplo: Marina Alves é uma aluna fictícia, e os nomes dos vídeos são ilustrativos.</span><span>© 2026 Studio Evolution BJJ</span></div>
   </div>
 </footer>
 
@@ -338,117 +409,358 @@
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$;
-  var ap = $("#ap"), views = $$(".ap-view", ap), dockBtns = $$("#apDock button"), toastEl = $("#apToast"), toastT = null;
+  var ap = $("#ap"), views = $$(".ap-view", ap), dock = $("#apDock"), dockBtns = $$("button", dock), toastEl = $("#apToast"), toastT = null;
   var tabs = $$("#demoTabs button"), chs = $$(".dch"), rail = $$("#demoRail button");
   var anim = !!window.gsap && !Site.reduce;
+  var CHECK = '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>';
   function later(fn, ms) { return setTimeout(fn, ms); }
   function desk() { return window.innerWidth >= 1024; }
+  function screenOf(name) { return $('.ap-view[data-view="' + name + '"]', ap); }
 
   /* ---------- celular: trocar de tela (o capítulo e a aba acompanham) ---------- */
-  var current = "inicio";
+  var current = "inicio", sheetOn = false;
+  /* só a tela aberta recebe foco e toque (a que sai ainda fica 650 ms por cima, sumindo).
+     Com a folha da mensalidade aberta, a tela e o dock ficam de fora; na tela bloqueada, o dock some */
+  function syncInert() {
+    views.forEach(function (v) { v.inert = sheetOn || v.dataset.view !== current; });
+    dock.inert = sheetOn || current === "avisos";
+  }
   function show(name) {
-    tabs.forEach(function (t) { t.setAttribute("aria-selected", t.dataset.view === name ? "true" : "false"); });
+    tabs.forEach(function (t) { t.setAttribute("aria-current", t.dataset.view === name ? "true" : "false"); });
     rail.forEach(function (r) { r.setAttribute("aria-current", r.dataset.view === name ? "true" : "false"); });
     chs.forEach(function (c) { c.classList.toggle("on", c.dataset.view === name); });
+    tabInView($('#demoTabs button[data-view="' + name + '"]'));
+    missed = null;  /* qualquer troca de tela vale mais do que o capítulo que passou sem trocar (watchChapters) */
     if (name === current) return;
+    /* a tela que sai fica inerte (e o dock, na tela bloqueada): quem estava com o foco nela, na folha ou no dock que some
+       segue para a tela nova, não para o body */
+    var a = document.activeElement;
+    var had = screenOf(current).contains(a) || $("#apSheet").contains(a) || (name === "avisos" && dock.contains(a));
+    closeSheet(false);
     current = name;
     views.forEach(function (v) { v.classList.toggle("on", v.dataset.view === name); });
     dockBtns.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === name ? "true" : "false"); });
     ap.classList.toggle("is-lock", name === "avisos");
+    syncInert();
     if (name === "avisos") notes();
+    if (had) Site.focusSoft($(".ap-hi", screenOf(name)) || $("#apLockClock"), { preventScroll: true });
   }
+  /* abas no celular: a faixa rola de lado (nunca a página) até a aba ativa ou focada aparecer inteira,
+     fora da ponta esmaecida; no fim da faixa, a ponta perde o esmaecido */
+  var tabBar = $("#demoTabs");
+  function tabEnd() { tabBar.classList.toggle("at-end", tabBar.scrollLeft + tabBar.clientWidth >= tabBar.scrollWidth - 2); }
+  function tabInView(b) {
+    if (!b || !tabBar.clientWidth || tabBar.scrollWidth <= tabBar.clientWidth) return;
+    var bar = tabBar.getBoundingClientRect(), r = b.getBoundingClientRect(), pad = parseFloat(getComputedStyle(tabBar).paddingLeft) || 16;
+    var clear = tabBar.classList.contains("at-end") ? bar.right : bar.left + bar.width * 0.85;
+    if (r.left >= bar.left + pad - 1 && r.right <= clear) return;
+    tabBar.scrollTo({ left: tabBar.scrollLeft + r.left - bar.left - pad, behavior: Site.reduce ? "auto" : "smooth" });
+  }
+  tabBar.addEventListener("scroll", tabEnd, { passive: true });
+  tabBar.addEventListener("focusin", function (e) { tabInView(e.target.closest("button")); });
+  window.addEventListener("resize", tabEnd);
+  tabEnd();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(tabEnd);
+  syncInert();
   dockBtns.forEach(function (b) { b.addEventListener("click", function () { show(b.dataset.go); }); });
   tabs.forEach(function (t) { t.addEventListener("click", function () { show(t.dataset.view); }); });
-  /* computador: os números abaixo do celular levam ao capítulo de cada tela */
+  /* computador: os números abaixo do celular levam ao capítulo de cada tela. Enquanto a página rola até lá,
+     os capítulos do meio não trocam a tela (antes o celular piscava por todas elas) */
+  var jumping = false;
   rail.forEach(function (r) {
-    r.addEventListener("click", function () { show(r.dataset.view); Site.scrollTo($('.dch[data-view="' + r.dataset.view + '"]'), 0); });
+    r.addEventListener("click", function () {
+      jumping = true;
+      show(r.dataset.view);
+      Site.scrollTo($('.dch[data-view="' + r.dataset.view + '"]'), 0, function () { jumping = false; });
+    });
   });
   function toast(msg) {
     $("span", toastEl).textContent = msg;
     toastEl.classList.add("on");
     clearTimeout(toastT);
-    toastT = setTimeout(function () { toastEl.classList.remove("on"); }, 2800);
+    /* tempo de leitura: aviso longo fica mais na tela */
+    toastT = setTimeout(function () { toastEl.classList.remove("on"); }, Math.max(2800, msg.length * 55));
+  }
+  /* rola a tela do celular (nunca a página) até el aparecer inteiro acima do dock */
+  function into(el) {
+    var v = el && el.closest(".ap-view"), top = 0, n = el;
+    if (!v) return;
+    while (n && n !== v) { top += n.offsetTop; n = n.offsetParent; }
+    if (n !== v) return;
+    var room = v.clientHeight - parseFloat(getComputedStyle(v).paddingBottom), y = v.scrollTop;
+    if (top + el.offsetHeight > y + room) y = top + el.offsetHeight - room;
+    if (top < y) y = Math.max(0, top - 12);
+    if (y !== v.scrollTop) v.scrollTo({ top: y, behavior: Site.reduce ? "auto" : "smooth" });
   }
 
-  /* ---------- Início: confirmar a vaga ---------- */
-  var confirmed = false;
-  function markConfirmed() {
-    confirmed = true;
-    var btn = $("#apConfirm");
-    btn.classList.remove("pulse");
-    btn.classList.add("ok");
-    $("span", btn).textContent = "Vaga confirmada";
-    $$("#apDots i")[7].classList.add("me");
-    $("#apVagas").textContent = "Começa em 48 min · 8 de 10 vagas ocupadas";
+  /* ---------- relógio da cena: 18:12 ao abrir; confirmar leva a 18:14 e registrar a 18:55. Ele nunca volta ---------- */
+  var now = 18 * 60 + 12;
+  function hm(m) { return Math.floor(m / 60) + ":" + ("0" + (m % 60)).slice(-2); }
+  function clockTo(m) { now = Math.max(now, m); $("#apClock").textContent = hm(now); return hm(now); }
+
+  /* ---------- Início: confirmar e liberar a vaga ---------- */
+  var confirmed = false, registered = false, confAt = "", regAt = "";
+  var confBtn = $("#apConfirm"), relBtn = $("#apRelease"), askEl = $("#apAsk"), btnRow = $("#apBtnRow");
+  /* a turma já tem 7 de 10 vagas reservadas; a 8ª é da Marina, reservada pelo app ou ocupada no tatame.
+     Tudo que depende disso (Início e passo 1 da Presença) é pintado aqui, a partir do mesmo estado */
+  function paintSpot() {
+    var mine = confirmed || registered;
+    $$("#apDots i")[7].classList.toggle("me", mine);
+    $("#apVagas").textContent = registered ? "Presença registrada às " + regAt + " · aula às 19h"
+      : "Começa em " + (19 * 60 - now) + " min · " + (mine ? 8 : 7) + " de 10 vagas ocupadas";
+    $("span", confBtn).textContent = registered ? "Presença registrada" : confirmed ? "Vaga confirmada" : "Confirmar vaga";
+    confBtn.classList.toggle("ok", mine);
+    confBtn.classList.toggle("pulse", !mine);
+    if (mine) confBtn.setAttribute("aria-disabled", "true"); else confBtn.removeAttribute("aria-disabled");
+    relBtn.hidden = !confirmed || registered;
+    /* passo 1: pede a vaga, mostra a reserva ou, se a presença entrou sem reserva, que havia vaga */
+    var li = $("#apStep1");
+    li.className = confirmed ? "done" : registered ? "skip" : "now";
+    $(".ap-mk", li).innerHTML = confirmed ? CHECK : registered ? "–" : "1";
+    $("#apStep1h").textContent = confirmed ? "Vaga confirmada" : registered ? "Sem reserva" : "Confirme sua vaga";
+    $("#apStep1t").textContent = confirmed ? "Às " + confAt + " · 8 de 10 vagas ocupadas" : registered ? "Havia vaga: 8 de 10 vagas ocupadas." : "Na tela Início, um toque.";
+    /* o código pode ser digitado mesmo sem reserva; com a vaga garantida, ele vira o passo da vez */
+    if (!registered) $("#apStep2").className = confirmed ? "now" : "";
   }
   function confirmSpot() {
     show("inicio");
-    if (confirmed) return;
-    markConfirmed();
+    if (confirmed || registered) return;
+    confirmed = true;
+    confAt = clockTo(18 * 60 + 14);
+    paintSpot();
     toast("Vaga confirmada. Te esperamos às 19h.");
   }
-  $("#apConfirm").addEventListener("click", confirmSpot);
+  confBtn.addEventListener("click", confirmSpot);
+  /* liberar: uma pergunta no próprio cartão, no lugar do botão; a vaga volta para a turma */
+  function askRelease(open) {
+    btnRow.hidden = open;
+    askEl.hidden = !open;
+  }
+  relBtn.addEventListener("click", function () {
+    askRelease(true);
+    Site.focusSoft($("#apRelNo"), { preventScroll: true });
+    into(askEl);
+  });
+  $("#apRelNo").addEventListener("click", function () {
+    askRelease(false);
+    Site.focusSoft(relBtn, { preventScroll: true });
+  });
+  $("#apRelYes").addEventListener("click", function () {
+    confirmed = false;
+    askRelease(false);
+    paintSpot();
+    Site.focusSoft(confBtn, { preventScroll: true });
+    toast("Vaga liberada. Obrigado por avisar.");
+  });
+  /* a meta é da aluna: na vitrine, o toque explica como ela escolhe */
+  $("#apGoal").addEventListener("click", function () {
+    toast("No app, a aluna escolhe a meta: de 1 a 5 treinos por semana. Quem está começando parte de 2.");
+  });
 
-  /* ---------- Presença: o código tem 3 letras e 3 números, como no app ---------- */
-  var CODE = "KTR482", typed = "", registered = false, typing = false;
-  var cells = $$("#apCode b"), regBtn = $("#apRegister");
+  /* ---------- Início: a mensalidade abre uma folha com o plano (dados de exemplo da Marina no Financeiro) ---------- */
+  var sheet = $("#apSheet"), scrim = $("#apScrim"), fee = $("#apFee");
+  function openSheet() {
+    sheetOn = true;
+    sheet.classList.add("on");
+    scrim.classList.add("on");
+    fee.setAttribute("aria-expanded", "true");
+    syncInert();
+    Site.focusSoft($("#apSheetT"), { preventScroll: true });
+  }
+  /* back: devolve o foco à linha da mensalidade (fechar pelo X, pelo Esc ou tocando fora) */
+  function closeSheet(back) {
+    if (!sheetOn) return;
+    sheetOn = false;
+    sheet.classList.remove("on");
+    scrim.classList.remove("on");
+    fee.setAttribute("aria-expanded", "false");
+    syncInert();
+    if (back) Site.focusSoft(fee, { preventScroll: true });
+  }
+  fee.addEventListener("click", openSheet);
+  $("#apSheetX").addEventListener("click", function () { closeSheet(true); });
+  scrim.addEventListener("click", function () { closeSheet(true); });
+  sheet.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.stopPropagation(); closeSheet(true); } });
+  $("#apReceipt").addEventListener("click", function () { toast("No app, abre o recibo gerado pelo Asaas."); });
+  $("#apTalk").addEventListener("click", function () { toast("No app, abre o WhatsApp do Studio com a mensagem pronta."); });
+
+  /* ---------- Presença: o código tem 3 letras e 3 números, digitado num campo de verdade ---------- */
+  var CODE = "KTR482", typed = "", settled = "", typing = false, errT = null, edit = null, ime = false;
+  var inp = $("#apCodeIn"), codeF = $(".ap-codef"), cells = $$("#apCode b"), regBtn = $("#apRegister"), errEl = $("#apCodeErr");
+  function clean(s) { return s.replace(/[^a-z0-9]/gi, "").toUpperCase(); }
+  /* as caixas mostram o que o campo transparente esconde: com o foco nele, o trecho selecionado e a caixa do cursor;
+     sem o foco, a próxima caixa vazia */
   function paintCode() {
-    cells.forEach(function (c, i) { c.textContent = typed[i] || ""; c.classList.toggle("caret", i === typed.length && typed.length < 6); });
+    var f = document.activeElement === inp, a = f ? inp.selectionStart : typed.length, b = f ? inp.selectionEnd : a;
+    cells.forEach(function (c, i) {
+      c.textContent = typed[i] || "";
+      c.classList.toggle("caret", a === b && i === a && i === typed.length);
+      c.classList.toggle("at", a === b && i === a && i < typed.length);
+      c.classList.toggle("hl", i >= a && i < b);
+    });
     var full = typed.length === 6;
     regBtn.classList.toggle("off", !full);
     regBtn.setAttribute("aria-disabled", full ? "false" : "true");
   }
+  /* o alerta é apagado e escrito de novo: a mesma frase duas vezes também é anunciada */
+  function setErr(msg, bad) {
+    clearTimeout(errT);
+    errEl.textContent = "";
+    codeF.classList.toggle("bad", !!bad);
+    if (bad) inp.setAttribute("aria-invalid", "true"); else inp.removeAttribute("aria-invalid");
+    if (msg) errT = later(function () { errEl.textContent = msg; into(errEl); }, 60);
+  }
+  /* onde estava o cursor e o que o campo tinha antes da tecla (ou da composição do teclado) */
+  function mark() { edit = { a: inp.selectionStart, b: inp.selectionEnd, base: inp.value }; }
+  inp.addEventListener("beforeinput", function (e) { if (!e.isComposing) mark(); });
+  inp.addEventListener("compositionstart", function () { ime = true; mark(); });
+  /* fica só com letras e números, em maiúsculas, até 6: colar 'ktr-482' ou 'KTR 482' vale.
+     Passou de 6, vale o que acabou de entrar (antes, a letra nova era cortada): um código inteiro colado ocupa o campo;
+     com o campo cheio e o cursor no fim, a digitação recomeça; no meio, a letra nova toma o lugar da caixa à direita.
+     Durante a composição do teclado (Android), só desenha; o valor do campo é ajustado no fim */
+  function onCode(e) {
+    var composing = !!(e && e.isComposing), raw = inp.value, end = inp.selectionStart || 0;
+    var v = clean(raw), pos = clean(raw.slice(0, end)).length;
+    if (e && edit && v.length > 6 && end >= edit.a) {
+      var ins = clean(raw.slice(edit.a, end)), pre = clean(edit.base.slice(0, edit.a)), post = clean(edit.base.slice(edit.b));
+      if (ins.length >= 6 || (ins && pre.length >= 6)) { v = ins; pos = ins.length; }
+      else if (ins) { v = pre + ins + post.slice(pre.length + ins.length + post.length - 6); pos = pre.length + ins.length; }
+    }
+    v = v.slice(0, 6);
+    pos = Math.min(pos, v.length);
+    if (!composing) {
+      edit = null;
+      if (raw !== v) { inp.value = v; if (document.activeElement === inp) inp.setSelectionRange(pos, pos); }
+    }
+    if (v !== typed) { setErr(""); $("#apCode").classList.remove("pulse"); }
+    typed = v;
+    paintCode();
+    if (composing) return;
+    /* com 6, envia sozinho; uma tecla que não muda o código não o envia de novo */
+    var changed = v !== settled;
+    settled = v;
+    if (v.length === 6 && changed && !typing) submit();
+  }
+  function submit() {
+    if (registered || typing) return;
+    var left = 6 - typed.length;
+    if (left > 0) {
+      setErr(left === 1 ? "Falta 1 caractere." : "Faltam " + left + " caracteres.");
+      Site.focusSoft(inp, { preventScroll: true });
+      return;
+    }
+    if (typed !== CODE) {
+      setErr("Código não confere. Confira na TV do tatame: 3 letras e 3 números.", true);
+      if (document.activeElement === inp) inp.select();
+      return;
+    }
+    register();
+  }
+  inp.addEventListener("input", onCode);
+  inp.addEventListener("compositionend", function (e) { ime = false; onCode(e); });
+  /* depois de um código errado, voltar ao campo seleciona tudo: digitar já substitui */
+  inp.addEventListener("focus", function () { if (inp.getAttribute("aria-invalid") === "true") inp.select(); });
+  /* o clique vale pela caixa clicada (as letras do campo não ficam sobre as caixas): o cursor vai para ela,
+     ou para o fim do que foi digitado. Com o código errado no campo, o clique seleciona tudo de novo.
+     O navegador só desfaz a seleção depois do evento de clique: a escolha vem logo em seguida, ou já na primeira tecla
+     (o teclado passa na frente do timer: quem clica e digita de uma vez perdia a primeira letra para o fim do código) */
+  var caretFn = null, caretT = null;
+  function caretNow() {
+    var fn = caretFn;
+    clearTimeout(caretT);
+    caretFn = null;
+    if (fn) fn();
+  }
+  inp.addEventListener("click", function (e) {
+    var x = e.clientX, real = e.detail, val = inp.value;
+    caretFn = function () {
+      /* algo já entrou no campo (ditado, teclado sem keydown): o cursor fica onde a digitação o deixou */
+      if (document.activeElement !== inp || inp.value !== val) return;
+      if (inp.getAttribute("aria-invalid") === "true") inp.select();
+      else if (real && inp.selectionStart === inp.selectionEnd) {
+        var i = 0;
+        while (i < 5 && x > cells[i].getBoundingClientRect().right) i++;
+        i = Math.min(i, typed.length);
+        inp.setSelectionRange(i, i);
+      }
+      paintCode();
+    };
+    clearTimeout(caretT);
+    caretT = later(caretNow, 0);
+  });
+  inp.addEventListener("keydown", caretNow);
+  /* setas, Home, End, Tab e seleção mudam o cursor sem mudar o texto: as caixas acompanham */
+  ["keyup", "select", "selectionchange", "focus", "blur"].forEach(function (t) { inp.addEventListener(t, paintCode); });
+  regBtn.addEventListener("click", submit);
+  /* com uma palavra ainda em composição (teclado do Android), o toque no botão não tira o foco do campo:
+     sem isso, a composição fechava no meio da troca de foco, registrava, e o navegador terminava focando o botão que some */
+  regBtn.addEventListener("mousedown", function (e) { if (ime) e.preventDefault(); });
   function register() {
-    if (registered || typed.length < 6) return;
+    if (registered) return;
     registered = true;
-    [$("#apStep2"), $("#apStep3")].forEach(function (li) { li.className = "done"; $(".ap-mk", li).innerHTML = '<svg class="ic"><use href="#i-check"/></svg>'; });
-    /* o teclado do código se recolhe numa linha, abrindo espaço para a confirmação */
+    regAt = clockTo(18 * 60 + 55);
+    askRelease(false);
+    paintSpot();
+    var wrap = $("#apCodeWrap"), done = $("#apDone"), had = wrap.contains(document.activeElement);
+    [$("#apStep2"), $("#apStep3")].forEach(function (li) { li.className = "done"; $(".ap-mk", li).innerHTML = CHECK; });
+    /* o campo do código se recolhe numa linha, abrindo espaço para a confirmação */
     $("#apStep2h").textContent = "Código digitado";
-    $("#apStep2t").textContent = CODE.slice(0, 3) + " " + CODE.slice(3) + " · às 18:55";
-    var wrap = $("#apCodeWrap");
-    if (anim) gsap.to(wrap, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: function () { wrap.hidden = true; } });
-    else wrap.hidden = true;
-    $("#apDone").hidden = false;
+    $("#apCodeHelp").textContent = CODE.slice(0, 3) + " " + CODE.slice(3) + " · às " + regAt;
+    done.hidden = false;
+    /* se o foco ainda entrou no bloco que se recolhe (um Tab no meio da composição, por exemplo), ele passa para a confirmação.
+       Sem animação, o bloco some na tarefa seguinte: antes, a troca de foco em curso ia para o botão já escondido e caía no body */
+    function fold() {
+      var lost = wrap.contains(document.activeElement);
+      wrap.hidden = true;
+      if (lost) Site.focusSoft(done, { preventScroll: true });
+    }
+    if (anim) gsap.to(wrap, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: fold });
+    else later(fold, 0);
+    /* a presença de hoje conta em tudo que depende dela: a meta da semana, o ponto de hoje e as aulas desde o grau */
     $("#apWeek").textContent = "3 de 3";
     $("#apToday").hidden = false;
-    $("#apClock").textContent = "18:55";
+    $("#apSince").textContent = "22";
     /* as três barras da meta acendem em sequência */
-    var goal = $("#apDone .ap-goal");
+    var goal = $(".ap-goal", done);
     goal.classList.remove("burst"); void goal.offsetWidth; goal.classList.add("burst");
-    if (anim) gsap.from("#apDone", { y: 18, opacity: 0, duration: 0.8, ease: "expo.out" });
+    if (anim) gsap.from(done, { y: 18, opacity: 0, duration: 0.8, ease: "expo.out" });
+    /* quem digitou o código não perde o lugar: o foco vai para a confirmação */
+    if (had) Site.focusSoft(done, { preventScroll: true });
+    later(function () { into(done); }, anim ? 650 : 0);
     toast("Presença registrada. Meta da semana batida!");
+  }
+  /* atalhos da demonstração: o código aparece letra por letra no campo, como se a aluna digitasse */
+  function typeCode(code) {
+    if (registered || typing) return;
+    typing = true;
+    inp.value = "";
+    onCode();
+    code.split("").forEach(function (ch, i) { later(function () { inp.value += ch; onCode(); }, 420 + i * 170); });
+    later(function () { typing = false; submit(); }, 420 + code.length * 170 + 520);
   }
   function checkin() {
     show("presenca");
-    if (registered || typing) return;
-    if (!confirmed) markConfirmed();
-    typing = true;
-    $("#apCode").classList.remove("pulse");
-    typed = "";
-    paintCode();
-    CODE.split("").forEach(function (ch, i) { later(function () { typed += ch; paintCode(); }, 420 + i * 170); });
-    later(function () { typing = false; register(); }, 420 + 6 * 170 + 520);
+    typeCode(CODE);
   }
-  regBtn.addEventListener("click", function () { if (typed.length < 6) checkin(); else register(); });
-  $("#apCode").addEventListener("click", checkin);
+  $("#apWrong").addEventListener("click", function () { typeCode("KTR481"); });
 
-  /* ---------- Movimentos: aos 90% abre o quiz; acertando tudo, o movimento conta ---------- */
+  /* ---------- Movimentos: aos 90% abre o quiz; respondendo certo, o movimento conta como estudado ---------- */
   var QUIZ = [
-    { q: "Para a raspagem funcionar, o que vem primeiro?", a: ["Fazer força com os braços", "Desequilibrar o parceiro", "Esperar o parceiro cair"], r: 1, hint: "Quase. Pense no que tira o parceiro da base." },
-    { q: "Onde fica o pé que faz o gancho?", a: ["Apoiado no chão, longe do parceiro", "Por fora do joelho do parceiro", "Por dentro da coxa do parceiro"], r: 2, hint: "Quase. O gancho levanta o parceiro por dentro da perna." }
+    { q: "Para a raspagem funcionar, o que vem primeiro?", a: ["Fazer força com os braços", "Desequilibrar o parceiro", "Esperar o parceiro cair"], r: 1, hint: "Ainda não. Pense no que tira o parceiro da base." },
+    { q: "Onde fica o pé que faz o gancho?", a: ["Apoiado no chão, longe do parceiro", "Por fora do joelho do parceiro", "Por dentro da coxa do parceiro"], r: 2, hint: "Ainda não. O gancho levanta o parceiro por dentro da perna." }
   ];
-  var watched = false, qi = 0, quizDone = false, qLock = false;
+  var watched = false, qi = 0, qErr = 0, quizDone = false, qLock = false;
   function renderQ() {
     var Q = QUIZ[qi];
     $("#apQn").textContent = "Pergunta " + (qi + 1) + " de " + QUIZ.length;
     $("#apQt").textContent = Q.q;
     $("#apQa").innerHTML = Q.a.map(function (t, k) { return '<button type="button" data-k="' + k + '">' + t + "</button>"; }).join("");
-    $("#apFb").hidden = true;
+    $("#apFb").textContent = "";
     qLock = false;
     if (anim) gsap.from($$("#apQa button"), { y: 10, opacity: 0, duration: 0.6, stagger: 0.06, ease: "expo.out" });
   }
   function openQuiz() {
-    $('[data-view="movimentos"]', ap).classList.add("quiz");
+    screenOf("movimentos").classList.add("quiz");
     $("#apList").hidden = true;
     renderQ();
     $("#apQuiz").hidden = false;
@@ -456,6 +768,19 @@
       gsap.to("#apPlay", { height: 84, duration: 0.8, ease: "expo.inOut" });
       gsap.from("#apQuiz", { y: 16, opacity: 0, duration: 0.8, ease: "expo.out", delay: 0.15 });
     } else $("#apPlay").style.height = "84px";
+  }
+  /* fim do quiz: o bloco vira uma linha de resumo e a lista da faixa volta, com o estudado e o próximo */
+  function finishQuiz() {
+    var quiz = $("#apQuiz"), line = $("#apQdone"), had = quiz.contains(document.activeElement);
+    quiz.hidden = true;
+    line.hidden = false;
+    /* "quiz liberado" deixou de ser verdade: sob o vídeo fica só o quanto foi assistido, e a linha diz o resto */
+    $("#apProgTxt").textContent = "90% assistido";
+    $("#apStudied").hidden = false;
+    $("#apNext").hidden = false;
+    $("#apList").hidden = false;
+    if (had) Site.focusSoft(line, { preventScroll: true });
+    if (anim) gsap.from([line, "#apList"], { y: 12, opacity: 0, duration: 0.7, stagger: 0.08, ease: "expo.out" });
   }
   function watch() {
     show("movimentos");
@@ -479,16 +804,29 @@
     if (+b.dataset.k === Q.r) {
       b.classList.add("right");
       qLock = true;
-      if (qi < QUIZ.length - 1) { fb.hidden = true; later(function () { qi++; renderQ(); }, 750); return; }
+      if (qi < QUIZ.length - 1) {
+        fb.textContent = "";
+        later(function () {
+          var had = $("#apQuiz").contains(document.activeElement);
+          qi++;
+          renderQ();
+          /* as respostas foram trocadas: o foco vai para a pergunta nova */
+          if (had) Site.focusSoft($("#apQt"), { preventScroll: true });
+        }, 750);
+        return;
+      }
       quizDone = true;
-      fb.hidden = false;
-      fb.textContent = "Você acertou 2 de 2. Movimento concluído: agora são 6 de 12 da faixa azul.";
+      /* o texto final diz a verdade: "de primeira" só quando não houve nenhum erro */
+      fb.textContent = (qErr ? "Pronto!" : "Você acertou as " + QUIZ.length + " de primeira.") + " Movimento estudado: agora são 6 de 12 da faixa azul.";
       $("#apMov").textContent = "6";
-      $("#apMov2").textContent = "6/12";
-      toast("Movimento concluído.");
+      $("#apMov2").innerHTML = "6<small> de 12</small>";
+      toast("Movimento estudado.");
+      later(finishQuiz, 2600);
     } else {
+      qErr++;
       b.classList.add("wrong");
-      fb.hidden = false;
+      b.setAttribute("aria-disabled", "true");
+      b.insertAdjacentHTML("beforeend", '<span class="sr-only"> (incorreta)</span>');
       fb.textContent = Q.hint;
     }
   });
@@ -500,20 +838,37 @@
     if (open === !list.hidden) return;
     $("#apCompBtn").classList.remove("pulse");
     list.hidden = !open;
-    $("#apNote").hidden = open;
     $("#apCompBtn").setAttribute("aria-expanded", open ? "true" : "false");
+    /* a nota explica a lista e fica logo abaixo dela; a tela do celular rola até as 8 aparecerem */
+    if (open) into(list);
     if (open && anim) gsap.from($$("#apComp li"), { x: -10, opacity: 0, duration: 0.6, stagger: 0.05, ease: "expo.out" });
   }
   $("#apCompBtn").addEventListener("click", function () { toggleComps(); });
 
-  /* ---------- Avisos: chegam um por um ---------- */
-  var noteT = [];
+  /* ---------- Avisos: chegam um por um, e cada um leva à tela certa ---------- */
+  var lockV = screenOf("avisos"), noteT = [];
   function notes() {
-    var ns = $$(".ap-note");
+    var ns = $$(".ap-note", lockV);
     noteT.forEach(clearTimeout);
+    /* com menos movimento, os três já estão lá */
+    if (Site.reduce) { ns.forEach(function (n) { n.classList.add("on"); }); return; }
     ns.forEach(function (n) { n.classList.remove("on"); });
     noteT = ns.map(function (n, i) { return later(function () { n.classList.add("on"); }, 400 + i * 480); });
   }
+  /* a tela bloqueada fica inerte ao sair: show() leva o foco ao título da tela nova; focusEl, quando vem, é mais preciso */
+  function leaveLock(name, then, focusEl) {
+    var had = lockV.contains(document.activeElement);
+    show(name);
+    if (then) then();
+    if (had && focusEl) Site.focusSoft(focusEl, { preventScroll: true });
+  }
+  var NOTE = {
+    aula: function () { leaveLock("inicio", confirmSpot, confBtn); },
+    meta: function () { leaveLock("inicio"); },
+    mov: function () { leaveLock("movimentos"); }
+  };
+  $$(".ap-note[data-note]", lockV).forEach(function (n) { n.addEventListener("click", NOTE[n.dataset.note]); });
+  $("#apLockClock").addEventListener("click", function () { leaveLock("inicio"); });
 
   /* botões dos capítulos: no celular, a página sobe até o aparelho antes da ação */
   var acts = {
@@ -531,28 +886,64 @@
   });
 
   /* no computador, o capítulo que passa pelo meio da tela escolhe a tela do celular */
-  var io = null;
+  var io = null, phoneAt = 0, scrollAt = 0, ownFocus = false, missed = null;
+  /* com o foco no celular, a página pode rolar sozinha (o navegador mostra o item focado pelo Tab ou o cursor do campo);
+     essa rolagem não troca a tela debaixo de quem usa o celular, só a que vem de um gesto de rolar (roda, dedo, teclas).
+     Antes a regra era :focus-visible, que todo campo de texto tem: com o código digitado, a rolagem parava de trocar a tela */
+  ap.addEventListener("focusin", function () { if (!ownFocus) phoneAt = Date.now(); });
+  ap.addEventListener("input", function () { phoneAt = Date.now(); });
+  function scrolled() { scrollAt = Date.now(); }
+  window.addEventListener("wheel", scrolled, { passive: true });
+  window.addEventListener("touchmove", scrolled, { passive: true });
+  /* num campo, setas, Home, End e Espaço andam no texto; PageUp e PageDown, num campo de uma linha, rolam a página */
+  window.addEventListener("keydown", function (e) {
+    var t = e.target.tagName;
+    if (/^Page(Up|Down)$/.test(e.key) ? !/^(TEXTAREA|SELECT)$/.test(t) : /^(ArrowUp|ArrowDown|Home|End| )$/.test(e.key) && !/^(INPUT|TEXTAREA|SELECT)$/.test(t)) scrolled();
+  });
+  function autoScroll() { return phoneAt > scrollAt && ap.contains(document.activeElement); }
+  /* show() leva para a tela nova o foco que estava no celular: esse foco não é de quem navega */
+  function follow(name) { ownFocus = true; show(name); ownFocus = false; }
   function watchChapters() {
     if (io) { io.disconnect(); io = null; }
     if (!desk() || !("IntersectionObserver" in window)) return;
     io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) show(e.target.dataset.view); });
+      if (jumping) return;
+      /* o capítulo que passou durante a rolagem automática fica guardado: a próxima rolagem da pessoa o mostra */
+      var skip = autoScroll();
+      es.forEach(function (e) { if (e.isIntersecting) { if (skip) missed = e.target.dataset.view; else follow(e.target.dataset.view); } });
     }, { rootMargin: "-48% 0px -48% 0px" });
     chs.forEach(function (c) { io.observe(c); });
   }
+  window.addEventListener("scroll", function () {
+    if (!missed || jumping || autoScroll() || !desk()) return;
+    follow(missed);
+  }, { passive: true });
 
-  /* o celular cabe na área dele: altura da tela no computador, largura e altura no celular */
-  var dev = $("#device"), devBox = $(".demo-dev"), wasDesk = desk();
+  /* o celular cabe na área dele sem ficar pequeno demais para ler.
+     Computador: pela altura, descontada a barra fixa, entre 0,82 e 1.
+     Celular em pé: pela largura e pela altura, nunca abaixo de 0,86. Deitado e baixo: até 0,8, e a página rola.
+     A altura do celular (H) é lida no carregamento e ao girar: a barra de endereço que some não muda o aparelho */
+  var dev = $("#device"), devBox = $(".demo-dev"), wasDesk = desk(), lastW = window.innerWidth, H = window.innerHeight;
   function fit() {
-    var z = desk() ? (window.innerHeight - 170) / 660 : Math.min((devBox.clientWidth - 6) / 312, (window.innerHeight * 0.72) / 660);
-    dev.style.setProperty("--z", Math.max(0.5, Math.min(1, z)).toFixed(3));
+    var w = (devBox.clientWidth - 6) / 312, z;
+    if (desk()) z = Math.max(0.82, Math.min(1, (window.innerHeight - 230) / 660));
+    else if (H < 500) z = Math.min(0.8, w);
+    else z = Math.min(1, w, Math.max(0.86, H * 0.8 / 660));
+    dev.style.setProperty("--z", Math.max(0.5, z).toFixed(3));  /* piso só para medidas degeneradas (caixa ainda sem largura) */
   }
   fit();
   watchChapters();
   window.addEventListener("resize", function () {
-    fit();
+    var wChanged = window.innerWidth !== lastW;
+    lastW = window.innerWidth;
+    if (wChanged) H = window.innerHeight;
+    if (wChanged || desk()) fit();
     if (desk() !== wasDesk) { wasDesk = desk(); watchChapters(); }
   });
+  var portrait = window.matchMedia && window.matchMedia("(orientation: portrait)");
+  var turned = function () { H = window.innerHeight; fit(); };
+  if (portrait && portrait.addEventListener) portrait.addEventListener("change", turned);
+  else if (portrait && portrait.addListener) portrait.addListener(turned);
 
   Site.boot({
     intro: function (S) {

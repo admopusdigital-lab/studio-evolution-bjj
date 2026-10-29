@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Entrar · Studio Evolution BJJ</title>
+<meta name="theme-color" content="#14110d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Evolution">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/app/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "entrar");
+  try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
+<link rel="stylesheet" href="site.css">
+<script src="supabase-config.js"></script>
+<script src="acesso.js"></script>
+<script>
+/* o app instalado no celular abre aqui (entrar.html?app): quem já está conectado vai direto para o seu app */
+(function () {
+  var s = /[?&]app\b/.test(location.search) && Acesso.sessao();
+  if (s) { document.documentElement.style.display = "none"; location.replace(Acesso.area(s.papel)); }
+})();
+</script>
+<link rel="stylesheet" href="acesso.css">
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="entrar.html" data-int aria-current="page"><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="login cine" data-dark aria-labelledby="t-login">
+    <div class="lg-media" aria-hidden="true">
+      <img src="img/takes/chega.jpg" alt="" width="1080" height="1350">
+      <video id="lgVideo" muted loop playsinline preload="none" poster="img/takes/chega.jpg"></video>
+      <span class="lg-ghost">道</span>
+      <div class="lg-media-in">
+        <p class="label">Studio Evolution BJJ · Equipe TRUE</p>
+        <p class="lg-lema">A luta é o meio. <em class="metal">A evolução é o propósito.</em></p>
+      </div>
+    </div>
+
+    <div class="lg-panel">
+      <div class="lg-card">
+        <p class="label gold" data-in>Área restrita</p>
+        <h1 class="lg-title" id="t-login">Bem-vindo <em>de volta</em>.</h1>
+        <p class="lg-sub" id="lgSub" data-in>Entre para confirmar a vaga, registrar a presença e ver os movimentos da sua faixa.</p>
+
+        <div class="lg-on" id="lgOn" hidden>
+          <p>Você está conectado como <b id="lgOnRole">aluno</b>.</p>
+          <div class="ctas"><a class="btn btn-ink" id="lgGo" href="area-do-aluno.html">Continuar<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a><button class="link" type="button" id="lgOut">Sair</button></div>
+        </div>
+
+        <form id="lgForm" novalidate data-in>
+          <fieldset class="role">
+            <legend class="sr-only">Você é</legend>
+            <label><input type="radio" name="papel" value="aluno" checked><span>Sou aluno</span></label>
+            <label><input type="radio" name="papel" value="professor"><span>Sou professor</span></label>
+          </fieldset>
+          <div class="field"><input id="usuario" name="usuario" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder=" " aria-describedby="lgErr"><label for="usuario">E-mail ou usuário</label></div>
+          <div class="field pw"><input id="senha" name="senha" type="password" autocomplete="current-password" placeholder=" " aria-describedby="lgErr"><label for="senha">Senha</label><button class="pw-tg" type="button" id="pwTg" aria-controls="senha" aria-pressed="false">Mostrar</button></div>
+          <div class="lg-row">
+            <label class="chk"><input type="checkbox" id="manter"><span>Manter conectado</span></label>
+            <a id="esqueci" href="https://wa.me/5515996741812" target="_blank" rel="noopener">Esqueci a senha</a>
+          </div>
+          <p class="lg-err" id="lgErr" aria-live="assertive"></p>
+          <button class="btn btn-ink" type="submit" id="lgBtn">Entrar<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button>
+          <p class="lg-foot" id="lgFoot">Ainda não treina com a gente? <a href="agendamento.html" data-int>Agende uma aula grátis</a>.</p>
+          <p class="lg-note" id="lgNote">A conta é criada pelo Studio na matrícula. Para receber ou trocar a senha, chame no WhatsApp.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot foot-slim">
+  <div class="wrap">
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Academia da Equipe TRUE · Sorocaba/SP</span></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$;
+
+  /* o login de verdade (ou o de demonstração) está em acesso.js; aqui fica só a tela */
+  var WA = "https://wa.me/5515996741812?text=";
+  var TXT = {
+    aluno: { sub: "Entre para confirmar a vaga, registrar a presença e ver os movimentos da sua faixa.", wa: "Olá! Esqueci minha senha da Área do Aluno do Studio Evolution BJJ.", note: "A conta é criada pelo Studio na matrícula. Para receber ou trocar a senha, chame no WhatsApp." },
+    professor: { sub: "Entre para fazer a chamada e acompanhar os alunos, os interessados e o financeiro.", wa: "Olá! Esqueci minha senha da Área do Professor do Studio Evolution BJJ.", note: "Acesso da equipe do Studio. Para receber ou trocar a senha, chame no WhatsApp." }
+  };
+
+  var form = $("#lgForm"), user = $("#usuario"), pass = $("#senha"), err = $("#lgErr"), btn = $("#lgBtn");
+  /* com o servidor ligado, o login é sempre pelo e-mail */
+  if (Acesso.real) { user.type = "email"; user.setAttribute("autocomplete", "email"); $('label[for="usuario"]').textContent = "E-mail"; Acesso.precarregar(); }
+  var role = function () { return $('input[name="papel"]:checked', form).value; };
+  function paintRole() {
+    var r = role();
+    $("#lgSub").textContent = TXT[r].sub;
+    $("#lgNote").textContent = TXT[r].note;
+    $("#esqueci").href = WA + encodeURIComponent(TXT[r].wa);
+    $("#lgFoot").hidden = r === "professor";
+  }
+  $$('input[name="papel"]', form).forEach(function (i) { i.addEventListener("change", function () { paintRole(); say(""); }); });
+  /* entrar.html#professor já abre com "Sou professor" (as áreas mandam para cá com o papel certo) */
+  if (/professor/.test(location.hash)) $('input[value="professor"]', form).checked = true;
+  paintRole();
+
+  $("#pwTg").addEventListener("click", function () {
+    var show = pass.type === "password";
+    pass.type = show ? "text" : "password";
+    this.textContent = show ? "Ocultar" : "Mostrar";
+    this.setAttribute("aria-pressed", show ? "true" : "false");
+    pass.focus();
+  });
+
+  function say(msg, field, ok) {
+    err.textContent = msg;
+    err.classList.toggle("ok", !!ok);
+    [user, pass].forEach(function (f) { f.setAttribute("aria-invalid", f === field ? "true" : "false"); });
+    if (field) {
+      field.focus();
+      if (msg && window.gsap && !Site.reduce) gsap.fromTo(".lg-card", { x: -10 }, { x: 0, duration: 0.6, ease: "elastic.out(1, 0.3)" });
+    }
+  }
+  [user, pass].forEach(function (f) { f.addEventListener("input", function () { if (f.getAttribute("aria-invalid") === "true") say(""); }); });
+  /* voltou de nova-senha.html */
+  if (/[?&]senha=nova/.test(location.search)) say("Senha nova salva. Agora é só entrar.", null, true);
+
+  /* esqueci a senha: com o servidor, o link chega por e-mail; sem ele (ou se a pessoa preferir), pelo WhatsApp */
+  $("#esqueci").addEventListener("click", function (e) {
+    if (!Acesso.real) return;
+    e.preventDefault();
+    var wa = this.href;
+    Acesso.esqueci(user.value).then(function (r) {
+      if (!r.ok && !user.value.trim()) return say(r.msg, user);
+      say(r.msg, r.ok ? null : user, r.ok);
+      var a = document.createElement("a");
+      a.href = wa; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Não chegou? Chame no WhatsApp.";
+      err.appendChild(document.createTextNode(" ")); err.appendChild(a);
+    });
+  });
+
+  var busy = false;
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (busy) return;
+    busy = true;
+    btn.setAttribute("aria-busy", "true");
+    var bt = $(".bt > span", btn), label = bt ? bt.textContent : "";
+    if (bt) bt.textContent = "Entrando…";
+    Acesso.entrar(user.value, pass.value, role(), $("#manter").checked).then(function (r) {
+      if (!r.ok) {
+        busy = false; btn.removeAttribute("aria-busy"); if (bt) bt.textContent = label;
+        return say(r.msg, r.campo === "usuario" ? user : pass);
+      }
+      say("");
+      if (Site.leave) Site.leave(r.destino); else location.href = r.destino;
+    });
+  });
+
+  /* já conectado: continuar ou sair */
+  var s = Acesso.sessao();
+  if (s) {
+    $("#lgOn").hidden = false; form.hidden = true;
+    $("#lgOnRole").textContent = s.papel;
+    $("#lgGo").href = Acesso.area(s.papel);
+  }
+  $("#lgOut").addEventListener("click", function () {
+    Acesso.sair().then(function () {
+      $("#lgOn").hidden = true; form.hidden = false;
+      user.focus();
+    });
+  });
+
+  /* o take do Studio ao fundo: MP4 (H.264) onde o navegador toca, senão WebM; sem vídeo com economia de dados */
+  var v = $("#lgVideo");
+  if (v && !Site.reduce && !(navigator.connection && navigator.connection.saveData)) {
+    var ext = v.canPlayType('video/mp4; codecs="avc1.640028"') ? ".mp4" : v.canPlayType('video/webm; codecs="vp9"') ? ".webm" : "";
+    if (ext) { v.src = "img/takes/chega" + ext; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+  }
+
+  /* aberta pelo app instalado (?app): o app abre mesmo sem internet (sw.js) e sem a música do site */
+  var comoApp = /[?&]app\b/.test(location.search);
+  if (comoApp && "serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {}
+  }
+
+  Site.boot({
+    music: comoApp ? false : undefined,
+    intro: function (S) {
+      var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
+      tl.from(".lg-media", { opacity: 0, duration: 1.6 }, 0)
+        .from(Site.split($(".lg-title"), "words"), Object.assign({ duration: 1.3, stagger: 0.06 }, Site.PUNCH), 0.1)
+        .from(".lg-card [data-in], .lg-on", { y: 26, opacity: 0, duration: 1.1, stagger: 0.08, ease: "power3.out" }, 0.35)
+        .from(".lg-media-in > *", { y: 30, opacity: 0, duration: 1.2, stagger: 0.1, ease: "power3.out" }, 0.5)
+        .add(function () { $$(".lg-card .label").forEach(S.scramble); }, 0.3)
+        .from(".nav-in", { y: -30, opacity: 0, duration: 1.1 }, 0.15);
+      return tl;
+    }
+  });
+})();
+</script>
+</body>
+</html>

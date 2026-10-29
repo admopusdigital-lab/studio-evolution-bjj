@@ -5,3 +5,4 @@ desktop.ini
 
 # configurações locais do Claude Code nesta máquina
 .claude/settings.local.json
+_site/

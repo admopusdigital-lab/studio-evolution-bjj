@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Acessos ao app · Studio Evolution BJJ</title>
+<script src="supabase-config.js"></script>
+<script src="acesso.js"></script>
+<script>
+/* só professor: sem sessão de professor, volta para a entrada (acesso.js) */
+Acesso.portao("professor");
+</script>
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "acessos");
+  try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="acesso.css">
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="area-do-professor.html" data-int><span data-t="Área do professor">Área do professor</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="login cine" data-dark aria-labelledby="t-login">
+    <div class="lg-media" aria-hidden="true">
+      <img src="img/takes/tecnica.jpg" alt="" width="1080" height="1350">
+      <span class="lg-ghost">道</span>
+      <div class="lg-media-in">
+        <p class="label">Studio Evolution BJJ · Equipe TRUE</p>
+        <p class="lg-lema">A luta é o meio. <em class="metal">A evolução é o propósito.</em></p>
+      </div>
+    </div>
+
+    <div class="lg-panel">
+      <div class="lg-card">
+        <p class="label gold" data-in>Área do professor</p>
+        <h1 class="lg-title" id="t-login">Acessos <em>ao app</em>.</h1>
+        <p class="lg-sub" data-in>Crie o login de quem acabou de se matricular, ou gere uma senha provisória para quem esqueceu. A pessoa recebe tudo pelo WhatsApp.</p>
+        <p class="ac-demo" id="acDemo" data-in hidden><b>Modo demonstração.</b> Nenhuma conta é criada de verdade: a senha aparece só para você ver como funciona. Com o servidor do Studio ligado, a conta passa a valer na hora.</p>
+
+        <form id="acForm" novalidate data-in>
+          <fieldset class="role" id="acModo">
+            <legend class="sr-only">O que fazer</legend>
+            <label><input type="radio" name="acao" value="criar" checked><span>Novo acesso</span></label>
+            <label><input type="radio" name="acao" value="nova-senha"><span>Senha nova</span></label>
+          </fieldset>
+          <div class="field" data-so="criar"><input id="nome" name="nome" type="text" autocomplete="off" placeholder=" " aria-describedby="acErr"><label for="nome">Nome completo</label></div>
+          <div class="field"><input id="email" name="email" type="email" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder=" " aria-describedby="acErr"><label for="email">E-mail</label></div>
+          <div class="field"><input id="whats" name="whats" type="tel" inputmode="tel" autocomplete="off" placeholder=" " aria-describedby="acErr acWhatsDica"><label for="whats">WhatsApp com DDD</label></div>
+          <p class="lg-note" id="acWhatsDica">Para mandar o login e a senha. Na turma Kids, use o e-mail e o WhatsApp do responsável.</p>
+          <fieldset class="role" data-so="criar">
+            <legend class="sr-only">Tipo de acesso</legend>
+            <label><input type="radio" name="papel" value="aluno" checked><span>Aluno</span></label>
+            <label><input type="radio" name="papel" value="professor"><span>Professor</span></label>
+          </fieldset>
+          <p class="lg-err" id="acErr" aria-live="assertive"></p>
+          <button class="btn btn-ink" type="submit" id="acBtn">Criar acesso<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button>
+        </form>
+
+        <div class="ac-res" id="acRes" hidden tabindex="-1" aria-labelledby="acResT">
+          <h2 id="acResT">Acesso criado.</h2>
+          <dl>
+            <div><dt>Login</dt><dd id="acResEmail"></dd></div>
+            <div><dt>Senha provisória</dt><dd class="senha" id="acResSenha"></dd></div>
+          </dl>
+          <div class="ctas"><a class="btn btn-ink" id="acWa" href="#" target="_blank" rel="noopener">Enviar pelo WhatsApp<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a><button class="link" type="button" id="acCopiar">Copiar mensagem</button><button class="link" type="button" id="acOutro">Fazer outro</button></div>
+          <p class="lg-note">A senha provisória só aparece agora. Depois de entrar, a pessoa pode trocar em Esqueci a senha.</p>
+        </div>
+        <a class="link lg-back" href="area-do-professor.html?painel" data-int>Voltar ao painel</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot foot-slim">
+  <div class="wrap">
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Academia da Equipe TRUE · Sorocaba/SP</span></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$;
+  /* a conta é criada pela função criar-conta do Supabase (supabase/functions), que tem a chave secreta e
+     confere se quem pede é professor; sem servidor, acesso.js só simula (modo demonstração) */
+  var form = $("#acForm"), err = $("#acErr"), btn = $("#acBtn"), res = $("#acRes");
+  var nome = $("#nome"), email = $("#email"), whats = $("#whats");
+  $("#acDemo").hidden = Acesso.real;
+  var acao = function () { return $('input[name="acao"]:checked', form).value; };
+  function paintAcao() {
+    var criar = acao() === "criar";
+    $$("[data-so=criar]", form).forEach(function (el) { el.hidden = !criar; });
+    var bt = $(".bt > span", btn); var t = criar ? "Criar acesso" : "Gerar senha nova";
+    if (bt) { bt.textContent = t; bt.parentNode.setAttribute("data-t", t); } else btn.firstChild.textContent = t;
+    say("");
+  }
+  $$('input[name="acao"]', form).forEach(function (i) { i.addEventListener("change", paintAcao); });
+
+  function say(msg, field) {
+    err.textContent = msg;
+    [nome, email, whats].forEach(function (f) { f.setAttribute("aria-invalid", f === field ? "true" : "false"); });
+    if (field) field.focus();
+  }
+  var digitos = function (v) { return String(v || "").replace(/\D/g, ""); };
+  var fone = function (v) { var d = digitos(v); if (d.length === 10 || d.length === 11) d = "55" + d; return d.length >= 12 ? d : ""; };
+
+  var msgWa = "";
+  var busy = false;
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var criar = acao() === "criar", dados = { acao: acao(), email: email.value.trim(), whatsapp: digitos(whats.value) };
+    if (criar) { dados.nome = nome.value.trim(); dados.papel = $('input[name="papel"]:checked', form).value; }
+    if (criar && dados.nome.length < 3) return say("Digite o nome completo.", nome);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) return say("Digite um e-mail válido.", email);
+    if (whats.value.trim() && !fone(whats.value)) return say("Confira o WhatsApp: DDD e número, só com dígitos.", whats);
+    busy = true; btn.setAttribute("aria-busy", "true");
+    Acesso.conta(dados).then(function (r) {
+      busy = false; btn.removeAttribute("aria-busy");
+      if (!r.ok) return say(r.msg, email);
+      var primeiro = String(r.nome || dados.nome || "").split(" ")[0];
+      $("#acResT").textContent = criar ? "Acesso criado" + (primeiro ? " para " + primeiro : "") + "." : "Senha nova gerada" + (primeiro ? " para " + primeiro : "") + ".";
+      $("#acResEmail").textContent = r.email || dados.email;
+      $("#acResSenha").textContent = r.senha;
+      var link = new URL("entrar.html?app", location.href).href;
+      msgWa = (primeiro ? "Olá, " + primeiro + "! " : "Olá! ") + (criar ? "Seu acesso ao app do Studio Evolution BJJ está pronto." : "Aqui está sua senha nova do app do Studio Evolution BJJ.") +
+        "\n\nEntre em: " + link + "\nLogin: " + (r.email || dados.email) + "\nSenha provisória: " + r.senha + "\n\nDepois de entrar, você pode trocar a senha em Esqueci a senha." +
+        "\n\nPara ter o app no celular: abra o link e toque em Instalar (Android) ou em Compartilhar e depois Adicionar à Tela de Início (iPhone).";
+      var n = fone(whats.value);
+      $("#acWa").href = "https://wa.me/" + n + "?text=" + encodeURIComponent(msgWa);
+      $("#acWa").hidden = !n;
+      form.hidden = true; res.hidden = false;
+      Site.focusSoft ? Site.focusSoft(res) : res.focus();
+    });
+  });
+  $("#acCopiar").addEventListener("click", function () {
+    var b = this, done = function (t) { b.textContent = t; setTimeout(function () { b.textContent = "Copiar mensagem"; }, 2200); };
+    try { navigator.clipboard.writeText(msgWa).then(function () { done("Copiada"); }, function () { done("Não deu para copiar"); }); } catch (e2) { done("Não deu para copiar"); }
+  });
+  $("#acOutro").addEventListener("click", function () {
+    form.reset(); paintAcao(); res.hidden = true; form.hidden = false; nome.focus();
+  });
+  paintAcao();
+
+  Site.boot({
+    intro: function (S) {
+      var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
+      tl.from(".lg-media", { opacity: 0, duration: 1.6 }, 0)
+        .from(Site.split($(".lg-title"), "words"), Object.assign({ duration: 1.3, stagger: 0.06 }, Site.PUNCH), 0.1)
+        .from(".lg-card [data-in]", { y: 26, opacity: 0, duration: 1.1, stagger: 0.08, ease: "power3.out" }, 0.35)
+        .from(".lg-media-in > *", { y: 30, opacity: 0, duration: 1.2, stagger: 0.1, ease: "power3.out" }, 0.5)
+        .add(function () { $$(".lg-card .label").forEach(S.scramble); }, 0.3)
+        .from(".nav-in", { y: -30, opacity: 0, duration: 1.1 }, 0.15);
+      return tl;
+    }
+  });
+})();
+</script>
+</body>
+</html>

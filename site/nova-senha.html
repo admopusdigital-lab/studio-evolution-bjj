@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Senha nova · Studio Evolution BJJ</title>
+<script>
+(function () {
+  var d = document.documentElement, l = "black";
+  try { l = localStorage.getItem("evo-tema") || l; } catch (e) {}
+  if (/black/.test(location.hash)) l = "black";
+  if (location.hash === "#claro") l = "light";
+  d.setAttribute("data-look", l);
+  d.setAttribute("data-page", "nova-senha");
+  try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
+    var im = sessionStorage.getItem("evo-nav-img");
+    if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
+    sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400..700;1,400..500&family=JetBrains+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500&display=swap&text=柔術道礼稽古始問場">
+<link rel="preload" as="image" href="img/logo-evolution-mask.webp" type="image/webp" crossorigin>
+<link rel="stylesheet" href="site.css">
+<script src="supabase-config.js"></script>
+<script src="acesso.js"></script>
+<link rel="stylesheet" href="acesso.css">
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="brandrow">
+      <a class="brand shine" href="index.html" data-int aria-label="Studio Evolution BJJ, início"><span class="logo" role="img" aria-label="Studio Evolution BJJ"></span></a>
+    </div>
+    <nav class="links" aria-label="Menu principal">
+      <a class="roll" data-nav="inicio" href="index.html" data-int><span data-t="Início">Início</span></a>
+      <a class="roll" data-nav="aulas" href="aulas.html" data-int><span data-t="Aulas">Aulas</span></a>
+      <a class="roll" data-nav="agendar" href="agendamento.html" data-int><span data-t="Agendar">Agendar</span></a>
+      <a class="roll" data-nav="perguntas" href="perguntas.html" data-int><span data-t="Perguntas">Perguntas</span></a>
+      <a class="roll" data-nav="contato" href="contato.html" data-int><span data-t="Contato">Contato</span></a>
+    </nav>
+    <div class="nav-right">
+      <button class="look" id="lookBtn" type="button"><span class="lk-dot" aria-hidden="true"></span><span class="lk-txt" id="lookTxt">Versão clara</span></button>
+      <div class="nav-cta">
+        <a class="roll" href="entrar.html" data-int aria-current="page"><span data-t="Área do aluno">Área do aluno</span></a>
+        <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Aula grátis</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="login cine" data-dark aria-labelledby="t-login">
+    <div class="lg-media" aria-hidden="true">
+      <img src="img/takes/resenha.jpg" alt="" width="1080" height="1350">
+      <span class="lg-ghost">道</span>
+      <div class="lg-media-in">
+        <p class="label">Studio Evolution BJJ · Equipe TRUE</p>
+        <p class="lg-lema">A luta é o meio. <em class="metal">A evolução é o propósito.</em></p>
+      </div>
+    </div>
+
+    <div class="lg-panel">
+      <div class="lg-card">
+        <p class="label gold" data-in>Área restrita</p>
+        <h1 class="lg-title" id="t-login">Crie uma <em>senha nova</em>.</h1>
+        <p class="lg-sub" id="nsSub" data-in>Conferindo o link do e-mail…</p>
+        <form id="nsForm" novalidate data-in hidden>
+          <div class="field pw"><input id="senha" name="senha" type="password" autocomplete="new-password" placeholder=" " aria-describedby="nsErr nsDica" minlength="8"><label for="senha">Senha nova</label><button class="pw-tg" type="button" id="pwTg" aria-controls="senha" aria-pressed="false">Mostrar</button></div>
+          <div class="field"><input id="senha2" name="senha2" type="password" autocomplete="new-password" placeholder=" " aria-describedby="nsErr"><label for="senha2">Repita a senha</label></div>
+          <p class="lg-note" id="nsDica">Pelo menos 8 caracteres, misturando letras e números.</p>
+          <p class="lg-err" id="nsErr" aria-live="assertive"></p>
+          <button class="btn btn-ink" type="submit" id="nsBtn">Salvar senha<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button>
+        </form>
+        <a class="link lg-back" href="entrar.html" data-int id="nsBack" hidden>Voltar para a entrada</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot foot-slim">
+  <div class="wrap">
+    <div class="foot-bottom"><span>© 2026 Studio Evolution BJJ</span><span>Academia da Equipe TRUE · Sorocaba/SP</span></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="site.js"></script>
+<script>
+(function () {
+  var $ = Site.$, $$ = Site.$$;
+  /* o link do e-mail ("Esqueci a senha") traz uma sessão de recuperação; o Supabase a lê do endereço (acesso.js) */
+  var form = $("#nsForm"), p1 = $("#senha"), p2 = $("#senha2"), err = $("#nsErr"), btn = $("#nsBtn"), sub = $("#nsSub");
+  function say(msg, field) {
+    err.textContent = msg;
+    [p1, p2].forEach(function (f) { f.setAttribute("aria-invalid", f === field ? "true" : "false"); });
+    if (field) field.focus();
+  }
+  if (!Acesso.real) {
+    sub.textContent = "A troca de senha por e-mail funciona quando o login estiver ligado ao servidor do Studio. Por enquanto, peça uma senha nova no WhatsApp.";
+    $("#nsBack").hidden = false;
+  } else {
+    Acesso.recuperacao().then(function (ok) {
+      if (!ok) { sub.textContent = "Esse link venceu ou já foi usado. Peça um novo em Esqueci a senha, na tela de entrada."; $("#nsBack").hidden = false; return; }
+      sub.textContent = "Escolha a senha que você vai usar para entrar no app do Studio.";
+      form.hidden = false; p1.focus();
+    });
+  }
+  $("#pwTg").addEventListener("click", function () {
+    var show = p1.type === "password";
+    p1.type = p2.type = show ? "text" : "password";
+    this.textContent = show ? "Ocultar" : "Mostrar";
+    this.setAttribute("aria-pressed", show ? "true" : "false");
+    p1.focus();
+  });
+  var busy = false;
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var a = p1.value, b = p2.value;
+    if (a.length < 8 || !/[a-z]/i.test(a) || !/[0-9]/.test(a)) return say("Use pelo menos 8 caracteres, misturando letras e números.", p1);
+    if (a !== b) return say("As duas senhas estão diferentes.", p2);
+    busy = true; btn.setAttribute("aria-busy", "true");
+    Acesso.novaSenha(a).then(function (r) {
+      if (!r.ok) { busy = false; btn.removeAttribute("aria-busy"); return say(r.msg, p1); }
+      var url = "entrar.html?senha=nova";
+      if (Site.leave) Site.leave(url); else location.href = url;
+    });
+  });
+
+  Site.boot({
+    intro: function (S) {
+      var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
+      tl.from(".lg-media", { opacity: 0, duration: 1.6 }, 0)
+        .from(Site.split($(".lg-title"), "words"), Object.assign({ duration: 1.3, stagger: 0.06 }, Site.PUNCH), 0.1)
+        .from(".lg-card [data-in]", { y: 26, opacity: 0, duration: 1.1, stagger: 0.08, ease: "power3.out" }, 0.35)
+        .from(".lg-media-in > *", { y: 30, opacity: 0, duration: 1.2, stagger: 0.1, ease: "power3.out" }, 0.5)
+        .add(function () { $$(".lg-card .label").forEach(S.scramble); }, 0.3)
+        .from(".nav-in", { y: -30, opacity: 0, duration: 1.1 }, 0.15);
+      return tl;
+    }
+  });
+})();
+</script>
+</body>
+</html>
