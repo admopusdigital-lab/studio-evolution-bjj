@@ -1,0 +1,8 @@
+// Cloudflare Workers (site estático): o build roda scripts/montar-site.sh e publica a pasta _site/
+{
+  "name": "studio-evolution-bjj",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./_site"
+  }
+}
