@@ -108,6 +108,37 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-redo { display: block; margin-top: 6px; padding: 6px 0; border: 0; background: none; color: var(--ink-2); font: 500 12px/1 var(--sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .ap-redo[hidden] { display: none; }
 #aNext { margin-top: 16px; }
+/* quem vai: rostos (iniciais) empilhados no Início; a lista com faixa e chegada na Presença */
+.ap-strip { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 12px; padding: 8px 0 0; border: 0; border-top: 1px solid var(--rule); background: none; color: var(--ink-2); font: 500 12px/1.3 var(--sans); text-align: left; cursor: pointer; }
+.ap-strip .tx { flex: 1; min-width: 0; }
+.ap-strip .tx b { color: var(--ink); font-weight: 600; }
+.ap-strip > .ic { width: 13px; height: 13px; color: var(--gold-text); flex-shrink: 0; }
+.ap-faces { display: flex; flex-shrink: 0; }
+.ap-faces:empty { display: none; }
+.ap-faces .av { position: relative; width: 24px; height: 24px; margin-left: -3px; font-size: 8.5px; background: var(--paper-2); box-shadow: 0 0 0 2px var(--paper-2), inset 0 0 0 1px var(--rule); }
+.ap-card .ap-faces .av { box-shadow: 0 0 0 2px var(--paper-2), inset 0 0 0 1px var(--rule); }
+.ap-faces .av:first-child { margin-left: 0; }
+.ap-faces .av.me { background: var(--gold); color: oklch(0.14 0.006 75); box-shadow: 0 0 0 2px var(--paper-2); }
+.ap-faces .av.more { background: var(--paper); color: var(--ink-3); }
+.ap-go-n { display: flex; align-items: flex-end; gap: 10px; }
+.ap-go-n b { font: 400 54px/0.8 var(--serif); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.ap-go-n span { padding-bottom: 2px; font: italic 400 15px/1.15 var(--serif); color: var(--ink-2); max-width: 15ch; }
+.ap-who-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 22px; }
+.ap-who-h span { font-size: 11.5px; color: var(--ok); font-weight: 600; }
+.ap-who { margin-top: 6px; }
+.ap-who li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--rule); }
+.ap-who li:first-child { border-top: 0; }
+.ap-who li b { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+.ap-who li small { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: 11px; color: var(--ink-3); }
+.ap-who li small .belt-s { width: 26px; height: 6px; flex-shrink: 0; }
+.ap-who li.me .av { background: var(--gold); color: oklch(0.14 0.006 75); box-shadow: none; }
+.ap-who li.me b::after { content: "você"; display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 999px; background: color-mix(in oklch, var(--gold) 22%, transparent); color: var(--gold-text); font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; vertical-align: 1px; }
+.ap-who .pill-s { font-size: 10.5px; padding: 3px 8px; }
+.ap-who li.new { animation: whoIn 700ms var(--ease) both; }
+@keyframes whoIn { from { opacity: 0; transform: translateY(8px); } }
+.ap-who-none { margin-top: 10px; padding: 14px; background: var(--paper-2); font-size: 12px; color: var(--ink-2); text-align: center; }
+.ap-arr-h { margin-top: 24px; }
+.ap-arr-h + .ap-steps { margin-top: 12px; }
 /* computador: ao lado do app, a marca e como instalar no celular */
 .app-aside { display: none; }
 @media (min-width: 1100px) {
@@ -168,6 +199,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <div class="ap-big"><b>19h</b><span>Adulto</span></div>
           <p class="ap-sub" id="apVagas">Começa em 48 min · 7 de 10 vagas ocupadas</p>
           <div class="ap-dots" id="apDots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+          <button class="ap-strip" type="button" id="apStrip"><span class="ap-faces" id="apStripFaces" aria-hidden="true"></span><span class="tx" id="apStripTx">Veja quem vai</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></button>
           <div class="ap-btnrow" id="apBtnRow">
             <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span>Confirmar vaga</span></button>
             <button class="ap-link" type="button" id="apRelease" hidden>Liberar a vaga</button>
@@ -184,14 +216,29 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
       </section>
 
-      <!-- Presença -->
+      <!-- Presença: quem vai na aula de hoje, confirmar ou liberar a vaga e, no tatame, o código da aula -->
       <section class="ap-view" data-view="presenca" aria-label="Tela Presença">
         <p class="ap-lb">Presença</p>
-        <p class="ap-hi">Aula das 19h</p>
-        <p class="ap-mut" style="margin-top:4px">Adulto · quinta, 15 de outubro</p>
+        <p class="ap-hi" id="apPrH">Aula das 19h</p>
+        <p class="ap-mut" style="margin-top:4px" id="apPrSub">Adulto · quinta, 15 de outubro</p>
+        <div class="ap-card ap-go">
+          <div class="ap-go-n"><b id="apGoN">7</b><span id="apGoT">de 10 vagas confirmadas</span></div>
+          <div class="ap-dots" id="apGoDots" aria-hidden="true"></div>
+          <div class="ap-btnrow" id="apGoRow">
+            <button class="ap-btn pulse" type="button" id="apGoBtn"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span>Vou treinar</span></button>
+            <button class="ap-link" type="button" id="apGoRel" hidden>Liberar a vaga</button>
+          </div>
+          <div class="ap-ask" id="apGoAsk" hidden>
+            <p id="apGoAskT">Liberar sua vaga das 19h?</p>
+            <div class="ap-btnrow"><button class="ap-btn" type="button" id="apGoYes">Liberar</button><button class="ap-btn ghost" type="button" id="apGoNo">Manter</button></div>
+          </div>
+        </div>
+        <div class="ap-who-h"><p class="ap-lb">Quem vai</p><span id="apWhoArr"></span></div>
+        <ul class="ap-who" id="apWho" aria-label="Quem confirmou a aula"></ul>
+        <p class="ap-who-none" id="apWhoNone" hidden>Ninguém confirmou ainda. Que tal ser o primeiro?</p>
+        <p class="ap-lb ap-arr-h">Chegou no tatame?</p>
         <ol class="ap-steps">
-          <li class="now" id="apStep1"><span class="ap-mk">1</span><div><p class="ap-st" id="apStep1h">Confirme sua vaga</p><p id="apStep1t">Na tela Início, um toque.</p></div></li>
-          <li id="apStep2"><span class="ap-mk">2</span><div><p class="ap-st" id="apStep2h">Digite o código da aula</p><p id="apCodeHelp">3 letras e 3 números, mostrados na TV do tatame.</p>
+          <li class="now" id="apStep2"><span class="ap-mk">1</span><div><p class="ap-st" id="apStep2h">Digite o código da aula</p><p id="apCodeHelp">3 letras e 3 números, mostrados na TV do tatame.</p>
             <div id="apCodeWrap" style="overflow:hidden">
               <div class="ap-codef">
                 <label class="sr-only" for="apCodeIn">Código da aula</label>
@@ -202,7 +249,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
               <button class="ap-btn off" type="button" id="apRegister" aria-disabled="true">Registrar presença</button>
               <p class="ap-mut app-demo" id="apCodeDemo" hidden>Demonstração: o código de hoje na TV é <b>KTR 482</b>.</p>
             </div></div></li>
-          <li class="later" id="apStep3"><span class="ap-mk">3</span><div><p class="ap-st">Presença registrada</p><p>Conta para a meta da semana.</p></div></li>
+          <li class="later" id="apStep3"><span class="ap-mk">2</span><div><p class="ap-st">Presença registrada</p><p>Conta para a meta da semana.</p></div></li>
         </ol>
         <div class="ap-done" id="apDone" hidden><b>18:55</b><p>Presença registrada. Meta da semana batida: 3 de 3.</p><div class="ap-goal"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
       </section>
@@ -415,45 +462,206 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function hm(m) { return Math.floor(m / 60) + ":" + ("0" + (m % 60)).slice(-2); }
   function clockTo(m) { now = Math.max(now, m); return hm(now); }
 
-  /* ---------- Início: confirmar e liberar a vaga ---------- */
-  var confirmed = false, registered = false, confAt = "", regAt = "";
+  /* ---------- a aula e quem vai. Na demonstração, a turma das 19h da Marina (7 já confirmaram); no modo Supabase,
+     a próxima aula da turma do aluno (cadastro em alunos) e as reservas de verdade (confirmados_aula) ---------- */
+  var BELT = { branca: "Branca", cinza: "Cinza", amarela: "Amarela", laranja: "Laranja", verde: "Verde", azul: "Azul", roxa: "Roxa", marrom: "Marrom", preta: "Preta" };
+  var QUEM0 = [["Eduardo Prado", "marrom", 1, "09:12"], ["Thiago Moreira", "azul", 3, "12:31"], ["Larissa Mendes", "branca", 1, "16:05"], ["Renata Siqueira", "branca", 3, "17:21"],
+    ["Aline Duarte", "branca", 2, "17:33"], ["Felipe Antunes", "azul", 1, "17:40"], ["Gustavo Lima", "roxa", 0, "17:52"]];
+  var TURMA = { adulto: "Adulto", feminino: "Adulto", kids1: "Kids 1", kids2: "Kids 2" };
+  var ALUNO = demo ? { nome: "Marina Alves", faixa: "azul", graus: 2 } : null;
+  var AULA = { data: "", hora: "19:00", turma: "Adulto", k: 0 };
+  var confirmed = false, registered = false, confAt = "", regAt = "", quem = [], busy = false, semAula = false;
   var confBtn = $("#apConfirm"), relBtn = $("#apRelease"), askEl = $("#apAsk"), btnRow = $("#apBtnRow");
-  function paintSpot() {
-    var mine = confirmed || registered;
-    $$("#apDots i")[7].classList.toggle("me", mine);
-    $("#apVagas").textContent = registered ? "Presença registrada às " + regAt + " · aula às 19h"
-      : "Começa em " + (19 * 60 - now) + " min · " + (mine ? 8 : 7) + " de 10 vagas ocupadas";
-    $("span", confBtn).textContent = registered ? "Presença registrada" : confirmed ? "Vaga confirmada" : "Confirmar vaga";
-    confBtn.classList.toggle("ok", mine);
-    confBtn.classList.toggle("pulse", !mine);
-    if (mine) confBtn.setAttribute("aria-disabled", "true"); else confBtn.removeAttribute("aria-disabled");
-    relBtn.hidden = !confirmed || registered;
-    var li = $("#apStep1");
-    li.className = confirmed ? "done" : registered ? "skip" : "now";
-    $(".ap-mk", li).innerHTML = confirmed ? CHECK : registered ? "–" : "1";
-    $("#apStep1h").textContent = confirmed ? "Vaga confirmada" : registered ? "Sem reserva" : "Confirme sua vaga";
-    $("#apStep1t").textContent = confirmed ? "Às " + confAt + " · 8 de 10 vagas ocupadas" : registered ? "Havia vaga: 8 de 10 vagas ocupadas." : "Na tela Início, um toque.";
-    if (!registered) $("#apStep2").className = confirmed ? "now" : "";
+  var goBtn = $("#apGoBtn"), goRel = $("#apGoRel"), goAsk = $("#apGoAsk"), goRow = $("#apGoRow");
+  function p2(n) { return ("0" + n).slice(-2); }
+  function isoDia(d) { return d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate()); }
+  function mins(t) { var q = t.split(":"); return +q[0] * 60 + +q[1]; }
+  function hhmm(ts) { var d = new Date(ts); return p2(d.getHours()) + ":" + p2(d.getMinutes()); }
+  function curto(n) { var q = String(n).trim().split(/\s+/); return q[0] + (q[1] && !/\.$/.test(q[0]) ? " " + q[1].charAt(0).toUpperCase() + "." : ""); }
+  function ini(n) { var q = String(n).replace(/\./g, "").trim().split(/\s+/); return ((q[0] || "?").charAt(0) + (q[1] ? q[1].charAt(0) : "")).toUpperCase(); }
+  function grausTx(g) { return g ? g + (g === 1 ? " grau" : " graus") : "sem grau"; }
+
+  /* a próxima aula da turma: hoje, enquanto não passou 1 hora do início; senão, o próximo dia com aula (Site.GRADE) */
+  function proximaAula(turma, horario) {
+    var nome = TURMA[turma] || "Adulto", d = new Date(), agora = d.getHours() * 60 + d.getMinutes();
+    for (var k = 0; k < 8; k++) {
+      var dia = new Date(d.getFullYear(), d.getMonth(), d.getDate() + k);
+      var l = Site.aulasDo(dia.getDay()).filter(function (c) { return c.n === nome && (k > 0 || mins(c.t) + 60 > agora); });
+      var pref = horario ? l.filter(function (c) { return c.t === horario; }) : [];
+      if (pref.length) l = pref;
+      if (l.length) return { data: isoDia(dia), hora: l[0].t, turma: nome, k: k, dia: dia };
+    }
+    return null;
   }
+  function quemDemo() {
+    var l = QUEM0.map(function (q) { return { nome: curto(q[0]), faixa: q[1], graus: q[2], conf: q[3], chegou: registered && q[0] === "Felipe Antunes" ? "18:52" : null, eu: false }; });
+    if (confirmed || registered) l.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, conf: confAt, chegou: registered ? regAt : null, eu: true });
+    return l;
+  }
+  /* as vagas ocupadas são as reservas; quem chegou sem reservar aparece na lista, mas não ocupa vaga */
+  function ocupadas() { return quem.filter(function (q) { return q.conf; }).length; }
+
+  function faces(max) {
+    var l = quem.slice().sort(function (a, b) { return b.eu - a.eu; }), h = l.slice(0, max).map(function (q, i) {
+      return '<span class="av' + (q.eu ? " me" : "") + '" style="z-index:' + (max + 1 - i) + '">' + ini(q.nome) + "</span>";
+    }).join("");
+    return h + (l.length > max ? '<span class="av more" style="z-index:0">+' + (l.length - max) + "</span>" : "");
+  }
+  function stripTx() {
+    var n = quem.length, outros = quem.filter(function (q) { return !q.eu; }).map(function (q) { return q.nome.split(" ")[0]; }), eu = quem.some(function (q) { return q.eu; });
+    if (!n) return "Ninguém confirmou ainda";
+    if (eu && n === 1) return "<b>Você</b> confirmou primeiro";
+    var nomes = (eu ? ["Você"] : []).concat(outros), vis = nomes.slice(0, 2), resto = n - vis.length;
+    return "<b>" + esc(vis.join(", ")) + "</b>" + (resto > 0 ? " e mais " + resto : "") + (n === 1 ? " vai" : " vão");
+  }
+  function dots(el, n, mine) {
+    el.innerHTML = Array.apply(null, Array(10)).map(function (_, i) { return "<i" + (i < n ? ' class="' + (mine && i === n - 1 ? "on me" : "on") + '"' : "") + "></i>"; }).join("");
+  }
+  function quando() {
+    if (semAula) return "Sem aula marcada para a sua turma";
+    var ini0 = mins(AULA.hora);
+    if (demo) return "Começa em " + (ini0 - now) + " min";
+    if (AULA.k > 0) return (AULA.k === 1 ? "Amanhã" : Site.DIAS[AULA.dia.getDay()]) + ", às " + Site.hora(AULA.hora);
+    var d = new Date(), m = d.getHours() * 60 + d.getMinutes();
+    return m < ini0 ? (ini0 - m > 90 ? "Hoje, às " + Site.hora(AULA.hora) : "Começa em " + (ini0 - m) + " min") : "Começou às " + Site.hora(AULA.hora);
+  }
+  function paintBtn(b, mine) {
+    $("span", b).textContent = registered ? "Presença registrada" : confirmed ? "Vaga confirmada" : b === goBtn ? "Vou treinar" : "Confirmar vaga";
+    b.classList.toggle("ok", mine);
+    b.classList.toggle("pulse", !mine && !semAula);
+    if (mine || semAula) b.setAttribute("aria-disabled", "true"); else b.removeAttribute("aria-disabled");
+  }
+  function paintSpot() {
+    if (demo) quem = quemDemo();
+    var mine = confirmed || registered, n = ocupadas(), cheia = n >= 10 && !confirmed;
+    dots($("#apDots"), n, confirmed);
+    dots($("#apGoDots"), n, confirmed);
+    $("#apVagas").textContent = registered ? "Presença registrada às " + regAt + " · aula às " + Site.hora(AULA.hora)
+      : quando() + (semAula ? "" : " · " + n + " de 10 vagas ocupadas");
+    [confBtn, goBtn].forEach(function (b) { paintBtn(b, mine); });
+    if (cheia && !registered) [confBtn, goBtn].forEach(function (b) { $("span", b).textContent = "Turma cheia"; b.setAttribute("aria-disabled", "true"); b.classList.remove("pulse"); });
+    relBtn.hidden = goRel.hidden = !confirmed || registered;
+    $("#apStripFaces").innerHTML = faces(3);
+    $("#apStripTx").innerHTML = stripTx();
+    $("#apStrip").setAttribute("aria-label", "Quem vai: " + $("#apStripTx").textContent + ". Ver a lista");
+    /* Presença: o número, a lista e quem já chegou */
+    $("#apGoN").textContent = n;
+    $("#apGoT").textContent = semAula ? "sem aula marcada" : "de 10 vagas confirmadas";
+    var chegaram = quem.filter(function (q) { return q.chegou; }).length;
+    $("#apWhoArr").textContent = chegaram ? chegaram + (chegaram === 1 ? " já chegou" : " já chegaram") : "";
+    var lista = $("#apWho"), antes = {};
+    $$("li", lista).forEach(function (li) { antes[li.dataset.k] = 1; });
+    lista.innerHTML = quem.map(function (q) {
+      var k = q.nome + "|" + q.eu, st = q.chegou ? '<span class="pill-s in">Chegou ' + q.chegou + "</span>" : q.conf ? '<span class="pill-s">Confirmou</span>' : "";
+      return '<li data-k="' + esc(k) + '"' + (q.eu ? ' class="me' + (antes[k] ? "" : " new") + '"' : antes[k] || !Object.keys(antes).length ? "" : ' class="new"') + '><span class="av">' + ini(q.nome) + "</span><div><b>" + esc(q.eu ? "Você" : q.nome) + "</b><small>" +
+        '<i class="belt-s" style="--b:var(--b-' + q.faixa + ')"></i>' + (BELT[q.faixa] || "") + " · " + grausTx(q.graus) + "</small></div>" + st + "</li>";
+    }).join("");
+    $("#apWhoNone").hidden = !!quem.length || semAula;
+    if (!registered) $("#apStep2").className = semAula ? "" : "now";
+  }
+
+  /* confirmar: na demonstração, na hora; no modo Supabase, reservar() guarda a vaga (até 10 por aula) */
   function confirmSpot() {
-    show("inicio");
-    if (confirmed || registered) return;
-    confirmed = true;
-    confAt = clockTo(18 * 60 + 14);
-    paintSpot();
-    toast("Vaga confirmada. Te esperamos às 19h.");
+    if (confirmed || registered || busy || semAula) return;
+    if (demo) {
+      confirmed = true;
+      confAt = clockTo(18 * 60 + 14);
+      paintSpot();
+      toast("Vaga confirmada. Te esperamos às " + Site.hora(AULA.hora) + ".");
+      return;
+    }
+    busy = true;
+    Acesso.cliente().then(function (sb) { return sb.rpc("reservar", { p_data: AULA.data, p_hora: AULA.hora }); }).then(function (r) {
+      busy = false;
+      if (r.error) { toast(r.error.message || "Não deu para confirmar. Tente de novo."); return atualizarQuem(); }
+      toast("Vaga confirmada. Te esperamos às " + Site.hora(AULA.hora) + ".");
+      return atualizarQuem();
+    }).catch(function () { busy = false; toast("Sem conexão. Tente de novo."); });
+  }
+  function release() {
+    if (demo) {
+      confirmed = false;
+      paintSpot();
+      toast("Vaga liberada. Obrigado por avisar.");
+      return Promise.resolve();
+    }
+    return Acesso.cliente().then(function (sb) { return sb.from("reservas").delete().eq("data", AULA.data).eq("hora", AULA.hora); }).then(function (r) {
+      if (r.error) toast("Não deu para liberar a vaga. Tente de novo.");
+      else toast("Vaga liberada. Obrigado por avisar.");
+      return atualizarQuem();
+    }).catch(function () { toast("Sem conexão. Tente de novo."); });
   }
   confBtn.addEventListener("click", confirmSpot);
-  function askRelease(open) { btnRow.hidden = open; askEl.hidden = !open; }
-  relBtn.addEventListener("click", function () { askRelease(true); Site.focusSoft($("#apRelNo"), { preventScroll: true }); into(askEl); });
+  goBtn.addEventListener("click", confirmSpot);
+  /* liberar pergunta antes, no mesmo cartão em que foi pedido (Início ou Presença) */
+  function askRelease(open, box, row) {
+    [[askEl, btnRow], [goAsk, goRow]].forEach(function (p) { var on = open && p[0] === box; p[0].hidden = !on; p[1].hidden = on; });
+  }
+  relBtn.addEventListener("click", function () { askRelease(true, askEl); Site.focusSoft($("#apRelNo"), { preventScroll: true }); into(askEl); });
+  goRel.addEventListener("click", function () { $("#apGoAskT").textContent = "Liberar sua vaga das " + Site.hora(AULA.hora) + "?"; askRelease(true, goAsk); Site.focusSoft($("#apGoNo"), { preventScroll: true }); into(goAsk); });
   $("#apRelNo").addEventListener("click", function () { askRelease(false); Site.focusSoft(relBtn, { preventScroll: true }); });
-  $("#apRelYes").addEventListener("click", function () {
-    confirmed = false;
-    askRelease(false);
+  $("#apGoNo").addEventListener("click", function () { askRelease(false); Site.focusSoft(goRel, { preventScroll: true }); });
+  $("#apRelYes").addEventListener("click", function () { askRelease(false); release().then(function () { Site.focusSoft(confBtn, { preventScroll: true }); }); });
+  $("#apGoYes").addEventListener("click", function () { askRelease(false); release().then(function () { Site.focusSoft(goBtn, { preventScroll: true }); }); });
+  $("#apStrip").addEventListener("click", function () { show("presenca"); });
+
+  /* a aula nos títulos (Início e Presença) */
+  function paintAula() {
+    var card = $("#apVagas").closest(".ap-card"), dia = AULA.dia || new Date();
+    $(".ap-lb.gold", card).textContent = AULA.k > 0 ? "Sua próxima aula" : "Sua aula de hoje";
+    $(".ap-big b", card).textContent = Site.hora(AULA.hora);
+    $(".ap-big span", card).textContent = AULA.turma;
+    $("#apPrH").textContent = semAula ? "Sem aula marcada" : "Aula das " + Site.hora(AULA.hora);
+    var dt = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(dia);
+    $("#apPrSub").textContent = semAula ? "Fale com o professor para acertar a sua turma." : AULA.turma + " · " + dt;
+    $("p", askEl).textContent = "Liberar sua vaga das " + Site.hora(AULA.hora) + "?";
+  }
+
+  /* modo Supabase: o cadastro do aluno, a aula e quem vai (de novo a cada 30 s, com o app na tela) */
+  function semCadastro() {
+    semAula = true;
+    toast("Sua conta ainda não está ligada a um cadastro de aluno. Fale com o professor.");
+    paintAula();
     paintSpot();
-    Site.focusSoft(confBtn, { preventScroll: true });
-    toast("Vaga liberada. Obrigado por avisar.");
-  });
+  }
+  function atualizarQuem() {
+    if (demo || semAula) return Promise.resolve();
+    return Acesso.cliente().then(function (sb) {
+      return Promise.all([
+        sb.rpc("confirmados_aula", { p_data: AULA.data, p_hora: AULA.hora }),
+        sb.from("presencas").select("chegou_em").eq("data", AULA.data).eq("hora", AULA.hora).maybeSingle()
+      ]);
+    }).then(function (rs) {
+      var q = rs[0], pr = rs[1];
+      quem = (q.data || []).map(function (x) { return { nome: x.nome, faixa: x.faixa, graus: x.graus, eu: !!x.eu, conf: hhmm(x.confirmou_em), chegou: x.chegou_em ? hhmm(x.chegou_em) : null }; });
+      confirmed = quem.some(function (x) { return x.eu; });
+      var antes = registered;
+      registered = !!(pr.data && pr.data.chegou_em);
+      if (registered) {
+        regAt = hhmm(pr.data.chegou_em);
+        if (!confirmed) quem.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, eu: true, conf: "", chegou: regAt });
+      }
+      paintSpot();
+      if (registered && !antes) mostrarRegistro(false);
+    }).catch(function () {});
+  }
+  function carregarReal() {
+    return Acesso.cliente().then(function (sb) {
+      return sb.from("alunos").select("id, nome, turma, horario, faixa, graus").maybeSingle();
+    }).then(function (r) {
+      if (r.error || !r.data) return semCadastro();
+      ALUNO = r.data;
+      AULA = proximaAula(ALUNO.turma, ALUNO.horario);
+      if (!AULA) { AULA = { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 }; return semCadastro(); }
+      paintAula();
+      return atualizarQuem();
+    }).catch(function () { toast("Sem conexão com o Studio. Confira a internet."); });
+  }
+  if (!demo) {
+    carregarReal();
+    setInterval(function () { if (!document.hidden && current === "presenca" || !document.hidden && current === "inicio") atualizarQuem(); }, 30000);
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) atualizarQuem(); });
+  }
 
   /* ---------- a meta da semana é da aluna: cada toque em "mudar" passa para a próxima (1 a 5 treinos) ---------- */
   var goal = 3, trained = 2;
@@ -552,6 +760,26 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       Site.focusSoft(inp, { preventScroll: true });
       return;
     }
+    if (!demo) {
+      /* modo Supabase: registrar_presenca confere o código da aula aberta e o prazo */
+      if (busy) return;
+      busy = true;
+      regBtn.classList.add("off");
+      Acesso.cliente().then(function (sb) { return sb.rpc("registrar_presenca", { p_codigo: typed }); }).then(function (r) {
+        busy = false;
+        if (r.error) {
+          paintCode();
+          setErr(r.error.message || "Código não confere. Confira na TV do tatame.", true);
+          if (document.activeElement === inp) inp.select();
+          return;
+        }
+        registered = true;
+        regAt = hhmm(r.data.chegou_em);
+        mostrarRegistro(true);
+        atualizarQuem();
+      }).catch(function () { busy = false; paintCode(); setErr("Sem conexão. Tente de novo.", true); });
+      return;
+    }
     if (typed !== CODE) {
       setErr("Código não confere. Confira na TV do tatame: 3 letras e 3 números.", true);
       if (document.activeElement === inp) inp.select();
@@ -589,12 +817,17 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (registered) return;
     registered = true;
     regAt = clockTo(18 * 60 + 55);
+    mostrarRegistro(true);
+  }
+  /* fresh: acabou de registrar (conta na meta, anima e avisa); senão, o app abriu com a presença já feita */
+  function mostrarRegistro(fresh) {
     askRelease(false);
     paintSpot();
-    var wrap = $("#apCodeWrap"), done = $("#apDone"), had = wrap.contains(document.activeElement);
+    var wrap = $("#apCodeWrap"), done = $("#apDone"), had = wrap.contains(document.activeElement), cod = demo ? CODE : typed;
     [$("#apStep2"), $("#apStep3")].forEach(function (li) { li.className = "done"; $(".ap-mk", li).innerHTML = CHECK; });
-    $("#apStep2h").textContent = "Código digitado";
-    $("#apCodeHelp").textContent = CODE.slice(0, 3) + " " + CODE.slice(3) + " · às " + regAt;
+    $("#apStep2h").textContent = cod.length === 6 ? "Código digitado" : "Presença na aula";
+    $("#apCodeHelp").textContent = (cod.length === 6 ? cod.slice(0, 3) + " " + cod.slice(3) + " · " : "") + "às " + regAt;
+    if (!fresh) { wrap.hidden = true; $("b", done).textContent = regAt; done.hidden = false; $("p", done).textContent = "Presença registrada."; return; }
     trained++;
     paintGoal();
     $("b", done).textContent = regAt;

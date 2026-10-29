@@ -348,6 +348,30 @@ begin
 end;
 $$;
 
+-- quem confirmou a aula: o aluno vê o primeiro nome, a inicial do sobrenome e a faixa de cada um,
+-- e quem já chegou. Só para quem tem cadastro de aluno ativo ou é professor
+create or replace function public.confirmados_aula(p_data date, p_hora text)
+returns table (nome text, faixa text, graus smallint, eu boolean, chegou_em timestamptz, confirmou_em timestamptz)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select
+    split_part(trim(a.nome), ' ', 1)
+      || coalesce(' ' || upper(left(nullif(split_part(trim(a.nome), ' ', 2), ''), 1)) || '.', ''),
+    a.faixa,
+    a.graus,
+    a.id = privado.meu_aluno(),
+    (select p.chegou_em from public.presencas p where p.aluno = a.id and p.data = r.data and p.hora = r.hora),
+    r.criado_em
+  from public.reservas r
+  join public.alunos a on a.id = r.aluno
+  where r.data = p_data and r.hora = p_hora
+    and (privado.meu_aluno() is not null or privado.eh_professor())
+  order by r.criado_em;
+$$;
+
 -- o pedido de aula experimental do site (sem login): entra em Interessados
 create or replace function public.pedido_site(p_nome text, p_programa text, p_data date, p_hora text, p_turma text, p_codigo text, p_familia boolean default false)
 returns boolean
@@ -378,10 +402,12 @@ end;
 $$;
 
 revoke all on function public.registrar_presenca(text), public.vagas_aula(date, text), public.reservar(date, text),
-  public.pedido_site(text, text, date, text, text, text, boolean) from public;
+  public.confirmados_aula(date, text), public.pedido_site(text, text, date, text, text, text, boolean) from public;
 -- o Supabase também dá execução direto ao anon: aqui ela sai das funções que pedem login
-revoke execute on function public.registrar_presenca(text), public.vagas_aula(date, text), public.reservar(date, text) from anon;
-grant execute on function public.registrar_presenca(text), public.vagas_aula(date, text), public.reservar(date, text) to authenticated;
+revoke execute on function public.registrar_presenca(text), public.vagas_aula(date, text), public.reservar(date, text),
+  public.confirmados_aula(date, text) from anon;
+grant execute on function public.registrar_presenca(text), public.vagas_aula(date, text), public.reservar(date, text),
+  public.confirmados_aula(date, text) to authenticated;
 grant execute on function public.pedido_site(text, text, date, text, text, text, boolean) to anon, authenticated;
 
 -- Studio Evolution BJJ · limpeza inicial (rodar uma vez, depois da migration de gestão)
