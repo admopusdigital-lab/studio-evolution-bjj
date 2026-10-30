@@ -28,7 +28,8 @@
 /* Agendamento: abertura de cinema com os três passos acesos em ouro, programas em cartazes, datas e
    horários em placas e, ao lado, o ingresso da aula experimental: preenche ao vivo, ganha um código,
    carimba "pronto" quando tudo está escolhido e inclina com o mouse. */
-.ag-hero-pic img { object-position: 50% 32%; }
+.ag-hero-pic img { object-position: 50% 58%; }
+@media (min-aspect-ratio: 1/1) { .ag-hero-pic img { object-position: 50% 47%; } }
 .ag-steps-wrap { position: relative; margin-top: clamp(26px, 4vh, 50px); max-width: 760px; padding-bottom: clamp(28px, 4.5vh, 52px); }
 .ag-steps-wrap::before { content: ""; position: absolute; left: 0; right: 0; top: 17px; height: 2px; background: oklch(1 0 0 / 0.12); }
 .ag-steps-wrap .fill { position: absolute; left: 0; right: 0; top: 17px; height: 2px; background: var(--gold-metal); box-shadow: 0 0 14px var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 800ms var(--ease); }
@@ -211,7 +212,7 @@
 
 <main>
   <section class="phero cin cin-s cine ag-hero" data-dark aria-labelledby="t-ag">
-    <div class="cin-bg ag-hero-pic" aria-hidden="true"><img src="img/hero-real.jpg" alt="" width="1531" height="1027"></div>
+    <div class="cin-bg ag-hero-pic" aria-hidden="true"><img src="img/aula-tatame.webp" alt="" width="720" height="1280"></div>
     <div class="cin-shade" aria-hidden="true"></div>
     <span class="cin-ghost" aria-hidden="true">始</span>
     <div class="wrap">

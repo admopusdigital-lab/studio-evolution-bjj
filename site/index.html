@@ -328,6 +328,11 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 .bp-names-in { display: flex; flex-direction: column; will-change: transform; }
 .bp-names-in span { display: block; height: 1.04em; }
 .bp-names-in em { font-style: italic; }
+.bp-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 14px; }
+.bp-steps i { height: 4px; border-radius: 2px; background: var(--rule); position: relative; overflow: hidden; }
+.bp-steps i::after { content: ""; position: absolute; inset: 0; background: var(--c); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.18); transform: scaleX(0); transform-origin: left; transition: transform 1.2s var(--ease); }
+.bp-steps i.on::after, .bp-steps i.done::after { transform: none; }
+.bp-steps i.done { opacity: 0.55; }
 .bp-count { font-size: 14px; color: var(--ink-3); font-variant-numeric: tabular-nums; padding-bottom: 8px; }
 .bp-note { margin-top: 18px; font: italic 400 16px/1.5 var(--serif); color: var(--ink-3); max-width: 46ch; }
 .bp-video .vclip { overflow: hidden; clip-path: inset(0% 0% 0% 0%); box-shadow: var(--shadow-lg); }
@@ -750,6 +755,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
             <div class="bp-names" aria-hidden="true"><div class="bp-names-in" id="beltNames"><span>Branca</span><span><em>Azul</em></span><span>Roxa</span><span><em>Marrom</em></span><span>Preta</span></div></div>
             <span class="bp-count" id="beltCount">1 / 5</span>
           </div>
+          <div class="bp-steps" aria-hidden="true"><i style="--c:#f3f2ed"></i><i style="--c:#2b5fd0"></i><i style="--c:#6a35b0"></i><i style="--c:#6e4326"></i><i style="--c:#1c1c20"></i></div>
           <p class="bp-note">O caminho do adulto. Os graus de cada faixa são dados pelo professor, que acompanha seu treino no tatame.</p>
         </div>
       </div>
@@ -1220,32 +1226,55 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         }, { rootMargin: "800px 0px" });
         io.observe(box);
       })();
-      function buildBelt(pin) {
-        var names = $("#beltNames"), countB = $("#beltCount"), cur = -1;
+      /* a faixa: a rolagem escolhe a faixa, mas a troca anda uma faixa por vez e cada uma tem tempo de aparecer
+         inteira (a volta no ar, a cor nova e os graus). Rolou rápido? As faixas seguem em fila, sem pular nem
+         embaralhar. No computador a seção inteira fica presa; no celular, só a faixa com o nome, e a rolagem
+         assenta sempre numa faixa. */
+      function buildBelt(wide) {
+        var names = $("#beltNames"), countB = $("#beltCount"), cur = -1, alvo = 0, fila = null;
         gsap.set(".belt-big", { transformPerspective: 900, transformOrigin: "50% 50%" });
         var show = function (i) {
-          if (i === cur) return;
           var first = cur < 0;
           cur = i;
           countB.textContent = (i + 1) + " / 5";
-          gsap.to(names, { yPercent: -20 * i, duration: 0.8, ease: "expo.out", overwrite: true });
+          gsap.to(names, { yPercent: -20 * i, duration: 0.9, ease: "expo.out", overwrite: true });
           beltIdx = i;
+          $$(".bp-steps i").forEach(function (d, k) { d.classList.toggle("on", k === i); d.classList.toggle("done", k < i); });
           /* com a faixa 3D, a volta e a troca de cor acontecem dentro dela */
           if (beltGL) { beltGL.set(i, !first); return; }
           gsap.to("#beltBase", { attr: { fill: COLORS[i] }, duration: 0.6, ease: "power2.out", overwrite: true });
           gsap.to("#beltTip", { attr: { fill: i === 4 ? "#b3261e" : "#17171a" }, duration: 0.6, overwrite: true });
           gsap.to("#stitches", { attr: { stroke: i === 4 ? "#ffffff" : "#000000" }, duration: 0.6, overwrite: true });
-          /* a faixa dá uma volta inteira no ar a cada troca de cor */
           if (!first) gsap.fromTo(".belt-big", { rotationX: -180 }, { rotationX: 0, duration: 1.1, ease: "back.out(1.2)", overwrite: "auto" });
         };
+        /* um passo por vez até a faixa pedida pela rolagem */
+        var passo = function () {
+          fila = null;
+          if (cur === alvo) return;
+          show(cur + (alvo > cur ? 1 : -1));
+          fila = gsap.delayedCall(Site.reduce ? 0.2 : (beltGL ? 1.75 : 0.95), passo);
+        };
+        var pedir = function (i) { alvo = i; if (!fila) passo(); };
         show(0);
-        gsap.timeline({ scrollTrigger: { trigger: ".belt-sec", start: pin ? "top top" : "top 70%", end: pin ? "+=260%" : "bottom 45%", scrub: 0.6, pin: pin,
-            onUpdate: function (self) { show(Math.min(4, Math.floor(self.progress * 5))); } } })
-          .fromTo(".bp-video .vclip", { clipPath: "inset(14% 10% 14% 10%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.3, ease: "power2.out" }, 0)
-          .fromTo(".bp-video video", { scale: 1.25 }, { scale: 1, duration: 1, ease: "none" }, 0);
+        var st = wide
+          ? { trigger: ".belt-sec", start: "top top", end: "+=320%", scrub: 0.6, pin: true }
+          : { trigger: ".bp-stage", start: "center 52%", end: "+=" + Math.round(window.innerHeight * 2.8), pin: ".bp-stage", pinSpacing: true, anticipatePin: 1, scrub: 0.6 };
+        st.snap = { snapTo: 1 / 4, duration: { min: 0.35, max: 0.9 }, delay: 0.12, ease: "power2.inOut" };
+        st.onUpdate = function (self) { pedir(Math.round(self.progress * 4)); };
+        var tl = gsap.timeline({ scrollTrigger: st });
+        if (wide) {
+          tl.fromTo(".bp-video .vclip", { clipPath: "inset(14% 10% 14% 10%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.3, ease: "power2.out" }, 0)
+            .fromTo(".bp-video video", { scale: 1.25 }, { scale: 1, duration: 1, ease: "none" }, 0);
+        } else {
+          tl.to({}, { duration: 1 });
+          gsap.timeline({ scrollTrigger: { trigger: ".bp-video", start: "top 90%", end: "bottom 40%", scrub: 0.6 } })
+            .fromTo(".bp-video .vclip", { clipPath: "inset(14% 10% 14% 10%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.3, ease: "power2.out" }, 0)
+            .fromTo(".bp-video video", { scale: 1.25 }, { scale: 1, duration: 1, ease: "none" }, 0);
+        }
+        return function () { if (fila) fila.kill(); fila = null; };
       }
-      mm.add("(min-width: 1024px)", function () { buildBelt(true); });
-      mm.add("(max-width: 1023px)", function () { buildBelt(false); });
+      mm.add("(min-width: 1024px)", function () { return buildBelt(true); });
+      mm.add("(max-width: 1023px)", function () { return buildBelt(false); });
       /* com o mouse, a faixa e os nomes inclinam juntos, como um objeto sobre a mesa */
       if (fine) {
         var bs = $(".bp-stage");
