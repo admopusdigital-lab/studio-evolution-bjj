@@ -40,6 +40,7 @@
   --cta-bg: linear-gradient(115deg, oklch(0.7 0.12 76) 0%, oklch(0.85 0.13 87) 46%, oklch(0.74 0.125 80) 100%);
   --cta-fg: oklch(0.13 0.005 70);
   --logo-fill: linear-gradient(110deg, var(--ink) 0%, var(--ink) 42%, var(--gold) 50%, var(--ink) 58%, var(--ink) 100%);
+  --logo-bjj: var(--gold-deep);
   --serif: "Archivo Black", "Arial Black", "Helvetica Neue", Impact, sans-serif;
   --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -55,7 +56,10 @@
   --cine-fg-3: oklch(0.62 0.009 80);
   --cine-rule: oklch(1 0 0 / 0.12);
   --cine-gold: oklch(0.83 0.13 84);
-  --cine-logo: linear-gradient(110deg, oklch(0.64 0.12 76) 0%, oklch(0.83 0.13 85) 22%, oklch(0.64 0.12 76) 40%, oklch(0.97 0.05 90) 50%, oklch(0.64 0.12 76) 60%, oklch(0.83 0.13 85) 78%, oklch(0.64 0.12 76) 100%);
+  /* ouro da logo oficial: claro em cima, queimado embaixo; o brilho diagonal só passa na animação */
+  --logo-gold: linear-gradient(180deg, #fff1b3 0%, #efcc76 50%, #b98b35 100%);
+  --cine-logo: linear-gradient(110deg, transparent 0% 42%, oklch(1 0.03 95 / 0.85) 50%, transparent 58% 100%), var(--logo-gold);
+  --cine-bjj: #f7f7f7;
 }
 :root[data-look="black"] {
   color-scheme: dark;
@@ -86,7 +90,7 @@
   --grain-op: 0.08;
   --grain-blend: overlay;
   --gold-metal: var(--gold-metal-lit);
-  --logo-fill: linear-gradient(110deg, var(--gold-deep) 0%, var(--gold) 22%, var(--gold-deep) 40%, oklch(0.97 0.05 90) 50%, var(--gold-deep) 60%, var(--gold) 78%, var(--gold-deep) 100%);
+  --logo-fill: var(--cine-logo); --logo-bjj: var(--cine-bjj);
 }
 
 /* base */
@@ -137,7 +141,7 @@ html.menu-open, html.menu-open body { overflow: hidden; }
 .cine { --paper: var(--cine-bg); --paper-2: var(--cine-bg-2); --ink: var(--cine-fg); --ink-2: var(--cine-fg-2); --ink-3: var(--cine-fg-3); --rule: var(--cine-rule); --gold-text: var(--cine-gold); --gold: var(--cine-gold); --gold-deep: oklch(0.62 0.12 72);
   --btn-bg: var(--cine-gold); --btn-fg: oklch(0.13 0.005 70); --btn-hover: var(--cine-fg); --btn-hover-fg: oklch(0.13 0.005 70);
   --btn-glow: 0 0 0 1px oklch(0.83 0.13 84 / 0.35), 0 18px 44px -14px oklch(0.83 0.13 84 / 0.5);
-  --glass: color-mix(in oklch, oklch(0.2 0.006 70) 78%, transparent); --logo-fill: var(--cine-logo); --field: oklch(0.19 0.006 70);
+  --glass: color-mix(in oklch, oklch(0.2 0.006 70) 78%, transparent); --logo-fill: var(--cine-logo); --logo-bjj: var(--cine-bjj); --field: oklch(0.19 0.006 70);
   --ok: oklch(0.76 0.16 150); --warn: oklch(0.76 0.14 52); --gold-metal: var(--gold-metal-lit);
   --shadow-lg: 0 50px 90px -40px oklch(0 0 0 / 0.9), 0 16px 30px -18px oklch(0 0 0 / 0.65);
   background: var(--paper); color: var(--ink); color-scheme: dark; }
@@ -148,8 +152,11 @@ html.menu-open, html.menu-open body { overflow: hidden; }
 
 /* logo (máscara: a cor vem dos tokens, com um brilho que passa). A máscara só usa o canal alfa:
    o WebP sem perda tem 41 KB, contra 263 KB do PNG colorido */
-.logo { display: block; aspect-ratio: 16 / 5; background: var(--logo-fill); background-size: 300% 100%; background-position: 100% 0;
+.logo { position: relative; display: block; aspect-ratio: 32 / 9; background: var(--logo-fill); background-size: 300% 100%; background-position: 100% 0;
   -webkit-mask: url("img/logo-evolution-mask.webp") center / contain no-repeat; mask: url("img/logo-evolution-mask.webp") center / contain no-repeat; }
+/* o BJJ da logo tem cor própria (branco no escuro), por cima do ouro */
+.logo::after { content: ""; position: absolute; inset: 0; background: var(--logo-bjj);
+  -webkit-mask: url("img/logo-evolution-bjj.webp") center / contain no-repeat; mask: url("img/logo-evolution-bjj.webp") center / contain no-repeat; }
 .shine:hover .logo { animation: shine 1.4s var(--ease); }
 @keyframes shine { from { background-position: 100% 0; } to { background-position: 0% 0; } }
 
@@ -194,7 +201,7 @@ html.menu-open, html.menu-open body { overflow: hidden; }
 /* cortina entre páginas */
 html.entering::after { content: ""; position: fixed; inset: 0; z-index: 139; background: var(--paper); animation: cover-out 0.4s ease 2.6s forwards; }
 @keyframes cover-out { to { opacity: 0; visibility: hidden; } }
-.curtain { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: var(--cine-bg); pointer-events: none; transform: translateY(130%); --logo-fill: var(--cine-logo); }
+.curtain { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: var(--cine-bg); pointer-events: none; transform: translateY(130%); --logo-fill: var(--cine-logo); --logo-bjj: var(--cine-bjj); }
 .curtain .logo { width: min(56vw, 560px); }
 .curtain .tt, .curtain .tb { position: absolute; left: -5%; right: -5%; height: 20vh; background: var(--cine-bg); }
 .curtain .tt { bottom: 100%; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
@@ -236,7 +243,7 @@ html.entering-img::after, .enter-cover { background-color: var(--cine-bg); backg
 .nav.scrolled { background: color-mix(in oklch, var(--paper) 78%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); border-bottom-color: var(--rule); }
 /* sobre um capítulo escuro, a navegação troca para tinta clara */
 .nav.on-dark { --paper: var(--cine-bg); --ink: var(--cine-fg); --ink-2: var(--cine-fg-2); --ink-3: var(--cine-fg-3); --rule: oklch(1 0 0 / 0.18); --gold: var(--cine-gold); --gold-text: var(--cine-gold);
-  --btn-bg: var(--cine-gold); --btn-fg: oklch(0.13 0.005 70); --btn-hover: var(--cine-fg); --btn-hover-fg: oklch(0.13 0.005 70); --btn-glow: 0 0 0 1px oklch(0.83 0.13 84 / 0.35), 0 14px 34px -14px oklch(0.83 0.13 84 / 0.5); --logo-fill: var(--cine-logo); --gold-metal: var(--gold-metal-lit); color: var(--ink); }
+  --btn-bg: var(--cine-gold); --btn-fg: oklch(0.13 0.005 70); --btn-hover: var(--cine-fg); --btn-hover-fg: oklch(0.13 0.005 70); --btn-glow: 0 0 0 1px oklch(0.83 0.13 84 / 0.35), 0 14px 34px -14px oklch(0.83 0.13 84 / 0.5); --logo-fill: var(--cine-logo); --logo-bjj: var(--cine-bjj); --gold-metal: var(--gold-metal-lit); color: var(--ink); }
 .nav .roll, .nav .look, .nav .tagp, .nav .menu-btn { transition: color 400ms var(--ease), border-color 400ms var(--ease); }
 .nav.hide { transform: translateY(-100%); }
 .nav-in { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 80px; }
