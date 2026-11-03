@@ -308,6 +308,26 @@
     { t: "19:00", n: "Adulto", d: [1, 2, 3, 4, 5] },
     { t: "20:30", n: "Adulto", d: [1, 2, 3, 4, 5] }
   ];
+  /* faixas: as do adulto e as do Kids (cinza, amarela, laranja e verde com listra branca, lisa e com listra preta).
+     O código guarda a cor e a listra: "cinza-branca" é a faixa cinza com listra branca */
+  Site.FX_AD = ["branca", "azul", "roxa", "marrom", "preta"];
+  Site.FX_KD = ["branca", "cinza-branca", "cinza", "cinza-preta", "amarela-branca", "amarela", "amarela-preta",
+    "laranja-branca", "laranja", "laranja-preta", "verde-branca", "verde", "verde-preta"];
+  var COR_FX = { branca: "Branca", cinza: "Cinza", amarela: "Amarela", laranja: "Laranja", verde: "Verde", azul: "Azul", roxa: "Roxa", marrom: "Marrom", preta: "Preta" };
+  /* a cor de base ("cinza-preta" -> "cinza"), usada nos movimentos da faixa */
+  Site.faixaBase = function (f) { return String(f || "branca").split("-")[0]; };
+  Site.faixaNome = function (f) {
+    var q = String(f || "branca").split("-"), n = COR_FX[q[0]] || q[0];
+    return q[1] ? n + " e " + (q[1] === "branca" ? "branca" : "preta") : n;
+  };
+  /* estilo para .belt-s: --b é a cor; --s, a listra do meio (só no Kids) */
+  Site.faixaCss = function (f) {
+    var q = String(f || "branca").split("-");
+    return "--b:var(--b-" + q[0] + ")" + (q[1] ? ";--s:var(--b-" + q[1] + ")" : "");
+  };
+  /* as mesmas cores em valor, para SVG */
+  Site.COR_FAIXA = { branca: "oklch(0.96 0.004 90)", cinza: "oklch(0.66 0.012 260)", amarela: "oklch(0.85 0.15 95)", laranja: "oklch(0.72 0.16 55)", verde: "oklch(0.58 0.13 150)",
+    azul: "oklch(0.55 0.17 258)", roxa: "oklch(0.45 0.15 305)", marrom: "oklch(0.42 0.07 50)", preta: "oklch(0.2 0.006 285)" };
   Site.DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
   /* "08:00" -> "8h", "20:30" -> "20h30" */
   Site.hora = function (t) { var p = t.split(":"); return +p[0] + "h" + (p[1] !== "00" ? p[1] : ""); };

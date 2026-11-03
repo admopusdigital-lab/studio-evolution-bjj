@@ -67,6 +67,7 @@
       '<label class="crm-f"><span>Mensalidade (R$)</span><input class="crm-in" data-k="mensalidade" inputmode="decimal" autocomplete="off" value="' + (a.mensalidade != null ? String(a.mensalidade).replace(".", ",") : "") + '"></label>' +
       '<label class="crm-f"><span>Vencimento</span><select class="sel" data-k="vencimento">' + Array.apply(null, Array(28)).map(function (_, i) { return '<option value="' + (i + 1) + '"' + ((a.vencimento || 10) === i + 1 ? " selected" : "") + ">dia " + (i + 1) + "</option>"; }).join("") + "</select></label>" +
       '<label class="crm-f"><span>Início no Studio</span><input class="crm-in" type="date" data-k="inicio" value="' + (a.inicio || P.hoje()) + '"></label>' +
+      '<label class="crm-f"><span>Aulas feitas antes do app <small>(na faixa e grau de hoje)</small></span><input class="crm-in" data-k="aulas_antes" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (a.aulas_antes || "") + '"></label>' +
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><textarea class="crm-in" data-k="nota" rows="2">' + v("nota") + "</textarea></label>" +
       "</div>" +
       (a.id ? "" : '<label class="mf-pub"><input type="checkbox" data-k="mens1" checked><span>Lançar a mensalidade deste mês no Financeiro</span></label>' +
@@ -95,7 +96,7 @@
         responsavel: kid ? (g("responsavel") || null) : null, nascimento: kid ? (g("nascimento") || null) : null,
         whatsapp: P.foneBanco(g("whatsapp")), email: (g("email") || "").toLowerCase() || null,
         faixa: g("faixa"), graus: +g("graus"), mensalidade: val ? P.num(val) : null, vencimento: +g("vencimento"), inicio: g("inicio") || P.hoje(),
-        nota: g("nota") || null
+        nota: g("nota") || null, aulas_antes: g("aulas_antes") ? parseInt(g("aulas_antes").replace(/\D/g, ""), 10) || 0 : 0
       },
       foneTxt: g("whatsapp"), mens1: g("mens1"), app: g("app")
     };
@@ -108,6 +109,7 @@
     if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) return P.erroForm(f, el("email"), "Confira o e-mail.");
     if (x.app && !d.email) return P.erroForm(f, el("email"), "Para criar o acesso ao app, digite o e-mail.");
     if (d.mensalidade !== null && !(d.mensalidade >= 0)) return P.erroForm(f, el("mensalidade"), "Valor da mensalidade em reais, como 200.");
+    if (!(d.aulas_antes >= 0 && d.aulas_antes <= 5000)) return P.erroForm(f, el("aulas_antes"), "Aulas antes do app: um número de 0 a 5000.");
     return true;
   }
   /* a 1ª mensalidade: este mês, no dia do vencimento (se o dia já passou, vence no mês que vem) */
@@ -140,6 +142,8 @@
     if (!validar(form, x)) return;
     var btn = $('[type="submit"]', form);
     btn.classList.add("loading");
+    /* só manda o campo quando há aulas antes do app (assim funciona mesmo antes da migração das faixas do Kids) */
+    if (x.d.aulas_antes) x.d.aulas_antes_ate = P.hoje(); else delete x.d.aulas_antes;
     P.q(function (sb) { return sb.from("alunos").insert(x.d).select().single(); }).then(function (novo) {
       var passos = [];
       if (x.mens1 && x.d.mensalidade > 0) {
@@ -209,7 +213,7 @@
       P.q(function (sb) { return sb.from("graduacoes").select("*").eq("aluno", id).order("data", { ascending: false }); })
     ]).then(function (r) {
       var mens = r[0] || [], grads = r[1] || [], pres = P.pres.filter(function (p) { return p.aluno === id; });
-      var total = pres.length, desdeGrau = grads.length ? pres.filter(function (p) { return p.data > grads[0].data; }).length : total;
+      var antes = a.aulas_antes || 0, total = pres.length, desdeGrau = (grads.length ? pres.filter(function (p) { return p.data > grads[0].data; }).length : total) + P.antes(a, grads.length ? grads[0].data : null);
       var idade = a.nascimento ? Math.floor(P.difDias(a.nascimento, P.hoje()) / 365.25) : null;
       var html =
         (cred ? '<div class="cred"><b>Acesso ao app ' + (cred.reenvio ? "com senha nova" : "criado") + "</b><p>E-mail: <code>" + esc(cred.email) + "</code><br>Senha provisória: <code>" + esc(cred.senha) + '</code></p><div class="msg-acts">' +
@@ -224,7 +228,7 @@
           "<dt>No Studio desde</dt><dd>" + P.dataBRano(a.inicio) + (a.saida ? " · saiu em " + P.dataBRano(a.saida) : "") + "</dd>" +
           (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
         "</dl></div>" +
-        '<div class="ficha-sec"><h5>Frequência · 12 semanas</h5>' + heat(id) + '<p class="muted" style="margin-top:8px;font-size:12px">' + total + (total === 1 ? " aula" : " aulas") + " no último ano · " + desdeGrau + " desde o último grau · última: " + P.quando(P.ultima(id)) + "</p></div>" +
+        '<div class="ficha-sec"><h5>Frequência · 12 semanas</h5>' + heat(id) + '<p class="muted" style="margin-top:8px;font-size:12px">' + total + (total === 1 ? " aula" : " aulas") + " no último ano" + (antes ? " · mais " + antes + " antes do app" : "") + " · " + desdeGrau + " desde o último grau · última: " + P.quando(P.ultima(id)) + "</p></div>" +
         '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return "<li><span>" + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + "</span>" + statusMens(m) + "</li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
         '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return "<li><span>" + P.beltTxt(g.faixa, g.graus) + (g.nota ? " · " + esc(g.nota) : "") + "</span><span>" + P.dataBRano(g.data) + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
         '<form class="crm-form" id="frEdit" novalidate hidden></form>' +
@@ -271,6 +275,8 @@
       if (!validar(f, x)) return;
       var d = x.d;
       delete d.faixa; delete d.graus;  /* faixa e graus mudam pelo registro de grau (fica o histórico) */
+      if (d.aulas_antes !== (a.aulas_antes || 0)) d.aulas_antes_ate = d.aulas_antes ? P.hoje() : null;
+      else delete d.aulas_antes;
       $('[type="submit"]', f).classList.add("loading");
       P.q(function (sb) { return sb.from("alunos").update(d).eq("id", a.id); }).then(P.carregarAlunos).then(function () { P.toast("Dados de " + P.first(d.nome) + " salvos."); P.abrirAluno(a.id); })
         .catch(function (e2) { $('[type="submit"]', f).classList.remove("loading"); P.erro(e2); });
@@ -295,7 +301,7 @@
       paintGrad();
     });
   }
-  function desde(a) { var g = ultGrau[a.id], ref = g ? g.data : null; return P.pres.filter(function (p) { return p.aluno === a.id && (!ref || p.data > ref); }).length; }
+  function desde(a) { var g = ultGrau[a.id], ref = g ? g.data : null; return P.pres.filter(function (p) { return p.aluno === a.id && (!ref || p.data > ref); }).length + P.antes(a, ref); }
   function paintGrad() {
     var l = P.ativos().map(function (a) { return { a: a, n: desde(a) }; }).sort(function (x, y) { return y.n - x.n; });
     $("#grTbl tbody").innerHTML = l.map(function (x) {

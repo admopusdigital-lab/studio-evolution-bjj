@@ -123,6 +123,16 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-faces .av:first-child { margin-left: 0; }
 .ap-faces .av.me { background: var(--gold); color: oklch(0.14 0.006 75); box-shadow: 0 0 0 2px var(--paper-2); }
 .ap-faces .av.more { background: var(--paper); color: var(--ink-3); }
+.ap-aulas-w { margin-top: 16px; }
+.ap-aulas { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; margin-inline: -2px; scrollbar-width: none; scroll-snap-type: x proximity; }
+.ap-aulas::-webkit-scrollbar { display: none; }
+.ap-aulas button { position: relative; flex: 0 0 auto; display: grid; gap: 3px; min-width: 84px; padding: 10px 14px 10px 12px; border-radius: 14px; border: 1px solid var(--rule); background: transparent; color: var(--ink); text-align: left; cursor: pointer; scroll-snap-align: start; transition: border-color 250ms, background-color 250ms; }
+.ap-aulas button small { font: 500 10.5px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.ap-aulas button b { font: 400 21px/1 var(--serif); letter-spacing: -0.02em; }
+.ap-aulas button span { font-size: 11.5px; color: var(--ink-2); }
+.ap-aulas button[aria-pressed="true"] { border-color: var(--gold); background: color-mix(in oklch, var(--gold) 12%, transparent); }
+.ap-aulas button.mk::after { content: "✓"; position: absolute; top: 7px; right: 8px; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--ok, oklch(0.7 0.15 150)); color: #fff; font: 700 10px/1 var(--sans); }
+.ap-aulas-t { margin-top: 6px; font-size: 12px; color: var(--ink-3); }
 .ap-go-n { display: flex; align-items: flex-end; gap: 10px; }
 .ap-go-n b { font: 400 54px/0.8 var(--serif); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
 .ap-go-n span { padding-bottom: 2px; font: italic 400 15px/1.15 var(--serif); color: var(--ink-2); max-width: 15ch; }
@@ -224,6 +234,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <p class="ap-lb">Presença</p>
         <p class="ap-hi" id="apPrH">Aula das 19h</p>
         <p class="ap-mut" style="margin-top:4px" id="apPrSub">Adulto · quinta, 15 de outubro</p>
+        <div class="ap-aulas-w" id="apAulasW" hidden>
+          <div class="ap-aulas" id="apAulas" role="group" aria-label="Aulas das próximas 48 horas"></div>
+          <p class="ap-aulas-t">Marque com até 48 horas de antecedência. Dá para treinar mais de uma vez no mesmo dia.</p>
+        </div>
         <div class="ap-card ap-go">
           <div class="ap-go-n"><b id="apGoN">7</b><span id="apGoT">de 10 vagas confirmadas</span></div>
           <div class="ap-dots" id="apGoDots" aria-hidden="true"></div>
@@ -496,6 +510,43 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     }
     return null;
   }
+  /* todas as aulas da turma que ainda não acabaram e começam em até 48 h (o Adulto inclui o Open Mat de sábado).
+     O aluno pode marcar várias, inclusive no mesmo dia */
+  var AULAS = [], MINHAS = {};
+  function aulas48(turma) {
+    var nome = TURMA[turma] || "Adulto", d = new Date(), agora = d.getTime(), lim = agora + 48 * 36e5, l = [];
+    for (var k = 0; k < 3; k++) {
+      var dia = new Date(d.getFullYear(), d.getMonth(), d.getDate() + k);
+      Site.aulasDo(dia.getDay()).forEach(function (c) {
+        if (c.n !== nome && !(nome === "Adulto" && c.n === "Open Mat")) return;
+        var ini0 = new Date(dia.getFullYear(), dia.getMonth(), dia.getDate(), +c.t.slice(0, 2), +c.t.slice(3)).getTime();
+        if (ini0 + 36e5 > agora && ini0 <= lim) l.push({ data: isoDia(dia), hora: c.t, turma: c.n, k: k, dia: dia });
+      });
+    }
+    return l.sort(function (a, b) { return a.data < b.data ? -1 : a.data > b.data ? 1 : mins(a.hora) - mins(b.hora); });
+  }
+  function chaveAula(a) { return a.data + "|" + a.hora; }
+  function diaCurto(a) { return a.k === 0 ? "Hoje" : a.k === 1 ? "Amanhã" : Site.DIAS[a.dia.getDay()].slice(0, 3); }
+  function paintAulas() {
+    var w = $("#apAulasW");
+    if (demo || semAula || !AULAS.length) { w.hidden = true; return; }
+    w.hidden = false;
+    $("#apAulas").innerHTML = AULAS.map(function (a, i) {
+      var sel = chaveAula(a) === chaveAula(AULA), mk = MINHAS[chaveAula(a)];
+      return '<button type="button" data-i="' + i + '" aria-pressed="' + sel + '"' + (mk ? ' class="mk"' : "") + ' aria-label="' + diaCurto(a) + ", " + Site.hora(a.hora) + ", " + a.turma + (mk ? ", vaga marcada" : "") + '">' +
+        "<small>" + diaCurto(a) + "</small><b>" + Site.hora(a.hora) + "</b><span>" + a.turma + "</span></button>";
+    }).join("");
+  }
+  $("#apAulas").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-i]");
+    if (!b || busy) return;
+    var a = AULAS[+b.dataset.i];
+    if (!a || chaveAula(a) === chaveAula(AULA)) return;
+    AULA = a; registered = false; confirmed = false; quem = [];
+    askRelease(false);
+    paintAula(); paintAulas(); paintSpot();
+    atualizarQuem();
+  });
   function quemDemo() {
     var l = QUEM0.map(function (q) { return { nome: curto(q[0]), faixa: q[1], graus: q[2], conf: q[3], chegou: registered && q[0] === "Felipe Antunes" ? "18:52" : null, eu: false }; });
     if (confirmed || registered) l.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, conf: confAt, chegou: registered ? regAt : null, eu: true });
@@ -557,7 +608,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     lista.innerHTML = quem.map(function (q) {
       var k = q.nome + "|" + q.eu, st = q.chegou ? '<span class="pill-s in">Chegou ' + q.chegou + "</span>" : q.conf ? '<span class="pill-s">Confirmou</span>' : "";
       return '<li data-k="' + esc(k) + '"' + (q.eu ? ' class="me' + (antes[k] ? "" : " new") + '"' : antes[k] || !Object.keys(antes).length ? "" : ' class="new"') + '><span class="av">' + ini(q.nome) + "</span><div><b>" + esc(q.eu ? "Você" : q.nome) + "</b><small>" +
-        '<i class="belt-s" style="--b:var(--b-' + q.faixa + ')"></i>' + (BELT[q.faixa] || "") + " · " + grausTx(q.graus) + "</small></div>" + st + "</li>";
+        '<i class="belt-s" style="' + Site.faixaCss(q.faixa) + '"></i>' + Site.faixaNome(q.faixa) + " · " + grausTx(q.graus) + "</small></div>" + st + "</li>";
     }).join("");
     $("#apWhoNone").hidden = !!quem.length || semAula;
     if (!registered) $("#apStep2").className = semAula ? "" : "now";
@@ -638,6 +689,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       var q = rs[0], pr = rs[1];
       quem = (q.data || []).map(function (x) { return { nome: x.nome, faixa: x.faixa, graus: x.graus, eu: !!x.eu, conf: hhmm(x.confirmou_em), chegou: x.chegou_em ? hhmm(x.chegou_em) : null }; });
       confirmed = quem.some(function (x) { return x.eu; });
+      if (confirmed) MINHAS[chaveAula(AULA)] = 1; else delete MINHAS[chaveAula(AULA)];
+      paintAulas();
       var antes = registered;
       registered = !!(pr.data && pr.data.chegou_em);
       if (registered) {
@@ -648,16 +701,26 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (registered && !antes) mostrarRegistro(false);
     }).catch(function () {});
   }
+  /* as vagas que o aluno já marcou (de hoje em diante), para o ✓ nos chips */
+  function minhasReservas() {
+    return Acesso.cliente().then(function (sb) { return sb.from("reservas").select("data, hora").gte("data", isoDia(new Date())); }).then(function (r) {
+      MINHAS = {};
+      (r.data || []).forEach(function (x) { MINHAS[x.data + "|" + x.hora] = 1; });
+      paintAulas();
+    }).catch(function () {});
+  }
   function carregarReal() {
     return Acesso.cliente().then(function (sb) {
-      return sb.from("alunos").select("id, nome, artigo, turma, horario, faixa, graus, inicio, mensalidade, vencimento").maybeSingle();
+      return sb.from("alunos").select("*").maybeSingle();
     }).then(function (r) {
       if (r.error || !r.data) return semCadastro();
       ALUNO = r.data;
       AULA = proximaAula(ALUNO.turma, ALUNO.horario);
       if (!AULA) { AULA = { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 }; return semCadastro(); }
+      AULAS = aulas48(ALUNO.turma);
+      if (!AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
       paintAula();
-      return Promise.all([atualizarQuem(), extrasReal()]);
+      return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]);
     }).catch(function () { toast("Sem conexão com o Studio. Confira a internet."); });
   }
   if (!demo) {
@@ -912,7 +975,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   function carregar() {
     return Promise.all([Mov.minhaFaixa(), Mov.progresso()]).then(function (r) {
-      FAIXA = Mov.FAIXAS[r[0]] ? r[0] : "branca";
+      FAIXA = Mov.FAIXAS[Site.faixaBase(r[0])] ? Site.faixaBase(r[0]) : "branca";
       PROG = r[1] || {};
       return Mov.lista({ faixa: FAIXA });
     }).then(function (l) { MOVS = l; paintLib(); });
@@ -1282,15 +1345,18 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $(".ap-hi", pf).nextElementSibling.textContent = (a.artigo === "a" ? "Aluna" : "Aluno") + " desde " + MESES[d.getMonth()] + " de " + d.getFullYear() + " · " + (TURMA[a.turma] || "Adulto") + (a.horario ? " " + Site.hora(a.horario) : "");
     var barra = fx === "preta" ? "oklch(0.55 0.2 27)" : "oklch(0.2 0.006 285)", st = "";
     for (var i = 0; i < Math.min(graus, 4); i++) st += '<rect x="' + (196 + i * 12.5) + '" y="1.5" width="5" height="31" fill="oklch(0.97 0.003 264)"/>';
-    var nomeF = BELT[fx] || "Branca";
-    $(".ap-belt", pf).outerHTML = '<svg class="ap-belt" viewBox="0 0 264 34" role="img" aria-label="Faixa ' + nomeF.toLowerCase() + ", " + (graus ? graus + (graus === 1 ? " grau" : " graus") : "sem grau") + '"><rect x=".5" y=".5" width="263" height="33" rx="2" fill="' + BC[fx] + '" stroke="oklch(0 0 0 / .12)"/>' +
+    var nomeF = Site.faixaNome(fx), base = Site.faixaBase(fx), listra = fx.split("-")[1];
+    $(".ap-belt", pf).outerHTML = '<svg class="ap-belt" viewBox="0 0 264 34" role="img" aria-label="Faixa ' + nomeF.toLowerCase() + ", " + (graus ? graus + (graus === 1 ? " grau" : " graus") : "sem grau") + '"><rect x=".5" y=".5" width="263" height="33" rx="2" fill="' + (Site.COR_FAIXA[base] || BC.branca) + '" stroke="oklch(0 0 0 / .12)"/>' +
+      (listra ? '<path d="M1 12h189v10H1zM248 12h15v10h-15z" fill="' + Site.COR_FAIXA[listra] + '"/>' : "") +
       '<g stroke="oklch(0 0 0 / .14)" stroke-width=".7"><line x1="2" x2="262" y1="7" y2="7"/><line x1="2" x2="262" y1="13" y2="13"/><line x1="2" x2="262" y1="20" y2="20"/><line x1="2" x2="262" y1="27" y2="27"/></g>' +
       '<rect x="190" y=".5" width="58" height="33" fill="' + barra + '"/>' + st + "</svg>";
     var row = $(".ap-belt", pf).nextElementSibling;
     $("span", row).textContent = "Faixa " + nomeF.toLowerCase();
     $(".r", row).textContent = graus + " de 4 graus";
     $(".ap-degs", pf).innerHTML = [0, 1, 2, 3].map(function (i) { return "<i" + (i < graus ? ' class="on"' : "") + "></i>"; }).join("");
-    var desde = g ? MEUS.pres.filter(function (x) { return x.data > g.data; }).length : MEUS.pres.length, s = semanas();
+    /* aulas feitas antes do app (lançadas pelo professor) contam se o último grau é anterior a elas */
+    var antes = a.aulas_antes && (!g || !a.aulas_antes_ate || g.data <= a.aulas_antes_ate) ? a.aulas_antes : 0;
+    var desde = (g ? MEUS.pres.filter(function (x) { return x.data > g.data; }).length : MEUS.pres.length) + antes, s = semanas();
     $("#apSince").textContent = desde;
     $("#apStreak").textContent = s.atual;
     $("#apStreakT").textContent = (s.atual === 1 ? "semana seguida" : "semanas seguidas") + " · recorde " + s.rec;
@@ -1307,7 +1373,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     else if (m && !m.pago_em && (diaDe(m.vencimento) - diaDe(hoje)) / 864e5 <= 3) l.push(["fee", "A mensalidade vence em " + br(m.vencimento), brl(m.valor) + ". Toque para ver."]);
     if (trained < goal) l.push(["meta", "Faltam " + (goal - trained) + (goal - trained === 1 ? " treino" : " treinos") + " para a meta da semana", "Meta: " + goal + (goal === 1 ? " treino" : " treinos") + ". Se não der, tudo bem."]);
     var g = MEUS.grads[0];
-    if (g && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push(["perfil", "Parabéns pelo grau!", (BELT[g.faixa] || "") + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + "."]);
+    if (g && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push(["perfil", "Parabéns pelo grau!", Site.faixaNome(g.faixa) + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + "."]);
     var box = $(".app-notes", noteV);
     box.innerHTML = l.map(function (x) {
       return '<button class="ap-note" type="button" data-note="' + x[0] + '"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>' + esc(x[1]) + '</b><span class="tx">' + esc(x[2]) + "</span></span></button>";

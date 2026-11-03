@@ -38,11 +38,19 @@
   P.num = function (t) { var s = String(t || "").replace(/[^\d,.-]/g, ""); if (s.indexOf(",") >= 0) s = s.replace(/\./g, "").replace(",", "."); var v = parseFloat(s); return isFinite(v) ? v : NaN; };
 
   /* ---------- faixas e turmas ---------- */
-  P.FAIXAS = { branca: "Branca", cinza: "Cinza", amarela: "Amarela", laranja: "Laranja", verde: "Verde", azul: "Azul", roxa: "Roxa", marrom: "Marrom", preta: "Preta" };
-  P.FX_AD = ["branca", "azul", "roxa", "marrom", "preta"];
-  P.FX_KD = ["branca", "cinza", "amarela", "laranja", "verde"];
-  P.beltTxt = function (f, g) { return (P.FAIXAS[f] || f) + " · " + (g ? g + (g === 1 ? " grau" : " graus") : "sem grau"); };
-  P.belt = function (f, g) { return '<span class="bl"><i class="belt-s" style="--b:var(--b-' + f + ')"></i><span>' + P.beltTxt(f, g) + "</span></span>"; };
+  /* as faixas vêm de Site (site.js): as do adulto e as do Kids, com listra branca, lisa e com listra preta */
+  P.FX_AD = Site.FX_AD;
+  P.FX_KD = Site.FX_KD;
+  P.FAIXAS = {};
+  P.FX_KD.concat(P.FX_AD).forEach(function (f) { P.FAIXAS[f] = Site.faixaNome(f); });
+  P.beltTxt = function (f, g) { return (P.FAIXAS[f] || Site.faixaNome(f)) + " · " + (g ? g + (g === 1 ? " grau" : " graus") : "sem grau"); };
+  P.belt = function (f, g) { return '<span class="bl"><i class="belt-s" style="' + Site.faixaCss(f) + '"></i><span>' + P.beltTxt(f, g) + "</span></span>"; };
+  /* aulas feitas antes do app: somam no total e, se o último grau é anterior a elas, também "desde o último grau" */
+  P.antes = function (a, dataGrau) {
+    var n = (a && a.aulas_antes) || 0;
+    if (!n) return 0;
+    return !dataGrau || !a.aulas_antes_ate || dataGrau <= a.aulas_antes_ate ? n : 0;
+  };
   P.TURMAS = { adulto: "Adulto", feminino: "Feminino", kids1: "Kids 1", kids2: "Kids 2" };
   /* a turma na grade (Site.GRADE): o Feminino treina junto com o Adulto */
   P.GRADE_TURMA = { adulto: "Adulto", feminino: "Adulto", kids1: "Kids 1", kids2: "Kids 2" };
