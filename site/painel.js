@@ -103,12 +103,13 @@
     return pag(0);
   };
   /* o SQL de 03/11 (faixas do Kids, aulas antes do app, reserva em 48 h e ranking no app) */
-  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261103120000_kids_reservas.sql";
-  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|faixa_check|42703|ranking_frequencia/.test(m); };
+  /* o SQL mais novo que o painel precisa (o plano família); os anteriores já foram rodados */
+  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261104120000_familia.sql";
+  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|ranking_frequencia/.test(m); };
   P.avisoBanco = function () {
     var el = $("#dbAviso");
     if (!el || !el.hidden) return;
-    el.innerHTML = "<b>Falta atualizar o banco de dados.</b>Sem isso não dá para lançar as aulas feitas antes do app nem usar as faixas do Kids. " +
+    el.innerHTML = "<b>Falta atualizar o banco de dados.</b>Sem isso não dá para usar o plano família (pai ou mãe com os filhos na mesma conta do app). " +
       'Abra o Supabase → SQL Editor → New query, cole <a href="' + P.SQL_ATUALIZA + '" target="_blank" rel="noopener">este arquivo</a> inteiro e clique em Run. Depois, recarregue esta página.';
     el.hidden = false;
   };
@@ -234,7 +235,7 @@
   try { aba = sessionStorage.getItem("evo-painel-aba"); } catch (e) {}
   P.iniciar = function () {
     /* o banco já recebeu a atualização de 03/11? (a coluna aulas_antes existe) */
-    P.db.then(function (sb) { return sb.from("alunos").select("aulas_antes").limit(1); }).then(function (r) { if (r && r.error && P.faltaAtualizar(r.error)) P.avisoBanco(); }).catch(function () {});
+    P.db.then(function (sb) { return sb.from("alunos").select("aulas_antes, responsavel_conta").limit(1); }).then(function (r) { if (r && r.error && P.faltaAtualizar(r.error)) P.avisoBanco(); }).catch(function () {});
     return Promise.all([P.carregarAlunos(), P.carregarPresencas()]).catch(function (e) { P.erro(e, "Não deu para carregar os dados"); })
       .then(function () { P.go(aba && $('.dv[data-v="' + aba + '"]') ? aba : "hoje"); });
   };

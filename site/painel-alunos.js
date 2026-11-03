@@ -69,6 +69,7 @@
       '<label class="crm-f"><span>Início no Studio</span><input class="crm-in" type="date" data-k="inicio" value="' + (a.inicio || P.hoje()) + '"></label>' +
       '<label class="crm-f"><span>Aulas feitas antes do app <small>(na faixa e grau de hoje)</small></span><input class="crm-in" data-k="aulas_antes" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (a.aulas_antes || "") + '"></label>' +
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><textarea class="crm-in" data-k="nota" rows="2">' + v("nota") + "</textarea></label>" +
+      (pre.responsavel_conta ? '<input type="hidden" data-k="responsavel_conta" value="' + esc(pre.responsavel_conta) + '"><p class="muted wide" style="font-size:12.5px">Vai entrar no plano família de <b>' + esc(pre.titular || "") + "</b>: a conta do app dele marca as aulas e faz o check-in.</p>" : "") +
       "</div>" +
       (a.id ? "" : '<label class="mf-pub"><input type="checkbox" data-k="mens1" checked><span>Lançar a mensalidade deste mês no Financeiro</span></label>' +
         '<label class="mf-pub"><input type="checkbox" data-k="app"' + (pre.email ? " checked" : "") + '><span>Criar o acesso ao app <small>(precisa do e-mail; no Kids, a conta é do responsável)</small></span></label>') +
@@ -96,7 +97,7 @@
         responsavel: kid ? (g("responsavel") || null) : null, nascimento: kid ? (g("nascimento") || null) : null,
         whatsapp: P.foneBanco(g("whatsapp")), email: (g("email") || "").toLowerCase() || null,
         faixa: g("faixa"), graus: +g("graus"), mensalidade: val ? P.num(val) : null, vencimento: +g("vencimento"), inicio: g("inicio") || P.hoje(),
-        nota: g("nota") || null, aulas_antes: g("aulas_antes") ? parseInt(g("aulas_antes").replace(/\D/g, ""), 10) || 0 : 0
+        nota: g("nota") || null, responsavel_conta: g("responsavel_conta") || undefined, aulas_antes: g("aulas_antes") ? parseInt(g("aulas_antes").replace(/\D/g, ""), 10) || 0 : 0
       },
       foneTxt: g("whatsapp"), mens1: g("mens1"), app: g("app")
     };
@@ -144,6 +145,7 @@
     btn.classList.add("loading");
     /* só manda o campo quando há aulas antes do app (assim funciona mesmo antes da migração das faixas do Kids) */
     if (x.d.aulas_antes) x.d.aulas_antes_ate = P.hoje(); else delete x.d.aulas_antes;
+    if (!x.d.responsavel_conta) delete x.d.responsavel_conta;
     P.q(function (sb) { return sb.from("alunos").insert(x.d).select().single(); }).then(function (novo) {
       var passos = [];
       if (x.mens1 && x.d.mensalidade > 0) {
@@ -203,6 +205,35 @@
     if (m.vencimento < P.hoje()) return '<span class="pill-s warn">Atrasada desde ' + P.dataBR(m.vencimento) + "</span>";
     return '<span class="pill-s">Vence ' + P.dataBR(m.vencimento) + "</span>";
   }
+  /* ---------- plano família: o titular (com acesso ao app) e os dependentes ligados à conta dele ---------- */
+  function familiaHTML(a) {
+    if (!("responsavel_conta" in a)) return '<div class="ficha-sec"><h5>Plano família</h5><p class="muted">Para usar o plano família, rode a atualização do banco (veja o aviso no topo do painel).</p></div>';
+    var tit = a.responsavel_conta ? P.alunos.filter(function (x) { return x.conta === a.responsavel_conta; })[0] : null;
+    if (a.responsavel_conta) {
+      return '<div class="ficha-sec"><h5>Plano família</h5><p>Dependente de <b>' + esc(tit ? tit.nome : "outra conta") + "</b>. A conta do app " + (tit ? "de " + esc(P.first(tit.nome)) : "do responsável") + " marca as aulas e faz o check-in.</p>" +
+        '<div class="msg-acts" style="margin-top:8px">' + (tit ? '<button class="mini-btn ghost" type="button" data-ficha2="' + tit.id + '">Abrir ' + esc(P.first(tit.nome)) + "</button>" : "") +
+        '<button class="mini-btn ghost" type="button" data-desfam="' + a.id + '">Tirar do plano família</button></div></div>';
+    }
+    if (!a.conta) return '<div class="ficha-sec"><h5>Plano família</h5><p class="muted">Para ' + esc(P.first(a.nome)) + " ser o titular de um plano família (pai ou mãe com os filhos na mesma conta), crie primeiro o acesso ao app dele no botão abaixo.</p></div>";
+    var deps = P.alunos.filter(function (x) { return x.responsavel_conta === a.conta && x.id !== a.id; });
+    var cand = P.ativos().filter(function (x) { return x.id !== a.id && !x.responsavel_conta && !x.conta; })
+      .sort(function (x, y) { return (P.kid(y.turma) - P.kid(x.turma)) || x.nome.localeCompare(y.nome); });
+    return '<div class="ficha-sec"><h5>Plano família</h5>' +
+      (deps.length ? '<ul class="ficha-list">' + deps.map(function (d) {
+        return '<li><span><button class="nm-btn" type="button" data-ficha2="' + d.id + '">' + esc(d.nome) + "</button> · " + esc(P.turmaTx(d)) + '</span><button class="mini-btn ghost" type="button" data-desfam="' + d.id + '">Tirar</button></li>';
+      }).join("") + "</ul>" : '<p class="muted">Sem dependentes. Adicione os filhos para ' + esc(P.first(a.nome)) + " marcar as aulas e fazer o check-in deles pelo app, na mesma conta.</p>") +
+      '<div class="fam-add">' +
+        (cand.length ? '<label class="crm-f"><span>Aluno já cadastrado</span><select class="sel" id="famSel"><option value="">Escolha…</option>' + cand.map(function (x) { return '<option value="' + x.id + '">' + esc(x.nome) + " · " + esc(P.turmaTx(x)) + "</option>"; }).join("") + "</select></label>" +
+          '<button class="mini-btn" type="button" data-addfam>Adicionar ao plano</button>' : "") +
+        '<button class="mini-btn ghost" type="button" data-novodep>Cadastrar dependente novo</button>' +
+      "</div></div>";
+  }
+  function mudaFamilia(alunoId, conta, msg, voltar) {
+    return P.q(function (sb) { return sb.from("alunos").update({ responsavel_conta: conta }).eq("id", alunoId); })
+      .then(P.carregarAlunos).then(function () { P.toast(msg); P.abrirAluno(voltar); })
+      .catch(function (e) { P.erro(e); });
+  }
+
   P.abrirAluno = function (id, cred) {
     var a = P.porId[id];
     if (!a) return;
@@ -231,6 +262,7 @@
         '<div class="ficha-sec"><h5>Frequência · 12 semanas</h5>' + heat(id) + '<p class="muted" style="margin-top:8px;font-size:12px">' + total + (total === 1 ? " aula" : " aulas") + " no último ano" + (antes ? " · mais " + antes + " antes do app" : "") + " · " + desdeGrau + " desde o último grau · última: " + P.quando(P.ultima(id)) + "</p></div>" +
         '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return "<li><span>" + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + "</span>" + statusMens(m) + "</li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
         '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return "<li><span>" + P.beltTxt(g.faixa, g.graus) + (g.nota ? " · " + esc(g.nota) : "") + "</span><span>" + P.dataBRano(g.data) + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
+        familiaHTML(a) +
         '<form class="crm-form" id="frAntes" novalidate hidden>' +
           '<p class="fin-k">Aulas feitas antes do app</p>' +
           '<p class="muted" style="font-size:13px;margin:4px 0 10px">Quantas aulas ' + esc(P.first(a.nome)) + " já tinha feito antes de usar o app, na faixa e grau de hoje. Somam no total e nas aulas desde o último grau, no painel e no app do aluno.</p>" +
@@ -266,6 +298,20 @@
         else if (b.hasAttribute("data-wa")) P.wa(a.whatsapp, "Oi, " + P.first(a.responsavel || a.nome) + "! Aqui é do Studio Evolution BJJ. ");
         else if (b.hasAttribute("data-edit")) editar(a, dr);
         else if (b.hasAttribute("data-grau")) P.registrarGrau(a.id);
+        else if (b.dataset.ficha2) P.abrirAluno(b.dataset.ficha2);
+        else if (b.dataset.desfam) {
+          var dd = P.porId[b.dataset.desfam];
+          mudaFamilia(dd.id, null, P.first(dd.nome) + " saiu do plano família.", a.id);
+        }
+        else if (b.hasAttribute("data-addfam")) {
+          var sel = $("#famSel", dr), dep = P.porId[sel.value];
+          if (!dep) { P.toast("Escolha o aluno que vai entrar no plano."); P.focusSoft(sel); return; }
+          mudaFamilia(dep.id, a.conta, P.first(dep.nome) + " agora está no plano família de " + P.first(a.nome) + ".", a.id);
+        }
+        else if (b.hasAttribute("data-novodep")) {
+          P.fecharFicha();
+          P.novoAluno({ turma: "kids1", responsavel: a.nome, whatsapp: a.whatsapp, email: a.email, responsavel_conta: a.conta, titular: a.nome });
+        }
         else if (b.hasAttribute("data-antes")) {
           var fa = $("#frAntes", dr), abre = fa.hidden;
           fa.hidden = !abre; b.setAttribute("aria-expanded", String(abre));
@@ -298,6 +344,7 @@
       if (!validar(f, x)) return;
       var d = x.d;
       delete d.faixa; delete d.graus;  /* faixa e graus mudam pelo registro de grau (fica o histórico) */
+      delete d.responsavel_conta;  /* a família muda na seção Plano família */
       if (d.aulas_antes !== (a.aulas_antes || 0)) d.aulas_antes_ate = d.aulas_antes ? P.hoje() : null;
       else delete d.aulas_antes;
       $('[type="submit"]', f).classList.add("loading");

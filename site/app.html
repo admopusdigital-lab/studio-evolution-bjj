@@ -294,6 +294,21 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap.app .ap-dock-go:active .coin { transform: translateY(3px); box-shadow: 0 1px 0 #7d5a1f, 0 6px 12px -6px oklch(0 0 0 / 0.7), inset 0 2px 1px oklch(1 0 0 / 0.65), 0 0 0 4px var(--paper); }
 .ap.app .ap-dock-go[aria-current="true"] .coin { animation: ap-coin 2.4s ease-in-out infinite; }
 @keyframes ap-coin { 50% { transform: translateY(-2px) rotateY(18deg); } }
+/* plano família: quem vai treinar (o pai, a mãe e os filhos na mesma conta) */
+.ap-fam { display: flex; gap: 8px; margin: 14px -16px 0; padding: 2px 16px 4px; overflow-x: auto; scrollbar-width: none; }
+.ap-fam::-webkit-scrollbar { display: none; }
+.ap-fam button { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; padding: 5px 14px 5px 5px; border-radius: 999px; border: 1px solid var(--rule); background: color-mix(in oklch, var(--ink) 4%, transparent); color: var(--ink-2); font: 600 12px/1 var(--sans); cursor: pointer; transition: border-color 250ms, background-color 250ms, color 250ms; }
+.ap-fam button .av { width: 28px; height: 28px; font-size: 10px; }
+.ap-fam button small { display: block; margin-top: 2px; font: 500 10px/1 var(--sans); color: var(--ink-3); }
+.ap-fam button[aria-pressed="true"] { border-color: var(--gold); color: var(--ink); background: color-mix(in oklch, var(--gold) 14%, transparent); box-shadow: 0 8px 18px -12px color-mix(in oklch, var(--gold) 80%, transparent); }
+.ap-fam button[aria-pressed="true"] .av { background: radial-gradient(circle at 35% 28%, #fff1b3, #e2b65a 45%, #a87a26); color: oklch(0.16 0.02 70); }
+.ap-famck { margin: 10px 0 2px; }
+.ap-famck p { font-size: 12px; color: var(--ink-2); }
+.ap-famck-l { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.ap-famck-l button { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--rule); background: none; color: var(--ink-2); font: 600 12px/1 var(--sans); cursor: pointer; }
+.ap-famck-l button::before { content: ""; width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid currentColor; }
+.ap-famck-l button[aria-pressed="true"] { border-color: var(--gold); color: var(--ink); }
+.ap-famck-l button[aria-pressed="true"]::before { border-color: var(--gold); background: var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23201a10' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E") center / 11px no-repeat; }
 @media (prefers-reduced-motion: reduce) { .ap.app .ap-views::before, .ap.app .ap-hero::before, .ap.app .ap-dock-go .coin { animation: none !important; } .ap-tk { transform: none; } }
 .ap-go-n { display: flex; align-items: flex-end; gap: 10px; }
 .ap-go-n b { font: 400 54px/0.8 var(--serif); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
@@ -372,6 +387,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       <section class="ap-view on" data-view="inicio" aria-label="Tela Início">
         <p class="ap-lb" id="apDate">Quinta, 15 de outubro</p>
         <p class="ap-hi" id="apHello">Boa noite, Marina.</p>
+        <div class="ap-fam" data-fam hidden role="group" aria-label="Quem vai treinar"></div>
         <div class="ap-card ap-hero" id="apHero">
           <p class="ap-lb gold">Sua aula de hoje</p>
           <div class="ap-big"><b>19h</b><span>Adulto</span></div>
@@ -422,6 +438,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       <!-- Presença: quem vai na aula de hoje, confirmar ou liberar a vaga e, no tatame, o código da aula -->
       <section class="ap-view" data-view="presenca" aria-label="Tela Presença">
         <p class="ap-lb">Agendar e presença</p>
+        <div class="ap-fam" data-fam hidden role="group" aria-label="Quem vai treinar"></div>
         <p class="ap-hi" id="apPrH">Aula das 19h</p>
         <p class="ap-mut" style="margin-top:4px" id="apPrSub">Adulto · quinta, 15 de outubro</p>
         <div class="ap-aulas-w" id="apAulasW" hidden>
@@ -452,6 +469,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
                 <input id="apCodeIn" type="text" inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="20" aria-describedby="apCodeHelp apCodeErr">
                 <div class="ap-code pulse" id="apCode" aria-hidden="true"><b class="caret"></b><b></b><b></b><b></b><b></b><b></b></div>
               </div>
+              <div class="ap-famck" id="apFamCk" hidden><p>Registrar a presença de:</p><div class="ap-famck-l" role="group" aria-label="Quem chegou no tatame"></div></div>
               <p class="ap-err" id="apCodeErr" role="alert"></p>
               <button class="ap-btn off" type="button" id="apRegister" aria-disabled="true">Registrar presença</button>
               <p class="ap-mut app-demo" id="apCodeDemo" hidden>Demonstração: o código de hoje na TV é <b>KTR 482</b>.</p>
@@ -676,6 +694,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     ["Aline Duarte", "branca", 2, "17:33"], ["Felipe Antunes", "azul", 1, "17:40"], ["Gustavo Lima", "roxa", 0, "17:52"]];
   var TURMA = { adulto: "Adulto", feminino: "Adulto", kids1: "Kids 1", kids2: "Kids 2" };
   var ALUNO = demo ? { nome: "Marina Alves", faixa: "azul", graus: 2 } : null;
+  /* plano família: os cadastros que a conta cuida (o próprio e os dependentes). Com mais de um, o app mostra
+     "quem vai treinar" e manda p_aluno para o banco; com um só, funciona como antes */
+  var FAMILIA = [], CK = {};
+  function comAluno(o) { if (FAMILIA.length > 1 && ALUNO && ALUNO.id) o.p_aluno = ALUNO.id; return o; }
   var AULA = { data: "", hora: "19:00", turma: "Adulto", k: 0 };
   var confirmed = false, registered = false, confAt = "", regAt = "", quem = [], busy = false, semAula = false;
   var confBtn = $("#apConfirm"), relBtn = $("#apRelease"), askEl = $("#apAsk"), btnRow = $("#apBtnRow");
@@ -750,7 +772,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (!demo) atualizarQuem();
     }
     var h = $("#apHero");
-    h.scrollIntoView({ block: "start", behavior: Site.reduce ? "auto" : "smooth" });
+    var v = h.closest(".ap-view");
+    if (v) v.scrollTo({ top: Math.max(0, h.offsetTop - 12), behavior: Site.reduce ? "auto" : "smooth" });
     h.classList.remove("flash"); void h.offsetWidth; h.classList.add("flash");
   }
   $("#apTix").addEventListener("click", function (e) {
@@ -764,7 +787,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       return toast("Vaga marcada: " + diaCurto(a).toLowerCase() + ", " + Site.hora(a.hora) + ".");
     }
     tixBusy = true; b.classList.add("loading");
-    Acesso.cliente().then(function (sb) { return sb.rpc("reservar", { p_data: a.data, p_hora: a.hora }); }).then(function (r) {
+    Acesso.cliente().then(function (sb) { return sb.rpc("reservar", comAluno({ p_data: a.data, p_hora: a.hora })); }).then(function (r) {
       tixBusy = false;
       if (r.error) { b.classList.remove("loading"); return toast(r.error.message || "Não deu para marcar. Tente de novo."); }
       MINHAS[k] = 1; paintTix(); paintAulas();
@@ -864,7 +887,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       return;
     }
     busy = true;
-    Acesso.cliente().then(function (sb) { return sb.rpc("reservar", { p_data: AULA.data, p_hora: AULA.hora }); }).then(function (r) {
+    Acesso.cliente().then(function (sb) { return sb.rpc("reservar", comAluno({ p_data: AULA.data, p_hora: AULA.hora })); }).then(function (r) {
       busy = false;
       if (r.error) { toast(r.error.message || "Não deu para confirmar. Tente de novo."); return atualizarQuem(); }
       toast("Vaga confirmada. Te esperamos às " + Site.hora(AULA.hora) + ".");
@@ -879,7 +902,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       toast("Vaga liberada. Obrigado por avisar.");
       return Promise.resolve();
     }
-    return Acesso.cliente().then(function (sb) { return sb.from("reservas").delete().eq("data", AULA.data).eq("hora", AULA.hora); }).then(function (r) {
+    return Acesso.cliente().then(function (sb) { return sb.from("reservas").delete().eq("aluno", ALUNO.id).eq("data", AULA.data).eq("hora", AULA.hora); }).then(function (r) {
       if (r.error) toast("Não deu para liberar a vaga. Tente de novo.");
       else toast("Vaga liberada. Obrigado por avisar.");
       return atualizarQuem();
@@ -922,8 +945,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (demo || semAula) return Promise.resolve();
     return Acesso.cliente().then(function (sb) {
       return Promise.all([
-        sb.rpc("confirmados_aula", { p_data: AULA.data, p_hora: AULA.hora }),
-        sb.from("presencas").select("chegou_em").eq("data", AULA.data).eq("hora", AULA.hora).maybeSingle()
+        sb.rpc("confirmados_aula", comAluno({ p_data: AULA.data, p_hora: AULA.hora })),
+        sb.from("presencas").select("chegou_em").eq("aluno", ALUNO.id).eq("data", AULA.data).eq("hora", AULA.hora).maybeSingle()
       ]);
     }).then(function (rs) {
       var q = rs[0], pr = rs[1];
@@ -941,9 +964,49 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (registered && !antes) { mostrarRegistro(false); carregarRank(); }
     }).catch(function () {});
   }
+  /* plano família: os botões "quem vai treinar" (Início e Agendar) e o "registrar a presença de" do check-in */
+  function faixaMini(x) { return '<i class="belt-s" style="' + Site.faixaCss(x.faixa) + ';width:16px;height:5px"></i>'; }
+  function paintFamilia() {
+    var on = FAMILIA.length > 1;
+    $$("[data-fam]").forEach(function (box) {
+      box.hidden = !on;
+      if (!on) return;
+      box.innerHTML = FAMILIA.map(function (x) {
+        return '<button type="button" data-membro="' + x.id + '" aria-pressed="' + (x.id === ALUNO.id) + '"><span class="av">' + ini(x.nome) + "</span><span>" + esc(x.nome.split(" ")[0]) +
+          "<small>" + (TURMA[x.turma] || "Adulto") + "</small></span></button>";
+      }).join("");
+    });
+    var ck = $("#apFamCk");
+    ck.hidden = !on;
+    if (on) $(".ap-famck-l", ck).innerHTML = FAMILIA.map(function (x) {
+      return '<button type="button" data-ck="' + x.id + '" aria-pressed="' + !!CK[x.id] + '">' + esc(x.nome.split(" ")[0]) + "</button>";
+    }).join("");
+  }
+  function trocarMembro(id) {
+    var x = FAMILIA.filter(function (m) { return m.id === id; })[0];
+    if (!x || x === ALUNO || busy) return;
+    ALUNO = x;
+    try { localStorage.setItem("evo-membro", id); } catch (e) {}
+    CK = {}; CK[id] = 1;
+    confirmed = false; registered = false; quem = []; semAula = false; MINHAS = {};
+    askRelease(false);
+    AULA = proximaAula(ALUNO.turma, ALUNO.horario) || { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 };
+    AULAS = aulas48(ALUNO.turma);
+    if (AULA.data && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
+    paintFamilia(); paintAula(); paintAulas(); paintSpot();
+    toast("Agora no app: " + ALUNO.nome.split(" ")[0] + ".");
+    Promise.all([minhasReservas(), atualizarQuem(), extrasReal(), carregarRank()]);
+    if (window.recarregarMov) window.recarregarMov();
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-membro]");
+    if (b) return trocarMembro(b.dataset.membro);
+    var c = e.target.closest("[data-ck]");
+    if (c) { CK[c.dataset.ck] = !CK[c.dataset.ck]; c.setAttribute("aria-pressed", String(!!CK[c.dataset.ck])); }
+  });
   /* as vagas que o aluno já marcou (de hoje em diante), para o ✓ nos chips */
   function minhasReservas() {
-    return Acesso.cliente().then(function (sb) { return sb.from("reservas").select("data, hora").gte("data", isoDia(new Date())); }).then(function (r) {
+    return Acesso.cliente().then(function (sb) { return sb.from("reservas").select("data, hora").eq("aluno", ALUNO.id).gte("data", isoDia(new Date())); }).then(function (r) {
       MINHAS = {};
       (r.data || []).forEach(function (x) { MINHAS[x.data + "|" + x.hora] = 1; });
       paintAulas();
@@ -951,15 +1014,27 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   function carregarReal() {
     return Acesso.cliente().then(function (sb) {
-      return sb.from("alunos").select("*").maybeSingle();
-    }).then(function (r) {
-      if (r.error || !r.data) return semCadastro();
-      ALUNO = r.data;
+      return Promise.all([sb.from("alunos").select("*").order("nome"), sb.auth.getSession()]);
+    }).then(function (rs) {
+      var r = rs[0], uid = rs[1] && rs[1].data && rs[1].data.session ? rs[1].data.session.user.id : null;
+      var l = (r.data || []).filter(function (x) { return x.ativo !== false; });
+      if (r.error || !l.length) return semCadastro();
+      /* o próprio cadastro primeiro, depois os dependentes */
+      l.sort(function (a, b) { return (b.conta === uid) - (a.conta === uid) || a.nome.localeCompare(b.nome); });
+      FAMILIA = l;
+      var salvo = null;
+      try { salvo = localStorage.getItem("evo-membro"); } catch (e) {}
+      ALUNO = l.filter(function (x) { return x.id === salvo; })[0] || l[0];
+      CK = {}; CK[ALUNO.id] = 1;
+      paintFamilia();
       AULA = proximaAula(ALUNO.turma, ALUNO.horario);
       if (!AULA) { AULA = { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 }; return semCadastro(); }
       AULAS = aulas48(ALUNO.turma);
       if (!AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
       paintAula();
+      /* com a família carregada, o ranking e os movimentos passam a ser do membro escolhido */
+      if (FAMILIA.length > 1) carregarRank();
+      if (window.recarregarMov) window.recarregarMov();
       return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]);
     }).catch(function () { toast("Sem conexão com o Studio. Confira a internet."); });
   }
@@ -1000,7 +1075,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       RK.l = RK_DEMO.map(function (q) { var k = RK.per === "mes" ? 1 : 9; return { posicao: q[0], nome: q[1], faixa: q[2], graus: q[3], aulas: q[4] * k, eu: q[1] === "Marina A." }; });
       return paintRank();
     }
-    return Acesso.cliente().then(function (sb) { return sb.rpc("ranking_frequencia", { p_dias: diasRank() }); }).then(function (r) {
+    return Acesso.cliente().then(function (sb) { return sb.rpc("ranking_frequencia", comAluno({ p_dias: diasRank() })); }).then(function (r) {
       /* banco ainda sem a atualização de 03/11: o cartão some em vez de mostrar erro */
       if (r.error) { $("#apRank").hidden = true; return; }
       $("#apRank").hidden = false;
@@ -1134,18 +1209,27 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (busy) return;
       busy = true;
       regBtn.classList.add("off");
-      Acesso.cliente().then(function (sb) { return sb.rpc("registrar_presenca", { p_codigo: typed }); }).then(function (r) {
+      /* plano família: registra a presença de cada membro marcado em "Registrar a presença de" */
+      var quem0 = FAMILIA.length > 1 ? FAMILIA.filter(function (x) { return CK[x.id]; }) : [ALUNO];
+      if (!quem0.length) { busy = false; regBtn.classList.remove("off"); return setErr("Marque quem chegou no tatame.", true); }
+      Acesso.cliente().then(function (sb) {
+        return Promise.all(quem0.map(function (x) { return sb.rpc("registrar_presenca", FAMILIA.length > 1 ? { p_codigo: typed, p_aluno: x.id } : { p_codigo: typed }); }));
+      }).then(function (rs) {
         busy = false;
-        if (r.error) {
+        var ok = [], erro = null;
+        rs.forEach(function (r, i) { if (r.error) erro = erro || r.error; else ok.push(quem0[i]); });
+        if (!ok.length) {
           paintCode();
-          setErr(r.error.message || "Código não confere. Confira na TV do tatame.", true);
+          setErr((erro && erro.message) || "Código não confere. Confira na TV do tatame.", true);
           if (document.activeElement === inp) inp.select();
           return;
         }
-        registered = true;
-        regAt = hhmm(r.data.chegou_em);
-        mostrarRegistro(true);
-        atualizarQuem();
+        var meu = ok.indexOf(ALUNO) >= 0 ? rs[quem0.indexOf(ALUNO)] : rs[quem0.indexOf(ok[0])];
+        registered = ok.indexOf(ALUNO) >= 0 || registered;
+        regAt = hhmm(meu.data.chegou_em);
+        if (registered) mostrarRegistro(true); else { inp.value = ""; typed = ""; paintCode(); }
+        if (FAMILIA.length > 1) setTimeout(function () { toast("Presença registrada: " + ok.map(function (x) { return x.nome.split(" ")[0]; }).join(" e ") + (erro ? ". " + erro.message : ".")); }, 700);
+        atualizarQuem(); extrasReal(); carregarRank();
       }).catch(function () { busy = false; paintCode(); setErr("Sem conexão. Tente de novo.", true); });
       return;
     }
@@ -1280,7 +1364,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $$("#apMovs img, #apContImg").forEach(function (im) { im.onerror = function () { im.hidden = true; }; });
   }
   function carregar() {
-    return Promise.all([Mov.minhaFaixa(), Mov.progresso()]).then(function (r) {
+    return Promise.all([ALUNO && ALUNO.faixa && !demo ? Promise.resolve(ALUNO.faixa) : Mov.minhaFaixa(), Mov.progresso()]).then(function (r) {
       FAIXA = Mov.FAIXAS[Site.faixaBase(r[0])] ? Site.faixaBase(r[0]) : "branca";
       PROG = r[1] || {};
       return Mov.lista({ faixa: FAIXA });
@@ -1527,6 +1611,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     else if (b.id === "aJaVi" && aula) { PROG[aula.id] = { visto: 0.9, quiz: pr(aula.id).quiz, em: new Date().toISOString() }; Mov.registrar(aula.id, { visto: 0.9 }).catch(function () {}); liberar(false); }
   });
   carregar();
+  window.recarregarMov = function () { catF = "todos"; carregar(); };
 
   /* ---------- Perfil: competências ---------- */
   function toggleComps(open) {
@@ -1574,9 +1659,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (demo || !ALUNO || !ALUNO.id) return Promise.resolve();
     return Acesso.cliente().then(function (sb) {
       return Promise.all([
-        sb.from("presencas").select("data, hora").order("data", { ascending: false }).limit(1000),
-        sb.from("mensalidades").select("competencia, valor, vencimento, pago_em, forma").order("competencia", { ascending: false }).limit(6),
-        sb.from("graduacoes").select("faixa, graus, data").order("data", { ascending: false })
+        sb.from("presencas").select("data, hora").eq("aluno", ALUNO.id).order("data", { ascending: false }).limit(1000),
+        sb.from("mensalidades").select("competencia, valor, vencimento, pago_em, forma").eq("aluno", ALUNO.id).order("competencia", { ascending: false }).limit(6),
+        sb.from("graduacoes").select("faixa, graus, data").eq("aluno", ALUNO.id).order("data", { ascending: false })
       ]);
     }).then(function (r) {
       MEUS.pres = r[0].data || []; MEUS.mens = r[1].data || []; MEUS.grads = r[2].data || [];

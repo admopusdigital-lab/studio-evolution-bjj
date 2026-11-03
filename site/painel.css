@@ -450,3 +450,6 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 .rk-pos { font-weight: 600; color: var(--ink-2); }
 .rk-bar { display: block; }
 td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; background: linear-gradient(90deg, var(--gold) var(--w), var(--rule) var(--w)); }
+/* plano família na ficha: escolher o dependente e os botões na mesma linha */
+.fam-add { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; margin-top: 12px; }
+.fam-add .crm-f { flex: 1 1 220px; margin: 0; }
