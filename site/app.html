@@ -184,7 +184,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap.app .ap-row .r { text-align: right; }
 .ap.app #apNext { color: var(--ink); font-weight: 500; }
 /* ranking: título, período em segmento e linhas mais compactas */
-.ap.app .ap-rk-h { align-items: flex-start; }
+.ap.app .ap-rk-h { align-items: flex-start; flex-wrap: wrap; row-gap: 10px; }
 .ap-rk-t { margin-top: 3px; font: 400 15px/1.2 var(--serif); }
 .ap.app .ap-rk-per { flex-shrink: 0; padding: 3px; border-radius: 999px; background: color-mix(in oklch, var(--ink) 6%, transparent); gap: 2px; }
 .ap.app .ap-rk-per button { border: 0; padding: 6px 11px; white-space: nowrap; }
@@ -212,8 +212,89 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-vazio b { font: 400 17px/1.2 var(--serif); color: var(--ink); }
 .ap.app .ap-cats button { border-radius: 999px; }
 .ap.app .ap-code b { border-radius: 10px; }
-.ap.app .ap-rk-t { font-size: 14px; }
+.ap.app .ap-rk-t { font-size: 13px; }
 :root:not([data-look="black"]) .ap.app .ap-card { box-shadow: 0 14px 30px -24px oklch(0 0 0 / 0.3); }
+
+/* ================= premium: luz ao fundo, cartão-herói em 3D, ingressos, anel da meta e o botão Agendar ================= */
+@property --ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+/* luz ambiente: duas manchas douradas que respiram devagar atrás de tudo */
+.ap.app .ap-views::before { content: ""; position: absolute; inset: -20% -30% auto; height: 90%; z-index: 0; pointer-events: none;
+  background: radial-gradient(45% 40% at 20% 20%, color-mix(in oklch, var(--gold) 16%, transparent), transparent 70%), radial-gradient(40% 35% at 85% 55%, color-mix(in oklch, #b98b35 12%, transparent), transparent 70%);
+  filter: blur(10px); animation: ap-aurora 14s ease-in-out infinite alternate; }
+@keyframes ap-aurora { to { transform: translate3d(6%, 8%, 0) scale(1.08); } }
+.ap.app .ap-view { z-index: 1; }
+.ap.app .ap-sec-h { display: flex; align-items: baseline; justify-content: space-between; margin-top: 22px; }
+.ap.app .ap-sec-s { font-size: 11px; color: var(--ink-3); }
+/* cartão-herói: borda de ouro que gira, inclinação 3D e brilho que segue o dedo */
+.ap.app .ap-hero { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d; transition: transform 600ms cubic-bezier(.2,.8,.2,1);
+  border: 0; isolation: isolate; box-shadow: 0 30px 50px -30px oklch(0 0 0 / 0.9), 0 10px 22px -16px color-mix(in oklch, var(--gold) 45%, transparent); }
+.ap.app .ap-hero.tilt { transition: transform 120ms linear; }
+.ap.app .ap-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; padding: 1.2px; border-radius: inherit; pointer-events: none;
+  background: conic-gradient(from var(--ang), color-mix(in oklch, var(--gold) 20%, transparent), #fff1b3, #e0b453, color-mix(in oklch, var(--gold) 15%, transparent) 40%, color-mix(in oklch, var(--gold) 15%, transparent) 60%, #e0b453, #fff1b3, color-mix(in oklch, var(--gold) 20%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: ap-ang 6s linear infinite; }
+@keyframes ap-ang { to { --ang: 360deg; } }
+.ap.app .ap-hero::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
+  background: radial-gradient(60% 50% at var(--gx, 30%) var(--gy, 0%), oklch(1 0 0 / 0.10), transparent 70%); mix-blend-mode: screen; }
+.ap.app .ap-hero > * { transform: translateZ(18px); }
+.ap.app .ap-hero .ap-big { transform: translateZ(40px); }
+.ap.app .ap-hero .ap-big b { font-size: 64px; color: var(--ink);
+  text-shadow: 0 1px 0 #e9c46a, 0 2px 0 #d4a849, 0 3px 0 #b98b35, 0 4px 0 #9c7128, 0 5px 0 #7d5a1f, 0 12px 18px oklch(0 0 0 / 0.55); }
+.ap.app .ap-hero.flash { animation: ap-flash 1.1s ease-out; }
+@keyframes ap-flash { 30% { box-shadow: 0 0 0 3px var(--gold), 0 30px 50px -30px oklch(0 0 0 / 0.9); } }
+/* ingressos das próximas 48 h */
+.ap-tix { display: flex; gap: 10px; margin: 10px -16px 0; padding: 6px 16px 18px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.ap-tix::-webkit-scrollbar { display: none; }
+.ap-tix-none { padding: 14px; font-size: 12.5px; color: var(--ink-3); }
+.ap-tk { position: relative; flex: 0 0 116px; display: grid; gap: 2px; padding: 14px 12px 12px; border-radius: 18px; scroll-snap-align: start;
+  background: linear-gradient(160deg, color-mix(in oklch, var(--ink) 9%, var(--paper-2)), var(--paper-2) 60%); border: 1px solid var(--rule);
+  box-shadow: 0 18px 26px -16px oklch(0 0 0 / 0.85), 0 2px 0 oklch(0 0 0 / 0.35), inset 0 1px 0 oklch(1 0 0 / 0.07); transition: transform 300ms cubic-bezier(.2,.8,.2,1), border-color 300ms; }
+.ap-tk:active { transform: scale(0.97); }
+.ap-tk .d { font: 600 10px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.ap-tk b { font: 400 30px/1 var(--serif); letter-spacing: -0.03em; }
+.ap-tk .t { font-size: 11.5px; color: var(--ink-2); padding-bottom: 10px; border-bottom: 1px dashed var(--rule); }
+.ap-tk button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; margin-top: 10px; height: 34px; border: 0; border-radius: 10px; cursor: pointer;
+  background: linear-gradient(180deg, #f6d27a, #d9a94a); color: oklch(0.17 0.02 70); font: 700 12px/1 var(--sans);
+  box-shadow: 0 3px 0 #9c7128, 0 8px 14px -6px oklch(0 0 0 / 0.6), inset 0 1px 0 oklch(1 0 0 / 0.6); transition: transform 120ms, box-shadow 120ms; }
+.ap-tk button:active { transform: translateY(3px); box-shadow: 0 0 0 #9c7128, 0 4px 8px -6px oklch(0 0 0 / 0.6), inset 0 1px 0 oklch(1 0 0 / 0.6); }
+.ap-tk button .ic { width: 14px; height: 14px; }
+.ap-tk button.loading { opacity: 0.6; pointer-events: none; }
+.ap-tk.mk { border-color: color-mix(in oklch, var(--ok, #3fbf7f) 55%, var(--rule)); background: linear-gradient(160deg, color-mix(in oklch, var(--ok, #3fbf7f) 16%, var(--paper-2)), var(--paper-2) 65%); }
+.ap-tk.mk button { background: color-mix(in oklch, var(--ok, #3fbf7f) 22%, transparent); color: var(--ok, #3fbf7f); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ok, #3fbf7f) 50%, transparent); }
+.ap-tk.atual { border-color: var(--gold); box-shadow: 0 18px 26px -16px oklch(0 0 0 / 0.85), 0 0 0 1px var(--gold), 0 0 22px -6px color-mix(in oklch, var(--gold) 60%, transparent); }
+/* meta da semana: anel de ouro com profundidade */
+.ap.app .ap-goalc { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 14px; align-items: center; margin-top: 4px; }
+.ap-ring { position: relative; width: 92px; height: 92px; filter: drop-shadow(0 10px 14px oklch(0 0 0 / 0.55)); }
+.ap-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ap-ring circle { fill: none; stroke-width: 11; }
+.ap-ring .bg { stroke: color-mix(in oklch, var(--ink) 10%, transparent); }
+.ap-ring .fg[stroke-dasharray^="0 "] { opacity: 0; }
+.ap-ring .fg { stroke: url(#gRing); stroke-linecap: round; transition: stroke-dasharray 900ms cubic-bezier(.2,.8,.2,1); }
+.ap-ring-n { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.ap-ring-n b { font: 400 34px/0.9 var(--serif); text-shadow: 0 1px 0 #d4a849, 0 2px 0 #b98b35, 0 3px 0 #7d5a1f, 0 8px 12px oklch(0 0 0 / 0.5); }
+.ap-ring-n span { font-size: 11px; color: var(--ink-3); }
+.ap-ring-n em { font-style: normal; }
+.ap-goalc.bateu .ap-ring { animation: ap-pop 900ms cubic-bezier(.2,1.6,.4,1); }
+@keyframes ap-pop { 40% { transform: scale(1.08); } }
+.ap-goal-t { margin-top: 4px; font: 400 19px/1.1 var(--serif); }
+.ap-goal-s { margin-top: 4px; font-size: 12px; color: var(--ink-2); }
+.ap-step { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; padding: 3px; border-radius: 999px; background: color-mix(in oklch, var(--ink) 6%, transparent); }
+.ap-step button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 50%; background: var(--paper-2); color: var(--ink); cursor: pointer; box-shadow: 0 2px 0 oklch(0 0 0 / 0.35), inset 0 1px 0 oklch(1 0 0 / 0.08); }
+.ap-step button:disabled { opacity: 0.35; cursor: default; }
+.ap-step button .ic { width: 14px; height: 14px; }
+.ap-step span { min-width: 0; padding: 0 4px; text-align: center; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.ap.app .ap-goalc .ap-wk { grid-column: 1 / -1; margin-top: 14px; }
+/* dock: o Agendar vira uma moeda de ouro que sobe da barra */
+.ap.app .ap-dock { overflow: visible; }
+.ap.app .ap-dock-go { color: var(--ink) !important; font-weight: 600; }
+.ap.app .ap-dock-go::before { display: none; }
+.ap.app .ap-dock-go .coin { display: grid; place-items: center; width: 46px; height: 46px; margin-top: -26px; margin-bottom: 1px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #fff1b3, #e2b65a 45%, #a87a26 100%); color: oklch(0.16 0.02 70);
+  box-shadow: 0 4px 0 #7d5a1f, 0 12px 20px -6px oklch(0 0 0 / 0.7), inset 0 2px 1px oklch(1 0 0 / 0.65), inset 0 -3px 6px oklch(0 0 0 / 0.25), 0 0 0 4px var(--paper); transition: transform 200ms; }
+.ap.app .ap-dock-go .coin .ic { width: 22px; height: 22px; stroke-width: 2; }
+.ap.app .ap-dock-go:active .coin { transform: translateY(3px); box-shadow: 0 1px 0 #7d5a1f, 0 6px 12px -6px oklch(0 0 0 / 0.7), inset 0 2px 1px oklch(1 0 0 / 0.65), 0 0 0 4px var(--paper); }
+.ap.app .ap-dock-go[aria-current="true"] .coin { animation: ap-coin 2.4s ease-in-out infinite; }
+@keyframes ap-coin { 50% { transform: translateY(-2px) rotateY(18deg); } }
+@media (prefers-reduced-motion: reduce) { .ap.app .ap-views::before, .ap.app .ap-hero::before, .ap.app .ap-dock-go .coin { animation: none !important; } .ap-tk { transform: none; } }
 .ap-go-n { display: flex; align-items: flex-end; gap: 10px; }
 .ap-go-n b { font: 400 54px/0.8 var(--serif); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
 .ap-go-n span { padding-bottom: 2px; font: italic 400 15px/1.15 var(--serif); color: var(--ink-2); max-width: 15ch; }
@@ -253,6 +334,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   <defs>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12l6 6L20 6"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M9.5 15l2 2 3.5-4"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+    <symbol id="i-plus2" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M2.5 10.5c3-1 6.5-4 9.5-6.5 3 2.5 6.5 5.5 9.5 6.5"/><path d="M5.5 10v9M18.5 10v9"/><path d="M3 20h18"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M19 6.5A9 9 0 1 0 20.5 15"/><path d="M10 8.5v7l6-3.5z"/></symbol>
     <symbol id="i-belt" viewBox="0 0 24 24"><path d="M2 9h7M15 9h7"/><rect x="9" y="6.5" width="6" height="5" rx="1"/><path d="M10.5 11.5L7.5 21M13.5 11.5l3 9.5"/></symbol>
@@ -288,14 +372,14 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       <section class="ap-view on" data-view="inicio" aria-label="Tela Início">
         <p class="ap-lb" id="apDate">Quinta, 15 de outubro</p>
         <p class="ap-hi" id="apHello">Boa noite, Marina.</p>
-        <div class="ap-card">
+        <div class="ap-card ap-hero" id="apHero">
           <p class="ap-lb gold">Sua aula de hoje</p>
           <div class="ap-big"><b>19h</b><span>Adulto</span></div>
           <p class="ap-sub" id="apVagas">Começa em 48 min · 7 de 10 vagas ocupadas</p>
           <div class="ap-dots" id="apDots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
           <button class="ap-strip" type="button" id="apStrip"><span class="ap-faces" id="apStripFaces" aria-hidden="true"></span><span class="tx" id="apStripTx">Veja quem vai</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></button>
           <div class="ap-btnrow" id="apBtnRow">
-            <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span>Confirmar vaga</span></button>
+            <button class="ap-btn pulse" type="button" id="apConfirm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span>Marcar esta aula</span></button>
             <button class="ap-link" type="button" id="apRelease" hidden>Liberar a vaga</button>
           </div>
           <div class="ap-ask" id="apAsk" hidden>
@@ -303,9 +387,26 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
             <div class="ap-btnrow"><button class="ap-btn" type="button" id="apRelYes">Liberar</button><button class="ap-btn ghost" type="button" id="apRelNo">Manter</button></div>
           </div>
         </div>
-        <div class="ap-wkh"><p class="ap-lb">Semana · <span id="apWeek">2 de 3</span> treinos</p><button class="ap-wkb" type="button" id="apGoal" aria-label="Mudar a meta da semana">mudar</button></div>
-        <!-- o ponto de quem treinou leva o texto para o leitor de tela; o de hoje só aparece depois da presença -->
-        <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
+        <!-- marcar aula: as aulas das próximas 48 h em "ingressos"; um toque marca a vaga -->
+        <div class="ap-sec-h"><p class="ap-lb">Marcar aula</p><span class="ap-sec-s">próximas 48 horas</span></div>
+        <div class="ap-tix" id="apTix" role="list" aria-label="Aulas que dá para marcar"></div>
+        <!-- meta da semana: o anel enche a cada treino; − e + mudam a meta (1 a 7) -->
+        <div class="ap-card ap-goalc" id="apGoalC">
+          <div class="ap-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><linearGradient id="gRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1b3"/><stop offset=".55" stop-color="#e2b65a"/><stop offset="1" stop-color="#a87a26"/></linearGradient></defs>
+            <circle class="bg" cx="60" cy="60" r="50"/><circle class="fg" id="apRingFg" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="0 100"/></svg>
+            <div class="ap-ring-n"><b id="apRingN">0</b><span>de <em id="apRingG">3</em></span></div></div>
+          <div class="ap-goal-tx">
+            <p class="ap-lb gold">Meta da semana</p>
+            <p class="ap-goal-t" id="apGoalT"><span id="apWeek">0 de 3</span> treinos</p>
+            <p class="ap-goal-s" id="apGoalS">Faltam 3 para bater a meta</p>
+            <div class="ap-step" role="group" aria-label="Mudar a meta da semana">
+              <button type="button" id="apGoalMenos" aria-label="Diminuir a meta"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-minus"/></svg></button>
+              <span id="apGoalV">3 treinos</span>
+              <button type="button" id="apGoal" aria-label="Aumentar a meta"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus2"/></svg></button>
+            </div>
+          </div>
+          <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
+        </div>
         <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r" id="apNext">segunda, 19 de outubro, 19h</span></div>
         <!-- ranking de frequência: os que mais treinaram (Adulto e Kids separados) -->
         <div class="ap-card ap-rank" id="apRank">
@@ -320,7 +421,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
       <!-- Presença: quem vai na aula de hoje, confirmar ou liberar a vaga e, no tatame, o código da aula -->
       <section class="ap-view" data-view="presenca" aria-label="Tela Presença">
-        <p class="ap-lb">Presença</p>
+        <p class="ap-lb">Agendar e presença</p>
         <p class="ap-hi" id="apPrH">Aula das 19h</p>
         <p class="ap-mut" style="margin-top:4px" id="apPrSub">Adulto · quinta, 15 de outubro</p>
         <div class="ap-aulas-w" id="apAulasW" hidden>
@@ -461,7 +562,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     </div>
     <nav class="ap-dock" id="apDock" aria-label="Abas do app">
       <button type="button" data-go="inicio" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Início</button>
-      <button type="button" data-go="presenca" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Presença</button>
+      <button type="button" data-go="presenca" aria-current="false" class="ap-dock-go"><span class="coin"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-cal"/></svg></span>Agendar</button>
       <button type="button" data-go="movimentos" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
       <button type="button" data-go="perfil" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Perfil</button>
     </nav>
@@ -617,6 +718,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function chaveAula(a) { return a.data + "|" + a.hora; }
   function diaCurto(a) { return a.k === 0 ? "Hoje" : a.k === 1 ? "Amanhã" : Site.DIAS[a.dia.getDay()].slice(0, 3); }
   function paintAulas() {
+    paintTix();
     var w = $("#apAulasW");
     if (demo || semAula || !AULAS.length) { w.hidden = true; return; }
     w.hidden = false;
@@ -626,6 +728,50 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         "<small>" + diaCurto(a) + "</small><b>" + Site.hora(a.hora) + "</b><span>" + a.turma + "</span></button>";
     }).join("");
   }
+  /* Início: as aulas das próximas 48 h como ingressos. Um toque em "Marcar" reserva a vaga direto;
+     um toque num ingresso já marcado abre a aula no cartão de cima (onde dá para ver quem vai e liberar) */
+  var tixBusy = false;
+  function paintTix() {
+    var box = $("#apTix");
+    if (!AULAS.length) { box.innerHTML = '<p class="ap-tix-none">Sem aulas da sua turma nas próximas 48 horas.</p>'; return; }
+    box.innerHTML = AULAS.map(function (a, i) {
+      var k = chaveAula(a), mk = !!MINHAS[k], sel = AULA && k === chaveAula(AULA);
+      return '<div class="ap-tk' + (mk ? " mk" : "") + (sel ? " atual" : "") + '" role="listitem">' +
+        '<span class="d">' + diaCurto(a) + "</span><b>" + Site.hora(a.hora) + "</b><span class=\"t\">" + a.turma + "</span>" +
+        '<button type="button" data-tix="' + i + '" aria-label="' + (mk ? "Aula marcada: " : "Marcar a aula de ") + diaCurto(a).toLowerCase() + ", " + Site.hora(a.hora) + '">' +
+        (mk ? '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Marcada' : "Marcar") + "</button></div>";
+    }).join("");
+  }
+  function abrirNoCartao(a) {
+    if (chaveAula(a) !== chaveAula(AULA)) {
+      AULA = a; registered = false; confirmed = !!MINHAS[chaveAula(a)]; quem = [];
+      askRelease(false);
+      paintAula(); paintAulas(); paintSpot();
+      if (!demo) atualizarQuem();
+    }
+    var h = $("#apHero");
+    h.scrollIntoView({ block: "start", behavior: Site.reduce ? "auto" : "smooth" });
+    h.classList.remove("flash"); void h.offsetWidth; h.classList.add("flash");
+  }
+  $("#apTix").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-tix]");
+    if (!b || tixBusy) return;
+    var a = AULAS[+b.dataset.tix], k = chaveAula(a);
+    if (MINHAS[k]) return abrirNoCartao(a);
+    if (demo) {
+      MINHAS[k] = 1; paintTix();
+      if (k === chaveAula(AULA)) { confirmed = true; confAt = clockTo(18 * 60 + 14); paintSpot(); }
+      return toast("Vaga marcada: " + diaCurto(a).toLowerCase() + ", " + Site.hora(a.hora) + ".");
+    }
+    tixBusy = true; b.classList.add("loading");
+    Acesso.cliente().then(function (sb) { return sb.rpc("reservar", { p_data: a.data, p_hora: a.hora }); }).then(function (r) {
+      tixBusy = false;
+      if (r.error) { b.classList.remove("loading"); return toast(r.error.message || "Não deu para marcar. Tente de novo."); }
+      MINHAS[k] = 1; paintTix(); paintAulas();
+      toast("Vaga marcada: " + diaCurto(a).toLowerCase() + ", " + Site.hora(a.hora) + ". Te esperamos!");
+      if (k === chaveAula(AULA)) atualizarQuem();
+    }).catch(function () { tixBusy = false; b.classList.remove("loading"); toast("Sem conexão. Tente de novo."); });
+  });
   $("#apAulas").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-i]");
     if (!b || busy) return;
@@ -636,6 +782,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     paintAula(); paintAulas(); paintSpot();
     atualizarQuem();
   });
+  if (demo) AULAS = aulas48("adulto");
   function quemDemo() {
     var l = QUEM0.map(function (q) { return { nome: curto(q[0]), faixa: q[1], graus: q[2], conf: q[3], chegou: registered && q[0] === "Felipe Antunes" ? "18:52" : null, eu: false }; });
     if (confirmed || registered) l.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, conf: confAt, chegou: registered ? regAt : null, eu: true });
@@ -671,7 +818,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     return falta > 90 ? "Começa em " + Math.floor(falta / 60) + "h" + (falta % 60 ? ("0" + falta % 60).slice(-2) : "") : "Começa em " + falta + " min";
   }
   function paintBtn(b, mine) {
-    $("span", b).textContent = registered ? "Presença registrada" : confirmed ? "Vaga confirmada" : b === goBtn ? "Vou treinar" : "Confirmar vaga";
+    $("span", b).textContent = registered ? "Presença registrada" : confirmed ? "Vaga confirmada" : b === goBtn ? "Vou treinar" : "Marcar esta aula";
     b.classList.toggle("ok", mine);
     b.classList.toggle("pulse", !mine && !semAula);
     if (mine || semAula) b.setAttribute("aria-disabled", "true"); else b.removeAttribute("aria-disabled");
@@ -711,6 +858,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (demo) {
       confirmed = true;
       confAt = clockTo(18 * 60 + 14);
+      MINHAS[chaveAula(AULA)] = 1; paintTix();
       paintSpot();
       toast("Vaga confirmada. Te esperamos às " + Site.hora(AULA.hora) + ".");
       return;
@@ -726,6 +874,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function release() {
     if (demo) {
       confirmed = false;
+      delete MINHAS[chaveAula(AULA)]; paintTix();
       paintSpot();
       toast("Vaga liberada. Obrigado por avisar.");
       return Promise.resolve();
@@ -873,17 +1022,29 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   var goal = 3, trained = 2;
   function paintGoal() {
     $("#apWeek").textContent = trained + " de " + goal;
+    var pct = Math.min(100, Math.round(trained / goal * 100)), falta = goal - trained;
+    $("#apRingFg").setAttribute("stroke-dasharray", pct + " 100");
+    $("#apRingN").textContent = trained;
+    $("#apRingG").textContent = goal;
+    $("#apGoalC").classList.toggle("bateu", falta <= 0);
+    $("#apGoalS").textContent = falta <= 0 ? "Meta batida! Bora manter o ritmo." : "Falta" + (falta === 1 ? " 1 treino" : "m " + falta + " treinos") + " para bater a meta";
+    $("#apGoalV").textContent = "Meta " + goal;
+    $("#apGoalMenos").disabled = goal <= 1;
+    $("#apGoal").disabled = goal >= 7;
     var g = $(".ap-goal", $("#apDone"));
     g.innerHTML = Array.apply(null, Array(goal)).map(function (_, i) { return '<i' + (i < trained ? ' class="on"' : "") + "></i>"; }).join("");
     $("p", $("#apDone")).textContent = "Presença registrada. " + (trained >= goal ? "Meta da semana batida: " + trained + " de " + goal + "." : "Faltam " + (goal - trained) + " para a meta da semana.");
   }
   if (!demo) { try { goal = +localStorage.getItem("evo-meta-semana") || 3; } catch (e) {} }
-  $("#apGoal").addEventListener("click", function () {
-    goal = goal % 5 + 1;
+  function mudaMeta(d) {
+    var n = Math.max(1, Math.min(7, goal + d));
+    if (n === goal) return;
+    goal = n;
     if (!demo) { try { localStorage.setItem("evo-meta-semana", String(goal)); } catch (e) {} if (window.paintAvisosReal) paintAvisosReal(); }
     paintGoal();
-    toast("Meta da semana: " + goal + (goal === 1 ? " treino." : " treinos."));
-  });
+  }
+  $("#apGoal").addEventListener("click", function () { mudaMeta(1); });
+  $("#apGoalMenos").addEventListener("click", function () { mudaMeta(-1); });
 
   /* ---------- Início: a mensalidade abre uma folha com o plano ---------- */
   var sheet = $("#apSheet"), scrim = $("#apScrim"), fee = $("#apFee");
@@ -1562,6 +1723,25 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
 
   paintGoal();
+  paintTix();
+  /* profundidade: o cartão da aula inclina com o dedo ou o mouse, e o brilho segue o ponto de toque */
+  (function () {
+    var h = $("#apHero");
+    if (!h || Site.reduce) return;
+    var raf = 0, tx = 0, ty = 0;
+    function set() { raf = 0; h.style.setProperty("--rx", (-ty * 7).toFixed(2) + "deg"); h.style.setProperty("--ry", (tx * 9).toFixed(2) + "deg"); h.style.setProperty("--gx", (50 + tx * 50).toFixed(1) + "%"); h.style.setProperty("--gy", (50 + ty * 50).toFixed(1) + "%"); }
+    function mv(e) {
+      var r = h.getBoundingClientRect(), p = e.touches ? e.touches[0] : e;
+      tx = Math.max(-1, Math.min(1, (p.clientX - r.left) / r.width * 2 - 1)); ty = Math.max(-1, Math.min(1, (p.clientY - r.top) / r.height * 2 - 1));
+      h.classList.add("tilt");
+      if (!raf) raf = requestAnimationFrame(set);
+    }
+    function sai() { tx = 0; ty = 0; h.classList.remove("tilt"); if (!raf) raf = requestAnimationFrame(set); }
+    h.addEventListener("pointermove", mv);
+    h.addEventListener("pointerleave", sai);
+    h.addEventListener("touchmove", mv, { passive: true });
+    h.addEventListener("touchend", sai);
+  })();
   paintSpot();
   if (anim) gsap.from(".ap.app .ap-view.on > *, .ap-dock", { y: 14, opacity: 0, duration: 0.8, stagger: 0.04, ease: "expo.out" });
 })();
