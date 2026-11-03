@@ -65,3 +65,37 @@ end;
 $$;
 revoke all on function public.reservar(date, text) from public, anon;
 grant execute on function public.reservar(date, text) to authenticated;
+
+-- ===== ranking de frequência para o app: os 10 que mais treinaram no período (e a posição de quem pergunta).
+-- Kids e Adulto têm rankings separados; o aluno vê o primeiro nome e a inicial do sobrenome, como em "quem vai" =====
+create or replace function public.ranking_frequencia(p_dias integer default 30)
+returns table (posicao integer, nome text, faixa text, graus smallint, aulas integer, eu boolean)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  with me as (
+    select a.id, a.turma from public.alunos a where a.id = privado.meu_aluno()
+  ), grupo as (
+    select case when (select turma from me) in ('kids1', 'kids2') then array['kids1', 'kids2']::text[] else array['adulto', 'feminino']::text[] end as g
+  ), base as (
+    select a.id, a.nome, a.faixa, a.graus, count(p.id)::integer as aulas
+    from public.alunos a
+    left join public.presencas p on p.aluno = a.id
+      and p.data > (now() at time zone 'America/Sao_Paulo')::date - greatest(1, least(coalesce(p_dias, 30), 400))
+    where a.ativo and a.turma = any ((select g from grupo)::text[])
+    group by a.id
+  ), r as (
+    select b.*, rank() over (order by b.aulas desc)::integer as pos from base b where b.aulas > 0
+  )
+  select r.pos,
+    split_part(trim(r.nome), ' ', 1) || coalesce(' ' || upper(left(nullif(split_part(trim(r.nome), ' ', 2), ''), 1)) || '.', ''),
+    r.faixa, r.graus, r.aulas, r.id = (select id from me)
+  from r
+  where (exists (select 1 from me) or privado.eh_professor())
+    and (r.pos <= 10 or r.id = (select id from me))
+  order by r.pos, r.nome;
+$$;
+revoke all on function public.ranking_frequencia(integer) from public, anon;
+grant execute on function public.ranking_frequencia(integer) to authenticated;

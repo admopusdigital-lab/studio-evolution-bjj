@@ -102,7 +102,18 @@
     }
     return pag(0);
   };
+  /* o SQL de 03/11 (faixas do Kids, aulas antes do app, reserva em 48 h e ranking no app) */
+  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261103120000_kids_reservas.sql";
+  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|faixa_check|42703|ranking_frequencia/.test(m); };
+  P.avisoBanco = function () {
+    var el = $("#dbAviso");
+    if (!el || !el.hidden) return;
+    el.innerHTML = "<b>Falta atualizar o banco de dados.</b>Sem isso não dá para lançar as aulas feitas antes do app nem usar as faixas do Kids. " +
+      'Abra o Supabase → SQL Editor → New query, cole <a href="' + P.SQL_ATUALIZA + '" target="_blank" rel="noopener">este arquivo</a> inteiro e clique em Run. Depois, recarregue esta página.';
+    el.hidden = false;
+  };
   P.erro = function (e, oQue) {
+    if (P.faltaAtualizar(e)) { P.avisoBanco(); P.toast("O banco ainda não foi atualizado. Veja o aviso no topo do painel."); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     var m = e && e.message ? e.message : "";
     var rede = !e || /fetch|network|Failed/i.test(m);
     P.toast((oQue || "Não deu para salvar") + (rede ? ". Confira a internet e tente de novo." : ": " + m));
@@ -222,6 +233,8 @@
   var aba = null;
   try { aba = sessionStorage.getItem("evo-painel-aba"); } catch (e) {}
   P.iniciar = function () {
+    /* o banco já recebeu a atualização de 03/11? (a coluna aulas_antes existe) */
+    P.db.then(function (sb) { return sb.from("alunos").select("aulas_antes").limit(1); }).then(function (r) { if (r && r.error && P.faltaAtualizar(r.error)) P.avisoBanco(); }).catch(function () {});
     return Promise.all([P.carregarAlunos(), P.carregarPresencas()]).catch(function (e) { P.erro(e, "Não deu para carregar os dados"); })
       .then(function () { P.go(aba && $('.dv[data-v="' + aba + '"]') ? aba : "hoje"); });
   };

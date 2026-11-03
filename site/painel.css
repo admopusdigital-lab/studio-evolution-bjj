@@ -427,3 +427,26 @@ textarea.crm-in { min-height: 64px; resize: vertical; }
 .pn-top nav .pn-sair { color: var(--warn); }
 @media (max-width: 860px) { [data-mode="painel"] .dash-in { min-height: 0; } .pn-top .pn-t { display: none; } }
 @media (max-width: 600px) { [data-mode="painel"] .pn-top { gap: 6px; } .pn-top .logo { width: 88px; } .pn-top nav :is(a, button) { padding: 0 8px; font-size: 12.5px; } }
+
+/* aviso: o banco ainda não recebeu a atualização */
+.db-aviso { margin-bottom: 18px; padding: 14px 16px; border-radius: 14px; border: 1px solid color-mix(in oklch, var(--warn, oklch(0.75 0.13 50)) 55%, transparent); background: color-mix(in oklch, var(--warn, oklch(0.75 0.13 50)) 12%, transparent); font-size: 14px; line-height: 1.5; }
+.db-aviso b { display: block; margin-bottom: 2px; }
+.db-aviso a { color: inherit; font-weight: 600; }
+/* ranking de frequência */
+.rk-bar { flex-wrap: wrap; gap: 8px 18px; }
+.rk-podio { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 18px 0 8px; padding: 0; list-style: none; }
+.rk-p { position: relative; display: grid; justify-items: start; gap: 6px; padding: 18px 16px 16px; border-radius: 16px; border: 1px solid var(--rule); background: color-mix(in oklch, var(--ink) 3%, transparent); }
+.rk-p .av { width: 44px; height: 44px; font-size: 15px; }
+.rk-podio .rk-p .nm-btn { font: 400 19px/1.1 var(--serif); letter-spacing: -0.01em; text-align: left; }
+.rk-p small { color: var(--ink-3); font-size: 12px; }
+.rk-m { position: absolute; top: 14px; right: 14px; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 400 17px/1 var(--serif); color: oklch(0.2 0.02 70);
+  box-shadow: inset 0 2px 1px rgb(255 255 255 / 0.55), inset 0 -3px 6px rgb(0 0 0 / 0.2), 0 6px 14px -6px rgb(0 0 0 / 0.5); }
+.rk-p.ouro { border-color: color-mix(in oklch, var(--gold) 60%, transparent); background: color-mix(in oklch, var(--gold) 10%, transparent); }
+.rk-p.ouro .rk-m { background: radial-gradient(circle at 35% 30%, #fff1b3, #e0b453 55%, #a87a26); }
+.rk-p.prata .rk-m { background: radial-gradient(circle at 35% 30%, #ffffff, #c9ccd3 55%, #8d929c); }
+.rk-p.bronze .rk-m { background: radial-gradient(circle at 35% 30%, #ffd6b0, #c98a52 55%, #8a5427); }
+.rk-n { margin-top: 4px; font: 400 34px/1 var(--serif); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.rk-n span { font: italic 400 14px/1 var(--serif); color: var(--ink-2); letter-spacing: 0; }
+.rk-pos { font-weight: 600; color: var(--ink-2); }
+.rk-bar { display: block; }
+td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; background: linear-gradient(90deg, var(--gold) var(--w), var(--rule) var(--w)); }

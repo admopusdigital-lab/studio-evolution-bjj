@@ -231,15 +231,32 @@
         '<div class="ficha-sec"><h5>Frequência · 12 semanas</h5>' + heat(id) + '<p class="muted" style="margin-top:8px;font-size:12px">' + total + (total === 1 ? " aula" : " aulas") + " no último ano" + (antes ? " · mais " + antes + " antes do app" : "") + " · " + desdeGrau + " desde o último grau · última: " + P.quando(P.ultima(id)) + "</p></div>" +
         '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return "<li><span>" + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + "</span>" + statusMens(m) + "</li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
         '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return "<li><span>" + P.beltTxt(g.faixa, g.graus) + (g.nota ? " · " + esc(g.nota) : "") + "</span><span>" + P.dataBRano(g.data) + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
+        '<form class="crm-form" id="frAntes" novalidate hidden>' +
+          '<p class="fin-k">Aulas feitas antes do app</p>' +
+          '<p class="muted" style="font-size:13px;margin:4px 0 10px">Quantas aulas ' + esc(P.first(a.nome)) + " já tinha feito antes de usar o app, na faixa e grau de hoje. Somam no total e nas aulas desde o último grau, no painel e no app do aluno.</p>" +
+          '<div class="crm-grid"><label class="crm-f"><span>Número de aulas</span><input class="crm-in" id="faN" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (antes || "") + '"></label></div>' +
+          '<p class="crm-err" role="alert"></p>' +
+          '<div class="msg-acts"><button class="mini-btn" type="submit">Salvar</button><button class="mini-btn ghost" type="button" data-cancel>Cancelar</button></div>' +
+        "</form>" +
         '<form class="crm-form" id="frEdit" novalidate hidden></form>' +
         '<div class="ficha-sec msg-acts">' +
           '<button class="mini-btn" type="button" data-edit>Editar dados</button>' +
           '<button class="mini-btn ghost" type="button" data-grau>Registrar grau</button>' +
+          '<button class="mini-btn ghost" type="button" data-antes aria-expanded="false">Aulas antes do app' + (antes ? " · " + antes : "") + "</button>" +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
           (a.email ? '<button class="mini-btn ghost" type="button" data-acesso>' + (a.conta ? "Senha nova do app" : "Criar acesso ao app") + "</button>" : "") +
           '<button class="mini-btn ghost" type="button" data-ativo>' + (a.ativo ? "Desativar aluno" : "Reativar aluno") + "</button>" +
         "</div>";
       $(".dr-body", dr).innerHTML = html;
+      $("#frAntes", dr).onsubmit = function (e) {
+        e.preventDefault();
+        var f = e.target, t = $("#faN", f).value.replace(/\s/g, ""), n = t === "" ? 0 : parseInt(t, 10);
+        if (!/^\d*$/.test(t) || !(n >= 0 && n <= 5000)) return P.erroForm(f, $("#faN", f), "Digite só o número de aulas, de 0 a 5000.");
+        $('[type="submit"]', f).classList.add("loading");
+        P.q(function (sb) { return sb.from("alunos").update({ aulas_antes: n, aulas_antes_ate: n ? P.hoje() : null }).eq("id", a.id); })
+          .then(P.carregarAlunos).then(function () { P.toast(n ? P.first(a.nome) + ": " + n + (n === 1 ? " aula" : " aulas") + " antes do app lançadas." : "Aulas antes do app zeradas."); P.abrirAluno(a.id); })
+          .catch(function (e2) { $('[type="submit"]', f).classList.remove("loading"); P.erro(e2); });
+      };
       var w = function (r) { return msgAcesso(a, r); };
       dr.onclick = function (e) {
         var b = e.target.closest("button");
@@ -249,6 +266,12 @@
         else if (b.hasAttribute("data-wa")) P.wa(a.whatsapp, "Oi, " + P.first(a.responsavel || a.nome) + "! Aqui é do Studio Evolution BJJ. ");
         else if (b.hasAttribute("data-edit")) editar(a, dr);
         else if (b.hasAttribute("data-grau")) P.registrarGrau(a.id);
+        else if (b.hasAttribute("data-antes")) {
+          var fa = $("#frAntes", dr), abre = fa.hidden;
+          fa.hidden = !abre; b.setAttribute("aria-expanded", String(abre));
+          if (abre) { fa.scrollIntoView({ block: "center", behavior: "smooth" }); P.focusSoft($("#faN", fa), { preventScroll: true }); }
+        }
+        else if (b.hasAttribute("data-cancel") && b.closest("#frAntes")) { $("#frAntes", dr).hidden = true; }
         else if (b.hasAttribute("data-acesso")) {
           b.classList.add("loading");
           if (a.conta) Acesso.conta({ acao: "nova-senha", email: a.email }).then(function (r) { if (r.ok) { r.reenvio = true; P.abrirAluno(a.id, r); } else { b.classList.remove("loading"); P.toast(r.msg); } });

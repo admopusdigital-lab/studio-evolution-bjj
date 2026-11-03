@@ -123,6 +123,27 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-faces .av:first-child { margin-left: 0; }
 .ap-faces .av.me { background: var(--gold); color: oklch(0.14 0.006 75); box-shadow: 0 0 0 2px var(--paper-2); }
 .ap-faces .av.more { background: var(--paper); color: var(--ink-3); }
+.ap-rank { margin-top: 18px; }
+.ap-rk-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ap-rk-per { display: flex; gap: 4px; }
+.ap-rk-per button { padding: 6px 10px; border-radius: 999px; border: 1px solid var(--rule); background: none; color: var(--ink-3); font: 500 11px/1 var(--sans); cursor: pointer; }
+.ap-rk-per button[aria-pressed="true"] { border-color: var(--gold); color: var(--ink); }
+.ap-rk { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.ap-rk li { display: grid; grid-template-columns: 30px 34px 1fr auto; align-items: center; gap: 10px; padding: 8px 6px; border-radius: 12px; }
+.ap-rk li.me { background: color-mix(in oklch, var(--gold) 13%, transparent); }
+.ap-rk .pos { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font: 400 13px/1 var(--serif); color: var(--ink-2); }
+.ap-rk li:nth-child(-n+3) .pos { color: oklch(0.2 0.02 70); box-shadow: inset 0 2px 1px rgb(255 255 255 / 0.5), inset 0 -2px 4px rgb(0 0 0 / 0.2); }
+.ap-rk .p1 { background: radial-gradient(circle at 35% 30%, #fff1b3, #e0b453 55%, #a87a26); }
+.ap-rk .p2 { background: radial-gradient(circle at 35% 30%, #fff, #c9ccd3 55%, #8d929c); }
+.ap-rk .p3 { background: radial-gradient(circle at 35% 30%, #ffd6b0, #c98a52 55%, #8a5427); }
+.ap-rk .av { width: 34px; height: 34px; font-size: 12px; }
+.ap-rk b { display: block; font-size: 14.5px; }
+.ap-rk small { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-3); }
+.ap-rk small .belt-s { width: 22px; height: 6px; }
+.ap-rk .n { font: 400 22px/1 var(--serif); font-variant-numeric: tabular-nums; text-align: right; }
+.ap-rk .n span { display: block; font: 500 9.5px/1.2 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.ap-rk-eu { margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+.ap-rk-vazio { padding: 10px 6px; font-size: 13.5px; color: var(--ink-3); }
 .ap-aulas-w { margin-top: 16px; }
 .ap-aulas { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; margin-inline: -2px; scrollbar-width: none; scroll-snap-type: x proximity; }
 .ap-aulas::-webkit-scrollbar { display: none; }
@@ -226,6 +247,14 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <!-- o ponto de quem treinou leva o texto para o leitor de tela; o de hoje só aparece depois da presença -->
         <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
         <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r" id="apNext">segunda, 19 de outubro, 19h</span></div>
+        <!-- ranking de frequência: os que mais treinaram (Adulto e Kids separados) -->
+        <div class="ap-card ap-rank" id="apRank">
+          <div class="ap-rk-h"><p class="ap-lb gold">Ranking de frequência</p>
+            <div class="ap-rk-per" role="group" aria-label="Período do ranking"><button type="button" data-d="30" aria-pressed="true">30 dias</button><button type="button" data-d="90" aria-pressed="false">3 meses</button></div></div>
+          <ol class="ap-rk" id="apRkL"></ol>
+          <p class="ap-rk-eu" id="apRkEu" hidden></p>
+          <button class="ap-link" type="button" id="apRkMais" hidden>Ver o top 10</button>
+        </div>
         <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
       </section>
 
@@ -698,7 +727,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         if (!confirmed) quem.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, eu: true, conf: "", chegou: regAt });
       }
       paintSpot();
-      if (registered && !antes) mostrarRegistro(false);
+      if (registered && !antes) { mostrarRegistro(false); carregarRank(); }
     }).catch(function () {});
   }
   /* as vagas que o aluno já marcou (de hoje em diante), para o ✓ nos chips */
@@ -728,6 +757,47 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     setInterval(function () { if (!document.hidden && current === "presenca" || !document.hidden && current === "inicio") atualizarQuem(); }, 30000);
     document.addEventListener("visibilitychange", function () { if (!document.hidden) atualizarQuem(); });
   }
+
+  /* ---------- ranking de frequência: no Supabase, ranking_frequencia() (top 10 da turma e a sua posição) ---------- */
+  var RK = { dias: 30, todos: false, l: [] };
+  var RK_DEMO = [[1, "Eduardo P.", "marrom", 1, 14], [2, "Thiago M.", "azul", 3, 12], [3, "Marina A.", "azul", 2, 11], [4, "Larissa M.", "branca", 1, 9], [4, "Gustavo L.", "roxa", 0, 9],
+    [6, "Felipe A.", "azul", 1, 8], [7, "Renata S.", "branca", 3, 7], [8, "Aline D.", "branca", 2, 6], [9, "Bruno C.", "branca", 0, 5], [10, "Paula R.", "azul", 0, 4]];
+  function paintRank() {
+    var l = RK.l, top = l.filter(function (x) { return x.posicao <= 10; }), eu = l.filter(function (x) { return x.eu; })[0];
+    var vis = RK.todos ? top : top.slice(0, 5);
+    $("#apRkL").innerHTML = vis.length ? vis.map(function (x) {
+      return '<li' + (x.eu ? ' class="me"' : "") + '><span class="pos' + (x.posicao <= 3 ? " p" + x.posicao : "") + '">' + x.posicao + '</span><span class="av">' + ini(x.nome) + "</span>" +
+        "<div><b>" + esc(x.eu ? "Você" : x.nome) + '</b><small><i class="belt-s" style="' + Site.faixaCss(x.faixa) + '"></i>' + Site.faixaNome(x.faixa) + "</small></div>" +
+        '<span class="n">' + x.aulas + "<span>" + (x.aulas === 1 ? "aula" : "aulas") + "</span></span></li>";
+    }).join("") : '<li class="ap-rk-vazio">Ninguém treinou nesse período ainda. Que tal abrir o ranking?</li>';
+    var euFora = eu && vis.indexOf(eu) < 0;
+    $("#apRkEu").hidden = !(euFora || (!eu && l.length));
+    $("#apRkEu").innerHTML = eu ? "Você está em <b>" + eu.posicao + "º</b>, com " + eu.aulas + (eu.aulas === 1 ? " aula." : " aulas.") : "Treine e registre a presença para entrar no ranking.";
+    $("#apRkMais").hidden = top.length <= 5;
+    $("#apRkMais").textContent = RK.todos ? "Ver só o top 5" : "Ver o top 10";
+  }
+  function carregarRank() {
+    if (demo) {
+      RK.l = RK_DEMO.map(function (q) { var k = RK.dias === 30 ? 1 : 3; return { posicao: q[0], nome: q[1], faixa: q[2], graus: q[3], aulas: q[4] * k, eu: q[1] === "Marina A." }; });
+      return paintRank();
+    }
+    return Acesso.cliente().then(function (sb) { return sb.rpc("ranking_frequencia", { p_dias: RK.dias }); }).then(function (r) {
+      /* banco ainda sem a atualização de 03/11: o cartão some em vez de mostrar erro */
+      if (r.error) { $("#apRank").hidden = true; return; }
+      $("#apRank").hidden = false;
+      RK.l = r.data || [];
+      paintRank();
+    }).catch(function () {});
+  }
+  $(".ap-rk-per", $("#apRank")).addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-d]");
+    if (!b || +b.dataset.d === RK.dias) return;
+    RK.dias = +b.dataset.d;
+    $$(".ap-rk-per button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    carregarRank();
+  });
+  $("#apRkMais").addEventListener("click", function () { RK.todos = !RK.todos; paintRank(); });
+  carregarRank();
 
   /* ---------- a meta da semana é da aluna: cada toque em "mudar" passa para a próxima (1 a 5 treinos) ---------- */
   var goal = 3, trained = 2;
