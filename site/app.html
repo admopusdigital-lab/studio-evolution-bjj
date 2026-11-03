@@ -154,6 +154,66 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-aulas button[aria-pressed="true"] { border-color: var(--gold); background: color-mix(in oklch, var(--gold) 12%, transparent); }
 .ap-aulas button.mk::after { content: "✓"; position: absolute; top: 7px; right: 8px; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--ok, oklch(0.7 0.15 150)); color: #fff; font: 700 10px/1 var(--sans); }
 .ap-aulas-t { margin-top: 6px; font-size: 12px; color: var(--ink-3); }
+
+/* ---------- acabamento do app no celular: cartões arredondados com profundidade, semana em pílulas,
+   rótulos menos espaçados, botões macios e listas alinhadas ---------- */
+.ap.app .ap-view { padding-inline: 16px; }
+.ap.app .ap-lb { letter-spacing: 0.13em; font-size: 10.5px; }
+.ap.app .ap-hi { font-size: 25px; }
+.ap.app .ap-card { margin-top: 14px; padding: 16px 16px 15px; border-radius: 18px; border: 1px solid var(--rule); border-top-color: color-mix(in oklch, var(--gold) 55%, var(--rule));
+  background: linear-gradient(170deg, color-mix(in oklch, var(--gold) 7%, var(--paper-2)) 0%, var(--paper-2) 55%); box-shadow: 0 18px 36px -26px oklch(0 0 0 / 0.75), inset 0 1px 0 oklch(1 0 0 / 0.04); }
+.ap.app .ap-big b { font-size: 54px; }
+.ap.app .ap-big span { font-size: 16px; color: var(--ink-2); }
+.ap.app .ap-sub { font-size: 12px; }
+.ap.app .ap-dots { gap: 3px; }
+.ap.app .ap-dots i { border-radius: 2px; }
+.ap.app .ap-btn { border-radius: 12px; min-height: 46px; box-shadow: 0 10px 22px -14px color-mix(in oklch, var(--gold) 70%, transparent); }
+.ap.app .ap-btn.ghost, .ap.app .ap-btn.ok { box-shadow: none; }
+.ap.app .ap-strip { border-top-color: color-mix(in oklch, var(--ink) 8%, transparent); }
+/* semana: cada dia é uma pílula; hoje com anel dourado; treino com o ponto */
+.ap.app .ap-wk { gap: 6px; }
+.ap.app .ap-wk div { padding: 8px 0 13px; border-radius: 14px; border: 1px solid transparent; background: color-mix(in oklch, var(--ink) 4%, transparent); }
+.ap.app .ap-wk .today { border-color: var(--gold); background: color-mix(in oklch, var(--gold) 12%, transparent); }
+.ap.app .ap-wk span { font-size: 9.5px; letter-spacing: 0.04em; }
+.ap.app .ap-wk b { font-size: 17px; }
+.ap.app .ap-wk i { bottom: 5px; width: 5px; height: 5px; margin-left: -2.5px; box-shadow: 0 0 0 3px color-mix(in oklch, var(--gold) 25%, transparent); }
+.ap.app .ap-wkb { font-size: 11.5px; }
+/* linhas de lista: mesmo recuo em botões e links (o botão do navegador tinha recuo próprio) */
+.ap.app .ap-rowbtn { padding-inline: 0; }
+.ap.app .ap-row { font-size: 12.5px; }
+.ap.app .ap-row .r { text-align: right; }
+.ap.app #apNext { color: var(--ink); font-weight: 500; }
+/* ranking: título, período em segmento e linhas mais compactas */
+.ap.app .ap-rk-h { align-items: flex-start; }
+.ap-rk-t { margin-top: 3px; font: 400 15px/1.2 var(--serif); }
+.ap.app .ap-rk-per { flex-shrink: 0; padding: 3px; border-radius: 999px; background: color-mix(in oklch, var(--ink) 6%, transparent); gap: 2px; }
+.ap.app .ap-rk-per button { border: 0; padding: 6px 11px; white-space: nowrap; }
+.ap.app .ap-rk-per button[aria-pressed="true"] { background: var(--gold); color: oklch(0.15 0.01 75); }
+.ap.app .ap-rk li { grid-template-columns: 26px 30px minmax(0, 1fr) auto; gap: 9px; padding: 7px 6px; }
+.ap.app .ap-rk .av { width: 30px; height: 30px; font-size: 10.5px; }
+.ap.app .ap-rk small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ap.app .ap-rk .n { font-size: 20px; }
+/* presença: chips das aulas e o cartão das vagas */
+.ap.app .ap-aulas button { border-radius: 14px; }
+.ap.app .ap-go-n b { font-size: 48px; }
+.ap.app .ap-go-n span { font-style: normal; font-family: var(--sans); font-size: 13px; line-height: 1.3; }
+.ap.app .ap-who-none { border-radius: 14px; }
+/* perfil: faixa com cantos e sombra; nome da faixa em uma linha com os graus ao lado */
+.ap.app .ap-belt { border-radius: 6px; box-shadow: 0 14px 26px -18px oklch(0 0 0 / 0.8); }
+.ap-fxrow > span:first-child { font: 400 18px/1.15 var(--serif); }
+.ap-fxrow .r { flex-shrink: 0; white-space: nowrap; }
+.ap.app .ap-degs i { height: 4px; border-radius: 2px; }
+.ap.app .ap-trio { margin-top: 18px; border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; }
+.ap.app .ap-trio div { padding: 14px 6px 12px; }
+.ap.app .ap-trio b { font-size: 28px; }
+/* movimentos sem vídeo ainda */
+.ap-vazio { display: grid; justify-items: center; gap: 6px; margin-top: 18px; padding: 30px 20px; border: 1px dashed var(--rule); border-radius: 18px; text-align: center; color: var(--ink-2); font-size: 12.5px; line-height: 1.45; }
+.ap-vazio .ic { width: 30px; height: 30px; color: var(--gold-text); }
+.ap-vazio b { font: 400 17px/1.2 var(--serif); color: var(--ink); }
+.ap.app .ap-cats button { border-radius: 999px; }
+.ap.app .ap-code b { border-radius: 10px; }
+.ap.app .ap-rk-t { font-size: 14px; }
+:root:not([data-look="black"]) .ap.app .ap-card { box-shadow: 0 14px 30px -24px oklch(0 0 0 / 0.3); }
 .ap-go-n { display: flex; align-items: flex-end; gap: 10px; }
 .ap-go-n b { font: 400 54px/0.8 var(--serif); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
 .ap-go-n span { padding-bottom: 2px; font: italic 400 15px/1.15 var(--serif); color: var(--ink-2); max-width: 15ch; }
@@ -249,8 +309,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r" id="apNext">segunda, 19 de outubro, 19h</span></div>
         <!-- ranking de frequência: os que mais treinaram (Adulto e Kids separados) -->
         <div class="ap-card ap-rank" id="apRank">
-          <div class="ap-rk-h"><p class="ap-lb gold">Ranking de frequência</p>
-            <div class="ap-rk-per" role="group" aria-label="Período do ranking"><button type="button" data-d="30" aria-pressed="true">30 dias</button><button type="button" data-d="90" aria-pressed="false">3 meses</button></div></div>
+          <div class="ap-rk-h"><div><p class="ap-lb gold">Ranking de frequência</p><p class="ap-rk-t" id="apRkT">Quem mais treinou no mês</p></div>
+            <div class="ap-rk-per" role="group" aria-label="Período do ranking"><button type="button" data-d="mes" aria-pressed="true">Mês</button><button type="button" data-d="ano" aria-pressed="false">Ano</button></div></div>
           <ol class="ap-rk" id="apRkL"></ol>
           <p class="ap-rk-eu" id="apRkEu" hidden></p>
           <button class="ap-link" type="button" id="apRkMais" hidden>Ver o top 10</button>
@@ -347,7 +407,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <rect x="196" y="1.5" width="5" height="31" fill="oklch(0.97 0.003 264)"/>
           <rect x="208.5" y="1.5" width="5" height="31" fill="oklch(0.97 0.003 264)"/>
         </svg>
-        <div class="ap-row" style="border-top:0;padding-bottom:0"><span style="font:400 19px/1 var(--serif)">Faixa azul</span><span class="r">2 de 4 graus</span></div>
+        <div class="ap-row ap-fxrow" style="border-top:0;padding-bottom:0"><span>Faixa azul</span><span class="r">2 de 4 graus</span></div>
         <div class="ap-degs"><i class="on"></i><i class="on"></i><i></i><i></i></div>
         <!-- "aulas desde o último grau" conta as presenças registradas: a de hoje leva 21 a 22 (register) -->
         <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b id="apStreak">6</b><span id="apStreakT">semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
@@ -606,7 +666,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (demo) return "Começa em " + (ini0 - now) + " min";
     if (AULA.k > 0) return (AULA.k === 1 ? "Amanhã" : Site.DIAS[AULA.dia.getDay()]) + ", às " + Site.hora(AULA.hora);
     var d = new Date(), m = d.getHours() * 60 + d.getMinutes();
-    return m < ini0 ? (ini0 - m > 90 ? "Hoje, às " + Site.hora(AULA.hora) : "Começa em " + (ini0 - m) + " min") : "Começou às " + Site.hora(AULA.hora);
+    if (m >= ini0) return "Começou às " + Site.hora(AULA.hora);
+    var falta = ini0 - m;
+    return falta > 90 ? "Começa em " + Math.floor(falta / 60) + "h" + (falta % 60 ? ("0" + falta % 60).slice(-2) : "") : "Começa em " + falta + " min";
   }
   function paintBtn(b, mine) {
     $("span", b).textContent = registered ? "Presença registrada" : confirmed ? "Vaga confirmada" : b === goBtn ? "Vou treinar" : "Confirmar vaga";
@@ -759,17 +821,25 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
 
   /* ---------- ranking de frequência: no Supabase, ranking_frequencia() (top 10 da turma e a sua posição) ---------- */
-  var RK = { dias: 30, todos: false, l: [] };
+  var RK = { per: "mes", todos: false, l: [] };
+  var MES_NOME = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  /* ranking_frequencia(p_dias) conta os últimos p_dias dias: o dia do mês dá o mês do calendário; o dia do ano, o ano */
+  function diasRank() {
+    var d = new Date();
+    return RK.per === "mes" ? d.getDate() : Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - new Date(d.getFullYear(), 0, 1)) / 864e5) + 1;
+  }
   var RK_DEMO = [[1, "Eduardo P.", "marrom", 1, 14], [2, "Thiago M.", "azul", 3, 12], [3, "Marina A.", "azul", 2, 11], [4, "Larissa M.", "branca", 1, 9], [4, "Gustavo L.", "roxa", 0, 9],
     [6, "Felipe A.", "azul", 1, 8], [7, "Renata S.", "branca", 3, 7], [8, "Aline D.", "branca", 2, 6], [9, "Bruno C.", "branca", 0, 5], [10, "Paula R.", "azul", 0, 4]];
   function paintRank() {
+    var hoje = new Date();
+    $("#apRkT").textContent = RK.per === "mes" ? "Quem mais treinou em " + MES_NOME[hoje.getMonth()] : "Quem mais treinou em " + hoje.getFullYear();
     var l = RK.l, top = l.filter(function (x) { return x.posicao <= 10; }), eu = l.filter(function (x) { return x.eu; })[0];
     var vis = RK.todos ? top : top.slice(0, 5);
     $("#apRkL").innerHTML = vis.length ? vis.map(function (x) {
       return '<li' + (x.eu ? ' class="me"' : "") + '><span class="pos' + (x.posicao <= 3 ? " p" + x.posicao : "") + '">' + x.posicao + '</span><span class="av">' + ini(x.nome) + "</span>" +
         "<div><b>" + esc(x.eu ? "Você" : x.nome) + '</b><small><i class="belt-s" style="' + Site.faixaCss(x.faixa) + '"></i>' + Site.faixaNome(x.faixa) + "</small></div>" +
         '<span class="n">' + x.aulas + "<span>" + (x.aulas === 1 ? "aula" : "aulas") + "</span></span></li>";
-    }).join("") : '<li class="ap-rk-vazio">Ninguém treinou nesse período ainda. Que tal abrir o ranking?</li>';
+    }).join("") : '<li class="ap-rk-vazio">Ninguém registrou presença ' + (RK.per === "mes" ? "neste mês" : "neste ano") + " ainda. Que tal abrir o ranking?</li>";
     var euFora = eu && vis.indexOf(eu) < 0;
     $("#apRkEu").hidden = !(euFora || (!eu && l.length));
     $("#apRkEu").innerHTML = eu ? "Você está em <b>" + eu.posicao + "º</b>, com " + eu.aulas + (eu.aulas === 1 ? " aula." : " aulas.") : "Treine e registre a presença para entrar no ranking.";
@@ -778,10 +848,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   function carregarRank() {
     if (demo) {
-      RK.l = RK_DEMO.map(function (q) { var k = RK.dias === 30 ? 1 : 3; return { posicao: q[0], nome: q[1], faixa: q[2], graus: q[3], aulas: q[4] * k, eu: q[1] === "Marina A." }; });
+      RK.l = RK_DEMO.map(function (q) { var k = RK.per === "mes" ? 1 : 9; return { posicao: q[0], nome: q[1], faixa: q[2], graus: q[3], aulas: q[4] * k, eu: q[1] === "Marina A." }; });
       return paintRank();
     }
-    return Acesso.cliente().then(function (sb) { return sb.rpc("ranking_frequencia", { p_dias: RK.dias }); }).then(function (r) {
+    return Acesso.cliente().then(function (sb) { return sb.rpc("ranking_frequencia", { p_dias: diasRank() }); }).then(function (r) {
       /* banco ainda sem a atualização de 03/11: o cartão some em vez de mostrar erro */
       if (r.error) { $("#apRank").hidden = true; return; }
       $("#apRank").hidden = false;
@@ -791,8 +861,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   $(".ap-rk-per", $("#apRank")).addEventListener("click", function (e) {
     var b = e.target.closest("button[data-d]");
-    if (!b || +b.dataset.d === RK.dias) return;
-    RK.dias = +b.dataset.d;
+    if (!b || b.dataset.d === RK.per) return;
+    RK.per = b.dataset.d;
     $$(".ap-rk-per button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
     carregarRank();
   });
@@ -1035,6 +1105,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var cats = Object.keys(Mov.CATS).filter(function (k) { return MOVS.some(function (m) { return m.cat === k; }); });
     if (catF !== "todos" && cats.indexOf(catF) < 0) catF = "todos";
     $("#apCats").innerHTML = ["todos"].concat(cats).map(function (k) { return '<button type="button" data-cat="' + k + '" aria-pressed="' + (k === catF) + '">' + (k === "todos" ? "Todos" : Mov.CATS[k]) + "</button>"; }).join("");
+    $("#apCats").hidden = !MOVS.length;
+    if (!MOVS.length) {
+      $("#apMovs").innerHTML = '<li class="ap-vazio"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg><b>Os vídeos da sua faixa chegam aqui</b><span>Quando o professor publicar os movimentos da ' + faixaTxt() + ", eles aparecem nesta tela, com quiz no fim de cada um.</span></li>";
+      return;
+    }
     $("#apMovs").innerHTML = MOVS.filter(function (m) { return catF === "todos" || m.cat === catF; }).map(function (m) {
       var c = capa(m);
       return '<li><button class="ap-mv" type="button" data-mov="' + m.id + '"><span class="th">' + (c ? '<img src="' + c + '" alt="">' : '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>') +
@@ -1375,7 +1450,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     trained = n;
     paintGoal();
     var p = proximaDepois();
-    $("#apNext").textContent = p ? new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(p.dia) + ", " + Site.hora(p.hora) : "—";
+    var hj = new Date(), dk = p ? Math.round((new Date(p.dia.getFullYear(), p.dia.getMonth(), p.dia.getDate()) - new Date(hj.getFullYear(), hj.getMonth(), hj.getDate())) / 864e5) : 0;
+    $("#apNext").textContent = !p ? "—" : (dk === 0 ? "Hoje" : dk === 1 ? "Amanhã" : new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "short" }).format(p.dia).replace(/^./, function (c) { return c.toUpperCase(); }).replace(".", "")) + ", " + Site.hora(p.hora);
   }
   function paintMens() {
     var agora = new Date(), comp = isoDia(agora).slice(0, 8) + "01", m = MEUS.mens.filter(function (x) { return x.competencia === comp; })[0], hoje = isoDia(agora);

@@ -3,12 +3,22 @@
 (function () {
   "use strict";
   var P = window.P, $ = P.$, esc = P.esc;
-  var PER = [["30", "30 dias"], ["90", "3 meses"], ["365", "12 meses"], ["tudo", "Desde o início"]];
+  /* por mês do calendário: o mês atual e os três anteriores; depois, o ano e desde o início */
+  var NOMES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  var PER = [0, 1, 2, 3].map(function (k) {
+    var m = P.mesIni(P.hoje()), d;
+    for (var i = 0; i < k; i++) { d = P.dia(m); d.setDate(0); m = P.mesIni(P.iso(d)); }
+    var nm = NOMES[+m.slice(5, 7) - 1];
+    return [m, nm.charAt(0).toUpperCase() + nm.slice(1) + (k === 0 ? " (este mês)" : "")];
+  }).concat([["ano", "Este ano"], ["tudo", "Desde o início"]]);
   var GR = [["todos", "Todos"], ["adulto", "Adulto"], ["kids", "Kids"]];
-  var per = "30", gr = "todos";
+  var per = PER[0][0], gr = "todos";
   function conta(a) {
-    var hoje = P.hoje(), ini = per === "tudo" ? "0000" : P.somaDias(hoje, -(+per) + 1);
-    var n = P.pres.filter(function (p) { return p.aluno === a.id && p.data >= ini; }).length;
+    var hoje = P.hoje(), ini, fim = "9999";
+    if (per === "tudo") ini = "0000";
+    else if (per === "ano") ini = hoje.slice(0, 4) + "-01-01";
+    else { ini = per; var d = P.dia(per); d.setMonth(d.getMonth() + 1); fim = P.iso(d); }
+    var n = P.pres.filter(function (p) { return p.aluno === a.id && p.data >= ini && p.data < fim; }).length;
     return per === "tudo" ? n + (a.aulas_antes || 0) : n;
   }
   function paint() {
@@ -19,8 +29,8 @@
       .sort(function (x, y) { return y.n - x.n || x.a.nome.localeCompare(y.a.nome); });
     /* empate divide a posição: 1, 2, 2, 4 */
     l.forEach(function (x, i) { x.pos = i && x.n === l[i - 1].n ? l[i - 1].pos : i + 1; });
-    var max = l.length ? l[0].n : 1, rot = PER.filter(function (x) { return x[0] === per; })[0][1].toLowerCase();
-    $("#rkK").textContent = l.length ? l.length + (l.length === 1 ? " aluno treinou" : " alunos treinaram") + " · " + rot : "Frequência";
+    var max = l.length ? l[0].n : 1, rot = PER.filter(function (x) { return x[0] === per; })[0][1].replace(" (este mês)", "").toLowerCase();
+    $("#rkK").textContent = l.length ? l.length + (l.length === 1 ? " aluno treinou" : " alunos treinaram") + " · " + (per.length === 10 ? "em " : "") + rot : "Frequência";
     var med = ["ouro", "prata", "bronze"];
     $("#rkPodio").innerHTML = l.slice(0, 3).map(function (x, i) {
       return '<li class="rk-p ' + med[Math.min(x.pos - 1, 2)] + '"><span class="rk-m" aria-hidden="true">' + x.pos + '</span><span class="av">' + P.ini(x.a.nome) + "</span>" +
