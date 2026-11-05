@@ -83,6 +83,7 @@
             (x.pago_em ? '<button class="mini-btn ghost" type="button" data-desfaz>Desfazer</button>'
               : '<select class="sel" data-forma aria-label="Forma de pagamento">' + Object.keys(FORMA).map(function (k) { return '<option value="' + k + '">' + FORMA[k] + "</option>"; }).join("") + '</select><button class="mini-btn" type="button" data-paga>Recebi</button>' +
                 (a && a.whatsapp ? '<button class="mini-btn wa" type="button" data-cobra>WhatsApp</button>' : "")) +
+            '<button class="mini-btn ghost" type="button" data-editm>Editar</button><button class="mini-btn ghost" type="button" data-apagam>Apagar</button>' +
             "</div></td></tr>";
         }).join("") + "</tbody></table>"
         : '<div class="empty-big">' + (l.length ? "Nada neste filtro." : "<b>Nenhuma mensalidade em " + P.mesNome(mes) + ".</b>" + (P.ativos().some(function (a) { return a.mensalidade > 0; }) ? "Toque em Lançar para criar as do mês." : "Cadastre o valor da mensalidade em cada aluno (Alunos → ficha → Editar dados).")) + "</div>") +
@@ -96,6 +97,29 @@
     if (b.dataset.ficha) return P.abrirAluno(b.dataset.ficha);
     var tr = b.closest("tr"), x = tr && MENS.filter(function (m) { return m.id === tr.dataset.id; })[0];
     if (!x) return;
+    if (b.hasAttribute("data-editm")) {
+      /* a linha vira um formulário: valor e vencimento */
+      tr.innerHTML = '<td><div class="nm"><span class="av">' + P.ini(nome(x.aluno)) + "</span><div><b>" + esc(nome(x.aluno)) + "</b><small>" + P.mesNome(x.competencia) + "</small></div></div></td>" +
+        '<td class="num"><input class="crm-in" data-ev inputmode="decimal" aria-label="Valor da mensalidade" value="' + String(x.valor).replace(".", ",") + '" style="max-width:110px;text-align:right"></td>' +
+        '<td><input class="crm-in" type="date" data-evenc aria-label="Vencimento" value="' + x.vencimento + '"></td>' +
+        '<td class="act"><div class="row-acts"><button class="mini-btn" type="button" data-salvam>Salvar</button><button class="mini-btn ghost" type="button" data-cancm>Cancelar</button></div></td>';
+      P.focusSoft($("[data-ev]", tr));
+      return;
+    }
+    if (b.hasAttribute("data-cancm")) return paintMens();
+    if (b.hasAttribute("data-salvam")) {
+      var v = P.num($("[data-ev]", tr).value), venc = $("[data-evenc]", tr).value;
+      if (!(v >= 0)) { P.toast("Digite o valor, como 200 ou 180,50."); P.focusSoft($("[data-ev]", tr)); return; }
+      if (!venc) { P.toast("Escolha o vencimento."); return; }
+      return salvarM(x, { valor: v, vencimento: venc }, b, "Mensalidade de " + P.first(nome(x.aluno)) + " agora é " + P.brl(v) + ", vence " + P.dataBR(venc) + ".");
+    }
+    if (b.hasAttribute("data-apagam")) {
+      if (b.dataset.certo !== "1") { b.dataset.certo = "1"; b.textContent = "Apagar mesmo?"; setTimeout(function () { if (document.contains(b)) { b.dataset.certo = ""; b.textContent = "Apagar"; } }, 4000); return; }
+      b.classList.add("loading");
+      return P.q(function (sb) { return sb.from("mensalidades").delete().eq("id", x.id); }).then(carregar)
+        .then(function () { P.toast("Mensalidade de " + P.first(nome(x.aluno)) + " em " + P.mesNome(x.competencia) + " apagada. Saiu do fechamento."); })
+        .catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+    }
     if (b.hasAttribute("data-paga")) salvarM(x, { pago_em: P.hoje(), forma: $("[data-forma]", tr).value }, b, "Baixa feita: " + P.first(nome(x.aluno)) + ", " + P.brl(x.valor) + ".");
     else if (b.hasAttribute("data-desfaz")) salvarM(x, { pago_em: null, forma: null }, b, "Baixa desfeita.");
     else if (b.hasAttribute("data-cobra")) {

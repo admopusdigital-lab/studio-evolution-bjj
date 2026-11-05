@@ -91,11 +91,29 @@
           (l.aula_data ? "<dt>Aula</dt><dd>" + esc(aulaTx(l)) + (l.codigo ? " · " + esc(l.codigo) : "") + "</dd>" : "") +
           "<dt>Chegou</dt><dd>" + P.dataBRano(l.criado_em) + "</dd>" +
         "</dl></div>" +
+        '<form class="crm-form" id="lfAula" novalidate><p class="fin-k">' + (l.aula_data ? "Remarcar a aula experimental" : "Agendar a aula experimental") + '</p><div class="crm-grid">' +
+          '<label class="crm-f"><span>Dia da aula</span><input class="crm-in" type="date" id="laDia" min="' + P.hoje() + '" value="' + (l.aula_data && l.aula_data >= P.hoje() ? l.aula_data : "") + '"></label>' +
+          '<label class="crm-f"><span>Horário</span><select class="sel" id="laHora"></select></label></div>' +
+          '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">' + (l.aula_data ? "Remarcar" : "Agendar aula") + "</button></div></form>" +
         '<form class="crm-form" id="lfNota" novalidate><label class="crm-f wide"><span>Anotação</span><textarea class="crm-in" id="lfNotaT" rows="3">' + esc(l.nota || "") + '</textarea></label><p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Salvar anotação</button></div></form>' +
         '<div class="ficha-sec"><h5>Histórico</h5><ul class="ficha-list">' + (ev || []).map(function (x) { return "<li><span>" + esc(x.texto) + "</span><span>" + P.dataBR(x.criado_em) + " " + P.hm(x.criado_em) + "</span></li>"; }).join("") + "</ul></div>" +
         '<div class="ficha-sec msg-acts">' + (l.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
           '<button class="mini-btn" type="button" data-matricula>Matricular como aluno</button><button class="mini-btn ghost" type="button" data-apaga>Apagar contato</button></div>' +
         '<div class="cfg-panel ask" id="ldDelAsk" hidden><p>Apagar o contato de ' + esc(l.nome) + ' e o histórico dele?</p><div class="msg-acts"><button class="mini-btn" type="button" data-apaga-sim>Apagar</button><button class="mini-btn ghost" type="button" data-apaga-nao>Manter</button></div></div>';
+      var kidL = l.programa === "kids", fa = $("#lfAula", dr), atualL = l.aula_hora ? l.aula_hora + "|" + (l.turma_aula || "") : "";
+      horasDoDia($("#laHora", fa), $("#laDia", fa).value, kidL, atualL);
+      $("#laDia", fa).onchange = function () { horasDoDia($("#laHora", fa), this.value, kidL, $("#laHora", fa).value); };
+      fa.onsubmit = function (e) {
+        e.preventDefault();
+        var dia = $("#laDia", fa).value, h = ($("#laHora", fa).value || "").split("|");
+        if (!dia || !h[0]) return P.erroForm(fa, $("#laDia", fa), "Escolha o dia e o horário da aula.");
+        var d = { etapa: "agendado", aula_data: dia, aula_hora: h[0], turma_aula: h[1] || null };
+        $('[type="submit"]', fa).classList.add("loading");
+        P.q(function (sb) { return sb.from("leads").update(d).eq("id", l.id); })
+          .then(function () { return registrar(l.id, (l.aula_data ? "Aula remarcada: " : "Aula agendada: ") + aulaTx(d)); })
+          .then(carregar).then(function () { P.toast("Aula experimental de " + P.first(l.nome) + ": " + aulaTx(d) + "."); abrir(l.id); })
+          .catch(function (er) { $('[type="submit"]', fa).classList.remove("loading"); P.erro(er); });
+      };
       $("#lfNota", dr).onsubmit = function (e) {
         e.preventDefault();
         var t = $("#lfNotaT").value.trim();
@@ -130,13 +148,19 @@
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><textarea class="crm-in" id="lfNota2" rows="2"></textarea></label></div>' +
       '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Salvar contato</button><button class="mini-btn ghost" type="button" data-cancel>Cancelar</button></div>';
   }
-  function sync() {
+  /* os horários da turma no dia escolhido; guarda o que já estava escolhido (antes, qualquer mudança no
+     formulário refazia a lista e o horário voltava para o primeiro: 8h no Adulto, 9h no Kids) */
+  function horasDoDia(sel, d, kid, atual) {
+    var wd = d ? P.dia(d).getDay() : null, l = [];
+    if (wd !== null) Site.aulasDo(wd).forEach(function (c) { if ((kid ? /^Kids/.test(c.n) : c.n === "Adulto")) l.push(c); });
+    sel.innerHTML = l.length ? l.map(function (c) { var v = c.t + "|" + c.n; return '<option value="' + v + '"' + (v === atual ? " selected" : "") + ">" + c.n + " " + Site.hora(c.t) + "</option>"; }).join("") : '<option value="">' + (d ? "Sem aula dessa turma nesse dia" : "Escolha o dia") + "</option>";
+  }
+  function sync(e) {
+    if (e && e.target && e.target.id === "lfHora") return;
     var kid = $("#lfProg").value === "kids", ag = $("#lfEtapa").value === "agendado";
     $$(".lf-kid", form).forEach(function (el) { el.hidden = !kid; });
     $$(".lf-aula", form).forEach(function (el) { el.hidden = !ag; });
-    var d = $("#lfDia").value, wd = d ? P.dia(d).getDay() : null, l = [];
-    if (wd !== null) Site.aulasDo(wd).forEach(function (c) { if ((kid ? /^Kids/.test(c.n) : c.n === "Adulto")) l.push(c); });
-    $("#lfHora").innerHTML = l.length ? l.map(function (c) { return '<option value="' + c.t + '|' + c.n + '">' + c.n + " " + Site.hora(c.t) + "</option>"; }).join("") : '<option value="">' + (d ? "Sem aula dessa turma nesse dia" : "Escolha o dia") + "</option>";
+    horasDoDia($("#lfHora"), $("#lfDia").value, kid, $("#lfHora").value);
   }
   add.addEventListener("click", function () {
     if (!form.hidden) { form.hidden = true; add.setAttribute("aria-expanded", "false"); return; }
