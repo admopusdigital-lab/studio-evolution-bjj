@@ -66,8 +66,8 @@
       '<label class="crm-f"><span>Graus</span><select class="sel" data-k="graus">' + [0, 1, 2, 3, 4, 5, 6].map(function (g) { return "<option" + ((a.graus || 0) === g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></label>" +
       '<label class="crm-f"><span>Mensalidade (R$)</span><input class="crm-in" data-k="mensalidade" inputmode="decimal" autocomplete="off" value="' + (a.mensalidade != null ? String(a.mensalidade).replace(".", ",") : "") + '"></label>' +
       '<label class="crm-f"><span>Vencimento</span><select class="sel" data-k="vencimento">' + Array.apply(null, Array(28)).map(function (_, i) { return '<option value="' + (i + 1) + '"' + ((a.vencimento || 10) === i + 1 ? " selected" : "") + ">dia " + (i + 1) + "</option>"; }).join("") + "</select></label>" +
-      '<label class="crm-f"><span>Início no Studio</span><input class="crm-in" type="date" data-k="inicio" value="' + (a.inicio || P.hoje()) + '"></label>' +
-      '<label class="crm-f"><span>Aulas feitas antes do app <small>(na faixa e grau de hoje)</small></span><input class="crm-in" data-k="aulas_antes" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (a.aulas_antes || "") + '"></label>' +
+      '<label class="crm-f"><span>Início no Studio</span><input class="crm-in" type="date" data-k="inicio" max="' + P.hoje() + '" value="' + (a.inicio || P.hoje()) + '"></label>' +
+      '<label class="crm-f"><span>Aulas no Studio antes do app <small>(na faixa e grau de hoje)</small></span><input class="crm-in" data-k="aulas_antes" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (a.aulas_antes || "") + '"></label>' +
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><textarea class="crm-in" data-k="nota" rows="2">' + v("nota") + "</textarea></label>" +
       (pre.responsavel_conta ? '<input type="hidden" data-k="responsavel_conta" value="' + esc(pre.responsavel_conta) + '"><p class="muted wide" style="font-size:12.5px">Vai entrar no plano família de <b>' + esc(pre.titular || "") + "</b>: a conta do app dele marca as aulas e faz o check-in.</p>" : "") +
       "</div>" +
@@ -112,6 +112,7 @@
     if (x.app && !d.email) return P.erroForm(f, el("email"), "Para criar o acesso ao app, digite o e-mail.");
     if (d.mensalidade !== null && !(d.mensalidade >= 0)) return P.erroForm(f, el("mensalidade"), "Valor da mensalidade em reais, como 200.");
     if (x.taxa !== 0 && !(x.taxa >= 0)) return P.erroForm(f, el("taxa"), "Taxa de matrícula em reais, como 100.");
+    if (d.inicio > P.hoje()) return P.erroForm(f, el("inicio"), "O início no Studio não pode ser no futuro.");
     if (!(d.aulas_antes >= 0 && d.aulas_antes <= 5000)) return P.erroForm(f, el("aulas_antes"), "Aulas antes do app: um número de 0 a 5000.");
     return true;
   }
@@ -154,7 +155,7 @@
         var p = primeiraParcela(x.d);
         passos.push(P.q(function (sb) { return sb.from("mensalidades").insert({ aluno: novo.id, competencia: p.competencia, valor: x.d.mensalidade, vencimento: p.vencimento }); }));
       }
-      if (x.d.graus || x.d.faixa !== "branca") passos.push(P.q(function (sb) { return sb.from("graduacoes").insert({ aluno: novo.id, faixa: x.d.faixa, graus: x.d.graus, data: x.d.inicio, nota: "Faixa ao entrar no Studio" }); }));
+      if (x.d.graus || x.d.faixa !== "branca") passos.push(P.q(function (sb) { return sb.from("graduacoes").insert({ aluno: novo.id, faixa: x.d.faixa, graus: x.d.graus, data: x.d.inicio, nota: P.NOTA_CADASTRO }); }));
       if (x.taxa > 0) passos.push(P.q(function (sb) { return sb.from("cobrancas").insert({ aluno: novo.id, descricao: "Taxa de matrícula", tipo: "matricula", valor: x.taxa, vencimento: P.hoje() }); }));
       if (preLead) passos.push(P.q(function (sb) { return sb.from("leads").update({ etapa: "matriculado" }).eq("id", preLead); }), P.q(function (sb) { return sb.from("lead_eventos").insert({ lead: preLead, texto: "Matriculado: cadastro de aluno criado" }); }));
       return Promise.all(passos).then(function () { return novo; });
@@ -304,14 +305,14 @@
           "<dt>No Studio desde</dt><dd>" + P.dataBRano(a.inicio) + (a.saida ? " · saiu em " + P.dataBRano(a.saida) : "") + "</dd>" +
           (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
         "</dl></div>" +
-        '<div class="ficha-sec"><h5>Frequência · 12 semanas</h5>' + heat(id) + '<p class="muted" style="margin-top:8px;font-size:12px">' + total + (total === 1 ? " aula" : " aulas") + " no último ano" + (antes ? " · mais " + antes + " antes do app" : "") + " · " + desdeGrau + " desde o último grau · última: " + P.quando(P.ultima(id)) + "</p></div>" +
+        '<div class="ficha-sec"><h5>Frequência · 12 semanas</h5>' + heat(id) + '<p class="muted" style="margin-top:8px;font-size:12px">' + total + (total === 1 ? " aula" : " aulas") + " no último ano" + (antes ? " · mais " + antes + " no Studio antes do app (" + (total + antes) + " no total)" : "") + " · " + desdeGrau + " desde o último grau · última: " + P.quando(P.ultima(id)) + "</p></div>" +
         '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return "<li><span>" + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + "</span>" + statusMens(m) + "</li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
         outrosHTML(a, cobs) +
-        '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return "<li><span>" + P.beltTxt(g.faixa, g.graus) + (g.nota ? " · " + esc(g.nota) : "") + "</span><span>" + P.dataBRano(g.data) + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
+        '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return "<li><span>" + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + "</span><span>" + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
         familiaHTML(a) +
         '<form class="crm-form" id="frAntes" novalidate hidden>' +
-          '<p class="fin-k">Aulas feitas antes do app</p>' +
-          '<p class="muted" style="font-size:13px;margin:4px 0 10px">Quantas aulas ' + esc(P.first(a.nome)) + " já tinha feito antes de usar o app, na faixa e grau de hoje. Somam no total e nas aulas desde o último grau, no painel e no app do aluno.</p>" +
+          '<p class="fin-k">Aulas no Studio antes do app</p>' +
+          '<p class="muted" style="font-size:13px;margin:4px 0 10px">Quantas aulas ' + esc(P.first(a.nome)) + " fez aqui no Studio Evolution antes de usar o app, desde o último grau (na faixa e grau de hoje). Somam no total e nas aulas desde o último grau, no painel e no app do aluno.</p>" +
           '<div class="crm-grid"><label class="crm-f"><span>Número de aulas</span><input class="crm-in" id="faN" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (antes || "") + '"></label></div>' +
           '<p class="crm-err" role="alert"></p>' +
           '<div class="msg-acts"><button class="mini-btn" type="submit">Salvar</button><button class="mini-btn ghost" type="button" data-cancel>Cancelar</button></div>' +
@@ -320,7 +321,7 @@
         '<div class="ficha-sec msg-acts">' +
           '<button class="mini-btn" type="button" data-edit>Editar dados</button>' +
           '<button class="mini-btn ghost" type="button" data-grau>Registrar grau</button>' +
-          '<button class="mini-btn ghost" type="button" data-antes aria-expanded="false">Aulas antes do app' + (antes ? " · " + antes : "") + "</button>" +
+          '<button class="mini-btn ghost" type="button" data-antes aria-expanded="false">Aulas no Studio antes do app' + (antes ? " · " + antes : "") + "</button>" +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
           (a.email ? '<button class="mini-btn ghost" type="button" data-acesso>' + (a.conta ? "Senha nova do app" : "Criar acesso ao app") + "</button>" : "") +
           '<button class="mini-btn ghost" type="button" data-ativo>' + (a.ativo ? "Desativar aluno" : "Reativar aluno") + "</button>" +
@@ -419,9 +420,9 @@
     return P.todos(function (sb) { return sb.from("graduacoes").select("id, aluno, faixa, graus, data, nota").order("data", { ascending: false }); }).then(function (l) {
       ultGrau = {};
       l.forEach(function (g) { if (!ultGrau[g.aluno]) ultGrau[g.aluno] = g; });
-      $("#grHist").innerHTML = l.slice(0, 15).map(function (g) {
+      $("#grHist").innerHTML = l.filter(function (g) { return !P.doCadastro(g); }).slice(0, 15).map(function (g) {
         var a = P.porId[g.aluno];
-        return "<li><span>" + esc(a ? a.nome : "Aluno removido") + " · " + P.beltTxt(g.faixa, g.graus) + "</span><span>" + P.dataBRano(g.data) + "</span></li>";
+        return "<li><span>" + esc(a ? a.nome : "Aluno removido") + " · " + P.beltTxt(g.faixa, g.graus) + (P.doCadastro(g) ? ' <small class="muted">· já tinha antes do app</small>' : "") + "</span><span>" + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + "</span></li>";
       }).join("") || '<li class="muted">Nenhum grau registrado ainda.</li>';
       paintGrad();
     });

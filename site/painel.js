@@ -237,6 +237,10 @@
     if (prox < h) { prox = data(ano + 1); }
     return { dias: Math.round((prox - h) / 864e5), idade: prox.getFullYear() - +n[0], data: prox };
   };
+  /* o grau lançado no cadastro é o que o aluno JÁ TINHA (dado antes, pelo professor, depois de avaliar), não graduação nova */
+  P.NOTA_CADASTRO = "Grau que já tinha antes do app";
+  P.doCadastro = function (g) { return !!(g && g.nota && /ao entrar no Studio|antes do app/i.test(g.nota)); };
+  P.notaGrau = function (g) { return P.doCadastro(g) ? "já tinha antes do app" : (g && g.nota) || ""; };
   P.ativos = function () { return P.alunos.filter(function (a) { return a.ativo; }); };
 
   /* ---------- volta para a aba em que estava ---------- */

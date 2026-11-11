@@ -1778,7 +1778,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       return Promise.all([
         sb.from("presencas").select("data, hora").eq("aluno", ALUNO.id).order("data", { ascending: false }).limit(1000),
         sb.from("mensalidades").select("competencia, valor, vencimento, pago_em, forma").eq("aluno", ALUNO.id).order("competencia", { ascending: false }).limit(6),
-        sb.from("graduacoes").select("faixa, graus, data").eq("aluno", ALUNO.id).order("data", { ascending: false }),
+        sb.from("graduacoes").select("faixa, graus, data, nota").eq("aluno", ALUNO.id).order("data", { ascending: false }),
         sb.from("cobrancas").select("descricao, valor, vencimento, pago_em").eq("aluno", ALUNO.id).order("vencimento", { ascending: false }).limit(6)
       ]);
     }).then(function (r) {
@@ -1869,7 +1869,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function paintPerfil() {
     var pf = screenOf("perfil"), a = ALUNO, g = MEUS.grads[0], fx = a.faixa || "branca", graus = a.graus || 0, d = diaDe(a.inicio || isoDia(new Date()));
     $(".ap-hi", pf).textContent = a.nome;
-    $(".ap-hi", pf).nextElementSibling.textContent = (a.artigo === "a" ? "Aluna" : "Aluno") + " desde " + MESES[d.getMonth()] + " de " + d.getFullYear() + " · " + (TURMA[a.turma] || "Adulto") + (a.horario ? " " + Site.hora(a.horario) : "");
+    /* todas as aulas no Studio Evolution: as registradas no app e as de antes do app, lançadas pelo professor */
+    var totalStudio = MEUS.pres.length + (a.aulas_antes || 0);
+    $(".ap-hi", pf).nextElementSibling.textContent = (a.artigo === "a" ? "Aluna" : "Aluno") + " desde " + MESES[d.getMonth()] + " de " + d.getFullYear() + " · " + (TURMA[a.turma] || "Adulto") + (a.horario ? " " + Site.hora(a.horario) : "") +
+      " · " + totalStudio + (totalStudio === 1 ? " aula" : " aulas") + " no Studio";
     var barra = fx === "preta" ? "oklch(0.55 0.2 27)" : "oklch(0.2 0.006 285)", st = "";
     for (var i = 0; i < Math.min(graus, 4); i++) st += '<rect x="' + (196 + i * 12.5) + '" y="1.5" width="5" height="31" fill="oklch(0.97 0.003 264)"/>';
     var nomeF = Site.faixaNome(fx), base = Site.faixaBase(fx), listra = fx.split("-")[1];
@@ -1900,7 +1903,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     else if (m && !m.pago_em && (diaDe(m.vencimento) - diaDe(hoje)) / 864e5 <= 3) l.push(["fee", "A mensalidade vence em " + br(m.vencimento), brl(m.valor) + ". Toque para ver."]);
     if (trained < goal) l.push(["meta", "Faltam " + (goal - trained) + (goal - trained === 1 ? " treino" : " treinos") + " para a meta da semana", "Meta: " + goal + (goal === 1 ? " treino" : " treinos") + ". Se não der, tudo bem."]);
     var g = MEUS.grads[0];
-    if (g && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push(["perfil", "Parabéns pelo grau!", Site.faixaNome(g.faixa) + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + "."]);
+    /* o grau lançado no cadastro é o que o aluno já tinha: não é graduação nova, não dá parabéns */
+    if (g && !/ao entrar no Studio|antes do app/i.test(g.nota || "") && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push(["perfil", "Parabéns pelo grau!", Site.faixaNome(g.faixa) + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + "."]);
     var box = $(".app-notes", noteV);
     box.innerHTML = l.map(function (x) {
       return '<button class="ap-note" type="button" data-note="' + x[0] + '"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>' + esc(x[1]) + '</b><span class="tx">' + esc(x[2]) + "</span></span></button>";
