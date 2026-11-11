@@ -192,17 +192,51 @@
   }
 
   /* ---------- a ficha ---------- */
-  function heat(id) {
-    /* 12 semanas, de segunda a sábado; a coluna é a semana e a linha o dia */
+  /* frequência da ficha: os números em cartões e o mapa das últimas 12 semanas (segunda a sábado),
+     com os dias e os meses escritos, a intensidade pela quantidade de aulas no dia e o total de cada semana */
+  var DS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"], MS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  function freqHTML(id, total, antes, desdeGrau) {
     var hoje = P.hoje(), d0 = P.dia(hoje), seg = new Date(d0); seg.setDate(d0.getDate() - ((d0.getDay() + 6) % 7) - 7 * 11);
-    var dias = {}, h = "";
-    P.pres.forEach(function (p) { if (p.aluno === id) dias[p.data] = 1; });
-    for (var dd = 0; dd < 6; dd++) for (var w = 0; w < 12; w++) {
-      var x = new Date(seg); x.setDate(seg.getDate() + w * 7 + dd);
-      var k = P.iso(x);
-      h += '<i class="' + (k > hoje ? "f" : dias[k] ? "y" : "") + '" title="' + P.dataBR(k) + (dias[k] ? ": veio" : "") + '"></i>';
+    var dias = {};
+    P.pres.forEach(function (p) { if (p.aluno === id) dias[p.data] = (dias[p.data] || 0) + 1; });
+    var sem = [], ini = P.iso(seg), noPeriodo = 0, max = 1;
+    for (var w = 0; w < 12; w++) {
+      var col = { dias: [], n: 0, mes: "" };
+      for (var dd = 0; dd < 6; dd++) {
+        var x = new Date(seg); x.setDate(seg.getDate() + w * 7 + dd);
+        var k = P.iso(x), n = dias[k] || 0;
+        col.dias.push({ k: k, n: n, fut: k > hoje, hoje: k === hoje, wd: dd });
+        col.n += n;
+        if (x.getDate() <= 7 && dd === 0 || w === 0 && dd === 0) col.mes = MS[x.getMonth()];
+      }
+      noPeriodo += col.n; max = Math.max(max, col.n);
+      sem.push(col);
     }
-    return '<div class="heat-w" role="img" aria-label="Frequência das últimas 12 semanas: ' + Object.keys(dias).filter(function (k) { return k >= P.iso(seg); }).length + ' aulas">' + h + "</div>";
+    var media = noPeriodo / 12, ult = P.ultima(id);
+    var cel = "";
+    for (var r = 0; r < 6; r++) {
+      cel += '<span class="fq-d">' + DS[r] + "</span>";
+      sem.forEach(function (c) {
+        var x = c.dias[r], lvl = x.fut ? "f" : x.n >= 2 ? "l2" : x.n === 1 ? "l1" : "";
+        cel += '<i class="' + lvl + (x.hoje ? " hj" : "") + '" title="' + DS[x.wd] + " " + P.dataBR(x.k) + (x.fut ? "" : ": " + (x.n ? x.n + (x.n === 1 ? " aula" : " aulas") : "não veio")) + '"></i>';
+      });
+    }
+    var meses = '<span></span>' + sem.map(function (c) { return '<span class="fq-m">' + c.mes + "</span>"; }).join("");
+    var barras = '<span class="fq-d">sem.</span>' + sem.map(function (c) {
+      return '<span class="fq-b" title="' + c.n + (c.n === 1 ? " aula na semana" : " aulas na semana") + '"><i style="height:' + (c.n ? Math.max(14, Math.round(c.n / max * 100)) : 0) + '%"></i><em>' + (c.n || "") + "</em></span>";
+    }).join("");
+    return '<div class="fq-kpis">' +
+        '<div class="fq-k gold"><b>' + (total + antes) + "</b><span>aulas no Studio" + (antes ? "<small>" + total + " no app + " + antes + " antes</small>" : "") + "</span></div>" +
+        '<div class="fq-k"><b>' + desdeGrau + "</b><span>desde o último grau</span></div>" +
+        '<div class="fq-k"><b>' + media.toFixed(1).replace(".", ",").replace(",0", "") + "</b><span>por semana<small>últimas 12 semanas</small></span></div>" +
+        '<div class="fq-k"><b class="sm">' + esc(P.quando(ult)) + "</b><span>última aula</span></div>" +
+      "</div>" +
+      '<div class="fq" role="img" aria-label="Frequência das últimas 12 semanas: ' + noPeriodo + (noPeriodo === 1 ? " aula" : " aulas") + '">' +
+        '<div class="fq-g fq-top">' + meses + "</div>" +
+        '<div class="fq-g">' + cel + "</div>" +
+        '<div class="fq-g fq-bars">' + barras + "</div>" +
+      "</div>" +
+      '<div class="fq-leg"><span><i></i>não veio</span><span><i class="l1"></i>1 aula</span><span><i class="l2"></i>2 aulas</span><span><i class="hj"></i>hoje</span><span class="fq-tot">' + noPeriodo + (noPeriodo === 1 ? " aula" : " aulas") + " em 12 semanas</span></div>";
   }
   function statusMens(m) {
     if (m.pago_em) return '<span class="pill-s in">Paga ' + P.dataBR(m.pago_em) + "</span>";
@@ -305,7 +339,7 @@
           "<dt>No Studio desde</dt><dd>" + P.dataBRano(a.inicio) + (a.saida ? " · saiu em " + P.dataBRano(a.saida) : "") + "</dd>" +
           (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
         "</dl></div>" +
-        '<div class="ficha-sec"><h5>Frequência · 12 semanas</h5>' + heat(id) + '<p class="muted" style="margin-top:8px;font-size:12px">' + total + (total === 1 ? " aula" : " aulas") + " no último ano" + (antes ? " · mais " + antes + " no Studio antes do app (" + (total + antes) + " no total)" : "") + " · " + desdeGrau + " desde o último grau · última: " + P.quando(P.ultima(id)) + "</p></div>" +
+        '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + "</div>" +
         '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return "<li><span>" + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + "</span>" + statusMens(m) + "</li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
         outrosHTML(a, cobs) +
         '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return "<li><span>" + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + "</span><span>" + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
