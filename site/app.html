@@ -504,7 +504,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
             </div></div></li>
           <li class="later" id="apStep3"><span class="ap-mk">2</span><div><p class="ap-st">Presença registrada</p><p>Conta para a meta da semana.</p></div></li>
         </ol>
-        <div class="ap-done" id="apDone" hidden><b>18:55</b><p>Presença registrada. Meta da semana batida: 3 de 3.</p><div class="ap-goal"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
+        <div class="ap-done" id="apDone" hidden><b>18:55</b><p>Presença registrada. Meta da semana batida: 3 de 3.</p><div class="ap-goal"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          <button class="ap-link" type="button" id="apOutra" hidden>Vou fazer outra aula hoje</button></div>
       </section>
 
       <!-- Movimentos: a biblioteca da faixa do aluno (movimentos.js). Cada movimento abre a tela da aula -->
@@ -993,6 +994,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (confirmed) MINHAS[chaveAula(AULA)] = 1; else delete MINHAS[chaveAula(AULA)];
       paintAulas();
       var antes = registered;
+      var reg0 = !!(pr.data && pr.data.chegou_em);
+      if (!reg0 && $("#apCodeWrap").hidden) abrirCheckin();
       registered = !!(pr.data && pr.data.chegou_em);
       if (registered) {
         regAt = hhmm(pr.data.chegou_em);
@@ -1390,6 +1393,32 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     mostrarRegistro(true);
   }
   /* fresh: acabou de registrar (conta na meta, anima e avisa); senão, o app abriu com a presença já feita */
+  /* o check-in volta a aparecer para a aula escolhida: dá para registrar duas aulas no mesmo dia,
+     cada uma com o código dela (cada aula conta uma presença) */
+  function abrirCheckin() {
+    var wrap = $("#apCodeWrap"), done = $("#apDone");
+    if (window.gsap) gsap.killTweensOf(wrap);
+    wrap.style.height = ""; wrap.style.opacity = ""; wrap.hidden = false;
+    done.hidden = true;
+    $("#apStep2").className = "now"; $(".ap-mk", $("#apStep2")).textContent = "1";
+    $("#apStep3").className = "later"; $(".ap-mk", $("#apStep3")).textContent = "2";
+    $("#apStep2h").textContent = "Digite o código da aula";
+    $("#apCodeHelp").textContent = "3 letras e 3 números, mostrados na TV do tatame.";
+    inp.value = ""; typed = ""; setErr("", false);
+    paintCode();
+  }
+  /* a próxima aula de hoje da turma, depois da que acabou de ser registrada */
+  function outraHoje() {
+    return AULAS.filter(function (a) { return a.k === 0 && chaveAula(a) !== chaveAula(AULA) && mins(a.hora) > mins(AULA.hora); })[0] || null;
+  }
+  $("#apOutra").addEventListener("click", function () {
+    var a = outraHoje();
+    if (!a) return;
+    AULA = a; registered = false; confirmed = !!MINHAS[chaveAula(a)]; quem = [];
+    paintAula(); paintAulas(); paintSpot(); abrirCheckin();
+    atualizarQuem();
+    Site.focusSoft(inp, { preventScroll: false });
+  });
   function mostrarRegistro(fresh) {
     askRelease(false);
     paintSpot();
@@ -1397,6 +1426,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     [$("#apStep2"), $("#apStep3")].forEach(function (li) { li.className = "done"; $(".ap-mk", li).innerHTML = CHECK; });
     $("#apStep2h").textContent = cod.length === 6 ? "Código digitado" : "Presença na aula";
     $("#apCodeHelp").textContent = (cod.length === 6 ? cod.slice(0, 3) + " " + cod.slice(3) + " · " : "") + "às " + regAt;
+    $("#apOutra").hidden = demo || !outraHoje();
     if (!fresh) { wrap.hidden = true; $("b", done).textContent = regAt; done.hidden = false; $("p", done).textContent = "Presença registrada."; return; }
     trained++;
     paintGoal();
