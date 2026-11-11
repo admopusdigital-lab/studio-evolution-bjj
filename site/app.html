@@ -1783,7 +1783,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       ]);
     }).then(function (r) {
       MEUS.pres = r[0].data || []; MEUS.mens = r[1].data || []; MEUS.grads = r[2].data || []; MEUS.cobs = r[3] && !r[3].error ? r[3].data || [] : [];
-      paintSemana(); paintMens(); paintPerfil(); paintAvisosReal();
+      paintSemana(); paintMens(); paintPerfil(); paintAvisosReal(); niver();
     }).catch(function () {});
   }
   /* a próxima aula da turma depois da que está no Início */
@@ -1799,13 +1799,25 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     }
     return null;
   }
+  /* aniversário do membro que está no app: parabéns no Início, uma vez por dia */
+  function niver() {
+    if (!ALUNO || !ALUNO.nascimento) return;
+    var n = String(ALUNO.nascimento).split("-"), d = new Date();
+    if (+n[1] !== d.getMonth() + 1 || +n[2] !== d.getDate()) return;
+    var nome = ALUNO.nome.split(" ")[0], idade = d.getFullYear() - +n[0];
+    $("#apHello").textContent = "Feliz aniversário, " + nome + "! 🎂";
+    var k = "evo-niver-" + ALUNO.id + "-" + d.getFullYear();
+    try { if (localStorage.getItem(k)) return; localStorage.setItem(k, "1"); } catch (e) {}
+    toast("Parabéns pelos " + idade + " anos, " + nome + "! Todo o Studio Evolution deseja um ano de muita evolução. Oss! 🥋");
+  }
   function paintSemana() {
     var hoje = new Date(), seg = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - ((hoje.getDay() + 6) % 7)), dias = {}, n = 0, html = "";
-    MEUS.pres.forEach(function (x) { dias[x.data] = 1; });
+    /* a meta conta aulas (dá para treinar mais de uma vez no dia); o ponto do dia marca que treinou */
+    MEUS.pres.forEach(function (x) { dias[x.data] = (dias[x.data] || 0) + 1; });
     ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].forEach(function (nm, i) {
       var d = new Date(seg); d.setDate(seg.getDate() + i);
       var k = isoDia(d), t = k === isoDia(hoje), v = dias[k];
-      if (v) n++;
+      if (v) n += v;
       html += "<div" + (t ? ' class="today"' : "") + "><span>" + nm + "</span><b>" + d.getDate() + "</b>" + (t ? '<span class="sr-only">, hoje</span>' : "") + (v ? '<i><span class="sr-only">, treinou</span></i>' : "") + "</div>";
     });
     var wk = $(".ap-wk", screenOf("inicio"));

@@ -468,3 +468,15 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .es-ic.acessorio, .es-ic.outro { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2b65a' stroke-width='1.6' stroke-linejoin='round'%3E%3Cpath d='M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5z'/%3E%3Cpath d='M3.5 7.5L12 12l8.5-4.5M12 12v9'/%3E%3C/svg%3E"); }
 .es-ped li { gap: 10px; align-items: center; }
 .es-ped .row-acts { flex-shrink: 0; }
+
+/* aniversariantes no Hoje */
+.niver { margin-top: 16px; padding: 16px 18px; border-radius: 16px; border: 1px solid var(--rule); background: color-mix(in oklch, var(--ink) 3%, transparent); }
+.niver.hoje { border-color: color-mix(in oklch, var(--gold) 55%, transparent); background: radial-gradient(120% 140% at 0% 0%, color-mix(in oklch, var(--gold) 18%, transparent), transparent 60%), color-mix(in oklch, var(--ink) 3%, transparent); box-shadow: 0 18px 30px -24px color-mix(in oklch, var(--gold) 60%, transparent); }
+.niver-h { display: flex; align-items: center; gap: 12px; }
+.niver-ic { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; font-size: 22px; background: radial-gradient(circle at 35% 28%, #fff1b3, #e2b65a 45%, #a87a26); box-shadow: 0 3px 0 #7d5a1f, 0 10px 18px -8px oklch(0 0 0 / 0.6); }
+.niver-h h4 { font: 400 19px/1.15 var(--serif); }
+.niver-l { margin-top: 12px; display: grid; gap: 8px; }
+.niver-l li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.niver-l small { display: block; color: var(--ink-3); font-size: 12px; }
+.niver-nada { font-size: 14px; color: var(--ink-2); }
+.niver-prox { margin-top: 10px; font-size: 13px; color: var(--ink-2); line-height: 1.6; }

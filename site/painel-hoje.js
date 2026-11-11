@@ -27,6 +27,39 @@
   }
 
   /* ---------- cabeçalho e números ---------- */
+  /* aniversariantes: os de hoje em destaque, com o parabéns pronto no WhatsApp; os próximos 7 dias embaixo */
+  function paintNiver() {
+    var box = $("#hNiver"), l = P.ativos().map(function (a) { return { a: a, n: P.aniversario(a) }; }).filter(function (x) { return x.n && x.n.dias <= 7; })
+      .sort(function (x, y) { return x.n.dias - y.n.dias || x.a.nome.localeCompare(y.a.nome); });
+    var hj = l.filter(function (x) { return x.n.dias === 0; }), prox = l.filter(function (x) { return x.n.dias > 0; });
+    var semData = P.ativos().filter(function (a) { return !a.nascimento; }).length;
+    box.hidden = !l.length && !semData;
+    if (box.hidden) return;
+    var dia = function (x) { return x.n.dias === 1 ? "amanhã" : new Intl.DateTimeFormat("pt-BR", { weekday: "short", day: "numeric", month: "numeric" }).format(x.n.data).replace(".", ""); };
+    box.className = "niver" + (hj.length ? " hoje" : "");
+    box.innerHTML = (hj.length ? '<div class="niver-h"><span class="niver-ic" aria-hidden="true">🎂</span><div><p class="dv-k">Aniversário hoje</p><h4>' +
+        hj.map(function (x) { return esc(P.first(x.a.nome)); }).join(" e ") + (hj.length === 1 ? " faz " + x0(hj[0]) : " fazem aniversário") + "</h4></div></div>" +
+        '<ul class="niver-l">' + hj.map(function (x) {
+          return '<li><span class="av">' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + x.n.idade + " anos · " + esc(P.turmaTx(x.a)) + "</small></div>" +
+            (x.a.whatsapp ? '<button class="mini-btn wa" type="button" data-parabens="' + x.a.id + '">Mandar parabéns</button>' : '<span class="muted" style="font-size:12px">sem WhatsApp</span>') + "</li>";
+        }).join("") + "</ul>"
+      : '<p class="niver-nada"><span aria-hidden="true">🎂</span> Ninguém faz aniversário hoje.</p>') +
+      (prox.length ? '<p class="niver-prox"><b>Próximos 7 dias:</b> ' + prox.map(function (x) { return '<button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(P.first(x.a.nome)) + "</button> (" + dia(x) + ", " + x.n.idade + ")"; }).join(" · ") + "</p>" : "") +
+      (semData ? '<p class="niver-prox"><button class="nm-btn" type="button" data-semnasc>' + semData + (semData === 1 ? " aluno ativo está" : " alunos ativos estão") + " sem data de nascimento</button>: cadastre em Editar dados para entrar no aviso.</p>" : "");
+    function x0(x) { return x.n.idade + " anos"; }
+  }
+  $("#hNiver").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.ficha) return P.abrirAluno(b.dataset.ficha);
+    if (b.hasAttribute("data-semnasc")) { if (P.filtroAlunos) P.filtroAlunos("semnasc"); return P.go("alunos", true); }
+    if (b.dataset.parabens) {
+      var a = P.porId[b.dataset.parabens], kid = P.kid(a.turma);
+      var resp = P.first(a.responsavel || ""), fem = a.artigo === "a";
+      P.wa(a.whatsapp, kid ? "Oi" + (resp ? ", " + resp : "") + "! Hoje é aniversário " + (fem ? "da " : a.artigo === "o" ? "do " : "de ") + P.first(a.nome) + " e todo o Studio Evolution BJJ deseja um dia muito especial! Parabéns, " + (fem ? "campeã" : "campeão") + "! 🥋🎂"
+        : "Parabéns, " + P.first(a.nome) + "! 🎂 Todo o Studio Evolution BJJ deseja um ano de muita saúde, evolução e treinos. Oss! 🥋");
+    }
+  });
   function paintTopo() {
     var dt = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(new Date()), h = new Date().getHours();
     $("#hData").textContent = dt.charAt(0).toUpperCase() + dt.slice(1);
@@ -182,7 +215,7 @@
   /* ---------- atualização: ao abrir a aba e a cada 15 s com Hoje ou o Modo tatame na tela ---------- */
   function atualizarTudo() {
     return Promise.all([carregarDia(), P.carregarPresencas()]).then(function () {
-      paintTopo(); paintAulas(); paintSala(); paintTV();
+      paintTopo(); paintNiver(); paintAulas(); paintSala(); paintTV();
     });
   }
   function ligar() {
@@ -199,6 +232,6 @@
   }
   P.aoAbrir("hoje", function () { atualizarTudo().catch(function (e) { P.erro(e, "Não deu para carregar as aulas"); }); ligar(); });
   P.aoAbrir("tatame", function () { atualizarTudo().catch(function () {}); ligar(); });
-  P.aoMudarAlunos(function () { if (P.atual() === "hoje") { paintTopo(); paintSala(); } });
+  P.aoMudarAlunos(function () { if (P.atual() === "hoje") { paintTopo(); paintNiver(); paintSala(); } });
   P.atualizarHoje = atualizarTudo;
 })();

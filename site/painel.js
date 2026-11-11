@@ -228,6 +228,15 @@
     var u = P.ultima(a.id), base = u || a.inicio;
     return P.difDias(base, P.hoje()) >= 14;
   };
+  /* aniversário: em quantos dias é o próximo (0 = hoje) e a idade que a pessoa completa; 29/02 vira 28/02 nos anos comuns */
+  P.aniversario = function (a) {
+    if (!a || !a.nascimento) return null;
+    var n = String(a.nascimento).split("-"), h = P.dia(P.hoje()), ano = h.getFullYear();
+    function data(y) { var d = new Date(y, +n[1] - 1, +n[2]); if (d.getMonth() !== +n[1] - 1) d = new Date(y, +n[1] - 1, 28); return d; }
+    var prox = data(ano);
+    if (prox < h) { prox = data(ano + 1); }
+    return { dias: Math.round((prox - h) / 864e5), idade: prox.getFullYear() - +n[0], data: prox };
+  };
   P.ativos = function () { return P.alunos.filter(function (a) { return a.ativo; }); };
 
   /* ---------- volta para a aba em que estava ---------- */

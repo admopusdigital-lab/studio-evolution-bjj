@@ -5,9 +5,9 @@
   var filtro = "ativos";
 
   /* ---------- a lista ---------- */
-  var FILTROS = [["ativos", "Ativos"], ["sumidos", "Sem treinar"], ["kids", "Kids"], ["inativos", "Inativos"], ["todos", "Todos"]];
+  var FILTROS = [["ativos", "Ativos"], ["sumidos", "Sem treinar"], ["kids", "Kids"], ["semnasc", "Sem aniversário"], ["inativos", "Inativos"], ["todos", "Todos"]];
   function passa(a, f) {
-    return f === "ativos" ? a.ativo : f === "sumidos" ? P.sumido(a) : f === "kids" ? a.ativo && P.kid(a.turma) : f === "inativos" ? !a.ativo : true;
+    return f === "semnasc" ? a.ativo && !a.nascimento : f === "ativos" ? a.ativo : f === "sumidos" ? P.sumido(a) : f === "kids" ? a.ativo && P.kid(a.turma) : f === "inativos" ? !a.ativo : true;
   }
   P.filtroAlunos = function (f) { filtro = f; paintLista(); };
   function paintLista() {
@@ -59,7 +59,7 @@
       '<label class="crm-f"><span>Turma</span><select class="sel" data-k="turma">' + Object.keys(P.TURMAS).map(function (t) { return '<option value="' + t + '"' + (t === turma ? " selected" : "") + ">" + P.TURMAS[t] + (t === "feminino" ? " (junto com o Adulto)" : t === "kids1" ? " (terça e quinta)" : t === "kids2" ? " (segunda e quarta)" : "") + "</option>"; }).join("") + "</select></label>" +
       '<label class="crm-f"><span>Horário</span><select class="sel" data-k="horario"></select></label>' +
       '<label class="crm-f f-kid"><span>Responsável</span><input class="crm-in" data-k="responsavel" autocomplete="off" value="' + v("responsavel") + '"></label>' +
-      '<label class="crm-f f-kid"><span>Nascimento <small>(opcional)</small></span><input class="crm-in" type="date" data-k="nascimento" value="' + v("nascimento") + '"></label>' +
+      '<label class="crm-f"><span>Data de nascimento <small>(para o aviso de aniversário)</small></span><input class="crm-in" type="date" data-k="nascimento" max="' + P.hoje() + '" value="' + v("nascimento") + '"></label>' +
       '<label class="crm-f"><span class="f-fone">WhatsApp</span><input class="crm-in" data-k="whatsapp" inputmode="tel" placeholder="(15) 99999-9999" autocomplete="off" value="' + esc(a.whatsapp ? P.fone(a.whatsapp) : pre.whatsapp ? P.fone(pre.whatsapp) : "") + '"></label>' +
       '<label class="crm-f"><span class="f-mail">E-mail <small>(o login do app)</small></span><input class="crm-in" type="email" data-k="email" autocomplete="off" spellcheck="false" value="' + v("email") + '"></label>' +
       '<label class="crm-f"><span>Faixa</span><select class="sel" data-k="faixa"></select></label>' +
@@ -95,7 +95,7 @@
     return {
       d: {
         nome: g("nome").replace(/\s+/g, " "), artigo: g("artigo") || null, turma: turma, horario: g("horario") || null,
-        responsavel: kid ? (g("responsavel") || null) : null, nascimento: kid ? (g("nascimento") || null) : null,
+        responsavel: kid ? (g("responsavel") || null) : null, nascimento: g("nascimento") || null,
         whatsapp: P.foneBanco(g("whatsapp")), email: (g("email") || "").toLowerCase() || null,
         faixa: g("faixa"), graus: +g("graus"), mensalidade: val ? P.num(val) : null, vencimento: +g("vencimento"), inicio: g("inicio") || P.hoje(),
         nota: g("nota") || null, responsavel_conta: g("responsavel_conta") || undefined, aulas_antes: g("aulas_antes") ? parseInt(g("aulas_antes").replace(/\D/g, ""), 10) || 0 : 0
