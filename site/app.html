@@ -317,6 +317,26 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-pc .ap-btn { margin-top: 10px; min-height: 40px; width: 100%; }
 .ap-shop-ped { margin-top: 18px; }
 .ap-shop-ped li { display: flex; justify-content: space-between; gap: 8px; padding: 9px 0; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-2); }
+/* perfil: calendário dos últimos 30 dias */
+.ap-cal-w { margin-top: 16px; padding: 14px 12px 12px; border-radius: 18px; border: 1px solid var(--rule); background: linear-gradient(160deg, color-mix(in oklch, var(--gold) 6%, var(--paper-2)), var(--paper-2) 60%); box-shadow: 0 16px 28px -22px oklch(0 0 0 / 0.85); }
+.ap-cal-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 0 2px; }
+.ap-cal-h span { flex-shrink: 0; font-size: 11.5px; color: var(--ink-2); }
+.ap-cal-p { margin-top: 3px; padding: 0 2px; font-size: 10.5px; color: var(--ink-3); }
+.ap-cal-h span b { font: 400 15px/1 var(--serif); color: var(--ink); }
+.ap-cal { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
+.ap-cal .h { text-align: center; font: 600 8.5px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); padding-bottom: 2px; }
+.ap-cal .d { position: relative; display: grid; place-items: center; height: 34px; border-radius: 9px; background: color-mix(in oklch, var(--ink) 6%, transparent); font: 600 11px/1 var(--sans); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.ap-cal .d i { position: absolute; bottom: 4px; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+.ap-cal .d i:first-of-type:not(:last-of-type) { margin-left: -7px; } .ap-cal .d i + i { margin-left: 7px; }
+.ap-cal .d.fora { background: none; color: color-mix(in oklch, var(--ink) 22%, transparent); }
+.ap-cal .d.l1 { background: color-mix(in oklch, var(--gold) 55%, transparent); color: var(--ink); }
+.ap-cal .d.l2 { background: linear-gradient(180deg, #fff1b3, #e2b65a 60%, #b98b35); color: oklch(0.18 0.02 70); box-shadow: 0 6px 12px -6px color-mix(in oklch, var(--gold) 80%, transparent); }
+.ap-cal .d.hj { outline: 1.5px solid var(--gold); outline-offset: 1px; }
+:root:not([data-look="black"]) .ap-cal .d.l1 { background: color-mix(in oklch, var(--gold) 40%, transparent); }
+.ap-cal-leg { display: flex; gap: 12px; margin-top: 10px; padding: 0 2px; font-size: 10.5px; color: var(--ink-3); }
+.ap-cal-leg i { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border-radius: 2px; vertical-align: -1px; background: color-mix(in oklch, var(--ink) 6%, transparent); }
+.ap-cal-leg i.l1 { background: color-mix(in oklch, var(--gold) 55%, transparent); }
+.ap-cal-leg i.l2 { background: linear-gradient(180deg, #fff1b3, #e2b65a 60%, #b98b35); }
 /* plano família: quem vai treinar (o pai, a mãe e os filhos na mesma conta) */
 .ap-fam { display: flex; gap: 8px; margin: 14px -16px 0; padding: 2px 16px 4px; overflow-x: auto; scrollbar-width: none; }
 .ap-fam::-webkit-scrollbar { display: none; }
@@ -559,6 +579,13 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <div class="ap-degs"><i class="on"></i><i class="on"></i><i></i><i></i></div>
         <!-- "aulas desde o último grau" conta as presenças registradas: a de hoje leva 21 a 22 (register) -->
         <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b id="apStreak">6</b><span id="apStreakT">semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
+        <!-- os últimos 30 dias em calendário (segunda a sábado): dourado quando veio, dois pontos quando fez duas aulas -->
+        <div class="ap-cal-w" id="apCalW" hidden>
+          <div class="ap-cal-h"><p class="ap-lb gold">Últimos 30 dias</p><span id="apCalN"></span></div>
+          <p class="ap-cal-p" id="apCalP"></p>
+          <div class="ap-cal" id="apCal" role="img"></div>
+          <div class="ap-cal-leg"><span><i></i>não veio</span><span><i class="l1"></i>1 aula</span><span><i class="l2"></i>2 aulas</span></div>
+        </div>
         <button class="ap-row pulse" type="button" id="apCompBtn" aria-expanded="false" aria-controls="apComp" style="width:100%;margin-top:12px;border-left:0;border-right:0;border-bottom:0;background:none;color:inherit;font:inherit;cursor:pointer"><span>Competências da faixa</span><span class="r">3 de 8<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
         <!-- as 8 da faixa azul: 3 conquistadas e 5 a conquistar (as três últimas são exemplo) -->
         <ul class="ap-comp" id="apComp" aria-label="3 de 8 competências conquistadas" hidden>
@@ -1840,6 +1867,27 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     try { if (localStorage.getItem(k)) return; localStorage.setItem(k, "1"); } catch (e) {}
     toast("Parabéns pelos " + idade + " anos, " + nome + "! Todo o Studio Evolution deseja um ano de muita evolução. Oss! 🥋");
   }
+  /* os últimos 30 dias do membro que está no app, em calendário */
+  function paintCal() {
+    var w = $("#apCalW");
+    if (demo || !ALUNO) { w.hidden = true; return; }
+    var hoje = isoDia(new Date()), d0 = diaDe(hoje), i0 = new Date(d0); i0.setDate(d0.getDate() - 29);
+    var ini = isoDia(i0), dias = {}, n30 = 0, dd30 = 0, h = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map(function (x) { return '<span class="h">' + x + "</span>"; }).join("");
+    MEUS.pres.forEach(function (x) { dias[x.data] = (dias[x.data] || 0) + 1; });
+    var seg = new Date(i0); seg.setDate(i0.getDate() - ((i0.getDay() + 6) % 7));
+    var fim = new Date(d0); fim.setDate(d0.getDate() + (6 - ((d0.getDay() + 6) % 7)) - 1);
+    for (var x = new Date(seg); x <= fim; x.setDate(x.getDate() + 1)) {
+      if (x.getDay() === 0) continue;
+      var k = isoDia(x), n = dias[k] || 0, fora = k < ini || k > hoje;
+      if (!fora) { n30 += n; if (n) dd30++; }
+      h += '<span class="d' + (fora ? " fora" : n >= 2 ? " l2" : n ? " l1" : "") + (k === hoje ? " hj" : "") + '">' + x.getDate() + (fora ? "" : n >= 2 ? "<i></i><i></i>" : n ? "<i></i>" : "") + "</span>";
+    }
+    $("#apCal").innerHTML = h;
+    $("#apCal").setAttribute("aria-label", "Últimos 30 dias: " + n30 + (n30 === 1 ? " aula" : " aulas") + " em " + dd30 + (dd30 === 1 ? " dia" : " dias"));
+    $("#apCalN").innerHTML = "<b>" + n30 + "</b> " + (n30 === 1 ? "aula" : "aulas");
+    $("#apCalP").textContent = br(ini) + " a " + br(hoje) + " · " + dd30 + (dd30 === 1 ? " dia" : " dias") + " de treino";
+    w.hidden = false;
+  }
   function paintSemana() {
     var hoje = new Date(), seg = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - ((hoje.getDay() + 6) % 7)), dias = {}, n = 0, html = "";
     /* a meta conta aulas (dá para treinar mais de uma vez no dia); o ponto do dia marca que treinou */
@@ -1918,6 +1966,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var antes = a.aulas_antes && (!g || !a.aulas_antes_ate || g.data <= a.aulas_antes_ate) ? a.aulas_antes : 0;
     var desde = (g ? MEUS.pres.filter(function (x) { return x.data > g.data; }).length : MEUS.pres.length) + antes, s = semanas();
     $("#apSince").textContent = desde;
+    paintCal();
     $("#apStreak").textContent = s.atual;
     $("#apStreakT").textContent = (s.atual === 1 ? "semana seguida" : "semanas seguidas") + " · recorde " + s.rec;
     $("#apCompBtn").hidden = true;
