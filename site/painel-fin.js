@@ -3,6 +3,8 @@
    despesas, metas e alunos; nada é exemplo. */
 (function () {
   var $ = P.$, $$ = P.$$, esc = P.esc;
+  /* EXTRA: os outros valores dos alunos (taxa de matrícula, produto, avulso), pelo mês do vencimento */
+  var EXTRA = [];
   var MENS = [], DESP = [], METAS = {}, mes = P.mesIni(P.hoje()), aba = "geral", mF = "todas", dF = "todas", ok = false;
   var DCAT = { aluguel: "Aluguel", contas: "Contas (luz, água, internet)", pessoal: "Pessoal", servicos: "Serviços", taxas: "Taxas", marketing: "Marketing", material: "Material", manutencao: "Manutenção", outros: "Outros" };
   var FORMA = { pix: "Pix", boleto: "Boleto", cartao: "Cartão", dinheiro: "Dinheiro" };
@@ -11,16 +13,19 @@
     return Promise.all([
       P.todos(function (sb) { return sb.from("mensalidades").select("*").order("vencimento"); }),
       P.todos(function (sb) { return sb.from("despesas").select("*").order("data"); }),
-      P.q(function (sb) { return sb.from("metas").select("*"); })
+      P.q(function (sb) { return sb.from("metas").select("*"); }),
+      P.todos(function (sb) { return sb.from("cobrancas").select("*").order("vencimento"); }).catch(function () { return []; })
     ]).then(function (r) {
       MENS = r[0]; DESP = r[1]; METAS = {};
+      EXTRA = (r[3] || []).map(function (c) { c._extra = true; c.competencia = P.mesIni(c.vencimento); return c; });
       (r[2] || []).forEach(function (m) { METAS[m.mes] = m; });
       ok = true;
       paintMeses(); paint();
     });
   }
   function fimMes(m) { return P.somaDias(P.somaMes(m, 1), -1); }
-  function doMes(m) { return MENS.filter(function (x) { return x.competencia === m; }); }
+  function doMes(m) { return MENS.concat(EXTRA).filter(function (x) { return x.competencia === m; }); }
+  function tabela(x) { return x._extra ? "cobrancas" : "mensalidades"; }
   function despMes(m) { return DESP.filter(function (x) { return P.mesIni(x.data) === m; }); }
   function soma(l, f) { return l.reduce(function (a, x) { return a + Number(f ? f(x) : x.valor); }, 0); }
   function atrasada(x) { return !x.pago_em && x.vencimento < P.hoje(); }
@@ -51,7 +56,7 @@
   });
   function paint() {
     if (!ok) return;
-    var atr = MENS.filter(atrasada).length;
+    var atr = MENS.concat(EXTRA).filter(atrasada).length;
     P.selo("bFin", atr);
     $("#fnK").textContent = P.mesNome(mes);
     if (aba === "geral") paintGeral(); else if (aba === "mens") paintMens(); else paintDesp();
@@ -78,7 +83,7 @@
       (vis.length ? '<table class="tbl"><thead><tr><th scope="col">Aluno</th><th scope="col" class="num">Valor</th><th scope="col">Situação</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead><tbody>' +
         vis.map(function (x) {
           var a = P.porId[x.aluno];
-          return '<tr data-id="' + x.id + '"><td><div class="nm"><span class="av">' + P.ini(nome(x.aluno)) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.aluno + '">' + esc(nome(x.aluno)) + "</button><small>vence " + P.dataBRano(x.vencimento) + "</small></div></div></td>" +
+          return '<tr data-id="' + x.id + '"><td><div class="nm"><span class="av">' + P.ini(nome(x.aluno)) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.aluno + '">' + esc(nome(x.aluno)) + "</button><small>" + (x._extra ? '<b style="color:var(--gold-text)">' + esc(x.descricao) + "</b> · " : "") + "vence " + P.dataBRano(x.vencimento) + "</small></div></div></td>" +
             '<td class="num">' + P.brl(x.valor) + "</td><td>" + statusM(x) + '</td><td class="act"><div class="row-acts">' +
             (x.pago_em ? '<button class="mini-btn ghost" type="button" data-desfaz>Desfazer</button>'
               : '<select class="sel" data-forma aria-label="Forma de pagamento">' + Object.keys(FORMA).map(function (k) { return '<option value="' + k + '">' + FORMA[k] + "</option>"; }).join("") + '</select><button class="mini-btn" type="button" data-paga>Recebi</button>' +
@@ -95,7 +100,7 @@
     if (b.dataset.f) { mF = b.dataset.f; return paintMens(); }
     if (b.id === "mGerar") return gerar(b);
     if (b.dataset.ficha) return P.abrirAluno(b.dataset.ficha);
-    var tr = b.closest("tr"), x = tr && MENS.filter(function (m) { return m.id === tr.dataset.id; })[0];
+    var tr = b.closest("tr"), x = tr && MENS.concat(EXTRA).filter(function (m) { return m.id === tr.dataset.id; })[0];
     if (!x) return;
     if (b.hasAttribute("data-editm")) {
       /* a linha vira um formulário: valor e vencimento */
@@ -111,26 +116,27 @@
       var v = P.num($("[data-ev]", tr).value), venc = $("[data-evenc]", tr).value;
       if (!(v >= 0)) { P.toast("Digite o valor, como 200 ou 180,50."); P.focusSoft($("[data-ev]", tr)); return; }
       if (!venc) { P.toast("Escolha o vencimento."); return; }
-      return salvarM(x, { valor: v, vencimento: venc }, b, "Mensalidade de " + P.first(nome(x.aluno)) + " agora é " + P.brl(v) + ", vence " + P.dataBR(venc) + ".");
+      return salvarM(x, { valor: v, vencimento: venc }, b, (x._extra ? x.descricao : "Mensalidade") + " de " + P.first(nome(x.aluno)) + " agora é " + P.brl(v) + ", vence " + P.dataBR(venc) + ".");
     }
     if (b.hasAttribute("data-apagam")) {
       if (b.dataset.certo !== "1") { b.dataset.certo = "1"; b.textContent = "Apagar mesmo?"; setTimeout(function () { if (document.contains(b)) { b.dataset.certo = ""; b.textContent = "Apagar"; } }, 4000); return; }
       b.classList.add("loading");
-      return P.q(function (sb) { return sb.from("mensalidades").delete().eq("id", x.id); }).then(carregar)
-        .then(function () { P.toast("Mensalidade de " + P.first(nome(x.aluno)) + " em " + P.mesNome(x.competencia) + " apagada. Saiu do fechamento."); })
+      return P.q(function (sb) { return sb.from(tabela(x)).delete().eq("id", x.id); }).then(carregar)
+        .then(function () { P.toast((x._extra ? x.descricao + " de " + P.first(nome(x.aluno)) : "Mensalidade de " + P.first(nome(x.aluno)) + " em " + P.mesNome(x.competencia)) + " apagada. Saiu do fechamento."); })
         .catch(function (er) { b.classList.remove("loading"); P.erro(er); });
     }
     if (b.hasAttribute("data-paga")) salvarM(x, { pago_em: P.hoje(), forma: $("[data-forma]", tr).value }, b, "Baixa feita: " + P.first(nome(x.aluno)) + ", " + P.brl(x.valor) + ".");
     else if (b.hasAttribute("data-desfaz")) salvarM(x, { pago_em: null, forma: null }, b, "Baixa desfeita.");
     else if (b.hasAttribute("data-cobra")) {
       var a = P.porId[x.aluno], cfg = P.cfg || {};
-      P.wa(a.whatsapp, "Oi, " + P.first(a.responsavel || a.nome) + "! Aqui é do Studio Evolution BJJ. " + (atrasada(x) ? "A mensalidade de " + P.mesNome(x.competencia) + " (" + P.brl(x.valor) + ") venceu em " + P.dataBR(x.vencimento) + "." : "Lembrete: a mensalidade de " + P.mesNome(x.competencia) + " (" + P.brl(x.valor) + ") vence em " + P.dataBR(x.vencimento) + ".") +
+      P.wa(a.whatsapp, "Oi, " + P.first(a.responsavel || a.nome) + "! Aqui é do Studio Evolution BJJ. " + (x._extra ? (atrasada(x) ? "O valor de " + x.descricao + " (" + P.brl(x.valor) + ") venceu em " + P.dataBR(x.vencimento) + "." : "Lembrete: " + x.descricao + " (" + P.brl(x.valor) + ") vence em " + P.dataBR(x.vencimento) + ".")
+          : atrasada(x) ? "A mensalidade de " + P.mesNome(x.competencia) + " (" + P.brl(x.valor) + ") venceu em " + P.dataBR(x.vencimento) + "." : "Lembrete: a mensalidade de " + P.mesNome(x.competencia) + " (" + P.brl(x.valor) + ") vence em " + P.dataBR(x.vencimento) + ".") +
         (cfg.pix ? " A chave Pix do Studio é " + cfg.pix + "." : "") + " Se já pagou, me manda o comprovante que eu dou baixa. Obrigado!");
     }
   });
   function salvarM(x, d, b, msg) {
     b.classList.add("loading");
-    P.q(function (sb) { return sb.from("mensalidades").update(d).eq("id", x.id); }).then(carregar).then(function () { P.toast(msg); }).catch(function (e) { b.classList.remove("loading"); P.erro(e); });
+    P.q(function (sb) { return sb.from(tabela(x)).update(d).eq("id", x.id); }).then(carregar).then(function () { P.toast(msg); }).catch(function (e) { b.classList.remove("loading"); P.erro(e); });
   }
   function gerar(b) {
     var l = faltam().map(function (a) { return { aluno: a.id, competencia: mes, valor: a.mensalidade, vencimento: mes.slice(0, 8) + P.two(a.vencimento || 10) }; });
@@ -212,7 +218,7 @@
     var l = doMes(mes), prev = soma(l), rec = soma(l.filter(function (x) { return x.pago_em; })), atr = soma(l.filter(atrasada));
     var dl = despMes(mes), desp = soma(dl), dpg = soma(dl.filter(function (x) { return x.paga; }));
     var fim = fimMes(mes), ati = ativosEm(fim), ent = P.alunos.filter(function (a) { return P.mesIni(a.inicio) === mes; }).length, sai = P.alunos.filter(function (a) { return a.saida && P.mesIni(a.saida) === mes; }).length;
-    var pag = l.length, tic = pag ? prev / pag : 0, res = rec - desp, meta = METAS[mes] || null, mNome = P.MESES[P.dia(mes).getMonth()];
+    var lm = l.filter(function (x) { return !x._extra; }), pag = lm.length, tic = pag ? soma(lm) / pag : 0, res = rec - desp, meta = METAS[mes] || null, mNome = P.MESES[P.dia(mes).getMonth()];
     var g = $("#fpGeral");
     g.classList.add("viz");
     g.innerHTML =

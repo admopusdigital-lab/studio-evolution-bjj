@@ -294,6 +294,29 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap.app .ap-dock-go:active .coin { transform: translateY(3px); box-shadow: 0 1px 0 #7d5a1f, 0 6px 12px -6px oklch(0 0 0 / 0.7), inset 0 2px 1px oklch(1 0 0 / 0.65), 0 0 0 4px var(--paper); }
 .ap.app .ap-dock-go[aria-current="true"] .coin { animation: ap-coin 2.4s ease-in-out infinite; }
 @keyframes ap-coin { 50% { transform: translateY(-2px) rotateY(18deg); } }
+/* loja do Studio: cartões com o produto em relevo, tamanhos em pílulas e o botão de pedir */
+.ap-shop-row { display: flex; gap: 10px; margin: 12px -16px 0; padding: 4px 16px 10px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; }
+.ap-shop-row::-webkit-scrollbar { display: none; }
+.ap-shop-t { flex: 0 0 132px; scroll-snap-align: start; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.ap-shop-t b { display: block; margin-top: 8px; font: 600 12px/1.25 var(--sans); }
+.ap-shop-t span { display: block; margin-top: 2px; font: 400 15px/1 var(--serif); color: var(--gold-text); }
+.ap-prod { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: 16px; overflow: hidden;
+  background: radial-gradient(80% 70% at 30% 20%, color-mix(in oklch, var(--gold) 28%, transparent), transparent 70%), linear-gradient(160deg, color-mix(in oklch, var(--ink) 10%, var(--paper-2)), var(--paper-2));
+  box-shadow: 0 14px 22px -14px oklch(0 0 0 / 0.85), inset 0 1px 0 oklch(1 0 0 / 0.08), inset 0 0 0 1px color-mix(in oklch, var(--gold) 22%, transparent); }
+.ap-prod svg { width: 52%; height: 52%; margin-top: 10%; filter: drop-shadow(0 8px 10px oklch(0 0 0 / 0.55)); transform: perspective(300px) rotateY(-8deg) rotateX(6deg); }
+.ap-prod .tag { position: absolute; top: 7px; left: 7px; padding: 2px 6px; font-size: 8px !important; border-radius: 999px; background: oklch(0 0 0 / 0.45); font: 600 9px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
+.ap-shop-list { display: grid; gap: 14px; margin-top: 16px; }
+.ap-pc { display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 14px; padding: 12px; border-radius: 18px; border: 1px solid var(--rule); background: linear-gradient(160deg, color-mix(in oklch, var(--gold) 6%, var(--paper-2)), var(--paper-2) 60%); box-shadow: 0 16px 28px -22px oklch(0 0 0 / 0.85); }
+.ap-pc h3 { font: 400 16px/1.15 var(--serif); }
+.ap-pc .pr { margin-top: 3px; font: 400 19px/1 var(--serif); color: var(--gold-text); }
+.ap-pc p { margin-top: 4px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
+.ap-sz { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.ap-sz button { min-width: 36px; height: 30px; padding: 0 9px; border-radius: 9px; border: 1px solid var(--rule); background: none; color: var(--ink); font: 600 11.5px/1 var(--sans); cursor: pointer; }
+.ap-sz button[aria-pressed="true"] { border-color: var(--gold); background: color-mix(in oklch, var(--gold) 18%, transparent); }
+.ap-sz small { align-self: center; font-size: 10.5px; color: var(--ink-3); }
+.ap-pc .ap-btn { margin-top: 10px; min-height: 40px; width: 100%; }
+.ap-shop-ped { margin-top: 18px; }
+.ap-shop-ped li { display: flex; justify-content: space-between; gap: 8px; padding: 9px 0; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-2); }
 /* plano família: quem vai treinar (o pai, a mãe e os filhos na mesma conta) */
 .ap-fam { display: flex; gap: 8px; margin: 14px -16px 0; padding: 2px 16px 4px; overflow-x: auto; scrollbar-width: none; }
 .ap-fam::-webkit-scrollbar { display: none; }
@@ -424,6 +447,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
         </div>
         <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r" id="apNext">segunda, 19 de outubro, 19h</span></div>
+        <!-- loja do Studio: só aparece quando o professor tem itens no estoque -->
+        <div class="ap-card ap-shopc" id="apShop" hidden>
+          <div class="ap-rk-h"><div><p class="ap-lb gold">Loja do Studio</p><p class="ap-rk-t">Kimonos e rashguards no tatame</p></div><button class="ap-link" type="button" id="apShopAll">Ver tudo</button></div>
+          <div class="ap-shop-row" id="apShopRow"></div>
+        </div>
         <!-- ranking de frequência: os que mais treinaram (Adulto e Kids separados) -->
         <div class="ap-card ap-rank" id="apRank">
           <div class="ap-rk-h"><div><p class="ap-lb gold">Ranking de frequência</p><p class="ap-rk-t" id="apRkT">Quem mais treinou no mês</p></div>
@@ -556,6 +584,16 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       </section>
 
       <!-- Avisos (o sino no topo): a lista do que o Studio mandou -->
+      <!-- Loja: os itens do estoque; o aluno escolhe o tamanho e pede, o professor confirma no tatame -->
+      <section class="ap-view" data-view="loja" aria-label="Tela Loja">
+        <button class="ap-back" type="button" id="apShopBack"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-back"/></svg>Início</button>
+        <p class="ap-lb">Loja do Studio</p>
+        <p class="ap-hi">Vista a Evolution.</p>
+        <p class="ap-mut" style="margin-top:4px">Escolha o tamanho e peça. O professor separa e você paga no Studio.</p>
+        <div class="ap-shop-list" id="apShopList"></div>
+        <div class="ap-shop-ped" id="apShopPed" hidden></div>
+      </section>
+
       <section class="ap-view" data-view="avisos" aria-label="Tela Avisos">
         <p class="ap-lb">Avisos</p>
         <p class="ap-hi">Para você</p>
@@ -635,7 +673,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (current === "aula") pararAula();
     current = name;
     views.forEach(function (v) { v.classList.toggle("on", v.dataset.view === name); });
-    var tab = name === "aula" ? "movimentos" : name;
+    var tab = name === "aula" ? "movimentos" : name === "loja" ? "inicio" : name;
     dockBtns.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === tab ? "true" : "false"); });
     bell.setAttribute("aria-pressed", name === "avisos" ? "true" : "false");
     syncInert();
@@ -964,6 +1002,84 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (registered && !antes) { mostrarRegistro(false); carregarRank(); }
     }).catch(function () {});
   }
+  /* ---------- loja: aparece só quando há item com quantidade no estoque ---------- */
+  var LOJA = [], MEUSPED = [], ESCOLHA = {};
+  var CAT_P = { kimono: "Kimono", rashguard: "Rashguard", faixa: "Faixa", camiseta: "Camiseta", acessorio: "Acessório", outro: "Item" };
+  /* o desenho do produto, em ouro: kimono, rashguard/camiseta, faixa ou caixa */
+  function prodSvg(cat) {
+    var g = '<defs><linearGradient id="pg' + cat + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b3"/><stop offset=".55" stop-color="#e2b65a"/><stop offset="1" stop-color="#a87a26"/></linearGradient></defs>';
+    var f = 'fill="url(#pg' + cat + ')" stroke="#7d5a1f" stroke-width=".6" stroke-linejoin="round"';
+    if (cat === "kimono") return '<svg viewBox="0 0 48 48" aria-hidden="true">' + g + '<path ' + f + ' d="M16 6l8 10 8-10 12 6-4 11-5-2v22H13V21l-5 2L4 12z"/><path d="M24 16l-6 13M24 16l6 13M13 31h22" stroke="#7d5a1f" stroke-width="1.4" fill="none"/></svg>';
+    if (cat === "rashguard" || cat === "camiseta") return '<svg viewBox="0 0 48 48" aria-hidden="true">' + g + '<path ' + f + ' d="M18 6h12l12 7-4 10-5-2v21H15V21l-5 2-4-10z"/><path d="M18 6a6 6 0 0 0 12 0" stroke="#7d5a1f" stroke-width="1.4" fill="none"/></svg>';
+    if (cat === "faixa") return '<svg viewBox="0 0 48 48" aria-hidden="true">' + g + '<path ' + f + ' d="M4 15h40v8H4z"/><rect x="17" y="12" width="14" height="14" rx="2" ' + f + '/><path ' + f + ' d="M20 26l-6 18 6-2 3-15zM28 26l6 18-6-2-3-15z"/></svg>';
+    return '<svg viewBox="0 0 48 48" aria-hidden="true">' + g + '<path ' + f + ' d="M6 15l18-9 18 9v18l-18 9-18-9z"/><path d="M6 15l18 9 18-9M24 24v18" stroke="#7d5a1f" stroke-width="1.4" fill="none"/></svg>';
+  }
+  /* agrupa os tamanhos do mesmo produto (nome + cor) */
+  function grupos() {
+    var m = {}, l = [];
+    LOJA.forEach(function (p) {
+      var k = p.nome + "|" + (p.cor || "");
+      if (!m[k]) { m[k] = { k: k, nome: p.nome, cor: p.cor, cat: p.categoria, desc: p.descricao, itens: [] }; l.push(m[k]); }
+      m[k].itens.push(p);
+      if (!m[k].desc && p.descricao) m[k].desc = p.descricao;
+    });
+    l.forEach(function (g) { g.disp = g.itens.filter(function (p) { return p.quantidade > 0; }); g.min = Math.min.apply(null, g.itens.map(function (p) { return Number(p.preco); })); });
+    return l.filter(function (g) { return g.disp.length; });
+  }
+  function nomeG(g) { return g.nome + (g.cor ? " " + g.cor.toLowerCase() : ""); }
+  function paintLoja() {
+    var gs = grupos(), box = $("#apShop");
+    box.hidden = !gs.length;
+    if (!gs.length) return;
+    $("#apShopRow").innerHTML = gs.map(function (g, i) {
+      return '<button class="ap-shop-t" type="button" data-shop="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodSvg(g.cat) + "</span><b>" + esc(nomeG(g)) + "</b><span>" + brl(g.min) + "</span></button>";
+    }).join("");
+    $("#apShopList").innerHTML = gs.map(function (g, i) {
+      var sel = ESCOLHA[g.k];
+      return '<article class="ap-pc" data-g="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodSvg(g.cat) + "</span><div><h3>" + esc(nomeG(g)) + '</h3><p class="pr">' + brl(g.min) + "</p>" + (g.desc ? "<p>" + esc(g.desc) + "</p>" : "") +
+        '<div class="ap-sz" role="group" aria-label="Tamanho">' + g.disp.map(function (p) { return '<button type="button" data-sz="' + p.id + '" aria-pressed="' + (sel === p.id) + '">' + esc(p.tamanho) + "</button>"; }).join("") +
+        (g.disp.length < g.itens.length ? "<small>outros tamanhos esgotados</small>" : "") + "</div>" +
+        '<button class="ap-btn" type="button" data-pedir' + (sel ? "" : ' aria-disabled="true"') + '><span>' + (sel ? "Quero este · " + esc(g.disp.filter(function (p) { return p.id === sel; })[0].tamanho) : "Escolha o tamanho") + "</span></button></div></article>";
+    }).join("");
+    var ped = $("#apShopPed");
+    ped.hidden = !MEUSPED.length;
+    ped.innerHTML = MEUSPED.length ? '<p class="ap-lb">Seus pedidos</p><ul>' + MEUSPED.map(function (x) {
+      var p = LOJA.filter(function (q) { return q.id === x.produto; })[0];
+      return "<li><span>" + esc(p ? p.nome + " · " + p.tamanho : "Item da loja") + '</span><span class="' + (x.status === "vendido" ? "ok" : "") + '">' + (x.status === "novo" ? "Esperando o professor" : x.status === "vendido" ? "Entregue" : "Cancelado") + "</span></li>";
+    }).join("") + "</ul>" : "";
+  }
+  function carregarLoja() {
+    if (demo) return Promise.resolve();
+    return Acesso.cliente().then(function (sb) {
+      return Promise.all([sb.from("produtos").select("*").order("nome").order("tamanho"), ALUNO && ALUNO.id ? sb.from("pedidos_loja").select("*").eq("aluno", ALUNO.id).order("criado_em", { ascending: false }).limit(5) : Promise.resolve({ data: [] })]);
+    }).then(function (r) {
+      /* sem a tabela (banco sem a atualização) ou sem estoque, a loja fica escondida */
+      LOJA = r[0].error ? [] : (r[0].data || []);
+      MEUSPED = r[1].error ? [] : (r[1].data || []);
+      paintLoja();
+    }).catch(function () {});
+  }
+  $("#apShopRow").addEventListener("click", function (e) { if (e.target.closest("[data-shop]")) show("loja"); });
+  $("#apShopAll").addEventListener("click", function () { show("loja"); });
+  $("#apShopBack").addEventListener("click", function () { show("inicio"); });
+  $("#apShopList").addEventListener("click", function (e) {
+    var card = e.target.closest("[data-g]");
+    if (!card) return;
+    var g = grupos()[+card.dataset.g], sz = e.target.closest("[data-sz]");
+    if (sz) { ESCOLHA[g.k] = sz.dataset.sz; return paintLoja(); }
+    var b = e.target.closest("[data-pedir]");
+    if (!b || !ESCOLHA[g.k] || busy) return;
+    var p = LOJA.filter(function (q) { return q.id === ESCOLHA[g.k]; })[0];
+    busy = true; b.classList.add("loading");
+    Acesso.cliente().then(function (sb) { return sb.rpc("pedir_produto", comAluno({ p_produto: p.id })); }).then(function (r) {
+      busy = false; b.classList.remove("loading");
+      if (r.error) return toast(r.error.message || "Não deu para pedir. Tente de novo.");
+      delete ESCOLHA[g.k];
+      toast("Pedido feito: " + nomeG(g) + " " + p.tamanho + ". O professor separa e você paga no Studio.");
+      carregarLoja();
+    }).catch(function () { busy = false; b.classList.remove("loading"); toast("Sem conexão. Tente de novo."); });
+  });
+
   /* plano família: os botões "quem vai treinar" (Início e Agendar) e o "registrar a presença de" do check-in */
   function faixaMini(x) { return '<i class="belt-s" style="' + Site.faixaCss(x.faixa) + ';width:16px;height:5px"></i>'; }
   function paintFamilia() {
@@ -995,7 +1111,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (AULA.data && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
     paintFamilia(); paintAula(); paintAulas(); paintSpot();
     toast("Agora no app: " + ALUNO.nome.split(" ")[0] + ".");
-    Promise.all([minhasReservas(), atualizarQuem(), extrasReal(), carregarRank()]);
+    Promise.all([minhasReservas(), atualizarQuem(), extrasReal(), carregarRank(), carregarLoja()]);
     if (window.recarregarMov) window.recarregarMov();
   }
   document.addEventListener("click", function (e) {
@@ -1035,6 +1151,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       /* com a família carregada, o ranking e os movimentos passam a ser do membro escolhido */
       if (FAMILIA.length > 1) carregarRank();
       if (window.recarregarMov) window.recarregarMov();
+      carregarLoja();
       return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]);
     }).catch(function () { toast("Sem conexão com o Studio. Confira a internet."); });
   }
@@ -1661,10 +1778,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       return Promise.all([
         sb.from("presencas").select("data, hora").eq("aluno", ALUNO.id).order("data", { ascending: false }).limit(1000),
         sb.from("mensalidades").select("competencia, valor, vencimento, pago_em, forma").eq("aluno", ALUNO.id).order("competencia", { ascending: false }).limit(6),
-        sb.from("graduacoes").select("faixa, graus, data").eq("aluno", ALUNO.id).order("data", { ascending: false })
+        sb.from("graduacoes").select("faixa, graus, data").eq("aluno", ALUNO.id).order("data", { ascending: false }),
+        sb.from("cobrancas").select("descricao, valor, vencimento, pago_em").eq("aluno", ALUNO.id).order("vencimento", { ascending: false }).limit(6)
       ]);
     }).then(function (r) {
-      MEUS.pres = r[0].data || []; MEUS.mens = r[1].data || []; MEUS.grads = r[2].data || [];
+      MEUS.pres = r[0].data || []; MEUS.mens = r[1].data || []; MEUS.grads = r[2].data || []; MEUS.cobs = r[3] && !r[3].error ? r[3].data || [] : [];
       paintSemana(); paintMens(); paintPerfil(); paintAvisosReal();
     }).catch(function () {});
   }
@@ -1717,6 +1835,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       var s2 = x.pago_em ? '<span class="r ok">Pago em ' + br(x.pago_em) + "</span>" : x.vencimento < hoje ? '<span class="r warn">Venceu em ' + br(x.vencimento) + "</span>" : '<span class="r">Vence ' + br(x.vencimento) + "</span>";
       return '<div class="ap-row"><span>' + nm + " · " + brl(x.valor) + "</span>" + s2 + "</div>";
     }).join("") || '<div class="ap-row"><span>Nenhuma mensalidade lançada</span></div>';
+    /* outros valores (taxa de matrícula, produto, avulso) */
+    if (MEUS.cobs && MEUS.cobs.length) rows += '<div class="ap-row" style="margin-top:14px;border-top:0"><span class="ap-lb">Outros valores</span></div>' + MEUS.cobs.map(function (c) {
+      var st = c.pago_em ? '<span class="r ok">Pago em ' + br(c.pago_em) + "</span>" : c.vencimento < hoje ? '<span class="r warn">Venceu em ' + br(c.vencimento) + "</span>" : '<span class="r">Vence ' + br(c.vencimento) + "</span>";
+      return '<div class="ap-row"><span>' + esc(c.descricao) + " · " + brl(c.valor) + "</span>" + st + "</div>";
+    }).join("");
     $("#apReceipt").insertAdjacentHTML("beforebegin", rows.replace('class="ap-row"', 'class="ap-row" style="margin-top:12px"'));
     $("#apReceipt").hidden = true;
   }

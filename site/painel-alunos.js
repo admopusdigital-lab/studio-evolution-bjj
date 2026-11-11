@@ -71,7 +71,8 @@
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><textarea class="crm-in" data-k="nota" rows="2">' + v("nota") + "</textarea></label>" +
       (pre.responsavel_conta ? '<input type="hidden" data-k="responsavel_conta" value="' + esc(pre.responsavel_conta) + '"><p class="muted wide" style="font-size:12.5px">Vai entrar no plano família de <b>' + esc(pre.titular || "") + "</b>: a conta do app dele marca as aulas e faz o check-in.</p>" : "") +
       "</div>" +
-      (a.id ? "" : '<label class="mf-pub"><input type="checkbox" data-k="mens1" checked><span>Lançar a mensalidade deste mês no Financeiro</span></label>' +
+      (a.id ? "" : '<div class="crm-grid" style="margin-top:4px"><label class="crm-f"><span>Taxa de matrícula (R$) <small>(opcional)</small></span><input class="crm-in" data-k="taxa" inputmode="decimal" placeholder="0" autocomplete="off"></label></div>' +
+        '<label class="mf-pub"><input type="checkbox" data-k="mens1" checked><span>Lançar a mensalidade deste mês no Financeiro</span></label>' +
         '<label class="mf-pub"><input type="checkbox" data-k="app"' + (pre.email ? " checked" : "") + '><span>Criar o acesso ao app <small>(precisa do e-mail; no Kids, a conta é do responsável)</small></span></label>') +
       '<p class="crm-err" role="alert"></p>' +
       '<div class="msg-acts"><button class="mini-btn" type="submit">' + (a.id ? "Salvar" : "Cadastrar aluno") + '</button><button class="mini-btn ghost" type="button" data-cancel>Cancelar</button></div>';
@@ -99,7 +100,7 @@
         faixa: g("faixa"), graus: +g("graus"), mensalidade: val ? P.num(val) : null, vencimento: +g("vencimento"), inicio: g("inicio") || P.hoje(),
         nota: g("nota") || null, responsavel_conta: g("responsavel_conta") || undefined, aulas_antes: g("aulas_antes") ? parseInt(g("aulas_antes").replace(/\D/g, ""), 10) || 0 : 0
       },
-      foneTxt: g("whatsapp"), mens1: g("mens1"), app: g("app")
+      foneTxt: g("whatsapp"), mens1: g("mens1"), app: g("app"), taxa: g("taxa") ? P.num(g("taxa")) : 0
     };
   }
   function validar(f, x) {
@@ -110,6 +111,7 @@
     if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) return P.erroForm(f, el("email"), "Confira o e-mail.");
     if (x.app && !d.email) return P.erroForm(f, el("email"), "Para criar o acesso ao app, digite o e-mail.");
     if (d.mensalidade !== null && !(d.mensalidade >= 0)) return P.erroForm(f, el("mensalidade"), "Valor da mensalidade em reais, como 200.");
+    if (x.taxa !== 0 && !(x.taxa >= 0)) return P.erroForm(f, el("taxa"), "Taxa de matrícula em reais, como 100.");
     if (!(d.aulas_antes >= 0 && d.aulas_antes <= 5000)) return P.erroForm(f, el("aulas_antes"), "Aulas antes do app: um número de 0 a 5000.");
     return true;
   }
@@ -153,6 +155,7 @@
         passos.push(P.q(function (sb) { return sb.from("mensalidades").insert({ aluno: novo.id, competencia: p.competencia, valor: x.d.mensalidade, vencimento: p.vencimento }); }));
       }
       if (x.d.graus || x.d.faixa !== "branca") passos.push(P.q(function (sb) { return sb.from("graduacoes").insert({ aluno: novo.id, faixa: x.d.faixa, graus: x.d.graus, data: x.d.inicio, nota: "Faixa ao entrar no Studio" }); }));
+      if (x.taxa > 0) passos.push(P.q(function (sb) { return sb.from("cobrancas").insert({ aluno: novo.id, descricao: "Taxa de matrícula", tipo: "matricula", valor: x.taxa, vencimento: P.hoje() }); }));
       if (preLead) passos.push(P.q(function (sb) { return sb.from("leads").update({ etapa: "matriculado" }).eq("id", preLead); }), P.q(function (sb) { return sb.from("lead_eventos").insert({ lead: preLead, texto: "Matriculado: cadastro de aluno criado" }); }));
       return Promise.all(passos).then(function () { return novo; });
     }).then(function (novo) {
@@ -205,6 +208,46 @@
     if (m.vencimento < P.hoje()) return '<span class="pill-s warn">Atrasada desde ' + P.dataBR(m.vencimento) + "</span>";
     return '<span class="pill-s">Vence ' + P.dataBR(m.vencimento) + "</span>";
   }
+  /* ---------- outros valores: taxa de matrícula, produto vendido, qualquer valor avulso ---------- */
+  var FORMA_C = { pix: "Pix", dinheiro: "Dinheiro", cartao: "Cartão", boleto: "Boleto" };
+  function statusC(c) {
+    if (c.pago_em) return '<span class="pill-s in">Pago ' + P.dataBR(c.pago_em) + (c.forma ? " · " + FORMA_C[c.forma] : "") + "</span>";
+    if (c.vencimento < P.hoje()) return '<span class="pill-s warn">Venceu ' + P.dataBR(c.vencimento) + "</span>";
+    return '<span class="pill-s">Vence ' + P.dataBR(c.vencimento) + "</span>";
+  }
+  function outrosHTML(a, cobs) {
+    if (cobs === null) return '<div class="ficha-sec"><h5>Outros valores</h5><p class="muted">Para lançar taxa de matrícula e outros valores, rode a atualização do banco (veja o aviso no topo do painel).</p></div>';
+    var aberto = cobs.filter(function (c) { return !c.pago_em; }).reduce(function (t, c) { return t + Number(c.valor); }, 0);
+    return '<div class="ficha-sec"><h5>Outros valores' + (aberto ? ' · <span style="color:var(--warn)">' + P.brl(aberto) + " em aberto</span>" : "") + "</h5>" +
+      (cobs.length ? '<ul class="ficha-list">' + cobs.map(function (c) {
+        return '<li data-cob="' + c.id + '"><span>' + esc(c.descricao) + " · " + P.brl(c.valor) + "</span><span class=\"row-acts\">" + statusC(c) +
+          (c.pago_em ? "" : '<button class="mini-btn" type="button" data-cob-paga>Recebi</button>') + '<button class="mini-btn ghost" type="button" data-cob-apaga>Apagar</button></span></li>';
+      }).join("") + "</ul>" : '<p class="muted">Nada além da mensalidade. Lance aqui a taxa de matrícula, um kimono, um seminário ou qualquer valor avulso.</p>') +
+      '<form class="crm-form oc-form" id="frCob" novalidate><div class="crm-grid">' +
+        '<label class="crm-f"><span>O que é</span><select class="sel" id="ocTipo"><option value="matricula">Taxa de matrícula</option><option value="outro" selected>Outro valor</option></select></label>' +
+        '<label class="crm-f"><span>Descrição</span><input class="crm-in" id="ocDesc" maxlength="80" placeholder="Seminário, exame de faixa…" autocomplete="off"></label>' +
+        '<label class="crm-f"><span>Valor (R$)</span><input class="crm-in" id="ocValor" inputmode="decimal" placeholder="100" autocomplete="off"></label>' +
+        '<label class="crm-f"><span>Vencimento</span><input class="crm-in" type="date" id="ocVenc" value="' + P.hoje() + '"></label></div>' +
+        '<label class="mf-pub"><input type="checkbox" id="ocPago"><span>Já recebi</span> <select class="sel" id="ocForma" style="margin-left:8px;max-width:130px">' + Object.keys(FORMA_C).map(function (k) { return '<option value="' + k + '">' + FORMA_C[k] + "</option>"; }).join("") + "</select></label>" +
+        '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Lançar valor</button></div></form></div>';
+  }
+  function ligaOutros(a, dr) {
+    var f = $("#frCob", dr);
+    if (!f) return;
+    $("#ocTipo", f).onchange = function () { var d = $("#ocDesc", f); if (this.value === "matricula" && !d.value) d.value = "Taxa de matrícula"; else if (this.value !== "matricula" && d.value === "Taxa de matrícula") d.value = ""; };
+    f.onsubmit = function (e) {
+      e.preventDefault();
+      var tipo = $("#ocTipo", f).value, desc = $("#ocDesc", f).value.trim() || (tipo === "matricula" ? "Taxa de matrícula" : ""), v = P.num($("#ocValor", f).value), venc = $("#ocVenc", f).value, pago = $("#ocPago", f).checked;
+      if (desc.length < 2) return P.erroForm(f, $("#ocDesc", f), "Diga o que é esse valor, como Seminário ou Exame de faixa.");
+      if (!(v > 0)) return P.erroForm(f, $("#ocValor", f), "Digite o valor, como 100 ou 49,90.");
+      if (!venc) return P.erroForm(f, $("#ocVenc", f), "Escolha o vencimento.");
+      $('[type="submit"]', f).classList.add("loading");
+      P.q(function (sb) { return sb.from("cobrancas").insert({ aluno: a.id, descricao: desc, tipo: tipo, valor: v, vencimento: venc, pago_em: pago ? P.hoje() : null, forma: pago ? $("#ocForma", f).value : null }); })
+        .then(function () { P.toast(desc + " · " + P.brl(v) + " lançado para " + P.first(a.nome) + "."); P.abrirAluno(a.id); })
+        .catch(function (er) { $('[type="submit"]', f).classList.remove("loading"); P.erro(er); });
+    };
+  }
+
   /* ---------- plano família: o titular (com acesso ao app) e os dependentes ligados à conta dele ---------- */
   function familiaHTML(a) {
     if (!("responsavel_conta" in a)) return '<div class="ficha-sec"><h5>Plano família</h5><p class="muted">Para usar o plano família, rode a atualização do banco (veja o aviso no topo do painel).</p></div>';
@@ -241,9 +284,11 @@
     $("#drSub").textContent = P.turmaTx(a) + " · " + P.beltTxt(a.faixa, a.graus) + (a.ativo ? "" : " · inativo");
     Promise.all([
       P.q(function (sb) { return sb.from("mensalidades").select("*").eq("aluno", id).order("competencia", { ascending: false }).limit(6); }),
-      P.q(function (sb) { return sb.from("graduacoes").select("*").eq("aluno", id).order("data", { ascending: false }); })
+      P.q(function (sb) { return sb.from("graduacoes").select("*").eq("aluno", id).order("data", { ascending: false }); }),
+      /* sem a tabela (banco sem a atualização), a ficha abre do mesmo jeito */
+      P.q(function (sb) { return sb.from("cobrancas").select("*").eq("aluno", id).order("vencimento", { ascending: false }); }).catch(function () { return null; })
     ]).then(function (r) {
-      var mens = r[0] || [], grads = r[1] || [], pres = P.pres.filter(function (p) { return p.aluno === id; });
+      var mens = r[0] || [], grads = r[1] || [], cobs = r[2], pres = P.pres.filter(function (p) { return p.aluno === id; });
       var antes = a.aulas_antes || 0, total = pres.length, desdeGrau = (grads.length ? pres.filter(function (p) { return p.data > grads[0].data; }).length : total) + P.antes(a, grads.length ? grads[0].data : null);
       var idade = a.nascimento ? Math.floor(P.difDias(a.nascimento, P.hoje()) / 365.25) : null;
       var html =
@@ -261,6 +306,7 @@
         "</dl></div>" +
         '<div class="ficha-sec"><h5>Frequência · 12 semanas</h5>' + heat(id) + '<p class="muted" style="margin-top:8px;font-size:12px">' + total + (total === 1 ? " aula" : " aulas") + " no último ano" + (antes ? " · mais " + antes + " antes do app" : "") + " · " + desdeGrau + " desde o último grau · última: " + P.quando(P.ultima(id)) + "</p></div>" +
         '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return "<li><span>" + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + "</span>" + statusMens(m) + "</li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
+        outrosHTML(a, cobs) +
         '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return "<li><span>" + P.beltTxt(g.faixa, g.graus) + (g.nota ? " · " + esc(g.nota) : "") + "</span><span>" + P.dataBRano(g.data) + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
         familiaHTML(a) +
         '<form class="crm-form" id="frAntes" novalidate hidden>' +
@@ -280,6 +326,7 @@
           '<button class="mini-btn ghost" type="button" data-ativo>' + (a.ativo ? "Desativar aluno" : "Reativar aluno") + "</button>" +
         "</div>";
       $(".dr-body", dr).innerHTML = html;
+      ligaOutros(a, dr);
       $("#frAntes", dr).onsubmit = function (e) {
         e.preventDefault();
         var f = e.target, t = $("#faN", f).value.replace(/\s/g, ""), n = t === "" ? 0 : parseInt(t, 10);
@@ -299,6 +346,14 @@
         else if (b.hasAttribute("data-edit")) editar(a, dr);
         else if (b.hasAttribute("data-grau")) P.registrarGrau(a.id);
         else if (b.dataset.ficha2) P.abrirAluno(b.dataset.ficha2);
+        else if (b.hasAttribute("data-cob-paga") || b.hasAttribute("data-cob-apaga")) {
+          var cid = b.closest("[data-cob]").dataset.cob, apaga = b.hasAttribute("data-cob-apaga");
+          if (apaga && b.dataset.certo !== "1") { b.dataset.certo = "1"; b.textContent = "Apagar mesmo?"; return; }
+          b.classList.add("loading");
+          P.q(function (sb) { return apaga ? sb.from("cobrancas").delete().eq("id", cid) : sb.from("cobrancas").update({ pago_em: P.hoje(), forma: "pix" }).eq("id", cid); })
+            .then(function () { P.toast(apaga ? "Valor apagado." : "Recebido. Entrou no Financeiro."); P.abrirAluno(a.id); })
+            .catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+        }
         else if (b.dataset.desfam) {
           var dd = P.porId[b.dataset.desfam];
           mudaFamilia(dd.id, null, P.first(dd.nome) + " saiu do plano família.", a.id);

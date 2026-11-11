@@ -104,12 +104,12 @@
   };
   /* o SQL de 03/11 (faixas do Kids, aulas antes do app, reserva em 48 h e ranking no app) */
   /* o SQL mais novo que o painel precisa (o plano família); os anteriores já foram rodados */
-  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261104120000_familia.sql";
-  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|ranking_frequencia/.test(m); };
+  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261111120000_estoque_cobrancas.sql";
+  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto/.test(m); };
   P.avisoBanco = function () {
     var el = $("#dbAviso");
     if (!el || !el.hidden) return;
-    el.innerHTML = "<b>Falta atualizar o banco de dados.</b>Sem isso não dá para usar o plano família (pai ou mãe com os filhos na mesma conta do app). " +
+    el.innerHTML = "<b>Falta atualizar o banco de dados.</b>Sem isso não dá para usar o Estoque, a loja do app e os outros valores do aluno (taxa de matrícula, produto, valor avulso). " +
       'Abra o Supabase → SQL Editor → New query, cole <a href="' + P.SQL_ATUALIZA + '" target="_blank" rel="noopener">este arquivo</a> inteiro e clique em Run. Depois, recarregue esta página.';
     el.hidden = false;
   };
