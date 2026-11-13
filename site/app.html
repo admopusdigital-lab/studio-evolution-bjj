@@ -797,12 +797,15 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
   /* ---------- quem está usando: no modo Supabase, o nome e a data de verdade; na demonstração, a Marina ---------- */
   var ses = Acesso.sessao();
-  if (!demo && ses && ses.nome) {
+  /* a saudação e a data de hoje (de novo quando o app volta do segundo plano em outro horário ou dia) */
+  function saudacao() {
+    if (demo || !ses || !ses.nome) return;
     var d = new Date(), h = d.getHours(), dia = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(d);
     $("#apHello").textContent = (h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite") + ", " + ses.nome.split(" ")[0] + ".";
     $("#apDate").textContent = dia.charAt(0).toUpperCase() + dia.slice(1);
-    $(".ap-hi", screenOf("perfil")).textContent = ses.nome;
   }
+  saudacao();
+  if (!demo && ses && ses.nome) $(".ap-hi", screenOf("perfil")).textContent = ses.nome;
   $("#apCodeDemo").hidden = !demo;
   $("#apReset").hidden = !demo;
   $("#apReset").addEventListener("click", function () { Mov.recomecar(); location.reload(); });
@@ -1218,6 +1221,27 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       paintAulas();
     }).catch(function () {});
   }
+  /* a aula mostrada já terminou (começo + 1 h)? */
+  function aulaAcabou() {
+    if (!AULA || !AULA.data || semAula) return false;
+    var d = diaDe(AULA.data);
+    d.setMinutes(mins(AULA.hora) + 60);
+    return Date.now() > d.getTime();
+  }
+  /* põe o app em dia sem recarregar a página: a próxima aula, as 48 h de aulas e os dados do membro */
+  function renovar() {
+    saudacao();
+    if (!ALUNO || busy) return atualizarQuem();
+    var nova = proximaAula(ALUNO.turma, ALUNO.horario);
+    if (nova && chaveAula(nova) !== chaveAula(AULA) && (aulaAcabou() || !AULA.data)) {
+      AULA = nova; confirmed = false; registered = false; quem = [];
+      askRelease(false);
+    }
+    AULAS = aulas48(ALUNO.turma);
+    if (AULA.data && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
+    paintAula(); paintAulas(); paintSpot();
+    return Promise.all([minhasReservas(), atualizarQuem(), extrasReal(), carregarRank()]).catch(function () {});
+  }
   function carregarReal() {
     return Acesso.cliente().then(function (sb) {
       return Promise.all([sb.from("alunos").select("*").order("nome"), sb.auth.getSession()]);
@@ -1247,8 +1271,17 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   if (!demo) {
     carregarReal();
-    setInterval(function () { if (!document.hidden && current === "presenca" || !document.hidden && current === "inicio") atualizarQuem(); }, 30000);
-    document.addEventListener("visibilitychange", function () { if (!document.hidden) atualizarQuem(); });
+    setInterval(function () {
+      if (document.hidden) return;
+      if (aulaAcabou()) return renovar();
+      if (current === "presenca" || current === "inicio") atualizarQuem();
+    }, 30000);
+    /* de volta ao app: depois de 10 min fora (ou se a aula já acabou), refaz a aula, a saudação e os dados */
+    var saiuEm = 0;
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) { saiuEm = Date.now(); return; }
+      if (aulaAcabou() || (saiuEm && Date.now() - saiuEm > 10 * 60000)) renovar(); else atualizarQuem();
+    });
   }
 
   /* ---------- ranking de frequência: no Supabase, ranking_frequencia() (top 10 da turma e a sua posição) ---------- */
