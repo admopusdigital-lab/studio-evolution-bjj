@@ -326,9 +326,9 @@
           (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
         "</dl></div>" +
         '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + "</div>" +
-        '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return "<li><span>" + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + "</span>" + statusMens(m) + "</li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
+        '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return '<li data-mens="' + m.id + '"><span>' + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + '</span><span class="row-acts">' + statusMens(m) + (m.pago_em ? "" : '<button class="mini-btn" type="button" data-mens-paga>Recebi</button>') + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
         outrosHTML(a, cobs) +
-        '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return "<li><span>" + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + "</span><span>" + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
+        '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return '<li data-grad="' + g.id + '"><span>' + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + '</span><span class="row-acts">' + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + '<button class="mini-btn ghost" type="button" data-grad-apaga>Apagar</button></span></li>'; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
         familiaHTML(a) +
         '<form class="crm-form" id="frAntes" novalidate hidden>' +
           '<p class="fin-k">Aulas no Studio antes do app</p>' +
@@ -367,6 +367,23 @@
         else if (b.hasAttribute("data-edit")) editar(a, dr);
         else if (b.hasAttribute("data-grau")) P.registrarGrau(a.id);
         else if (b.dataset.ficha2) P.abrirAluno(b.dataset.ficha2);
+        else if (b.hasAttribute("data-mens-paga")) {
+          var mid = b.closest("[data-mens]").dataset.mens;
+          b.classList.add("loading");
+          P.q(function (sb) { return sb.from("mensalidades").update({ pago_em: P.hoje(), forma: "pix" }).eq("id", mid); })
+            .then(function () { P.toast("Baixa feita. Entrou no Financeiro."); P.abrirAluno(a.id); })
+            .catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+        }
+        else if (b.hasAttribute("data-grad-apaga")) {
+          if (b.dataset.certo !== "1") { b.dataset.certo = "1"; b.textContent = "Apagar mesmo?"; return; }
+          var gid = b.closest("[data-grad]").dataset.grad;
+          b.classList.add("loading");
+          P.q(function (sb) { return sb.from("graduacoes").delete().eq("id", gid); })
+            .then(function () { return P.recalcFaixa(a.id); })
+            .then(function () { return Promise.all([P.carregarAlunos(), carregarGrad()]); })
+            .then(function () { var a2 = P.porId[a.id]; P.toast("Graduação apagada. " + P.first(a.nome) + " está em " + P.beltTxt(a2.faixa, a2.graus).toLowerCase() + "."); P.abrirAluno(a.id); })
+            .catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+        }
         else if (b.hasAttribute("data-cob-paga") || b.hasAttribute("data-cob-apaga")) {
           var cid = b.closest("[data-cob]").dataset.cob, apaga = b.hasAttribute("data-cob-apaga");
           if (apaga && b.dataset.certo !== "1") { b.dataset.certo = "1"; b.textContent = "Apagar mesmo?"; return; }
@@ -466,6 +483,26 @@
     if (b.dataset.ficha) P.abrirAluno(b.dataset.ficha);
     if (b.dataset.grau) P.registrarGrau(b.dataset.grau);
   });
+  /* a faixa e os graus do aluno vêm da graduação mais recente (pela data e, no mesmo dia, pela ordem do registro).
+     Uma graduação com data no futuro (digitada errada) volta para o dia em que foi registrada: antes ela travava
+     o aluno no grau antigo, porque nenhuma graduação nova ficava "mais recente" que ela */
+  P.recalcFaixa = function (id) {
+    return P.q(function (sb) { return sb.from("graduacoes").select("id, faixa, graus, data, criado_em").eq("aluno", id); }).then(function (l) {
+      l = l || [];
+      var hoje = P.hoje(), passos = [];
+      l.forEach(function (g) {
+        if (g.data > hoje) {
+          var certo = P.iso(new Date(g.criado_em));
+          if (certo > hoje) certo = hoje;
+          g.data = certo;
+          passos.push(P.q(function (sb) { return sb.from("graduacoes").update({ data: certo }).eq("id", g.id); }));
+        }
+      });
+      l.sort(function (x, y) { return x.data < y.data ? 1 : x.data > y.data ? -1 : String(y.criado_em).localeCompare(String(x.criado_em)); });
+      if (l[0]) passos.push(P.q(function (sb) { return sb.from("alunos").update({ faixa: l[0].faixa, graus: l[0].graus }).eq("id", id); }));
+      return Promise.all(passos);
+    });
+  };
   P.registrarGrau = function (id) {
     var a = P.porId[id];
     var fxs = P.kid(a.turma) ? P.FX_KD : P.FX_AD;
@@ -474,7 +511,7 @@
     var dr = P.abrirFicha('<form class="crm-form" id="grForm" novalidate><p class="fin-k">Hoje: ' + P.beltTxt(a.faixa, a.graus) + '</p><div class="crm-grid">' +
       '<label class="crm-f"><span>Faixa</span><select class="sel" id="gfF">' + fxs.map(function (f) { return '<option value="' + f + '"' + (f === prox.f ? " selected" : "") + ">" + P.FAIXAS[f] + "</option>"; }).join("") + "</select></label>" +
       '<label class="crm-f"><span>Graus</span><select class="sel" id="gfG">' + [0, 1, 2, 3, 4, 5, 6].map(function (g) { return "<option" + (g === prox.g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></label>" +
-      '<label class="crm-f"><span>Data</span><input class="crm-in" type="date" id="gfD" value="' + P.hoje() + '"></label>' +
+      '<label class="crm-f"><span>Data</span><input class="crm-in" type="date" id="gfD" max="' + P.hoje() + '" value="' + P.hoje() + '"></label>' +
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><input class="crm-in" id="gfN" autocomplete="off" placeholder="Ex.: entregue no treino de sexta"></label></div>' +
       '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Registrar</button><button class="mini-btn ghost" type="button" data-dr-x>Cancelar</button></div></form>', "Grau de " + a.nome);
     $("#drSub").textContent = P.turmaTx(a);
@@ -482,8 +519,10 @@
       e.preventDefault();
       var f = $("#gfF").value, g = +$("#gfG").value, d = $("#gfD").value || P.hoje(), n = $("#gfN").value.trim();
       if (f === a.faixa && g === a.graus) return P.erroForm(e.target, $("#gfG"), "Escolha um grau ou faixa diferente do atual.");
+      if (d > P.hoje()) return P.erroForm(e.target, $("#gfD"), "A data do grau não pode ser no futuro.");
       $('[type="submit"]', e.target).classList.add("loading");
       P.q(function (sb) { return sb.from("graduacoes").insert({ aluno: a.id, faixa: f, graus: g, data: d, nota: n || null }); })
+        .then(function () { return P.recalcFaixa(a.id); })
         .then(function () { return Promise.all([P.carregarAlunos(), carregarGrad()]); })
         .then(function () {
           P.fecharFicha();

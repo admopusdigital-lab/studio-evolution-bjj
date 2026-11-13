@@ -25,7 +25,8 @@
   }
   function fimMes(m) { return P.somaDias(P.somaMes(m, 1), -1); }
   function doMes(m) { return MENS.concat(EXTRA).filter(function (x) { return x.competencia === m; }); }
-  function tabela(x) { return x._extra ? "cobrancas" : "mensalidades"; }
+  /* de que tabela é a linha: mensalidade ou valor avulso (não confundir com tabela(), a dos gráficos) */
+  function tabelaDe(x) { return x._extra ? "cobrancas" : "mensalidades"; }
   function despMes(m) { return DESP.filter(function (x) { return P.mesIni(x.data) === m; }); }
   function soma(l, f) { return l.reduce(function (a, x) { return a + Number(f ? f(x) : x.valor); }, 0); }
   function atrasada(x) { return !x.pago_em && x.vencimento < P.hoje(); }
@@ -121,7 +122,7 @@
     if (b.hasAttribute("data-apagam")) {
       if (b.dataset.certo !== "1") { b.dataset.certo = "1"; b.textContent = "Apagar mesmo?"; setTimeout(function () { if (document.contains(b)) { b.dataset.certo = ""; b.textContent = "Apagar"; } }, 4000); return; }
       b.classList.add("loading");
-      return P.q(function (sb) { return sb.from(tabela(x)).delete().eq("id", x.id); }).then(carregar)
+      return P.q(function (sb) { return sb.from(tabelaDe(x)).delete().eq("id", x.id); }).then(carregar)
         .then(function () { P.toast((x._extra ? x.descricao + " de " + P.first(nome(x.aluno)) : "Mensalidade de " + P.first(nome(x.aluno)) + " em " + P.mesNome(x.competencia)) + " apagada. Saiu do fechamento."); })
         .catch(function (er) { b.classList.remove("loading"); P.erro(er); });
     }
@@ -136,7 +137,7 @@
   });
   function salvarM(x, d, b, msg) {
     b.classList.add("loading");
-    P.q(function (sb) { return sb.from(tabela(x)).update(d).eq("id", x.id); }).then(carregar).then(function () { P.toast(msg); }).catch(function (e) { b.classList.remove("loading"); P.erro(e); });
+    P.q(function (sb) { return sb.from(tabelaDe(x)).update(d).eq("id", x.id); }).then(carregar).then(function () { P.toast(msg); }).catch(function (e) { b.classList.remove("loading"); P.erro(e); });
   }
   function gerar(b) {
     var l = faltam().map(function (a) { return { aluno: a.id, competencia: mes, valor: a.mensalidade, vencimento: mes.slice(0, 8) + P.two(a.vencimento || 10) }; });
