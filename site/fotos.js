@@ -4,7 +4,7 @@
    das iniciais (.av); este arquivo troca as iniciais pela foto sozinho, em qualquer lista que aparecer na tela. */
 (function () {
   var BUCKET = "fotos", DIAS = 7, CHAVE = "evo-fotos";
-  var memo = {}, fila = {}, espera = null;
+  var memo = {}, falhou = {}, espera = null;
   try { memo = JSON.parse(localStorage.getItem(CHAVE) || "{}") || {}; } catch (e) { memo = {}; }
   var agora = function () { return Date.now(); };
   /* tira os links vencidos (ou quase) do guardado */
@@ -63,6 +63,7 @@
     return sb.storage.from(BUCKET).createSignedUrls(falta, DIAS * 86400).then(function (r) {
       (r.data || []).forEach(function (x) {
         if (x && x.signedUrl && !x.error) memo[x.path] = { u: x.signedUrl, ate: agora() + DIAS * 864e5 };
+        else if (x && x.path) falhou[x.path] = agora();
       });
       guarda();
     }, function () {});
@@ -87,7 +88,13 @@
   function pinta(raiz) {
     if (!cliente) return;
     var els = Array.prototype.slice.call((raiz || document).querySelectorAll("[data-foto]")).filter(function (el) {
-      return el.getAttribute("data-foto-ok") !== el.getAttribute("data-foto");
+      var c = el.getAttribute("data-foto");
+      if (el.getAttribute("data-foto-ok") === c) return false;
+      /* trocou de pessoa no mesmo círculo: a foto anterior sai na hora */
+      var velha = el.querySelector("img.ft");
+      if (velha && el.getAttribute("data-foto-ok")) { velha.remove(); el.classList.remove("com-foto"); el.removeAttribute("data-foto-ok"); }
+      /* link que não deu certo há pouco: espera 10 min antes de pedir de novo */
+      return !(falhou[c] && agora() - falhou[c] < 6e5);
     });
     if (!els.length) return;
     var cs = {};

@@ -69,7 +69,14 @@
     if (atrasada(x)) return '<span class="pill-s warn">Atrasada há ' + P.difDias(x.vencimento, P.hoje()) + (P.difDias(x.vencimento, P.hoje()) === 1 ? " dia" : " dias") + "</span>";
     return '<span class="pill-s">Vence ' + P.dataBR(x.vencimento) + "</span>";
   }
-  function faltam() { return P.ativos().filter(function (a) { return a.mensalidade > 0 && !MENS.some(function (x) { return x.aluno === a.id && x.competencia === mes; }); }); }
+  /* quem ainda não tem a mensalidade do mês: só quem já estava no Studio no vencimento daquele mês
+     (quem entrou depois do vencimento paga a 1ª no mês seguinte, como no cadastro) */
+  function faltam() {
+    return P.ativos().filter(function (a) {
+      var venc = mes.slice(0, 8) + P.two(a.vencimento || 10);
+      return a.mensalidade > 0 && (!a.inicio || a.inicio <= venc) && !MENS.some(function (x) { return x.aluno === a.id && x.competencia === mes; });
+    });
+  }
   function paintMens() {
     var l = doMes(mes), prev = soma(l), rec = soma(l.filter(function (x) { return x.pago_em; })), atr = soma(l.filter(atrasada)), fal = faltam();
     var vis = l.filter(function (x) { return mF === "todas" || (mF === "pagas" ? x.pago_em : mF === "atrasadas" ? atrasada(x) : !x.pago_em && !atrasada(x)); });
@@ -430,6 +437,8 @@
   window.addEventListener("resize", function () { clearTimeout(rz); rz = setTimeout(function () { if (P.atual() === "fin" && aba === "geral" && ok) paintGeral(); }, 200); });
 
   P.aoAbrir("fin", function () { carregar().catch(function (e) { P.erro(e, "Não deu para carregar o Financeiro"); }); });
+  /* pagou, editou ou lançou valor pela ficha do aluno com o Financeiro na tela: recarrega a lista */
+  P.aoFecharFicha(function (aba) { if (aba === "fin") carregar().catch(function () {}); });
   P.aoMudarAlunos(function () { if (P.atual() === "fin") paint(); });
   window.addEventListener("load", function () {
     P.q(function (sb) { return sb.from("mensalidades").select("id, vencimento, pago_em").is("pago_em", null).lt("vencimento", P.hoje()); }).then(function (l) { P.selo("bFin", (l || []).length); }).catch(function () {});

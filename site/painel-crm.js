@@ -21,7 +21,7 @@
   }
   function paint() {
     var abertos = LEADS.filter(function (l) { return passa(l, "abertos"); }).length, novos = LEADS.filter(function (l) { return l.etapa === "novo"; }).length;
-    var mes = P.mesIni(P.hoje()), doMes = LEADS.filter(function (l) { return P.mesIni(l.criado_em.slice(0, 10)) === mes; });
+    var mes = P.mesIni(P.hoje()), doMes = LEADS.filter(function (l) { return P.mesIni(P.d10(l.criado_em)) === mes; });
     $("#ldK").textContent = abertos + " em aberto · " + doMes.length + " neste mês · " + doMes.filter(function (l) { return l.etapa === "matriculado"; }).length + " matrículas";
     P.selo("bLeads", novos);
     $("#ldChips").innerHTML = FILTROS.map(function (f) { var n = LEADS.filter(function (l) { return passa(l, f[0]); }).length; return '<button type="button" data-f="' + f[0] + '" aria-pressed="' + (etapaF === f[0]) + '">' + f[1] + " · " + n + "</button>"; }).join("");
@@ -29,7 +29,7 @@
     var vis = LEADS.filter(function (l) { return passa(l, etapaF) && (!q || P.norm(l.nome).indexOf(q) >= 0 || P.norm(l.crianca).indexOf(q) >= 0 || (qd.length >= 4 && P.digitos(l.whatsapp).indexOf(qd) >= 0)); });
     $("#ldList").innerHTML = vis.map(function (l) {
       return '<div class="lead" data-id="' + l.id + '"><span class="av">' + P.ini(l.nome) + '</span><div><b><button class="nm-btn" type="button" data-ficha>' + esc(l.nome) + "</button></b>" + pill(l) +
-        "<small>" + esc(ORIGEM[l.origem] + " · " + oQue(l)) + (l.aula_data && l.etapa !== "agendado" ? " · pediu " + aulaTx(l) : "") + " · " + P.quando(l.criado_em.slice(0, 10)).replace("hoje", "chegou hoje") + "</small></div>" +
+        "<small>" + esc(ORIGEM[l.origem] + " · " + oQue(l)) + (l.aula_data && l.etapa !== "agendado" ? " · pediu " + aulaTx(l) : "") + " · " + P.quando(P.d10(l.criado_em)).replace("hoje", "chegou hoje") + "</small></div>" +
         '<div class="acts"><select class="sel" data-etapa aria-label="Etapa de ' + esc(l.nome) + '">' + Object.keys(ETAPA).map(function (k) { return '<option value="' + k + '"' + (k === l.etapa ? " selected" : "") + ">" + ETAPA[k] + "</option>"; }).join("") + "</select>" +
         (l.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
         (l.etapa === "matriculado" ? '<button class="mini-btn" type="button" data-matricula>Cadastrar aluno</button>' : "") + "</div></div>";
@@ -81,9 +81,10 @@
   /* ---------- a ficha do contato ---------- */
   function abrir(id) {
     var l = porId(id);
-    var dr = P.abrirFicha('<p class="muted">Carregando…</p>', l.nome);
+    var dr = P.abrirFicha('<p class="muted">Carregando…</p>', l.nome), minha = P.fichaN;
     $("#drSub").textContent = ORIGEM[l.origem] + " · " + ETAPA[l.etapa];
     P.q(function (sb) { return sb.from("lead_eventos").select("*").eq("lead", id).order("criado_em", { ascending: false }); }).then(function (ev) {
+      if (minha !== P.fichaN) return;
       $(".dr-body", dr).innerHTML =
         '<div class="ficha-sec"><h5>Contato</h5><dl class="ficha-dl">' +
           "<dt>WhatsApp</dt><dd>" + (l.whatsapp ? P.fone(l.whatsapp) : "—") + "</dd>" +

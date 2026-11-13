@@ -15,16 +15,18 @@
   P.two = function (n) { return (n < 10 ? "0" : "") + n; };
   P.iso = function (d) { return d.getFullYear() + "-" + P.two(d.getMonth() + 1) + "-" + P.two(d.getDate()); };
   P.hoje = function () { return P.iso(new Date()); };
-  P.dia = function (iso) { var p = String(iso).slice(0, 10).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
+  /* data do dia (AAAA-MM-DD) no horário do Brasil: um carimbo de hora (criado_em) vira o dia local, não o do UTC */
+  P.d10 = function (x) { var s = String(x || ""); return s.length > 10 && /[T ]\d\d:/.test(s) ? P.iso(new Date(s)) : s.slice(0, 10); };
+  P.dia = function (iso) { var p = P.d10(iso).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
   P.somaDias = function (iso, n) { var d = P.dia(iso); d.setDate(d.getDate() + n); return P.iso(d); };
   P.difDias = function (a, b) { return Math.round((P.dia(b) - P.dia(a)) / 864e5); };
-  P.mesIni = function (iso) { return String(iso).slice(0, 7) + "-01"; };
+  P.mesIni = function (iso) { return P.d10(iso).slice(0, 7) + "-01"; };
   P.somaMes = function (mes, n) { var d = P.dia(mes); d.setMonth(d.getMonth() + n, 1); return P.iso(d); };
   P.hm = function (ts) { var d = new Date(ts); return P.two(d.getHours()) + ":" + P.two(d.getMinutes()); };
   P.agoraMin = function () { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
   P.mins = function (t) { var p = String(t).split(":"); return +p[0] * 60 + +p[1]; };
-  P.dataBR = function (iso) { var p = String(iso).slice(0, 10).split("-"); return p[2] + "/" + p[1]; };
-  P.dataBRano = function (iso) { var p = String(iso).slice(0, 10).split("-"); return p[2] + "/" + p[1] + "/" + p[0]; };
+  P.dataBR = function (iso) { var p = P.d10(iso).split("-"); return p[2] + "/" + p[1]; };
+  P.dataBRano = function (iso) { var p = P.d10(iso).split("-"); return p[2] + "/" + p[1] + "/" + p[0]; };
   var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   P.MESES = MESES;
   P.mesNome = function (mes) { var d = P.dia(mes); return MESES[d.getMonth()] + " de " + d.getFullYear(); };
@@ -35,7 +37,19 @@
     return d <= 0 ? "hoje" : d === 1 ? "ontem" : d < 7 ? Site.DIAS[P.dia(iso).getDay()].toLowerCase() : "há " + d + " dias";
   };
   P.brl = function (v) { v = Number(v) || 0; return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
-  P.num = function (t) { var s = String(t || "").replace(/[^\d,.-]/g, ""); if (s.indexOf(",") >= 0) s = s.replace(/\./g, "").replace(",", "."); var v = parseFloat(s); return isFinite(v) ? v : NaN; };
+  /* "1.234,56", "150,00", "12.000" e "1.250" viram número; "12.5" continua 12,5 */
+  P.num = function (t) {
+    var s = String(t || "").replace(/[^\d,.-]/g, "");
+    if (s.indexOf(",") >= 0) s = s.replace(/\./g, "").replace(",", ".");
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+    var v = parseFloat(s);
+    return isFinite(v) ? v : NaN;
+  };
+  /* um formulário que já está salvando não envia de novo (Enter duas vezes, toque duplo) */
+  document.addEventListener("submit", function (e) {
+    var b = e.target.querySelector('[type="submit"]');
+    if (b && (b.disabled || b.classList.contains("loading"))) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
 
   /* ---------- faixas e turmas ---------- */
   /* as faixas vêm de Site (site.js): as do adulto e as do Kids, com listra branca, lisa e com listra preta */
@@ -171,6 +185,8 @@
     if (!drawer.classList.contains("on")) voltaFoco = document.activeElement;
     /* cada ficha põe o próprio onclick; o da ficha anterior sai */
     drawer.onclick = null;
+    /* cada ficha aberta ganha um número: a resposta que chega depois de trocar de ficha é descartada */
+    P.fichaN = (P.fichaN || 0) + 1;
     drawer.innerHTML = '<div class="dr-top"><div><h4 id="drName" tabindex="-1">' + P.esc(titulo) + '</h4><p id="drSub"></p></div><button class="dr-x" type="button" data-dr-x aria-label="Fechar"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-x"/></svg></button></div><div class="dr-body">' + html + "</div>";
     drawer.scrollTop = 0;
     drawer.classList.add("on"); scrim.classList.add("on");
@@ -178,9 +194,14 @@
     focusSoft($("#drName"), { preventScroll: true });
     return drawer;
   };
+  /* quem precisa saber que a ficha fechou (o Financeiro recarrega o que foi pago pela ficha) */
+  var aoFechar = [];
+  P.aoFecharFicha = function (fn) { aoFechar.push(fn); };
   P.fecharFicha = function () {
     if (!drawer.classList.contains("on")) return;
+    P.fichaN = (P.fichaN || 0) + 1;
     drawer.classList.remove("on"); scrim.classList.remove("on");
+    aoFechar.forEach(function (fn) { try { fn(cur); } catch (e) {} });
     document.body.style.overflow = "";
     if (voltaFoco && document.contains(voltaFoco)) focusSoft(voltaFoco, { preventScroll: true });
     voltaFoco = null;

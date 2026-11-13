@@ -139,8 +139,10 @@
       id: mvEdit ? mvEdit.id : undefined, nome: nome, faixa: $("#mfFaixa").value, cat: $("#mfCat").value, video: v || null,
       pontos: $("#mfPontos").value.split("\n").map(function (t) { return t.trim(); }).filter(Boolean), quiz: quiz, publicado: pub
     };
-    var era = mvEdit;
+    var era = mvEdit, btnS = $('[type="submit"]', mvForm);
+    if (btnS) btnS.classList.add("loading");
     Mov.salvar(m).then(function (salvo) {
+      if (btnS) btnS.classList.remove("loading");
       mvFechar(null);
       if (mvF !== "todas" && mvF !== salvo.faixa) mvF = salvo.faixa;
       return mvCarregar().then(function () {
@@ -150,7 +152,7 @@
         P.toast(!pub ? "Rascunho salvo: os alunos ainda não veem “" + salvo.nome + "”."
           : (era ? "Movimento atualizado" : "Movimento salvo") + ": “" + salvo.nome + "” já aparece no app dos alunos da " + fx + "." + (salvo.video ? "" : " Sem vídeo, ele aparece como em gravação."));
       });
-    }).catch(function () { mfErro(null, "Não deu para salvar agora. Confira a internet e tente de novo."); });
+    }).catch(function () { if (btnS) btnS.classList.remove("loading"); mfErro(null, "Não deu para salvar agora. Confira a internet e tente de novo."); });
   });
   $("#mfDel").addEventListener("click", function () {
     $("#mfDelT").textContent = "Apagar “" + mvEdit.nome + "”? Os alunos deixam de ver o movimento e o progresso dele some.";
@@ -160,7 +162,8 @@
   $("#mfDelNo").addEventListener("click", function () { $("#mfDelAsk").hidden = true; focusSoft($("#mfDel")); });
   $("#mfDelYes").addEventListener("click", function () {
     var m = mvEdit;
-    Mov.apagar(m.id).then(function () { mvFechar(null); return mvCarregar(); }).then(function () { P.toast("“" + m.nome + "” foi apagado."); });
+    Mov.apagar(m.id).then(function () { mvFechar(null); return mvCarregar(); }).then(function () { P.toast("“" + m.nome + "” foi apagado."); })
+      .catch(function (er) { P.erro(er, "Não deu para apagar o movimento"); });
   });
   P.aoAbrir("mov", function () { mvCarregar().catch(function (e) { P.erro(e, "Não deu para carregar os movimentos"); }); });
 

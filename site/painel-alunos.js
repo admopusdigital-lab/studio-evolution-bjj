@@ -149,7 +149,9 @@
     /* só manda o campo quando há aulas antes do app (assim funciona mesmo antes da migração das faixas do Kids) */
     if (x.d.aulas_antes) x.d.aulas_antes_ate = P.hoje(); else delete x.d.aulas_antes;
     if (!x.d.responsavel_conta) delete x.d.responsavel_conta;
+    var criado = null;
     P.q(function (sb) { return sb.from("alunos").insert(x.d).select().single(); }).then(function (novo) {
+      criado = novo;
       var passos = [];
       if (x.mens1 && x.d.mensalidade > 0) {
         var p = primeiraParcela(x.d);
@@ -169,7 +171,16 @@
         if (x.app) return criarAcesso(novo, true);
         P.abrirAluno(novo.id);
       });
-    }).catch(function (e) { btn.classList.remove("loading"); P.erro(e, "Não deu para cadastrar"); });
+    }).catch(function (e) {
+      btn.classList.remove("loading");
+      /* o aluno já entrou e só um passo seguinte falhou: fecha o formulário (cadastrar de novo duplicaria o aluno) */
+      if (criado) {
+        form.hidden = true; addBtn.setAttribute("aria-expanded", "false"); preLead = null;
+        P.erro(e, "Aluno cadastrado, mas faltou um passo (mensalidade, graduação ou taxa). Confira na ficha");
+        return P.carregarAlunos().then(function () { P.abrirAluno(criado.id); }).catch(function () {});
+      }
+      P.erro(e, "Não deu para cadastrar");
+    });
   });
 
   /* ---------- acesso ao app (função criar-conta): a conta liga sozinha ao cadastro pelo e-mail ---------- */
@@ -183,7 +194,7 @@
         P.abrirAluno(a.id, r.ok ? r : null);
         if (!r.ok) P.toast((novo ? "Aluno cadastrado, mas o acesso ao app não foi criado: " : "") + (r.msg || "tente de novo."));
       });
-    });
+    }).catch(function (e) { P.erro(e, "Não deu para criar o acesso ao app"); P.abrirAluno(a.id); });
   }
   function msgAcesso(a, r) {
     var link = new URL("entrar.html?app", location.href).href;
@@ -340,7 +351,7 @@
   P.abrirAluno = function (id, cred) {
     var a = P.porId[id];
     if (!a) return;
-    var dr = P.abrirFicha('<p class="muted">Carregando a ficha…</p>', a.nome);
+    var dr = P.abrirFicha('<p class="muted">Carregando a ficha…</p>', a.nome), minha = P.fichaN;
     $("#drSub").textContent = P.turmaTx(a) + " · " + P.beltTxt(a.faixa, a.graus) + (a.ativo ? "" : " · inativo");
     Promise.all([
       P.q(function (sb) { return sb.from("mensalidades").select("*").eq("aluno", id).order("competencia", { ascending: false }).limit(6); }),
@@ -348,6 +359,7 @@
       /* sem a tabela (banco sem a atualização), a ficha abre do mesmo jeito */
       P.q(function (sb) { return sb.from("cobrancas").select("*").eq("aluno", id).order("vencimento", { ascending: false }); }).catch(function () { return null; })
     ]).then(function (r) {
+      if (minha !== P.fichaN) return;
       var mens = r[0] || [], grads = r[1] || [], cobs = r[2], pres = P.pres.filter(function (p) { return p.aluno === id; });
       var antes = a.aulas_antes || 0, total = pres.length, desdeGrau = (grads.length ? pres.filter(function (p) { return p.data > grads[0].data; }).length : total) + P.antes(a, grads.length ? grads[0].data : null);
       var idade = a.nascimento ? Math.floor(P.difDias(a.nascimento, P.hoje()) / 365.25) : null;
@@ -420,7 +432,7 @@
           var gid = b.closest("[data-grad]").dataset.grad;
           b.classList.add("loading");
           P.q(function (sb) { return sb.from("graduacoes").delete().eq("id", gid); })
-            .then(function () { return P.recalcFaixa(a.id); })
+            .then(function () { return P.recalcFaixa(a.id, grads.filter(function (g) { return g.id === gid; })[0]); })
             .then(function () { return Promise.all([P.carregarAlunos(), carregarGrad()]); })
             .then(function () { var a2 = P.porId[a.id]; P.toast("Graduação apagada. " + P.first(a.nome) + " está em " + P.beltTxt(a2.faixa, a2.graus).toLowerCase() + "."); P.abrirAluno(a.id); })
             .catch(function (er) { b.classList.remove("loading"); P.erro(er); });
@@ -463,7 +475,7 @@
             .catch(function (e2) { P.erro(e2); });
         }
       };
-    }).catch(function (e) { P.erro(e, "Não deu para abrir a ficha"); });
+    }).catch(function (e) { if (minha === P.fichaN) P.erro(e, "Não deu para abrir a ficha"); });
   };
   function editar(a, dr) {
     var f = $("#frEdit", dr);
@@ -527,7 +539,8 @@
   /* a faixa e os graus do aluno vêm da graduação mais recente (pela data e, no mesmo dia, pela ordem do registro).
      Uma graduação com data no futuro (digitada errada) volta para o dia em que foi registrada: antes ela travava
      o aluno no grau antigo, porque nenhuma graduação nova ficava "mais recente" que ela */
-  P.recalcFaixa = function (id) {
+  /* apagada: a graduação que acabou de sair (se não sobrar nenhuma, o aluno fica na faixa dela, com um grau a menos) */
+  P.recalcFaixa = function (id, apagada) {
     return P.q(function (sb) { return sb.from("graduacoes").select("id, faixa, graus, data, criado_em").eq("aluno", id); }).then(function (l) {
       l = l || [];
       var hoje = P.hoje(), passos = [];
@@ -541,6 +554,7 @@
       });
       l.sort(function (x, y) { return x.data < y.data ? 1 : x.data > y.data ? -1 : String(y.criado_em).localeCompare(String(x.criado_em)); });
       if (l[0]) passos.push(P.q(function (sb) { return sb.from("alunos").update({ faixa: l[0].faixa, graus: l[0].graus }).eq("id", id); }));
+      else if (apagada) passos.push(P.q(function (sb) { return sb.from("alunos").update({ faixa: apagada.faixa, graus: Math.max(0, (apagada.graus || 0) - 1) }).eq("id", id); }));
       return Promise.all(passos);
     });
   };

@@ -179,9 +179,12 @@
     if (b.hasAttribute("data-vende")) return vender(p);
     if (b.hasAttribute("data-edita")) return editar(p);
     if (b.hasAttribute("data-mais") || b.hasAttribute("data-menos")) {
+      /* um toque de cada vez por produto: os pedidos ao banco saem em ordem e o número final é o da tela */
       var n = Math.max(0, p.quantidade + (b.hasAttribute("data-mais") ? 1 : -1));
       p.quantidade = n; paint();
-      P.q(function (sb) { return sb.from("produtos").update({ quantidade: n }).eq("id", p.id); }).catch(function (er) { P.erro(er); carregar(); });
+      p._fila = (p._fila || Promise.resolve()).then(function () {
+        return P.q(function (sb) { return sb.from("produtos").update({ quantidade: n }).eq("id", p.id); });
+      }).catch(function (er) { P.erro(er); p._fila = null; carregar(); });
     }
   });
   $("#esPed").addEventListener("click", function (e) {

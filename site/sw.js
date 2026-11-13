@@ -4,7 +4,7 @@
    - Imagens, fontes e bibliotecas com versão no endereço: usa a guardada e só busca na rede se não tiver.
    - Login e dados (Supabase) e vídeos: nunca passam pelo cache.
    Ao mudar a lista abaixo, suba a versão (VERSAO) para o celular trocar o cache antigo. */
-var VERSAO = "evo-app-v22";
+var VERSAO = "evo-app-v23";
 var TELAS = [
   "app.html", "painel.html", "painel.js", "painel-hoje.js", "painel-alunos.js", "painel-crm.js", "painel-fin.js", "painel-mov.js", "painel-rank.js", "painel-estoque.js", "painel.css", "area-do-professor.html", "entrar.html", "nova-senha.html", "acessos.html",
   "site.css", "app.css", "tema.css", "acesso.css",
@@ -30,7 +30,8 @@ self.addEventListener("activate", function (e) {
 });
 
 function guarda(req, res) {
-  if (res && (res.ok || res.type === "opaque")) {
+  /* só guarda resposta boa: um erro passageiro da CDN não fica preso no cache (opaca só a das fontes do Google) */
+  if (res && (res.ok || (res.type === "opaque" && /fonts\.g/.test(req.url)))) {
     var copia = res.clone();
     caches.open(VERSAO).then(function (c) { c.put(req, copia); });
   }

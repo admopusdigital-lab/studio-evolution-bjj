@@ -52,7 +52,7 @@
     if (!carregando) carregando = new Promise(function (ok, falha) {
       if (window.supabase && window.supabase.createClient) return ok();
       var s = document.createElement("script");
-      s.src = LIB; s.async = true;
+      s.src = LIB; s.async = true; s.crossOrigin = "anonymous";
       s.onload = ok; s.onerror = function () { carregando = null; falha(new Error("sem-biblioteca")); };
       document.head.appendChild(s);
     });
@@ -64,11 +64,15 @@
     });
   }
   /* erro de rede (sem internet, servidor fora, página que bloqueia conexões) não é o mesmo que "senha errada" */
-  function semRede(err) { return !err || !err.status || err.name === "AuthRetryableFetchError" || /fetch|network|sem-biblioteca/i.test(err.message || ""); }
+  function semRede(err) { return !err || !err.status || err.status >= 500 || err.name === "AuthRetryableFetchError" || /fetch|network|sem-biblioteca|timeout/i.test(err.message || ""); }
   var MSG_REDE = "Não deu para falar com o servidor. Confira a internet e tente de novo.";
 
+  /* o perfil da conta; { falhou: true } quando a leitura não deu certo (rede, servidor): não é "conta desativada" */
   function perfil(c, id) {
-    return c.from("perfis").select("papel, nome, ativo").eq("id", id).single().then(function (r) { return r.data || null; });
+    return c.from("perfis").select("papel, nome, ativo").eq("id", id).maybeSingle().then(function (r) {
+      if (r.error) return { falhou: true, erro: r.error };
+      return r.data || null;
+    }, function (e) { return { falhou: true, erro: e }; });
   }
 
   var Acesso = {
@@ -108,6 +112,7 @@
           return { ok: false, campo: "senha", msg: "E-mail ou senha não conferem. Confira e tente de novo." };
         }
         return perfil(c, r.data.user.id).then(function (p) {
+          if (p && p.falhou) return c.auth.signOut().then(function () { return { ok: false, campo: "senha", msg: MSG_REDE }; }, function () { return { ok: false, campo: "senha", msg: MSG_REDE }; });
           if (!p || p.ativo === false) {
             return c.auth.signOut().then(function () { return { ok: false, campo: "usuario", msg: "Sua conta ainda não foi liberada pelo Studio. Fale com a gente no WhatsApp." }; });
           }
@@ -150,6 +155,8 @@
           if (r.error && semRede(r.error)) return;
           if (r.error || !r.data.user) { apagar(SESSAO); apagar(TOKEN); return volta(); }
           return perfil(c, r.data.user.id).then(function (p) {
+            /* sem rede na hora de conferir: a pessoa continua logada */
+            if (p && p.falhou) return;
             if (!p || p.ativo === false || !permite(p.papel, area)) { Acesso.sair().then(volta); return; }
             gravar(SESSAO, JSON.stringify({ papel: p.papel, nome: p.nome, desde: s.desde }));
           });

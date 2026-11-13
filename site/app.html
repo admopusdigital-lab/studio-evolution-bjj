@@ -202,6 +202,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-fxrow > span:first-child { font: 400 18px/1.15 var(--serif); }
 .ap-fxrow .r { flex-shrink: 0; white-space: nowrap; }
 .ap.app .ap-degs i { height: 4px; border-radius: 2px; }
+/* modo real: até os dados do aluno chegarem, os números de exemplo do HTML ficam escondidos */
+.ap.app.sem-dados #apFee, .ap.app.sem-dados #apReceipt, .ap.app.sem-dados .ap-trio, .ap.app.sem-dados #apBadge,
+.ap.app.sem-dados .ap-notes, .ap.app.sem-dados #apCalW, .ap.app.sem-dados #apNext { visibility: hidden; }
 /* perfil: a foto do aluno ao lado do nome, com o botão da câmera */
 .ap-pf-h { display: flex; align-items: flex-start; gap: 14px; }
 .ap-pf-t { flex: 1; min-width: 0; }
@@ -711,7 +714,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous"></script>
 <script src="site.js"></script>
 <script src="movimentos.js"></script>
 <script src="fotos.js"></script>
@@ -974,6 +977,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     b.classList.toggle("ok", mine);
     b.classList.toggle("pulse", !mine && !semAula);
     if (mine || semAula) b.setAttribute("aria-disabled", "true"); else b.removeAttribute("aria-disabled");
+    if (!mine && !semAula && longe()) { $("span", b).textContent = "Abre 48 h antes"; b.classList.remove("pulse"); b.setAttribute("aria-disabled", "true"); }
   }
   function paintSpot() {
     if (demo) quem = quemDemo();
@@ -1005,8 +1009,15 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
 
   /* confirmar: na demonstração, na hora; no modo Supabase, reservar() guarda a vaga (até 10 por aula) */
+  /* a aula do cartão começa daqui a mais de 48 h: o banco ainda não aceita a vaga */
+  function inicioAula(a) { var d = diaDe(a.data); d.setMinutes(mins(a.hora)); return d.getTime(); }
+  function longe() { return !demo && !!AULA && !!AULA.data && inicioAula(AULA) - Date.now() > 48 * 36e5; }
   function confirmSpot() {
     if (confirmed || registered || busy || semAula) return;
+    if (longe()) {
+      var ab = new Date(inicioAula(AULA) - 48 * 36e5);
+      return toast("Essa aula abre para marcar " + Site.DIAS[ab.getDay()].toLowerCase() + " às " + Site.hora(("0" + ab.getHours()).slice(-2) + ":" + ("0" + ab.getMinutes()).slice(-2)) + " (48 h antes).");
+    }
     if (demo) {
       confirmed = true;
       confAt = clockTo(18 * 60 + 14);
@@ -1070,8 +1081,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     paintAula();
     paintSpot();
   }
+  /* a "foto" do que está na tela: uma resposta pedida para outro membro ou outra aula chega tarde e é descartada */
+  function vez() { return (ALUNO ? ALUNO.id : "") + "|" + (AULA ? chaveAula(AULA) : ""); }
   function atualizarQuem() {
     if (demo || semAula) return Promise.resolve();
+    var pedido = vez();
     return Acesso.cliente().then(function (sb) {
       return Promise.all([
         sb.rpc("confirmados_aula", comAluno({ p_data: AULA.data, p_hora: AULA.hora })),
@@ -1079,6 +1093,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       ]);
     }).then(function (rs) {
       var q = rs[0], pr = rs[1];
+      /* sem sinal ou erro do banco: mantém a tela como está (não apaga a vaga nem a presença) */
+      if (pedido !== vez() || !q || q.error || !pr || pr.error) return;
       quem = (q.data || []).map(function (x) { return { nome: x.nome, faixa: x.faixa, graus: x.graus, foto: x.foto, eu: !!x.eu, conf: hhmm(x.confirmou_em), chegou: x.chegou_em ? hhmm(x.chegou_em) : null }; });
       confirmed = quem.some(function (x) { return x.eu; });
       if (confirmed) MINHAS[chaveAula(AULA)] = 1; else delete MINHAS[chaveAula(AULA)];
@@ -1128,6 +1144,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       return '<button class="ap-shop-t" type="button" data-shop="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodSvg(g.cat) + "</span><b>" + esc(nomeG(g)) + "</b><span>" + brl(g.min) + "</span></button>";
     }).join("");
     $("#apShopList").innerHTML = gs.map(function (g, i) {
+      /* o tamanho escolhido acabou: a escolha sai (não trava a loja) */
+      if (ESCOLHA[g.k] && !g.disp.some(function (p) { return p.id === ESCOLHA[g.k]; })) delete ESCOLHA[g.k];
       var sel = ESCOLHA[g.k];
       return '<article class="ap-pc" data-g="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodSvg(g.cat) + "</span><div><h3>" + esc(nomeG(g)) + '</h3><p class="pr">' + brl(g.min) + "</p>" + (g.desc ? "<p>" + esc(g.desc) + "</p>" : "") +
         '<div class="ap-sz" role="group" aria-label="Tamanho">' + g.disp.map(function (p) { return '<button type="button" data-sz="' + p.id + '" aria-pressed="' + (sel === p.id) + '">' + esc(p.tamanho) + "</button>"; }).join("") +
@@ -1201,7 +1219,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     askRelease(false);
     AULA = proximaAula(ALUNO.turma, ALUNO.horario) || { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 };
     AULAS = aulas48(ALUNO.turma);
-    if (AULA.data && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
+    if (AULA.data && !longe() && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
     paintFamilia(); paintAula(); paintAulas(); paintSpot();
     toast("Agora no app: " + ALUNO.nome.split(" ")[0] + ".");
     Promise.all([minhasReservas(), atualizarQuem(), extrasReal(), carregarRank(), carregarLoja()]);
@@ -1215,7 +1233,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   });
   /* as vagas que o aluno já marcou (de hoje em diante), para o ✓ nos chips */
   function minhasReservas() {
+    var quemPediu = ALUNO && ALUNO.id;
     return Acesso.cliente().then(function (sb) { return sb.from("reservas").select("data, hora").eq("aluno", ALUNO.id).gte("data", isoDia(new Date())); }).then(function (r) {
+      if (!r || r.error || !ALUNO || ALUNO.id !== quemPediu) return;
       MINHAS = {};
       (r.data || []).forEach(function (x) { MINHAS[x.data + "|" + x.hora] = 1; });
       paintAulas();
@@ -1238,7 +1258,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       askRelease(false);
     }
     AULAS = aulas48(ALUNO.turma);
-    if (AULA.data && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
+    if (AULA.data && !longe() && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
     paintAula(); paintAulas(); paintSpot();
     return Promise.all([minhasReservas(), atualizarQuem(), extrasReal(), carregarRank()]).catch(function () {});
   }
@@ -1247,8 +1267,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       return Promise.all([sb.from("alunos").select("*").order("nome"), sb.auth.getSession()]);
     }).then(function (rs) {
       var r = rs[0], uid = rs[1] && rs[1].data && rs[1].data.session ? rs[1].data.session.user.id : null;
+      /* erro de rede ou do banco não é "conta sem cadastro": avisa e tenta de novo quando a internet voltar */
+      if (!r || r.error) throw r && r.error;
       var l = (r.data || []).filter(function (x) { return x.ativo !== false; });
-      if (r.error || !l.length) return semCadastro();
+      if (!l.length) return semCadastro();
+      carregou = true;
       /* o próprio cadastro primeiro, depois os dependentes */
       l.sort(function (a, b) { return (b.conta === uid) - (a.conta === uid) || a.nome.localeCompare(b.nome); });
       FAMILIA = l;
@@ -1260,19 +1283,25 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       AULA = proximaAula(ALUNO.turma, ALUNO.horario);
       if (!AULA) { AULA = { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 }; return semCadastro(); }
       AULAS = aulas48(ALUNO.turma);
-      if (!AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
+      if (!longe() && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
       paintAula();
       /* com a família carregada, o ranking e os movimentos passam a ser do membro escolhido */
       if (FAMILIA.length > 1) carregarRank();
       if (window.recarregarMov) window.recarregarMov();
       carregarLoja();
       return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]);
-    }).catch(function () { toast("Sem conexão com o Studio. Confira a internet."); });
+    }).catch(function () { toast("Sem conexão com o Studio. Assim que a internet voltar, o app atualiza sozinho."); });
   }
+  var carregou = false;
+  /* a internet voltou, ou o app voltou para a tela sem ter carregado: tenta de novo */
+  function tentaDeNovo() { if (!demo && !carregou && !document.hidden) carregarReal(); }
+  window.addEventListener("online", function () { if (!carregou) tentaDeNovo(); else renovar(); });
   if (!demo) {
+    $("#ap").classList.add("sem-dados");
     carregarReal();
     setInterval(function () {
       if (document.hidden) return;
+      if (!carregou) return tentaDeNovo();
       if (aulaAcabou()) return renovar();
       if (current === "presenca" || current === "inicio") atualizarQuem();
     }, 30000);
@@ -1280,6 +1309,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var saiuEm = 0;
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) { saiuEm = Date.now(); return; }
+      if (!carregou) return tentaDeNovo();
       if (aulaAcabou() || (saiuEm && Date.now() - saiuEm > 10 * 60000)) renovar(); else atualizarQuem();
     });
   }
@@ -1310,14 +1340,17 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $("#apRkMais").hidden = top.length <= 5;
     $("#apRkMais").textContent = RK.todos ? "Ver só o top 5" : "Ver o top 10";
   }
+  var rkSeq = 0;
   function carregarRank() {
     if (demo) {
       RK.l = RK_DEMO.map(function (q) { var k = RK.per === "mes" ? 1 : 9; return { posicao: q[0], nome: q[1], faixa: q[2], graus: q[3], aulas: q[4] * k, eu: q[1] === "Marina A." }; });
       return paintRank();
     }
+    var n = ++rkSeq;
     return Acesso.cliente().then(function (sb) { return sb.rpc("ranking_frequencia", comAluno({ p_dias: diasRank() })); }).then(function (r) {
-      /* banco ainda sem a atualização de 03/11: o cartão some em vez de mostrar erro */
-      if (r.error) { $("#apRank").hidden = true; return; }
+      if (n !== rkSeq) return;
+      /* banco ainda sem a atualização de 03/11: o cartão some em vez de mostrar erro (falha de rede mantém o que está) */
+      if (r.error) { if (r.error.code === "PGRST202" || r.error.code === "42883") $("#apRank").hidden = true; return; }
       $("#apRank").hidden = false;
       RK.l = r.data || [];
       paintRank();
@@ -1465,6 +1498,15 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           return;
         }
         var meu = ok.indexOf(ALUNO) >= 0 ? rs[quem0.indexOf(ALUNO)] : rs[quem0.indexOf(ok[0])];
+        /* o código era de outra aula de hoje (ex.: marcou 19h e treinou 20h30): o cartão passa para a aula do check-in */
+        var md = meu.data || {};
+        if (md.data && md.hora && (md.data !== AULA.data || md.hora !== AULA.hora)) {
+          var outra = AULAS.filter(function (a) { return a.data === md.data && a.hora === md.hora; })[0] ||
+            { data: md.data, hora: md.hora, turma: TURMA[md.turma] || AULA.turma, k: 0, dia: diaDe(md.data) };
+          if (!AULAS.some(function (a) { return chaveAula(a) === chaveAula(outra); })) AULAS.unshift(outra);
+          AULA = outra; confirmed = !!MINHAS[chaveAula(outra)]; quem = [];
+          paintAula(); paintAulas();
+        }
         registered = ok.indexOf(ALUNO) >= 0 || registered;
         regAt = hhmm(meu.data.chegou_em);
         if (registered) mostrarRegistro(true); else { inp.value = ""; typed = ""; paintCode(); }
@@ -1630,12 +1672,17 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     /* capa que não carrega (YouTube fora do ar, link apagado): fica o ícone */
     $$("#apMovs img, #apContImg").forEach(function (im) { im.onerror = function () { im.hidden = true; }; });
   }
+  var movSeq = 0;
   function carregar() {
+    /* no modo real, espera o cadastro do membro escolhido (a faixa vem dele); só a última carga pinta */
+    if (!demo && !ALUNO) return Promise.resolve();
+    var n = ++movSeq;
     return Promise.all([ALUNO && ALUNO.faixa && !demo ? Promise.resolve(ALUNO.faixa) : Mov.minhaFaixa(), Mov.progresso()]).then(function (r) {
       FAIXA = Mov.FAIXAS[Site.faixaBase(r[0])] ? Site.faixaBase(r[0]) : "branca";
       PROG = r[1] || {};
       return Mov.lista({ faixa: FAIXA });
-    }).then(function (l) { MOVS = l; paintLib(); });
+    }).then(function (l) { if (n !== movSeq) return; MOVS = l; paintLib(); })
+      .catch(function () { if (n === movSeq) toast("Não deu para carregar os movimentos. Confira a internet."); });
   }
   $("#apCats").addEventListener("click", function (e) {
     var b = e.target.closest("button");
@@ -1924,14 +1971,21 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function brl(v) { v = Number(v) || 0; return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: v % 1 ? 2 : 0 }); }
   function extrasReal() {
     if (demo || !ALUNO || !ALUNO.id) return Promise.resolve();
+    var membro = ALUNO;
     return Acesso.cliente().then(function (sb) {
       return Promise.all([
         sb.from("presencas").select("data, hora").eq("aluno", ALUNO.id).order("data", { ascending: false }).limit(1000),
         sb.from("mensalidades").select("competencia, valor, vencimento, pago_em, forma").eq("aluno", ALUNO.id).order("competencia", { ascending: false }).limit(6),
         sb.from("graduacoes").select("faixa, graus, data, nota").eq("aluno", ALUNO.id).order("data", { ascending: false }),
-        sb.from("cobrancas").select("descricao, valor, vencimento, pago_em").eq("aluno", ALUNO.id).order("vencimento", { ascending: false }).limit(6)
+        sb.from("cobrancas").select("descricao, valor, vencimento, pago_em").eq("aluno", ALUNO.id).order("vencimento", { ascending: false }).limit(6),
+        /* o cadastro de novo: um grau dado pelo professor aparece sem precisar sair do app */
+        sb.from("alunos").select("*").eq("id", ALUNO.id).maybeSingle()
       ]);
     }).then(function (r) {
+      /* trocou de membro no meio do caminho, ou faltou sinal: não pinta dados errados por cima */
+      if (ALUNO !== membro || r[0].error || r[1].error || r[2].error) return;
+      if (r[4] && r[4].data && !r[4].error) Object.keys(r[4].data).forEach(function (k) { membro[k] = r[4].data[k]; });
+      $("#ap").classList.remove("sem-dados");
       MEUS.pres = r[0].data || []; MEUS.mens = r[1].data || []; MEUS.grads = r[2].data || []; MEUS.cobs = r[3] && !r[3].error ? r[3].data || [] : [];
       paintSemana(); paintMens(); paintPerfil(); paintAvisosReal(); niver();
     }).catch(function () {});
@@ -1951,6 +2005,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   /* aniversário do membro que está no app: parabéns no Início, uma vez por dia */
   function niver() {
+    saudacao();
     if (!ALUNO || !ALUNO.nascimento) return;
     var n = String(ALUNO.nascimento).split("-"), d = new Date();
     if (+n[1] !== d.getMonth() + 1 || +n[2] !== d.getDate()) return;
