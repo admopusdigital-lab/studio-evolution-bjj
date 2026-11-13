@@ -84,7 +84,7 @@
       (vis.length ? '<table class="tbl"><thead><tr><th scope="col">Aluno</th><th scope="col" class="num">Valor</th><th scope="col">Situação</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead><tbody>' +
         vis.map(function (x) {
           var a = P.porId[x.aluno];
-          return '<tr data-id="' + x.id + '"><td><div class="nm"><span class="av">' + P.ini(nome(x.aluno)) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.aluno + '">' + esc(nome(x.aluno)) + "</button><small>" + (x._extra ? '<b style="color:var(--gold-text)">' + esc(x.descricao) + "</b> · " : "") + "vence " + P.dataBRano(x.vencimento) + "</small></div></div></td>" +
+          return '<tr data-id="' + x.id + '"><td><div class="nm"><span class="av"' + Fotos.attr((P.porId[x.aluno] || {}).foto) + '>' + P.ini(nome(x.aluno)) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.aluno + '">' + esc(nome(x.aluno)) + "</button><small>" + (x._extra ? '<b style="color:var(--gold-text)">' + esc(x.descricao) + "</b> · " : "") + "vence " + P.dataBRano(x.vencimento) + "</small></div></div></td>" +
             '<td class="num">' + P.brl(x.valor) + "</td><td>" + statusM(x) + '</td><td class="act"><div class="row-acts">' +
             (x.pago_em ? '<button class="mini-btn ghost" type="button" data-desfaz>Desfazer</button>'
               : '<select class="sel" data-forma aria-label="Forma de pagamento">' + Object.keys(FORMA).map(function (k) { return '<option value="' + k + '">' + FORMA[k] + "</option>"; }).join("") + '</select><button class="mini-btn" type="button" data-paga>Recebi</button>' +
@@ -105,7 +105,7 @@
     if (!x) return;
     if (b.hasAttribute("data-editm")) {
       /* a linha vira um formulário: valor e vencimento */
-      tr.innerHTML = '<td><div class="nm"><span class="av">' + P.ini(nome(x.aluno)) + "</span><div><b>" + esc(nome(x.aluno)) + "</b><small>" + P.mesNome(x.competencia) + "</small></div></div></td>" +
+      tr.innerHTML = '<td><div class="nm"><span class="av"' + Fotos.attr((P.porId[x.aluno] || {}).foto) + '>' + P.ini(nome(x.aluno)) + "</span><div><b>" + esc(nome(x.aluno)) + "</b><small>" + P.mesNome(x.competencia) + "</small></div></div></td>" +
         '<td class="num"><input class="crm-in" data-ev inputmode="decimal" aria-label="Valor da mensalidade" value="' + String(x.valor).replace(".", ",") + '" style="max-width:110px;text-align:right"></td>' +
         '<td><input class="crm-in" type="date" data-evenc aria-label="Vencimento" value="' + x.vencimento + '"></td>' +
         '<td class="act"><div class="row-acts"><button class="mini-btn" type="button" data-salvam>Salvar</button><button class="mini-btn ghost" type="button" data-cancm>Cancelar</button></div></td>';

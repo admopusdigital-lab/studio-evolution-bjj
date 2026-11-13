@@ -40,7 +40,7 @@
     box.innerHTML = (hj.length ? '<div class="niver-h"><span class="niver-ic" aria-hidden="true">🎂</span><div><p class="dv-k">Aniversário hoje</p><h4>' +
         hj.map(function (x) { return esc(P.first(x.a.nome)); }).join(" e ") + (hj.length === 1 ? " faz " + x0(hj[0]) : " fazem aniversário") + "</h4></div></div>" +
         '<ul class="niver-l">' + hj.map(function (x) {
-          return '<li><span class="av">' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + x.n.idade + " anos · " + esc(P.turmaTx(x.a)) + "</small></div>" +
+          return '<li><span class="av"' + Fotos.attr(x.a.foto) + '>' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + x.n.idade + " anos · " + esc(P.turmaTx(x.a)) + "</small></div>" +
             (x.a.whatsapp ? '<button class="mini-btn wa" type="button" data-parabens="' + x.a.id + '">Mandar parabéns</button>' : '<span class="muted" style="font-size:12px">sem WhatsApp</span>') + "</li>";
         }).join("") + "</ul>"
       : '<p class="niver-nada"><span aria-hidden="true">🎂</span> Ninguém faz aniversário hoje.</p>') +
@@ -123,7 +123,7 @@
         var a = P.porId[x.id] || { nome: "Aluno removido", faixa: "branca", graus: 0 };
         var pill = x.pres ? '<span class="pill-s in">Chegou ' + P.hm(x.pres.chegou_em) + (x.pres.como === "professor" ? " · marcado" : "") + "</span>" : '<span class="pill-s">Confirmou</span>';
         var act = x.pres ? '<button class="mini-btn ghost" type="button" data-desfaz="' + x.pres.id + '">Desfazer</button>' : '<button class="mini-btn" type="button" data-marca="' + x.id + '">Chegou</button>';
-        return '<li data-id="' + x.id + '"><span class="av">' + P.ini(a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.id + '">' + esc(a.nome) + "</button><small>" + P.beltTxt(a.faixa, a.graus) + "</small></div>" +
+        return '<li data-id="' + x.id + '"><span class="av"' + Fotos.attr(a.foto) + '>' + P.ini(a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.id + '">' + esc(a.nome) + "</button><small>" + P.beltTxt(a.faixa, a.graus) + "</small></div>" +
           '<div class="row-acts">' + pill + act + "</div></li>";
       }).join("") : '<li class="muted" style="display:block">Ninguém confirmou esta aula ainda.</li>') + "</ul>" +
       '<div class="walk"><label class="sr-only" for="walkQ">Marcar a presença de quem veio sem confirmar</label><input class="crm-in" type="search" id="walkQ" placeholder="Marcar quem veio sem confirmar: digite o nome" autocomplete="off"><ul id="walkList"></ul></div>';

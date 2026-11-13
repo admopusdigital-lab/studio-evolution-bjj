@@ -33,7 +33,7 @@
     $("#rkK").textContent = l.length ? l.length + (l.length === 1 ? " aluno treinou" : " alunos treinaram") + " · " + (per.length === 10 ? "em " : "") + rot : "Frequência";
     var med = ["ouro", "prata", "bronze"];
     $("#rkPodio").innerHTML = l.slice(0, 3).map(function (x, i) {
-      return '<li class="rk-p ' + med[Math.min(x.pos - 1, 2)] + '"><span class="rk-m" aria-hidden="true">' + x.pos + '</span><span class="av">' + P.ini(x.a.nome) + "</span>" +
+      return '<li class="rk-p ' + med[Math.min(x.pos - 1, 2)] + '"><span class="rk-m" aria-hidden="true">' + x.pos + '</span><span class="av"' + Fotos.attr(x.a.foto) + '>' + P.ini(x.a.nome) + "</span>" +
         '<button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button>" +
         "<small>" + esc(P.turmaTx(x.a)) + "</small>" + P.belt(x.a.faixa, x.a.graus) +
         '<b class="rk-n">' + x.n + "<span>" + (x.n === 1 ? " aula" : " aulas") + "</span></b></li>";
@@ -41,7 +41,7 @@
     $("#rkPodio").hidden = !l.length;
     $("#rkTbl tbody").innerHTML = l.slice(3).map(function (x) {
       return '<tr><td class="num rk-pos">' + x.pos + "º</td>" +
-        '<td><div class="nm"><span class="av">' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + esc(P.turmaTx(x.a)) + "</small></div></div></td>" +
+        '<td><div class="nm"><span class="av"' + Fotos.attr(x.a.foto) + '>' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + esc(P.turmaTx(x.a)) + "</small></div></div></td>" +
         "<td>" + P.belt(x.a.faixa, x.a.graus) + '</td><td class="num">' + x.n + '</td><td class="hide-s"><span class="rk-bar" style="--w:' + Math.round(x.n / max * 100) + '%"></span></td></tr>';
     }).join("");
     $("#rkTbl").hidden = l.length <= 3;

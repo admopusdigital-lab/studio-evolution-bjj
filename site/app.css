@@ -228,7 +228,12 @@
 .codebox small { display: block; font-size: 12px; color: var(--ink-3); }
 .roster { margin-top: 14px; }
 .roster li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding-block: 8px; border-top: 1px solid var(--rule); font-size: 13px; }
-.av { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); font: 600 10.5px/1 var(--sans); color: var(--ink-2); }
+.av { position: relative; overflow: hidden; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); font: 600 10.5px/1 var(--sans); color: var(--ink-2); }
+/* foto do aluno no lugar das iniciais (fotos.js coloca a imagem quando a pessoa tem foto) */
+.av > img.ft { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; opacity: 0; transition: opacity .3s; }
+.av.com-foto > img.ft { opacity: 1; }
+.av.com-foto { color: transparent; }
+li.me .av.com-foto, .av.me.com-foto { box-shadow: 0 0 0 2px var(--gold); }
 .roster small { display: block; font-size: 11.5px; color: var(--ink-3); }
 .pill-s { padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; background: color-mix(in oklch, var(--ink) 7%, transparent); color: var(--ink-2); }
 .pill-s.in { background: color-mix(in oklch, var(--ok) 15%, transparent); color: var(--ok); }

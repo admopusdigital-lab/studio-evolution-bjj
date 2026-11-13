@@ -87,6 +87,8 @@
 
   /* ---------- banco ---------- */
   P.db = Acesso.cliente();
+  /* fotos dos alunos: troca as iniciais pela foto em qualquer lista do painel */
+  if (window.Fotos && Acesso.real) Fotos.liga(P.db);
   /* uma consulta: devolve os dados ou falha com a mensagem do banco */
   P.q = function (fn) {
     return P.db.then(fn).then(function (r) { if (r && r.error) throw r.error; return r ? r.data : null; });
@@ -104,8 +106,8 @@
   };
   /* o SQL de 03/11 (faixas do Kids, aulas antes do app, reserva em 48 h e ranking no app) */
   /* o SQL mais novo que o painel precisa (o plano família); os anteriores já foram rodados */
-  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261111120000_estoque_cobrancas.sql";
-  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto/.test(m); };
+  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261113120000_fotos.sql";
+  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto|foto/.test(m); };
   P.avisoBanco = function () {
     var el = $("#dbAviso");
     if (!el || !el.hidden) return;
@@ -248,7 +250,7 @@
   try { aba = sessionStorage.getItem("evo-painel-aba"); } catch (e) {}
   P.iniciar = function () {
     /* o banco já recebeu a atualização de 03/11? (a coluna aulas_antes existe) */
-    P.db.then(function (sb) { return sb.from("alunos").select("aulas_antes, responsavel_conta").limit(1); }).then(function (r) { if (r && r.error && P.faltaAtualizar(r.error)) P.avisoBanco(); }).catch(function () {});
+    P.db.then(function (sb) { return sb.from("alunos").select("aulas_antes, responsavel_conta, foto").limit(1); }).then(function (r) { if (r && r.error && P.faltaAtualizar(r.error)) P.avisoBanco(); }).catch(function () {});
     return Promise.all([P.carregarAlunos(), P.carregarPresencas()]).catch(function (e) { P.erro(e, "Não deu para carregar os dados"); })
       .then(function () { P.go(aba && $('.dv[data-v="' + aba + '"]') ? aba : "hoje"); });
   };

@@ -22,7 +22,7 @@
     var mes = P.mesIni(P.hoje());
     $("#alTbl tbody").innerHTML = l.map(function (a) {
       var u = P.ultima(a.id), dias = u ? P.difDias(u, P.hoje()) : null, sum = P.sumido(a);
-      return '<tr data-id="' + a.id + '"' + (a.ativo ? "" : ' class="off"') + '><td><div class="nm"><span class="av">' + P.ini(a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + a.id + '">' + esc(a.nome) + "</button><small>" +
+      return '<tr data-id="' + a.id + '"' + (a.ativo ? "" : ' class="off"') + '><td><div class="nm"><span class="av"' + Fotos.attr(a.foto) + '>' + P.ini(a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + a.id + '">' + esc(a.nome) + "</button><small>" +
         esc(P.turmaTx(a)) + (a.responsavel ? " · resp. " + esc(P.first(a.responsavel)) : "") + (a.ativo ? "" : " · inativo") + "</small></div></div></td>" +
         "<td>" + P.belt(a.faixa, a.graus) + "</td>" +
         "<td>" + (sum && a.ativo ? '<span class="pill-s warn">' + (u ? "há " + dias + " dias" : "nunca veio") + "</span>" : P.quando(u)) + "</td>" +
@@ -298,6 +298,45 @@
       .catch(function (e) { P.erro(e); });
   }
 
+  /* ---------- foto do aluno: aparece em "quem vai" e no ranking do app e nas listas do painel ---------- */
+  function fotoHTML(a) {
+    return '<div class="ficha-sec ficha-foto"><span class="av"' + Fotos.attr(a.foto) + ">" + P.ini(a.nome) + "</span><div><b>Foto</b>" +
+      '<p class="muted">' + (a.foto ? "Aparece na lista de quem vai, no ranking e aqui no painel." : "Sem foto. Com ela, " + esc(P.first(a.nome)) + " aparece com o rosto na lista de quem vai e no ranking.") + "</p>" +
+      '<div class="msg-acts"><button class="mini-btn" type="button" data-foto-poe>' + (a.foto ? "Trocar foto" : "Colocar foto") + "</button>" +
+      (a.foto ? '<button class="mini-btn ghost" type="button" data-foto-tira>Tirar foto</button>' : "") +
+      '</div></div><input type="file" accept="image/*" hidden data-foto-in></div>';
+  }
+  function ligaFoto(a, dr) {
+    var box = $(".ficha-foto", dr);
+    if (!box) return;
+    var inp = $("[data-foto-in]", box), poe = $("[data-foto-poe]", box), tira = $("[data-foto-tira]", box);
+    function erro(e) {
+      var m = String((e && e.message) || "");
+      P.toast(/bucket|row-level|security|foto|schema cache|not found/i.test(m) ? "As fotos ainda não estão ativadas no banco. Rode a atualização das fotos no Supabase." : "Não deu para salvar a foto. Tente de novo.");
+      poe.disabled = false; poe.textContent = a.foto ? "Trocar foto" : "Colocar foto";
+    }
+    function grava(caminho) {
+      var antiga = a.foto;
+      return P.q(function (sb) { return sb.from("alunos").update({ foto: caminho }).eq("id", a.id); }).then(function () {
+        if (antiga && antiga !== caminho) P.db.then(function (sb) { Fotos.apaga(sb, antiga); });
+        return P.carregarAlunos();
+      }).then(function () { P.abrirAluno(a.id); });
+    }
+    poe.addEventListener("click", function () { inp.click(); });
+    inp.addEventListener("change", function () {
+      var f = inp.files && inp.files[0];
+      inp.value = "";
+      if (!f) return;
+      poe.disabled = true; poe.textContent = "Enviando…";
+      P.db.then(function (sb) { return Fotos.envia(sb, a.id, f); }).then(grava).then(function () {
+        P.toast("Foto de " + P.first(a.nome) + " salva.");
+      }).catch(erro);
+    });
+    if (tira) tira.addEventListener("click", function () {
+      if (!confirm("Tirar a foto de " + P.first(a.nome) + "?")) return;
+      grava(null).then(function () { P.toast("Foto tirada."); }).catch(erro);
+    });
+  }
   P.abrirAluno = function (id, cred) {
     var a = P.porId[id];
     if (!a) return;
@@ -315,6 +354,7 @@
       var html =
         (cred ? '<div class="cred"><b>Acesso ao app ' + (cred.reenvio ? "com senha nova" : "criado") + "</b><p>E-mail: <code>" + esc(cred.email) + "</code><br>Senha provisória: <code>" + esc(cred.senha) + '</code></p><div class="msg-acts">' +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-envia>Mandar pelo WhatsApp</button>' : "") + '<button class="mini-btn ghost" type="button" data-copia>Copiar mensagem</button></div><p class="muted" style="margin-top:6px;font-size:12px">A senha aparece só agora. Depois de entrar, o aluno pode trocar em "Esqueci a senha".</p></div>' : "") +
+        fotoHTML(a) +
         '<div class="ficha-sec"><h5>Dados</h5><dl class="ficha-dl">' +
           (a.responsavel ? "<dt>Responsável</dt><dd>" + esc(a.responsavel) + "</dd>" : "") +
           (idade !== null ? "<dt>Idade</dt><dd>" + idade + " anos</dd>" : "") +
@@ -348,6 +388,7 @@
         "</div>";
       $(".dr-body", dr).innerHTML = html;
       ligaOutros(a, dr);
+      ligaFoto(a, dr);
       $("#frAntes", dr).onsubmit = function (e) {
         e.preventDefault();
         var f = e.target, t = $("#faN", f).value.replace(/\s/g, ""), n = t === "" ? 0 : parseInt(t, 10);
@@ -469,7 +510,7 @@
     var l = P.ativos().map(function (a) { return { a: a, n: desde(a) }; }).sort(function (x, y) { return y.n - x.n; });
     $("#grTbl tbody").innerHTML = l.map(function (x) {
       var g = ultGrau[x.a.id];
-      return '<tr><td><div class="nm"><span class="av">' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + esc(P.turmaTx(x.a)) + (g ? " · último grau em " + P.dataBRano(g.data) : "") + "</small></div></div></td>" +
+      return '<tr><td><div class="nm"><span class="av"' + Fotos.attr(x.a.foto) + '>' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + esc(P.turmaTx(x.a)) + (g ? " · último grau em " + P.dataBRano(g.data) : "") + "</small></div></div></td>" +
         "<td>" + P.belt(x.a.faixa, x.a.graus) + '</td><td class="num">' + x.n + '</td><td class="act"><button class="mini-btn" type="button" data-grau="' + x.a.id + '">Registrar grau</button></td></tr>';
     }).join("");
     $("#grTbl").hidden = !l.length;

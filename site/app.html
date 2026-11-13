@@ -202,6 +202,18 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-fxrow > span:first-child { font: 400 18px/1.15 var(--serif); }
 .ap-fxrow .r { flex-shrink: 0; white-space: nowrap; }
 .ap.app .ap-degs i { height: 4px; border-radius: 2px; }
+/* perfil: a foto do aluno ao lado do nome, com o botão da câmera */
+.ap-pf-h { display: flex; align-items: flex-start; gap: 14px; }
+.ap-pf-t { flex: 1; min-width: 0; }
+.ap.app .ap-foto { position: relative; flex-shrink: 0; margin-top: 4px; padding: 0; border: 0; background: none; border-radius: 50%; cursor: pointer; color: inherit; }
+.ap.app .ap-foto .av { width: 68px; height: 68px; font-size: 20px; background: linear-gradient(160deg, color-mix(in oklch, var(--gold) 22%, var(--paper-2)), var(--paper-2));
+  box-shadow: 0 0 0 2px var(--gold), 0 10px 24px -12px oklch(0 0 0 / 0.7); color: var(--gold-text); }
+.ap.app .ap-foto .av.com-foto { color: transparent; }
+.ap-foto .cam { position: absolute; right: -2px; bottom: -2px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--gold); color: oklch(0.15 0.01 75); box-shadow: 0 0 0 3px var(--paper); }
+.ap-foto .cam svg { width: 14px; height: 14px; }
+.ap-foto.enviando .av { animation: apFotoP 1s ease-in-out infinite; }
+@keyframes apFotoP { 50% { opacity: .45; } }
 /* ===== faixa 3D: tecido com volume, ponteira e graus em fita; flutua, brilha e inclina com o dedo ===== */
 .b3d { position: relative; isolation: isolate; display: block; margin-top: 16px; perspective: 760px; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
 .b3d::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: -16px; height: 16px; border-radius: 50%;
@@ -611,9 +623,15 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
       <!-- Perfil -->
       <section class="ap-view" data-view="perfil" aria-label="Tela Perfil">
-        <p class="ap-lb">Seu lugar no tatame</p>
-        <p class="ap-hi">Marina Alves</p>
-        <p class="ap-mut" style="margin-top:4px">Aluna desde março de 2025 · Adulto 19h</p>
+        <div class="ap-pf-h">
+          <div class="ap-pf-t">
+            <p class="ap-lb">Seu lugar no tatame</p>
+            <p class="ap-hi">Marina Alves</p>
+            <p class="ap-mut" style="margin-top:4px">Aluna desde março de 2025 · Adulto 19h</p>
+          </div>
+          <button class="ap-foto" type="button" id="apFotoBtn" aria-label="Colocar sua foto"><span class="av" id="apFotoAv">MA</span><span class="cam" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></button>
+          <input type="file" accept="image/*" id="apFotoIn" hidden>
+        </div>
         <span class="ap-belt b3d lg" data-belt></span>
         <div class="ap-row ap-fxrow" style="border-top:0;padding-bottom:0"><span>Faixa azul</span><span class="r">2 de 4 graus</span></div>
         <div class="ap-degs"><i class="on"></i><i class="on"></i><i></i><i></i></div>
@@ -696,6 +714,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="site.js"></script>
 <script src="movimentos.js"></script>
+<script src="fotos.js"></script>
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$;
@@ -915,7 +934,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   if (demo) AULAS = aulas48("adulto");
   function quemDemo() {
     var l = QUEM0.map(function (q) { return { nome: curto(q[0]), faixa: q[1], graus: q[2], conf: q[3], chegou: registered && q[0] === "Felipe Antunes" ? "18:52" : null, eu: false }; });
-    if (confirmed || registered) l.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, conf: confAt, chegou: registered ? regAt : null, eu: true });
+    if (confirmed || registered) l.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, foto: ALUNO.foto, conf: confAt, chegou: registered ? regAt : null, eu: true });
     return l;
   }
   /* as vagas ocupadas são as reservas; quem chegou sem reservar aparece na lista, mas não ocupa vaga */
@@ -923,7 +942,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
   function faces(max) {
     var l = quem.slice().sort(function (a, b) { return b.eu - a.eu; }), h = l.slice(0, max).map(function (q, i) {
-      return '<span class="av' + (q.eu ? " me" : "") + '" style="z-index:' + (max + 1 - i) + '">' + ini(q.nome) + "</span>";
+      return '<span class="av' + (q.eu ? " me" : "") + '"' + Fotos.attr(q.foto) + ' style="z-index:' + (max + 1 - i) + '">' + ini(q.nome) + "</span>";
     }).join("");
     return h + (l.length > max ? '<span class="av more" style="z-index:0">+' + (l.length - max) + "</span>" : "");
   }
@@ -975,7 +994,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $$("li", lista).forEach(function (li) { antes[li.dataset.k] = 1; });
     lista.innerHTML = quem.map(function (q) {
       var k = q.nome + "|" + q.eu, st = q.chegou ? '<span class="pill-s in">Chegou ' + q.chegou + "</span>" : q.conf ? '<span class="pill-s">Confirmou</span>' : "";
-      return '<li data-k="' + esc(k) + '"' + (q.eu ? ' class="me' + (antes[k] ? "" : " new") + '"' : antes[k] || !Object.keys(antes).length ? "" : ' class="new"') + '><span class="av">' + ini(q.nome) + "</span><div><b>" + esc(q.eu ? "Você" : q.nome) + "</b><small>" +
+      return '<li data-k="' + esc(k) + '"' + (q.eu ? ' class="me' + (antes[k] ? "" : " new") + '"' : antes[k] || !Object.keys(antes).length ? "" : ' class="new"') + '><span class="av"' + Fotos.attr(q.foto) + '>' + ini(q.nome) + "</span><div><b>" + esc(q.eu ? "Você" : q.nome) + "</b><small>" +
         '<i class="belt-s" style="' + Site.faixaCss(q.faixa) + '"></i>' + Site.faixaNome(q.faixa) + " · " + grausTx(q.graus) + "</small></div>" + st + "</li>";
     }).join("");
     $("#apWhoNone").hidden = !!quem.length || semAula;
@@ -1057,7 +1076,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       ]);
     }).then(function (rs) {
       var q = rs[0], pr = rs[1];
-      quem = (q.data || []).map(function (x) { return { nome: x.nome, faixa: x.faixa, graus: x.graus, eu: !!x.eu, conf: hhmm(x.confirmou_em), chegou: x.chegou_em ? hhmm(x.chegou_em) : null }; });
+      quem = (q.data || []).map(function (x) { return { nome: x.nome, faixa: x.faixa, graus: x.graus, foto: x.foto, eu: !!x.eu, conf: hhmm(x.confirmou_em), chegou: x.chegou_em ? hhmm(x.chegou_em) : null }; });
       confirmed = quem.some(function (x) { return x.eu; });
       if (confirmed) MINHAS[chaveAula(AULA)] = 1; else delete MINHAS[chaveAula(AULA)];
       paintAulas();
@@ -1067,7 +1086,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       registered = !!(pr.data && pr.data.chegou_em);
       if (registered) {
         regAt = hhmm(pr.data.chegou_em);
-        if (!confirmed) quem.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, eu: true, conf: "", chegou: regAt });
+        if (!confirmed) quem.push({ nome: curto(ALUNO.nome), faixa: ALUNO.faixa, graus: ALUNO.graus, foto: ALUNO.foto, eu: true, conf: "", chegou: regAt });
       }
       paintSpot();
       if (registered && !antes) { mostrarRegistro(false); carregarRank(); }
@@ -1159,7 +1178,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       box.hidden = !on;
       if (!on) return;
       box.innerHTML = FAMILIA.map(function (x) {
-        return '<button type="button" data-membro="' + x.id + '" aria-pressed="' + (x.id === ALUNO.id) + '"><span class="av">' + ini(x.nome) + "</span><span>" + esc(x.nome.split(" ")[0]) +
+        return '<button type="button" data-membro="' + x.id + '" aria-pressed="' + (x.id === ALUNO.id) + '"><span class="av"' + Fotos.attr(x.foto) + '>' + ini(x.nome) + "</span><span>" + esc(x.nome.split(" ")[0]) +
           "<small>" + (TURMA[x.turma] || "Adulto") + "</small></span></button>";
       }).join("");
     });
@@ -1248,7 +1267,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var l = RK.l, top = l.filter(function (x) { return x.posicao <= 10; }), eu = l.filter(function (x) { return x.eu; })[0];
     var vis = RK.todos ? top : top.slice(0, 5);
     $("#apRkL").innerHTML = vis.length ? vis.map(function (x) {
-      return '<li' + (x.eu ? ' class="me"' : "") + '><span class="pos' + (x.posicao <= 3 ? " p" + x.posicao : "") + '">' + x.posicao + '</span><span class="av">' + ini(x.nome) + "</span>" +
+      return '<li' + (x.eu ? ' class="me"' : "") + '><span class="pos' + (x.posicao <= 3 ? " p" + x.posicao : "") + '">' + x.posicao + '</span><span class="av"' + Fotos.attr(x.foto) + '>' + ini(x.nome) + "</span>" +
         "<div><b>" + esc(x.eu ? "Você" : x.nome) + '</b><small><i class="belt-s" style="' + Site.faixaCss(x.faixa) + '"></i>' + Site.faixaNome(x.faixa) + "</small></div>" +
         '<span class="n">' + x.aulas + "<span>" + (x.aulas === 1 ? "aula" : "aulas") + "</span></span></li>";
     }).join("") : '<li class="ap-rk-vazio">Ninguém registrou presença ' + (RK.per === "mes" ? "neste mês" : "neste ano") + " ainda. Que tal abrir o ranking?</li>";
@@ -1985,6 +2004,62 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     lista.forEach(function (w) { var d = diaDe(w); run = prev && (d - prev) / 864e5 === 7 ? run + 1 : 1; prev = d; rec = Math.max(rec, run); });
     return { atual: atual, rec: rec };
   }
+  /* ---------- foto do aluno: o próprio aluno (ou o responsável, para o dependente) coloca pelo Perfil ---------- */
+  function pintaFoto() {
+    var av = $("#apFotoAv");
+    if (!av || !ALUNO) return;
+    var tx = av.firstChild && av.firstChild.nodeType === 3 ? av.firstChild : av.insertBefore(document.createTextNode(""), av.firstChild);
+    tx.nodeValue = ini(ALUNO.nome);
+    if (ALUNO.foto) av.setAttribute("data-foto", ALUNO.foto);
+    else if (!demo) {
+      av.removeAttribute("data-foto"); av.removeAttribute("data-foto-ok"); av.classList.remove("com-foto");
+      var im = $("img.ft", av);
+      if (im) im.remove();
+    }
+    $("#apFotoBtn").setAttribute("aria-label", ALUNO.foto || av.classList.contains("com-foto") ? "Trocar a foto" : "Colocar sua foto");
+  }
+  function erroFoto(e) {
+    var m = String((e && e.message) || "");
+    if (/bucket|row-level|security|definir_foto|function|schema cache|not found/i.test(m)) return "As fotos ainda não foram ativadas no sistema. Avise o professor.";
+    return m && m.length < 120 ? m : "Não deu para enviar a foto. Tente de novo.";
+  }
+  $("#apFotoBtn").addEventListener("click", function () { $("#apFotoIn").click(); });
+  $("#apFotoIn").addEventListener("change", function () {
+    var f = this.files && this.files[0], btn = $("#apFotoBtn"), av = $("#apFotoAv");
+    this.value = "";
+    if (!f || btn.classList.contains("enviando")) return;
+    btn.classList.add("enviando");
+    if (demo) {
+      Fotos.reduz(f).then(function (b) {
+        var im = $("img.ft", av);
+        if (!im) { im = document.createElement("img"); im.className = "ft"; im.alt = ""; av.appendChild(im); }
+        im.onload = function () { av.classList.add("com-foto"); pintaFoto(); };
+        im.src = URL.createObjectURL(b);
+        toast("Foto colocada. Na demonstração ela não fica salva.");
+      }, function (e) { toast(erroFoto(e)); }).then(function () { btn.classList.remove("enviando"); });
+      return;
+    }
+    var membro = ALUNO, cli;
+    Acesso.cliente().then(function (sb) {
+      cli = sb;
+      return Fotos.envia(sb, membro.id, f);
+    }).then(function (caminho) {
+      return cli.rpc("definir_foto", comAluno({ p_foto: caminho })).then(function (r) {
+        if (r.error) { Fotos.apaga(cli, caminho); throw r.error; }
+        var antiga = r.data && r.data.antiga;
+        if (antiga && antiga !== caminho) Fotos.apaga(cli, antiga);
+        membro.foto = caminho;
+        if (ALUNO === membro) {
+          quem.forEach(function (q) { if (q.eu) q.foto = caminho; });
+          pintaFoto(); paintSpot();
+        }
+        paintFamilia();
+        toast(membro.nome.split(" ")[0] + ", sua foto já aparece na lista de quem vai. Oss!");
+      });
+    }).catch(function (e) { toast(erroFoto(e)); }).then(function () { btn.classList.remove("enviando"); });
+  });
+  if (!demo) Fotos.liga(Acesso.cliente());
+
   /* ---------- a faixa em 3D: desenhada aqui (SVG) para qualquer faixa, inclusive as do Kids com listra ---------- */
   var beltN = 0;
   function beltSVG(fx, graus) {
@@ -2055,6 +2130,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function paintPerfil() {
     var pf = screenOf("perfil"), a = ALUNO, g = MEUS.grads[0], fx = a.faixa || "branca", graus = a.graus || 0, d = diaDe(a.inicio || isoDia(new Date()));
     $(".ap-hi", pf).textContent = a.nome;
+    pintaFoto();
     /* todas as aulas no Studio Evolution: as registradas no app e as de antes do app, lançadas pelo professor */
     var totalStudio = MEUS.pres.length + (a.aulas_antes || 0);
     $(".ap-hi", pf).nextElementSibling.textContent = (a.artigo === "a" ? "Aluna" : "Aluno") + " desde " + MESES[d.getMonth()] + " de " + d.getFullYear() + " · " + (TURMA[a.turma] || "Adulto") + (a.horario ? " " + Site.hora(a.horario) : "") +

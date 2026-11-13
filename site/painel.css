@@ -533,3 +533,8 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 @media (prefers-reduced-motion: no-preference) { .drawer.on .cal-d:not(.fora) { animation: pop 0.4s var(--ease) both; } }
 .cal-t { margin-top: 16px; font: 600 10.5px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
 .cal-t + .cal { margin-top: 8px; }
+
+/* ficha: a foto do aluno */
+.ficha-foto { display: flex; gap: 14px; align-items: center; }
+.ficha-foto > .av { width: 64px; height: 64px; flex-shrink: 0; font-size: 18px; box-shadow: 0 0 0 2px var(--gold); color: var(--gold-text); }
+.ficha-foto .muted { margin: 2px 0 8px; font-size: 12.5px; }
