@@ -27,6 +27,7 @@
         "<td>" + P.belt(a.faixa, a.graus, a.turma) + "</td>" +
         "<td>" + (sum && a.ativo ? '<span class="pill-s warn">' + (u ? "há " + dias + " dias" : "nunca veio") + "</span>" : P.quando(u)) + "</td>" +
         '<td class="num hide-s">' + P.noMes(a.id, mes) + "</td>" +
+        "<td>" + vencSel(a) + "</td>" +
         '<td class="act"><div class="row-acts">' + (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa="' + a.id + '">WhatsApp</button>' : "") + "</div></td></tr>";
     }).join("");
     var vazio = $("#alEmpty");
@@ -35,6 +36,33 @@
       : q ? "Nenhum aluno com “" + esc($("#alQ").value.trim()) + "”." : "Ninguém neste filtro.";
     $("#alTbl").hidden = !l.length;
   }
+  /* o dia do vencimento direto na lista: escolheu, salvou (e a mensalidade em aberto deste mês em diante acompanha) */
+  function vencSel(a) {
+    if (!(a.mensalidade > 0)) return '<span class="muted" title="Sem mensalidade">—</span>';
+    var v = a.vencimento || 10;
+    return '<label class="venc-sel"><span class="sr-only">Dia do vencimento de ' + esc(a.nome) + '</span><select class="sel" data-venc="' + a.id + '">' +
+      Array.apply(null, Array(31)).map(function (_, i) { return '<option value="' + (i + 1) + '"' + (v === i + 1 ? " selected" : "") + ">dia " + (i + 1) + "</option>"; }).join("") + "</select></label>";
+  }
+  $("#alTbl").addEventListener("change", function (e) {
+    var sel = e.target.closest("select[data-venc]");
+    if (!sel) return;
+    var a = P.porId[sel.dataset.venc], dia = +sel.value, antes = a.vencimento || 10;
+    if (!a || dia === antes) return;
+    sel.disabled = true;
+    var mes = P.mesIni(P.hoje()), mudou = [];
+    P.q(function (sb) { return sb.from("alunos").update({ vencimento: dia }).eq("id", a.id); }).then(function () {
+      return P.q(function (sb) { return sb.from("mensalidades").select("id, competencia, vencimento").eq("aluno", a.id).is("pago_em", null).gte("competencia", mes); });
+    }).then(function (abertas) {
+      return Promise.all((abertas || []).map(function (m) {
+        var nova = P.vencDe(m.competencia, dia);
+        if (nova === m.vencimento) return null;
+        mudou.push(P.dataBR(nova));
+        return P.q(function (sb) { return sb.from("mensalidades").update({ vencimento: nova }).eq("id", m.id); });
+      }));
+    }).then(function () { return P.carregarAlunos(); }).then(function () {
+      P.toast("Vencimento de " + P.first(a.nome) + " agora é dia " + dia + "." + (mudou.length ? " A mensalidade em aberto passou para " + mudou.join(" e ") + "." : ""));
+    }).catch(function (er) { sel.value = String(antes); sel.disabled = false; P.erro(er, "Não deu para mudar o vencimento"); });
+  });
   $("#alChips").addEventListener("click", function (e) { var b = e.target.closest("button[data-f]"); if (b) { filtro = b.dataset.f; paintLista(); } });
   $("#alQ").addEventListener("input", paintLista);
   $("#alTbl").addEventListener("click", function (e) {

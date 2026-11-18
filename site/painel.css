@@ -573,3 +573,6 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .grau-aviso { margin-top: 14px; }
 .grau-aviso .niver-l li { flex-wrap: wrap; }
 .pill-s.grau { margin-left: 4px; background: color-mix(in oklch, var(--gold) 22%, transparent); color: var(--gold-text); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--gold) 60%, transparent); }
+
+/* Alunos: o dia do vencimento direto na lista */
+.venc-sel .sel { height: 32px; min-width: 76px; padding: 0 6px; font-size: 12.5px; }
