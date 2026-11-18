@@ -584,3 +584,8 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .es-foto-prev img { width: 100%; height: 100%; object-fit: cover; }
 .es-foto-prev .es-ic { width: 44px; height: 44px; background-size: 26px; }
 .es-foto .msg-acts { margin: 0; }
+
+/* ficha: editar a mensalidade em aberto */
+.ficha-list li[data-mens] { flex-wrap: wrap; }
+.mens-ed { flex-basis: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; margin-top: 10px; }
+.mens-ed .msg-acts { grid-column: 1 / -1; margin: 0; }

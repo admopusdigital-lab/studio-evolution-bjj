@@ -292,6 +292,17 @@
       "</div>" +
       '<div class="fq-leg"><span><i></i>não veio</span><span><i class="l1"></i>1 aula</span><span><i class="l2"></i>2 aulas</span><span><i class="hj"></i>hoje</span></div>';
   }
+  /* a mensalidade na ficha: em aberto, dá para receber, passar para o dia cadastrado do aluno ou editar data e valor */
+  function mensLi(a, m) {
+    var certo = !m.pago_em && a.vencimento ? P.vencDe(m.competencia, a.vencimento) : null;
+    return '<li data-mens="' + m.id + '"><span>' + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + '</span><span class="row-acts">' + statusMens(m) +
+      (m.pago_em ? "" : '<button class="mini-btn" type="button" data-mens-paga>Recebi</button>' +
+        (certo && certo !== m.vencimento ? '<button class="mini-btn ghost" type="button" data-mens-dia="' + certo + '">Passar para ' + P.dataBR(certo) + "</button>" : "") +
+        '<button class="mini-btn ghost" type="button" data-mens-ed>Editar</button>') + "</span>" +
+      (m.pago_em ? "" : '<form class="mens-ed" hidden novalidate><label class="crm-f"><span>Vencimento</span><input class="crm-in" type="date" data-mv value="' + m.vencimento + '"></label>' +
+        '<label class="crm-f"><span>Valor (R$)</span><input class="crm-in" inputmode="decimal" data-mval value="' + String(m.valor).replace(".", ",") + '"></label>' +
+        '<div class="msg-acts"><button class="mini-btn" type="submit">Salvar</button><button class="mini-btn ghost" type="button" data-mens-cancela>Cancelar</button></div></form>') + "</li>";
+  }
   function statusMens(m) {
     if (m.pago_em) return '<span class="pill-s in">Paga ' + P.dataBR(m.pago_em) + "</span>";
     if (m.vencimento < P.hoje()) return '<span class="pill-s warn">Atrasada desde ' + P.dataBR(m.vencimento) + "</span>";
@@ -435,7 +446,7 @@
           (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
         "</dl></div>" +
         '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + foraHTML(a, grads[0]) + "</div>" +
-        '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return '<li data-mens="' + m.id + '"><span>' + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + '</span><span class="row-acts">' + statusMens(m) + (m.pago_em ? "" : '<button class="mini-btn" type="button" data-mens-paga>Recebi</button>') + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
+        '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return mensLi(a, m); }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
         outrosHTML(a, cobs) +
         '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return '<li data-grad="' + g.id + '"><span>' + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + '</span><span class="row-acts">' + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + '<button class="mini-btn ghost" type="button" data-grad-apaga>Apagar</button></span></li>'; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
         familiaHTML(a) +
@@ -458,6 +469,19 @@
       $(".dr-body", dr).innerHTML = html;
       ligaOutros(a, dr);
       ligaFoto(a, dr);
+      /* editar a data e o valor de uma mensalidade em aberto, ali mesmo na ficha */
+      $$(".mens-ed", dr).forEach(function (fm) {
+        fm.onsubmit = function (e) {
+          e.preventDefault();
+          var mid = fm.closest("[data-mens]").dataset.mens, dt = $("[data-mv]", fm).value, vl = P.num($("[data-mval]", fm).value), bt = $('[type="submit"]', fm);
+          if (!dt) return P.toast("Escolha a data do vencimento.");
+          if (!(vl >= 0)) return P.toast("Digite o valor, como 160 ou 149,90.");
+          bt.classList.add("loading");
+          P.q(function (sb) { return sb.from("mensalidades").update({ vencimento: dt, valor: vl }).eq("id", mid); })
+            .then(function () { if (P.recarregarFin) P.recarregarFin(); P.toast("Mensalidade salva: " + P.brl(vl) + ", vence " + P.dataBR(dt) + "."); P.abrirAluno(a.id); })
+            .catch(function (er) { bt.classList.remove("loading"); P.erro(er); });
+        };
+      });
       $("#frAntes", dr).onsubmit = function (e) {
         e.preventDefault();
         var f = e.target, t = $("#faN", f).value.replace(/\s/g, ""), n = t === "" ? 0 : parseInt(t, 10);
@@ -480,6 +504,18 @@
         else if (b.hasAttribute("data-ja-tinha")) {
           b.classList.add("loading");
           P.jaTinha(b.dataset.jaTinha, a.id).then(function () { P.abrirAluno(a.id); }).catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+        }
+        else if (b.hasAttribute("data-mens-dia")) {
+          var mi = b.closest("[data-mens]").dataset.mens, nd = b.dataset.mensDia;
+          b.classList.add("loading");
+          P.q(function (sb) { return sb.from("mensalidades").update({ vencimento: nd }).eq("id", mi); })
+            .then(function () { if (P.recarregarFin) P.recarregarFin(); P.toast("Mensalidade passou para " + P.dataBR(nd) + "."); P.abrirAluno(a.id); })
+            .catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+        }
+        else if (b.hasAttribute("data-mens-ed") || b.hasAttribute("data-mens-cancela")) {
+          var fm = $(".mens-ed", b.closest("[data-mens]"));
+          fm.hidden = b.hasAttribute("data-mens-cancela");
+          if (!fm.hidden) P.focusSoft($("[data-mv]", fm));
         }
         else if (b.hasAttribute("data-mens-paga")) {
           var mid = b.closest("[data-mens]").dataset.mens;
