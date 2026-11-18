@@ -328,6 +328,46 @@
   /* as mesmas cores em valor, para SVG */
   Site.COR_FAIXA = { branca: "oklch(0.96 0.004 90)", cinza: "oklch(0.66 0.012 260)", amarela: "oklch(0.85 0.15 95)", laranja: "oklch(0.72 0.16 55)", verde: "oklch(0.58 0.13 150)",
     azul: "oklch(0.55 0.17 258)", roxa: "oklch(0.45 0.15 305)", marrom: "oklch(0.42 0.07 50)", preta: "oklch(0.2 0.006 285)" };
+
+  /* ---------- graus no padrão IBJJF (Sistema Geral de Graduação, jun/2026) ----------
+     Adulto: branca, azul, roxa e marrom com até 4 graus; preta com até 6 (na ponteira vermelha).
+     Kids (4 a 15 anos): a escola escolhe o sistema (trimestral: 3 graus; quadrimestral: 2; mensal: 11).
+     No mensal, os 4 primeiros graus são brancos, os 4 seguintes vermelhos e os 3 últimos da cor da próxima faixa.
+     Todas as faixas kids têm ponteira (barra) preta. */
+  Site.GRAU_BRANCO = "oklch(0.97 0.004 90)";
+  Site.GRAU_VERMELHO = "oklch(0.56 0.21 27)";
+  /* faixa do Kids? pela turma, quando se sabe; senão, pela cor (cinza, amarela, laranja e verde só existem no Kids) */
+  Site.kidFx = function (f, turma) {
+    if (turma) return /^kids/.test(turma);
+    return ["cinza", "amarela", "laranja", "verde"].indexOf(Site.faixaBase(f)) >= 0;
+  };
+  Site.maxGraus = function (f, kid) { return f === "preta" ? 6 : kid ? 11 : 4; };
+  /* a próxima faixa no caminho (Kids: verde e preta vai para a azul aos 16 anos) */
+  Site.proxFaixa = function (f, kid) {
+    var l = kid ? Site.FX_KD : Site.FX_AD, i = l.indexOf(f);
+    return i >= 0 && i < l.length - 1 ? l[i + 1] : kid ? "azul" : null;
+  };
+  /* a cor da fita do grau i (0 = 1º grau) */
+  Site.corGrau = function (f, i, kid) {
+    if (!kid || i < 4) return Site.GRAU_BRANCO;
+    if (i < 8) return Site.GRAU_VERMELHO;
+    var n = Site.proxFaixa(f, true);
+    return Site.COR_FAIXA[Site.faixaBase(n)] || Site.GRAU_BRANCO;
+  };
+  /* idade mínima de cada grupo kids (IBJJF): cinza 4, amarela 7, laranja 10, verde 13 */
+  Site.IDADE_MIN = { cinza: 4, amarela: 7, laranja: 10, verde: 13 };
+  /* faixa pequena em SVG para listas: cor, listra do Kids, ponteira e os graus com as cores certas */
+  Site.miniFaixa = function (f, graus, kid) {
+    f = f || "branca"; kid = kid === undefined ? Site.kidFx(f) || (graus > 4 && f !== "preta") : kid;
+    var b = Site.faixaBase(f), l = String(f).split("-")[1], cor = Site.COR_FAIXA[b] || Site.COR_FAIXA.branca;
+    var bar = f === "preta" ? "oklch(0.52 0.2 27)" : "oklch(0.17 0.006 285)", n = Math.max(0, Math.min(graus || 0, Site.maxGraus(f, kid)));
+    var px = 34, pw = 18, gw = n > 6 ? 0.95 : n > 4 ? 1.4 : 2, gs = n > 6 ? 1.55 : n > 4 ? 2.6 : 3.8, g0 = px + (pw - ((n - 1) * gs + gw)) / 2, t = "";
+    for (var i = 0; i < n; i++) t += '<rect x="' + (g0 + i * gs).toFixed(2) + '" y="0" width="' + gw + '" height="12" fill="' + Site.corGrau(f, i, kid) + '"/>';
+    return '<svg class="mfx" viewBox="0 0 56 12" width="44" height="10" aria-hidden="true" focusable="false"><rect width="56" height="12" rx="2" fill="' + cor + '"/>' +
+      (l ? '<rect y="4.4" width="56" height="3.2" fill="' + Site.COR_FAIXA[l] + '"/>' : "") +
+      '<rect x="' + px + '" width="' + pw + '" height="12" fill="' + bar + '"/>' + t +
+      '<rect x=".4" y=".4" width="55.2" height="11.2" rx="1.8" fill="none" stroke="#000" stroke-opacity=".22" stroke-width=".8"/></svg>';
+  };
   Site.DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
   /* "08:00" -> "8h", "20:30" -> "20h30" */
   Site.hora = function (t) { var p = t.split(":"); return +p[0] + "h" + (p[1] !== "00" ? p[1] : ""); };

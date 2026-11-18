@@ -217,6 +217,26 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-foto .cam svg { width: 14px; height: 14px; }
 .ap-foto.enviando .av { animation: apFotoP 1s ease-in-out infinite; }
 @keyframes apFotoP { 50% { opacity: .45; } }
+/* Movimentos: técnicas da semana e "quero aprender" */
+.ap-sem-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.ap-sem-n { font-size: 11.5px; color: var(--ink-2); white-space: nowrap; }
+.ap-sem-l, .ap-quero-l { list-style: none; margin: 10px 0 0; padding: 0; }
+.ap-sem-l li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--rule); }
+.ap-sem-l li.vazio { display: block; color: var(--ink-2); font-size: 12.5px; }
+.ap-sem-l .t { min-width: 0; }
+.ap-sem-l .t b { display: block; font: 400 15px/1.25 var(--serif); }
+.ap-sem-v { margin-top: 3px; padding: 0; border: 0; background: none; color: var(--gold-text); font: 500 11.5px/1.3 var(--sans); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.ap-sem-ok { flex-shrink: 0; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--rule); background: transparent; color: var(--ink); font: 600 12px/1 var(--sans); cursor: pointer; transition: background .2s, color .2s, transform .15s; }
+.ap-sem-ok[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: oklch(0.15 0.01 75); }
+.ap-sem-ok:active { transform: scale(.96); }
+.ap-sem-ok.loading, .ap-quero-f button.loading { opacity: .55; pointer-events: none; }
+.ap-quero-f { display: flex; gap: 8px; margin-top: 10px; }
+.ap-quero-f input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); font: 400 14px/1 var(--sans); }
+.ap-quero-f input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+.ap-quero-f button { flex-shrink: 0; min-height: 42px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: oklch(0.15 0.01 75); font: 700 13px/1 var(--sans); cursor: pointer; }
+.ap-quero-l li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--rule); font-size: 13px; }
+.ap-quero-l small { display: block; margin-top: 2px; font-size: 11px; color: var(--gold-text); }
+.ap-quero-l button { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--rule); background: transparent; color: var(--ink-2); font-size: 16px; cursor: pointer; }
 /* ===== faixa 3D: tecido com volume, ponteira e graus em fita; flutua, brilha e inclina com o dedo ===== */
 .b3d { position: relative; isolation: isolate; display: block; margin-top: 16px; perspective: 760px; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
 .b3d::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: -16px; height: 16px; border-radius: 50%;
@@ -257,7 +277,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-fx-c { grid-column: 1 / -1; font-size: 12px; color: var(--ink-2); }
 .ap-fx-g { display: inline-flex; gap: 5px; padding-bottom: 4px; }
 .ap-fx-g i { width: 9px; height: 22px; border-radius: 2px; background: color-mix(in oklch, var(--ink) 12%, transparent); }
-.ap-fx-g i.on { background: oklch(0.97 0.003 90); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.35), 0 0 12px -2px var(--gold); }
+.ap-fx-g i.on { background: var(--gc, oklch(0.97 0.003 90)); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.35), 0 0 12px -2px var(--gold); }
+.ap-fx-g.kid { flex-wrap: wrap; max-width: 150px; justify-content: flex-end; gap: 4px; }
+.ap-fx-g.kid i { width: 7px; height: 18px; }
+.ap.app .ap-degs i.on[style] { background: var(--gc); box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.3); }
 @media (prefers-reduced-motion: reduce) { .b3d .b3-fl, .b3d .b3-in, .b3d .b3-in::after, .b3d .b3-g, .b3d::after { animation: none !important; } .b3d .b3-in { transform: none; } }
 .ap.app .ap-trio { margin-top: 18px; border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; }
 .ap.app .ap-trio div { padding: 14px 6px 12px; }
@@ -593,6 +616,22 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       <section class="ap-view" data-view="movimentos" aria-label="Tela Movimentos">
         <p class="ap-lb" id="apMovLb">Faixa azul</p>
         <p class="ap-hi">Movimentos</p>
+        <!-- técnicas da semana (o professor marca no painel) e o que o aluno quer aprender -->
+        <div class="ap-card ap-sem" id="apSem" hidden>
+          <div class="ap-sem-h"><p class="ap-lb gold">Nesta semana no tatame</p><span class="ap-sem-n" id="apSemN"></span></div>
+          <p class="ap-mut" id="apSemD"></p>
+          <ul class="ap-sem-l" id="apSemL"></ul>
+        </div>
+        <div class="ap-card ap-quero" id="apQuero" hidden>
+          <p class="ap-lb gold">Quero aprender</p>
+          <p class="ap-mut">Conte ao professor que técnica você quer treinar.</p>
+          <form class="ap-quero-f" id="apQueroF" novalidate>
+            <label class="sr-only" for="apQueroIn">Técnica que você quer aprender</label>
+            <input id="apQueroIn" maxlength="120" autocomplete="off" enterkeyhint="send" placeholder="Ex.: defesa de triângulo">
+            <button type="submit">Pedir</button>
+          </form>
+          <ul class="ap-quero-l" id="apQueroL"></ul>
+        </div>
         <div id="apCont" hidden>
           <p class="ap-lb gold" style="margin-top:16px">Continue assistindo</p>
           <button class="ap-cover" type="button" id="apPlay"><img id="apContImg" src="img/takes/guarda.jpg" alt=""><span class="play"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-tri"/></svg></span><span class="dur" id="apContDur"></span><span class="pg"><span id="apProg"></span></span></button>
@@ -1681,7 +1720,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       FAIXA = Mov.FAIXAS[Site.faixaBase(r[0])] ? Site.faixaBase(r[0]) : "branca";
       PROG = r[1] || {};
       return Mov.lista({ faixa: FAIXA });
-    }).then(function (l) { if (n !== movSeq) return; MOVS = l; paintLib(); })
+    }).then(function (l) { if (n !== movSeq) return; MOVS = l; paintLib(); paintSemanaTec(); })
       .catch(function () { if (n === movSeq) toast("Não deu para carregar os movimentos. Confira a internet."); });
   }
   $("#apCats").addEventListener("click", function (e) {
@@ -1927,6 +1966,94 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   carregar();
   window.recarregarMov = function () { catF = "todos"; carregar(); };
 
+  /* ---------- técnicas da semana (o professor marca no painel) e "quero aprender" ---------- */
+  var SEM = { l: [], meus: [], ok: false }, semBusy = false;
+  var SEM_DEMO = [{ id: "s1", titulo: "Raspagem de gancho", movimento: null }, { id: "s2", titulo: "Passagem toreando", movimento: null }, { id: "s3", titulo: "Defesa de triângulo", movimento: null }];
+  function segundaDe(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - (x.getDay() + 6) % 7); return x; }
+  function ddmm(d) { return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2); }
+  function carregarSemana() {
+    var seg = segundaDe(new Date()), sab = new Date(seg); sab.setDate(seg.getDate() + 5);
+    $("#apSemD").textContent = "Semana de " + ddmm(seg) + " a " + ddmm(sab);
+    if (demo) { SEM.l = SEM_DEMO; SEM.ok = true; return paintSemanaTec(); }
+    if (!ALUNO) return Promise.resolve();
+    var membro = ALUNO, grupo = /^kids/.test(ALUNO.turma || "") ? "kids" : "adulto";
+    return Acesso.cliente().then(function (sb) {
+      return Promise.all([
+        sb.from("tecnicas_semana").select("id, titulo, movimento, turma, ordem").eq("semana", isoDia(seg)).in("turma", ["todas", grupo]).order("ordem").order("criado_em"),
+        sb.from("tecnicas_aluno").select("id, tipo, tecnica, titulo, visto, criado_em").eq("aluno", membro.id).order("criado_em", { ascending: false }).limit(60)
+      ]);
+    }).then(function (r) {
+      if (ALUNO !== membro) return;
+      var er = r[0].error || r[1].error;
+      if (er) {
+        /* banco ainda sem a atualização: os cartões ficam escondidos; falta de sinal mantém o que está */
+        if (/PGRST205|42P01|PGRST200/.test(er.code || "") || /does not exist|schema cache/i.test(er.message || "")) { SEM.ok = false; $("#apSem").hidden = $("#apQuero").hidden = true; }
+        return;
+      }
+      SEM.ok = true; SEM.l = r[0].data || []; SEM.meus = r[1].data || [];
+      paintSemanaTec();
+    }).catch(function () {});
+  }
+  function paintSemanaTec() {
+    if (!SEM.ok) return;
+    $("#apSem").hidden = false; $("#apQuero").hidden = false;
+    var aprendi = {};
+    SEM.meus.forEach(function (m) { if (m.tipo === "aprendi") aprendi[m.tecnica] = m.id; });
+    $("#apSemL").innerHTML = SEM.l.length ? SEM.l.map(function (t) {
+      var mov = t.movimento && MOVS.filter(function (m) { return m.id === t.movimento; })[0], ok = !!aprendi[t.id];
+      return '<li><div class="t"><b>' + esc(t.titulo) + "</b>" + (mov ? '<button type="button" class="ap-sem-v" data-sem-mov="' + mov.id + '">Ver o vídeo</button>' : "") + "</div>" +
+        '<button type="button" class="ap-sem-ok" data-aprendi="' + t.id + '" aria-pressed="' + ok + '" aria-label="' + (ok ? "Aprendi: " : "Marcar que aprendi: ") + esc(t.titulo) + '">' + (ok ? "✓ Aprendi" : "Aprendi") + "</button></li>";
+    }).join("") : '<li class="vazio">O professor ainda não marcou as técnicas desta semana.</li>';
+    var n = SEM.l.filter(function (t) { return aprendi[t.id]; }).length;
+    $("#apSemN").textContent = SEM.l.length ? n + " de " + SEM.l.length + (SEM.l.length === 1 ? " aprendida" : " aprendidas") : "";
+    $("#apQueroL").innerHTML = SEM.meus.filter(function (m) { return m.tipo === "quero"; }).map(function (m) {
+      return "<li><span>" + esc(m.titulo) + (m.visto ? "<small>O professor já viu o seu pedido</small>" : "") + '</span><button type="button" data-quero-x="' + m.id + '" aria-label="Tirar o pedido: ' + esc(m.titulo) + '">×</button></li>';
+    }).join("");
+  }
+  /* grava ou apaga uma marcação do membro escolhido (na demonstração, só na tela) */
+  function semGrava(novo) {
+    if (demo) return Promise.resolve(Object.assign({ id: "d" + Date.now(), visto: false, criado_em: new Date().toISOString() }, novo));
+    return Acesso.cliente().then(function (sb) { return sb.from("tecnicas_aluno").insert(Object.assign({ aluno: ALUNO.id }, novo)).select().single(); })
+      .then(function (r) { if (r.error) throw r.error; return r.data; });
+  }
+  function semApaga(id) {
+    if (demo) return Promise.resolve();
+    return Acesso.cliente().then(function (sb) { return sb.from("tecnicas_aluno").delete().eq("id", id); }).then(function (r) { if (r.error) throw r.error; });
+  }
+  $("#apSemL").addEventListener("click", function (e) {
+    var v = e.target.closest("[data-sem-mov]");
+    if (v) return abrir(v.dataset.semMov);
+    var b = e.target.closest("[data-aprendi]");
+    if (!b || semBusy) return;
+    var tid = b.dataset.aprendi, ja = SEM.meus.filter(function (m) { return m.tipo === "aprendi" && m.tecnica === tid; })[0], membro = ALUNO;
+    semBusy = true; b.classList.add("loading");
+    (ja ? semApaga(ja.id).then(function () { SEM.meus = SEM.meus.filter(function (m) { return m !== ja; }); })
+      : semGrava({ tipo: "aprendi", tecnica: tid }).then(function (row) { SEM.meus.unshift(row); toast("Boa! O professor vê que você aprendeu essa. Oss!"); }))
+      .catch(function () { toast("Não deu para marcar agora. Confira a internet e tente de novo."); })
+      .then(function () { semBusy = false; if (ALUNO === membro) paintSemanaTec(); });
+  });
+  $("#apQueroF").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var inp = $("#apQueroIn"), t = inp.value.trim().replace(/\s+/g, " "), btn = $("button", this);
+    if (t.length < 2) { inp.focus(); return toast("Escreva a técnica que você quer aprender."); }
+    if (semBusy) return;
+    semBusy = true; btn.classList.add("loading");
+    semGrava({ tipo: "quero", titulo: (t.charAt(0).toUpperCase() + t.slice(1)).slice(0, 120) }).then(function (row) {
+      SEM.meus.unshift(row); inp.value = "";
+      toast("Pedido enviado ao professor: " + row.titulo + ".");
+    }).catch(function () { toast("Não deu para enviar agora. Confira a internet e tente de novo."); })
+      .then(function () { semBusy = false; btn.classList.remove("loading"); paintSemanaTec(); });
+  });
+  $("#apQueroL").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-quero-x]");
+    if (!b || semBusy) return;
+    semBusy = true;
+    semApaga(b.dataset.queroX).then(function () { SEM.meus = SEM.meus.filter(function (m) { return m.id !== b.dataset.queroX; }); })
+      .catch(function () { toast("Não deu para tirar agora. Tente de novo."); })
+      .then(function () { semBusy = false; paintSemanaTec(); });
+  });
+  if (demo) carregarSemana();
+
   /* ---------- Perfil: competências ---------- */
   function toggleComps(open) {
     var list = $("#apComp");
@@ -1987,7 +2114,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (r[4] && r[4].data && !r[4].error) Object.keys(r[4].data).forEach(function (k) { membro[k] = r[4].data[k]; });
       $("#ap").classList.remove("sem-dados");
       MEUS.pres = r[0].data || []; MEUS.mens = r[1].data || []; MEUS.grads = r[2].data || []; MEUS.cobs = r[3] && !r[3].error ? r[3].data || [] : [];
-      paintSemana(); paintMens(); paintPerfil(); paintAvisosReal(); niver();
+      paintSemana(); paintMens(); paintPerfil(); paintAvisosReal(); niver(); carregarSemana();
     }).catch(function () {});
   }
   /* a próxima aula da turma depois da que está no Início */
@@ -2150,11 +2277,12 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
   /* ---------- a faixa em 3D: desenhada aqui (SVG) para qualquer faixa, inclusive as do Kids com listra ---------- */
   var beltN = 0;
-  function beltSVG(fx, graus) {
+  /* kid: graus no padrão IBJJF do Kids (até 11: brancos, vermelhos e da cor da próxima faixa) */
+  function beltSVG(fx, graus, kid) {
     var u = "b3" + (++beltN), base = Site.faixaBase(fx), listra = fx.split("-")[1], cor = Site.COR_FAIXA[base] || Site.COR_FAIXA.branca;
-    var barra = fx === "preta" ? "oklch(0.52 0.2 27)" : "oklch(0.17 0.006 285)", n = Math.max(0, Math.min(graus || 0, 6));
-    var px = 226, pw = 70, gw = n > 4 ? 5 : 7, gs = n > 4 ? 10 : 15, g0 = px + (pw - ((n - 1) * gs + gw)) / 2, gr = "";
-    for (var i = 0; i < n; i++) gr += '<g class="b3-g" style="--i:' + i + '"><rect x="' + (g0 + i * gs) + '" y="0" width="' + gw + '" height="50" fill="oklch(0.97 0.004 90)"/>' +
+    var barra = fx === "preta" ? "oklch(0.52 0.2 27)" : "oklch(0.17 0.006 285)", n = Math.max(0, Math.min(graus || 0, Site.maxGraus(fx, kid)));
+    var px = 226, pw = 70, gw = n > 6 ? 3.6 : n > 4 ? 5 : 7, gs = n > 6 ? 6 : n > 4 ? 10 : 15, g0 = px + (pw - ((n - 1) * gs + gw)) / 2, gr = "";
+    for (var i = 0; i < n; i++) gr += '<g class="b3-g" style="--i:' + i + '"><rect x="' + (g0 + i * gs) + '" y="0" width="' + gw + '" height="50" fill="' + Site.corGrau(fx, i, kid) + '"/>' +
       '<rect x="' + (g0 + i * gs) + '" y="0" width="1.4" height="50" fill="#fff" fill-opacity=".7"/><rect x="' + (g0 + i * gs + gw - 1.2) + '" y="0" width="1.2" height="50" fill="#000" fill-opacity=".22"/></g>';
     var pont = '<rect x="' + px + '" y="0" width="' + pw + '" height="50" fill="' + barra + '"/>' +
       '<rect x="' + px + '" y="0" width="1.5" height="50" fill="#000" fill-opacity=".45"/><rect x="' + (px + pw - 1.5) + '" y="0" width="1.5" height="50" fill="#000" fill-opacity=".45"/>';
@@ -2175,12 +2303,12 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       '<rect width="320" height="50" fill="url(#' + u + 's)"/><rect width="320" height="50" fill="url(#' + u + 'e)"/>' +
       '<rect x=".5" y=".5" width="319" height="49" rx="7.5" fill="none" stroke="#000" stroke-opacity=".35"/></svg>';
   }
-  function beltInto(el, fx, graus) {
+  function beltInto(el, fx, graus, kid) {
     var nomeF = Site.faixaNome(fx).toLowerCase(), cor = Site.COR_FAIXA[Site.faixaBase(fx)] || Site.COR_FAIXA.branca;
     el.setAttribute("role", "img");
     el.setAttribute("aria-label", "Faixa " + nomeF + ", " + (graus ? graus + (graus === 1 ? " grau" : " graus") : "sem grau"));
     el.style.setProperty("--fx", cor);
-    el.innerHTML = '<span class="b3-fl"><span class="b3-in">' + beltSVG(fx, graus) + "</span></span>";
+    el.innerHTML = '<span class="b3-fl"><span class="b3-in">' + beltSVG(fx, graus, kid) + "</span></span>";
     beltPlay(el);
   }
   function beltPlay(el) {
@@ -2204,11 +2332,19 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (!el.closest("button")) el.addEventListener("click", function () { beltPlay(el); el.classList.add("tap"); });
   });
   /* a faixa no Início (cartão) e no Perfil (grande) */
-  function paintFaixa(fx, graus, desde) {
+  /* as fitas dos graus: adulto mostra as 4 (ou 6 na preta) com as ganhas acesas; Kids mostra só as ganhas, nas cores da IBJJF */
+  function fitas(fx, graus, kid) {
+    var tot = kid ? graus : Site.maxGraus(fx, false);
+    return Array.apply(null, Array(tot)).map(function (_, i) {
+      return "<i" + (i < graus ? ' class="on" style="--gc:' + Site.corGrau(fx, i, kid) + '"' : "") + "></i>";
+    }).join("");
+  }
+  function paintFaixa(fx, graus, desde, kid) {
     var nome = Site.faixaNome(fx), card = $("#apFx");
-    $$("[data-belt]").forEach(function (el) { beltInto(el, fx, graus); });
+    $$("[data-belt]").forEach(function (el) { beltInto(el, fx, graus, kid); });
     $(".ap-fx-n", card).textContent = nome;
-    $(".ap-fx-g", card).innerHTML = [0, 1, 2, 3].concat(graus > 4 ? [4, 5].slice(0, graus - 4) : []).map(function (i) { return "<i" + (i < graus ? ' class="on"' : "") + "></i>"; }).join("");
+    $(".ap-fx-g", card).innerHTML = fitas(fx, graus, kid);
+    $(".ap-fx-g", card).classList.toggle("kid", !!kid);
     $(".ap-fx-c", card).textContent = (graus ? graus + (graus === 1 ? " grau" : " graus") : "Sem grau ainda") + " · " + desde + (desde === 1 ? " aula" : " aulas") + " desde o último grau";
     card.setAttribute("aria-label", "Sua faixa: " + nome.toLowerCase() + ", " + (graus ? graus + (graus === 1 ? " grau" : " graus") : "sem grau") + ". Ver no Perfil");
   }
@@ -2226,15 +2362,19 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var nomeF = Site.faixaNome(fx);
     var row = $(".ap-belt", pf).nextElementSibling;
     $("span", row).textContent = "Faixa " + nomeF.toLowerCase();
-    $(".r", row).textContent = graus + " de 4 graus";
-    $(".ap-degs", pf).innerHTML = [0, 1, 2, 3].map(function (i) { return "<i" + (i < graus ? ' class="on"' : "") + "></i>"; }).join("");
+    var kid = /^kids/.test(a.turma || ""), gMax = Site.maxGraus(fx, kid);
+    $(".r", row).textContent = kid ? (graus ? graus + (graus === 1 ? " grau" : " graus") : "sem grau") : graus + " de " + gMax + " graus";
+    var degs = $(".ap-degs", pf);
+    degs.innerHTML = fitas(fx, graus, kid);
+    degs.hidden = kid && !graus;
+    degs.style.gridTemplateColumns = "repeat(" + Math.max(kid ? graus : gMax, 1) + ", 1fr)";
     /* aulas feitas antes do app (lançadas pelo professor) contam se o último grau é anterior a elas */
     /* grau marcado "já tinha antes do app" pelo professor não zera as aulas de antes */
     var gAntes = g && g.nota && /ao entrar no Studio|antes do app/i.test(g.nota);
     var antes = a.aulas_antes && (!g || gAntes || !a.aulas_antes_ate || g.data <= a.aulas_antes_ate) ? a.aulas_antes : 0;
     var desde = (g ? MEUS.pres.filter(function (x) { return x.data > g.data; }).length : MEUS.pres.length) + antes, s = semanas();
     $("#apSince").textContent = desde;
-    paintFaixa(fx, graus, desde);
+    paintFaixa(fx, graus, desde, kid);
     paintCal();
     $("#apStreak").textContent = s.atual;
     $("#apStreakT").textContent = (s.atual === 1 ? "semana seguida" : "semanas seguidas") + " · recorde " + s.rec;

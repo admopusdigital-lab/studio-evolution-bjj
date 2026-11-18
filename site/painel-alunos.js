@@ -24,7 +24,7 @@
       var u = P.ultima(a.id), dias = u ? P.difDias(u, P.hoje()) : null, sum = P.sumido(a);
       return '<tr data-id="' + a.id + '"' + (a.ativo ? "" : ' class="off"') + '><td><div class="nm"><span class="av"' + Fotos.attr(a.foto) + '>' + P.ini(a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + a.id + '">' + esc(a.nome) + "</button><small>" +
         esc(P.turmaTx(a)) + (a.responsavel ? " · resp. " + esc(P.first(a.responsavel)) : "") + (a.ativo ? "" : " · inativo") + "</small></div></div></td>" +
-        "<td>" + P.belt(a.faixa, a.graus) + "</td>" +
+        "<td>" + P.belt(a.faixa, a.graus, a.turma) + "</td>" +
         "<td>" + (sum && a.ativo ? '<span class="pill-s warn">' + (u ? "há " + dias + " dias" : "nunca veio") + "</span>" : P.quando(u)) + "</td>" +
         '<td class="num hide-s">' + P.noMes(a.id, mes) + "</td>" +
         '<td class="act"><div class="row-acts">' + (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa="' + a.id + '">WhatsApp</button>' : "") + "</div></td></tr>";
@@ -63,7 +63,7 @@
       '<label class="crm-f"><span class="f-fone">WhatsApp</span><input class="crm-in" data-k="whatsapp" inputmode="tel" placeholder="(15) 99999-9999" autocomplete="off" value="' + esc(a.whatsapp ? P.fone(a.whatsapp) : pre.whatsapp ? P.fone(pre.whatsapp) : "") + '"></label>' +
       '<label class="crm-f"><span class="f-mail">E-mail <small>(o login do app)</small></span><input class="crm-in" type="email" data-k="email" autocomplete="off" spellcheck="false" value="' + v("email") + '"></label>' +
       '<label class="crm-f"><span>Faixa</span><select class="sel" data-k="faixa"></select></label>' +
-      '<label class="crm-f"><span>Graus</span><select class="sel" data-k="graus">' + [0, 1, 2, 3, 4, 5, 6].map(function (g) { return "<option" + ((a.graus || 0) === g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></label>" +
+      '<label class="crm-f"><span>Graus</span><select class="sel" data-k="graus" data-atual="' + (a.graus || 0) + '"></select></label>' +
       '<label class="crm-f"><span>Mensalidade (R$)</span><input class="crm-in" data-k="mensalidade" inputmode="decimal" autocomplete="off" value="' + (a.mensalidade != null ? String(a.mensalidade).replace(".", ",") : "") + '"></label>' +
       '<label class="crm-f"><span>Vencimento</span><select class="sel" data-k="vencimento">' + Array.apply(null, Array(28)).map(function (_, i) { return '<option value="' + (i + 1) + '"' + ((a.vencimento || 10) === i + 1 ? " selected" : "") + ">dia " + (i + 1) + "</option>"; }).join("") + "</select></label>" +
       '<label class="crm-f"><span>Início no Studio</span><input class="crm-in" type="date" data-k="inicio" max="' + P.hoje() + '" value="' + (a.inicio || P.hoje()) + '"></label>' +
@@ -85,6 +85,10 @@
     if (fxs.indexOf(cf) < 0) fxs = fxs.concat([cf]);
     fx.innerHTML = fxs.map(function (x) { return '<option value="' + x + '">' + P.FAIXAS[x] + "</option>"; }).join("");
     fx.value = cf;
+    /* graus pela IBJJF: adulto até 4 (preta até 6); kids até 11 (sistema mensal) */
+    var gs = $('[data-k="graus"]', f), gAtual = gs.options.length ? +gs.value : +(gs.dataset.atual || 0), gMax = Site.maxGraus(fx.value, kid);
+    gs.innerHTML = Array.apply(null, Array(gMax + 1)).map(function (_, i) { return "<option>" + i + "</option>"; }).join("");
+    gs.value = String(Math.min(gAtual, gMax));
     $$(".f-kid", f).forEach(function (el) { el.hidden = !kid; });
     $(".f-fone", f).textContent = kid ? "WhatsApp do responsável" : "WhatsApp";
     $(".f-mail", f).innerHTML = (kid ? "E-mail do responsável" : "E-mail") + " <small>(o login do app)</small>";
@@ -114,6 +118,8 @@
     if (x.taxa !== 0 && !(x.taxa >= 0)) return P.erroForm(f, el("taxa"), "Taxa de matrícula em reais, como 100.");
     if (d.inicio > P.hoje()) return P.erroForm(f, el("inicio"), "O início no Studio não pode ser no futuro.");
     if (!(d.aulas_antes >= 0 && d.aulas_antes <= 5000)) return P.erroForm(f, el("aulas_antes"), "Aulas antes do app: um número de 0 a 5000.");
+    var aviso = d.faixa ? P.avisoIdade(d.faixa, d.nascimento) : "";
+    if (aviso && !confirm(aviso)) return P.erroForm(f, el("faixa"), aviso.replace(" Registrar assim mesmo?", ""));
     return true;
   }
   /* a 1ª mensalidade: este mês, no dia do vencimento (se o dia já passou, vence no mês que vem) */
@@ -138,7 +144,7 @@
     if (!form.hidden) { form.hidden = true; addBtn.setAttribute("aria-expanded", "false"); return; }
     P.novoAluno(null);
   });
-  form.addEventListener("change", function (e) { if (e.target.dataset.k === "turma") formSync(form); });
+  form.addEventListener("change", function (e) { if (e.target.dataset.k === "turma" || e.target.dataset.k === "faixa") formSync(form); });
   form.addEventListener("click", function (e) { if (e.target.closest("[data-cancel]")) { form.hidden = true; addBtn.setAttribute("aria-expanded", "false"); P.focusSoft(addBtn); } });
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -545,7 +551,7 @@
     $("#grTbl tbody").innerHTML = l.map(function (x) {
       var g = ultGrau[x.a.id];
       return '<tr><td><div class="nm"><span class="av"' + Fotos.attr(x.a.foto) + '>' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + esc(P.turmaTx(x.a)) + (g ? " · último grau em " + P.dataBRano(g.data) : "") + "</small></div></div></td>" +
-        "<td>" + P.belt(x.a.faixa, x.a.graus) + '</td><td class="num">' + x.n + '</td><td class="act"><button class="mini-btn" type="button" data-grau="' + x.a.id + '">Registrar grau</button></td></tr>';
+        "<td>" + P.belt(x.a.faixa, x.a.graus, x.a.turma) + '</td><td class="num">' + x.n + '</td><td class="act"><button class="mini-btn" type="button" data-grau="' + x.a.id + '">Registrar grau</button></td></tr>';
     }).join("");
     $("#grTbl").hidden = !l.length;
     /* quem está com as aulas de antes do app fora da conta por causa de um grau registrado depois delas */
@@ -593,21 +599,42 @@
     var a = P.porId[id];
     var fxs = P.kid(a.turma) ? P.FX_KD : P.FX_AD;
     if (fxs.indexOf(a.faixa) < 0) fxs = fxs.concat([a.faixa]);
-    var prox = a.graus < 4 ? { f: a.faixa, g: a.graus + 1 } : { f: fxs[Math.min(fxs.indexOf(a.faixa) + 1, fxs.length - 1)], g: 0 };
+    /* a sugestão: o próximo grau; no limite da faixa (adulto 4, preta 6, kids 11), a próxima faixa */
+    var kid = P.kid(a.turma), gMax = Site.maxGraus(a.faixa, kid);
+    var prox = a.graus < gMax ? { f: a.faixa, g: a.graus + 1 } : { f: fxs[Math.min(fxs.indexOf(a.faixa) + 1, fxs.length - 1)], g: 0 };
     var dr = P.abrirFicha('<form class="crm-form" id="grForm" novalidate><p class="fin-k">Hoje: ' + P.beltTxt(a.faixa, a.graus) + '</p><div class="crm-grid">' +
       '<label class="crm-f"><span>Faixa</span><select class="sel" id="gfF">' + fxs.map(function (f) { return '<option value="' + f + '"' + (f === prox.f ? " selected" : "") + ">" + P.FAIXAS[f] + "</option>"; }).join("") + "</select></label>" +
-      '<label class="crm-f"><span>Graus</span><select class="sel" id="gfG">' + [0, 1, 2, 3, 4, 5, 6].map(function (g) { return "<option" + (g === prox.g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></label>" +
+      '<label class="crm-f"><span>Graus</span><select class="sel" id="gfG"></select></label>' +
       '<label class="crm-f"><span>Data</span><input class="crm-in" type="date" id="gfD" max="' + P.hoje() + '" value="' + P.hoje() + '"></label>' +
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><input class="crm-in" id="gfN" autocomplete="off" placeholder="Ex.: entregue no treino de sexta"></label></div>' +
       '<label class="mf-pub"><input type="checkbox" id="gfJa"><span>' + esc(P.first(a.nome)) + ' já tinha esse grau antes do app (não zera as aulas desde o último grau)</span></label>' +
       '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Registrar</button><button class="mini-btn ghost" type="button" data-dr-x>Cancelar</button></div></form>', "Grau de " + a.nome);
     $("#drSub").textContent = P.turmaTx(a);
+    /* os graus possíveis seguem a faixa escolhida; a prévia mostra as fitas nas cores da IBJJF */
+    var gSel = $("#gfG", dr), fSel = $("#gfF", dr), prev = document.createElement("p");
+    prev.className = "gr-prev muted";
+    $(".crm-grid", dr).after(prev);
+    function grausSync(manter) {
+      var m = Site.maxGraus(fSel.value, kid), v = manter ? Math.min(+gSel.value || 0, m) : (fSel.value === prox.f ? prox.g : 0);
+      gSel.innerHTML = Array.apply(null, Array(m + 1)).map(function (_, i) { return "<option>" + i + "</option>"; }).join("");
+      gSel.value = String(v);
+      pinta();
+    }
+    function pinta() {
+      prev.innerHTML = Site.miniFaixa(fSel.value, +gSel.value, kid).replace('width="44" height="10"', 'width="132" height="30"') +
+        (kid ? ' <span>Kids (IBJJF): graus 1 a 4 brancos, 5 a 8 vermelhos, 9 a 11 da cor da próxima faixa. A escola pode usar só parte deles.</span>' : "");
+    }
+    fSel.onchange = function () { grausSync(false); };
+    gSel.onchange = pinta;
+    grausSync(false);
     $("#grForm", dr).onsubmit = function (e) {
       e.preventDefault();
       var f = $("#gfF").value, g = +$("#gfG").value, d = $("#gfD").value || P.hoje(), n = $("#gfN").value.trim(), ja = $("#gfJa").checked;
       if (ja) n = P.NOTA_CADASTRO + (n ? " · " + n : "");
       if (f === a.faixa && g === a.graus) return P.erroForm(e.target, $("#gfG"), "Escolha um grau ou faixa diferente do atual.");
       if (d > P.hoje()) return P.erroForm(e.target, $("#gfD"), "A data do grau não pode ser no futuro.");
+      var aviso = f !== a.faixa ? P.avisoIdade(f, a.nascimento) : "";
+      if (aviso && !confirm(aviso)) return;
       $('[type="submit"]', e.target).classList.add("loading");
       P.q(function (sb) { return sb.from("graduacoes").insert({ aluno: a.id, faixa: f, graus: g, data: d, nota: n || null }); })
         .then(function () { return P.recalcFaixa(a.id); })

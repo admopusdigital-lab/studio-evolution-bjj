@@ -58,7 +58,8 @@
   P.FAIXAS = {};
   P.FX_KD.concat(P.FX_AD).forEach(function (f) { P.FAIXAS[f] = Site.faixaNome(f); });
   P.beltTxt = function (f, g) { return (P.FAIXAS[f] || Site.faixaNome(f)) + " · " + (g ? g + (g === 1 ? " grau" : " graus") : "sem grau"); };
-  P.belt = function (f, g) { return '<span class="bl"><i class="belt-s" style="' + Site.faixaCss(f) + '"></i><span>' + P.beltTxt(f, g) + "</span></span>"; };
+  /* faixa pequena com os graus nas cores certas (Kids: brancos, vermelhos e da próxima faixa) */
+  P.belt = function (f, g, turma) { return '<span class="bl">' + Site.miniFaixa(f, g, turma ? P.kid(turma) : undefined) + "<span>" + P.beltTxt(f, g) + "</span></span>"; };
   /* aulas feitas antes do app: somam no total e também em "desde o último grau", a não ser que o último grau
      seja NOVO (dado depois de lançadas essas aulas). Grau marcado "já tinha antes do app" nunca zera a conta.
      g: a última graduação (objeto) ou só a data dela */
@@ -79,6 +80,13 @@
   P.GRADE_TURMA = { adulto: "Adulto", feminino: "Adulto", kids1: "Kids 1", kids2: "Kids 2" };
   P.HORAS = { adulto: ["08:00", "11:00", "19:00", "20:30"], feminino: ["08:00", "11:00", "19:00", "20:30"], kids1: ["09:00", "18:00"], kids2: ["09:00", "18:00"] };
   P.kid = function (t) { return /^kids/.test(t); };
+  /* idade mínima da IBJJF para a faixa kids (cinza 4, amarela 7, laranja 10, verde 13): a mensagem, ou "" se está ok ou sem nascimento */
+  P.avisoIdade = function (faixa, nascimento) {
+    var min = Site.IDADE_MIN[Site.faixaBase(faixa)];
+    if (!min || !nascimento) return "";
+    var idade = Math.floor(P.difDias(nascimento, P.hoje()) / 365.25);
+    return idade < min ? "Pela IBJJF, a faixa " + P.FAIXAS[faixa].toLowerCase() + " é a partir de " + min + " anos, e o aluno tem " + idade + ". Registrar assim mesmo?" : "";
+  };
   P.turmaTx = function (a) { return (P.TURMAS[a.turma] || a.turma) + (a.horario ? " " + Site.hora(a.horario) : ""); };
   /* a turma da aula no banco (chamadas e presenças) a partir do nome na grade */
   P.turmaAula = function (n) { return n === "Kids 1" ? "kids1" : n === "Kids 2" ? "kids2" : n === "Open Mat" ? "openmat" : "adulto"; };
@@ -129,8 +137,8 @@
   };
   /* o SQL de 03/11 (faixas do Kids, aulas antes do app, reserva em 48 h e ranking no app) */
   /* o SQL mais novo que o painel precisa (o plano família); os anteriores já foram rodados */
-  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261113120000_fotos.sql";
-  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto|foto/.test(m); };
+  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261118120000_kids_graus_tecnicas.sql";
+  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto|foto|tecnicas/.test(m); };
   P.avisoBanco = function () {
     var el = $("#dbAviso");
     if (!el || !el.hidden) return;
@@ -280,7 +288,8 @@
   try { aba = sessionStorage.getItem("evo-painel-aba"); } catch (e) {}
   P.iniciar = function () {
     /* o banco já recebeu a atualização de 03/11? (a coluna aulas_antes existe) */
-    P.db.then(function (sb) { return sb.from("alunos").select("aulas_antes, responsavel_conta, foto").limit(1); }).then(function (r) { if (r && r.error && P.faltaAtualizar(r.error)) P.avisoBanco(); }).catch(function () {});
+    P.db.then(function (sb) { return Promise.all([sb.from("alunos").select("aulas_antes, responsavel_conta, foto").limit(1), sb.from("tecnicas_semana").select("id").limit(1)]); })
+      .then(function (rs) { if (rs.some(function (r) { return r && r.error && P.faltaAtualizar(r.error); })) P.avisoBanco(); }).catch(function () {});
     return Promise.all([P.carregarAlunos(), P.carregarPresencas()]).catch(function (e) { P.erro(e, "Não deu para carregar os dados"); })
       .then(function () { P.go(aba && $('.dv[data-v="' + aba + '"]') ? aba : "hoje"); });
   };

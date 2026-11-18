@@ -242,6 +242,21 @@ body.pr { background: var(--paper); }
       <!-- Movimentos -->
       <section class="dv" data-v="mov" aria-labelledby="t-mov">
         <div class="dv-h"><div><p class="dv-k">Biblioteca da academia</p><h3 id="t-mov">Movimentos</h3></div><p>Os vídeos e quizzes que os alunos veem no app, separados por faixa. O aluno assiste e, aos 90% do vídeo, faz o quiz.</p></div>
+        <div class="tec-box" id="tecBox" aria-labelledby="t-tec">
+          <div class="tec-h"><h4 class="fin-k" id="t-tec">Técnicas da semana</h4>
+            <div class="tec-nav"><button class="mini-btn ghost" type="button" id="tecPrev" aria-label="Semana anterior">‹</button><b id="tecSem">Esta semana</b><button class="mini-btn ghost" type="button" id="tecNext" aria-label="Próxima semana">›</button><button class="mini-btn ghost" type="button" id="tecHoje">Hoje</button></div></div>
+          <p class="muted tec-sub">O que foi ensinado no tatame. Os alunos veem no app, em Movimentos, e marcam “aprendi”.</p>
+          <form class="tec-add" id="tecForm" novalidate>
+            <label class="crm-f"><span>Técnica</span><input class="crm-in" id="tecTit" maxlength="120" autocomplete="off" placeholder="Ex.: raspagem de gancho"></label>
+            <label class="crm-f"><span>Vídeo do catálogo</span><select class="sel" id="tecMov"></select></label>
+            <label class="crm-f"><span>Turma</span><select class="sel" id="tecTurma"><option value="todas">Todas</option><option value="adulto">Adulto</option><option value="kids">Kids</option></select></label>
+            <button class="mini-btn" type="submit">Adicionar</button>
+            <p class="crm-err" role="alert"></p>
+          </form>
+          <ul class="tec-l" id="tecL"></ul>
+          <div class="tec-h" style="margin-top:20px"><h4 class="fin-k">Quero aprender · pedidos dos alunos</h4><span class="muted" id="tecPedN"></span></div>
+          <ul class="tec-l" id="tecPed"></ul>
+        </div>
         <div class="kpis">
           <div class="kpi"><b id="mvK1">0</b><span>publicados no app</span></div>
           <div class="kpi"><b id="mvK2">0</b><span>com vídeo</span></div>
@@ -340,6 +355,7 @@ body.pr { background: var(--paper); }
 <script src="painel-crm.js"></script>
 <script src="painel-fin.js"></script>
 <script src="painel-mov.js"></script>
+<script src="painel-tecnicas.js"></script>
 <script src="painel-rank.js"></script>
 <script src="painel-estoque.js"></script>
 </body>

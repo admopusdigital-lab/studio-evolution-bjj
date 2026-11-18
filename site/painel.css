@@ -547,3 +547,24 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .antes-fora ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
 .antes-fora li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 8px; border-top: 1px solid var(--rule); }
 .dv[data-v="grad"] .antes-fora { margin: 0 0 18px; }
+
+/* registrar grau: prévia da faixa com as fitas dos graus */
+.gr-prev { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; font-size: 12px; line-height: 1.4; }
+.gr-prev .mfx { flex-shrink: 0; }
+
+/* Movimentos: técnicas da semana e pedidos dos alunos */
+.tec-box { margin-top: 20px; padding: 18px 20px; border: 1px solid var(--rule); border-top-color: color-mix(in oklch, var(--gold) 55%, var(--rule)); border-radius: 16px; }
+.tec-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.tec-h .fin-k { margin: 0; }
+.tec-nav { display: flex; align-items: center; gap: 6px; }
+.tec-nav b { min-width: 150px; text-align: center; font-size: 13px; }
+.tec-sub { margin: 6px 0 12px; font-size: 12.5px; }
+.tec-add { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr) auto; gap: 10px; align-items: end; }
+.tec-add .crm-err { grid-column: 1 / -1; margin: 0; }
+.tec-add .mini-btn { height: 40px; }
+.tec-l { list-style: none; margin: 10px 0 0; padding: 0; }
+.tec-l li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 13px; }
+.tec-l li b { display: block; font-weight: 600; }
+.tec-l li small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 12px; }
+.tec-acts { display: flex; gap: 6px; flex-shrink: 0; }
+@media (max-width: 760px) { .tec-add { grid-template-columns: 1fr; } .tec-l li { flex-wrap: wrap; } }
