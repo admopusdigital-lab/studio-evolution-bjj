@@ -148,7 +148,7 @@ body.pr { background: var(--paper); }
       <button type="button" data-go="hoje" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Hoje</button>
       <button type="button" data-go="tatame" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-code"/></svg>Modo tatame</button>
       <button type="button" data-go="alunos" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-users"/></svg>Alunos<span class="badge" id="bAlunos" hidden></span></button>
-      <button type="button" data-go="grad" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Graduações</button>
+      <button type="button" data-go="grad" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad" hidden></span></button>
       <button type="button" data-go="rank" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-trophy"/></svg>Ranking</button>
       <button type="button" data-go="mov" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
       <button type="button" data-go="leads" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads" hidden></span></button>
@@ -170,6 +170,7 @@ body.pr { background: var(--paper); }
           <button class="kpi" type="button" data-goto="leads"><b id="kLeads">–</b><span>interessados esperando retorno</span></button>
         </div>
         <div class="niver" id="hNiver" hidden></div>
+        <div class="niver grau-aviso" id="hGrau" hidden></div>
         <div class="day-grid">
           <div class="classes" id="classes" role="group" aria-label="Aulas de hoje"></div>
           <div class="room" id="room"></div>
@@ -356,6 +357,7 @@ body.pr { background: var(--paper); }
 <script src="painel-fin.js"></script>
 <script src="painel-mov.js"></script>
 <script src="painel-tecnicas.js"></script>
+<script src="painel-grau.js"></script>
 <script src="painel-rank.js"></script>
 <script src="painel-estoque.js"></script>
 </body>

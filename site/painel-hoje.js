@@ -123,7 +123,7 @@
         var a = P.porId[x.id] || { nome: "Aluno removido", faixa: "branca", graus: 0 };
         var pill = x.pres ? '<span class="pill-s in">Chegou ' + P.hm(x.pres.chegou_em) + (x.pres.como === "professor" ? " · marcado" : "") + "</span>" : '<span class="pill-s">Confirmou</span>';
         var act = x.pres ? '<button class="mini-btn ghost" type="button" data-desfaz="' + x.pres.id + '">Desfazer</button>' : '<button class="mini-btn" type="button" data-marca="' + x.id + '">Chegou</button>';
-        return '<li data-id="' + x.id + '"><span class="av"' + Fotos.attr(a.foto) + '>' + P.ini(a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.id + '">' + esc(a.nome) + "</button><small>" + P.beltTxt(a.faixa, a.graus) + "</small></div>" +
+        return '<li data-id="' + x.id + '"><span class="av"' + Fotos.attr(a.foto) + '>' + P.ini(a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.id + '">' + esc(a.nome) + "</button><small>" + P.beltTxt(a.faixa, a.graus) + (P.seloGrau ? P.seloGrau(a) : "") + "</small></div>" +
           '<div class="row-acts">' + pill + act + "</div></li>";
       }).join("") : '<li class="muted" style="display:block">Ninguém confirmou esta aula ainda.</li>') + "</ul>" +
       '<div class="walk"><label class="sr-only" for="walkQ">Marcar a presença de quem veio sem confirmar</label><input class="crm-in" type="search" id="walkQ" placeholder="Marcar quem veio sem confirmar: digite o nome" autocomplete="off"><ul id="walkList"></ul></div>';
@@ -216,6 +216,7 @@
   function atualizarTudo() {
     return Promise.all([carregarDia(), P.carregarPresencas()]).then(function () {
       paintTopo(); paintNiver(); paintAulas(); paintSala(); paintTV();
+      if (P.paintGrauAviso) P.paintGrauAviso();
     });
   }
   function ligar() {
