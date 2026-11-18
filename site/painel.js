@@ -20,6 +20,11 @@
   P.dia = function (iso) { var p = P.d10(iso).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
   P.somaDias = function (iso, n) { var d = P.dia(iso); d.setDate(d.getDate() + n); return P.iso(d); };
   P.difDias = function (a, b) { return Math.round((P.dia(b) - P.dia(a)) / 864e5); };
+  /* o vencimento no mês: o dia escolhido (1 a 31) ou o último dia do mês, se o mês for mais curto */
+  P.vencDe = function (mes, dia) {
+    var d = P.dia(mes), ult = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    return P.mesIni(mes).slice(0, 8) + P.two(Math.min(dia || 10, ult));
+  };
   P.mesIni = function (iso) { return P.d10(iso).slice(0, 7) + "-01"; };
   P.somaMes = function (mes, n) { var d = P.dia(mes); d.setMonth(d.getMonth() + n, 1); return P.iso(d); };
   P.hm = function (ts) { var d = new Date(ts); return P.two(d.getHours()) + ":" + P.two(d.getMinutes()); };
@@ -137,8 +142,8 @@
   };
   /* o SQL de 03/11 (faixas do Kids, aulas antes do app, reserva em 48 h e ranking no app) */
   /* o SQL mais novo que o painel precisa (o plano família); os anteriores já foram rodados */
-  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261118120000_kids_graus_tecnicas.sql";
-  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto|foto|tecnicas/.test(m); };
+  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261118130000_vencimento_31.sql";
+  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto|foto|tecnicas|vencimento_check/.test(m); };
   P.avisoBanco = function () {
     var el = $("#dbAviso");
     if (!el || !el.hidden) return;

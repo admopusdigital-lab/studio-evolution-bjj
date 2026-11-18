@@ -65,7 +65,7 @@
       '<label class="crm-f"><span>Faixa</span><select class="sel" data-k="faixa"></select></label>' +
       '<label class="crm-f"><span>Graus</span><select class="sel" data-k="graus" data-atual="' + (a.graus || 0) + '"></select></label>' +
       '<label class="crm-f"><span>Mensalidade (R$)</span><input class="crm-in" data-k="mensalidade" inputmode="decimal" autocomplete="off" value="' + (a.mensalidade != null ? String(a.mensalidade).replace(".", ",") : "") + '"></label>' +
-      '<label class="crm-f"><span>Vencimento</span><select class="sel" data-k="vencimento">' + Array.apply(null, Array(28)).map(function (_, i) { return '<option value="' + (i + 1) + '"' + ((a.vencimento || 10) === i + 1 ? " selected" : "") + ">dia " + (i + 1) + "</option>"; }).join("") + "</select></label>" +
+      '<label class="crm-f"><span>Vencimento</span><select class="sel" data-k="vencimento">' + Array.apply(null, Array(31)).map(function (_, i) { return '<option value="' + (i + 1) + '"' + ((a.vencimento || 10) === i + 1 ? " selected" : "") + ">dia " + (i + 1) + "</option>"; }).join("") + "</select></label>" +
       '<label class="crm-f"><span>Início no Studio</span><input class="crm-in" type="date" data-k="inicio" max="' + P.hoje() + '" value="' + (a.inicio || P.hoje()) + '"></label>' +
       '<label class="crm-f"><span>Aulas no Studio antes do app <small>(na faixa e grau de hoje)</small></span><input class="crm-in" data-k="aulas_antes" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (a.aulas_antes || "") + '"></label>' +
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><textarea class="crm-in" data-k="nota" rows="2">' + v("nota") + "</textarea></label>" +
@@ -124,8 +124,8 @@
   }
   /* a 1ª mensalidade: este mês, no dia do vencimento (se o dia já passou, vence no mês que vem) */
   function primeiraParcela(d) {
-    var hoje = P.hoje(), mes = P.mesIni(hoje), venc = mes.slice(0, 8) + P.two(d.vencimento || 10);
-    if (venc < hoje) { mes = P.somaMes(mes, 1); venc = mes.slice(0, 8) + P.two(d.vencimento || 10); }
+    var hoje = P.hoje(), mes = P.mesIni(hoje), venc = P.vencDe(mes, d.vencimento);
+    if (venc < hoje) { mes = P.somaMes(mes, 1); venc = P.vencDe(mes, d.vencimento); }
     return { competencia: mes, vencimento: venc };
   }
 

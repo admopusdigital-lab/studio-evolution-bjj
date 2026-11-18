@@ -73,7 +73,7 @@
      (quem entrou depois do vencimento paga a 1ª no mês seguinte, como no cadastro) */
   function faltam() {
     return P.ativos().filter(function (a) {
-      var venc = mes.slice(0, 8) + P.two(a.vencimento || 10);
+      var venc = P.vencDe(mes, a.vencimento);
       return a.mensalidade > 0 && (!a.inicio || a.inicio <= venc) && !MENS.some(function (x) { return x.aluno === a.id && x.competencia === mes; });
     });
   }
@@ -147,7 +147,7 @@
     P.q(function (sb) { return sb.from(tabelaDe(x)).update(d).eq("id", x.id); }).then(carregar).then(function () { P.toast(msg); }).catch(function (e) { b.classList.remove("loading"); P.erro(e); });
   }
   function gerar(b) {
-    var l = faltam().map(function (a) { return { aluno: a.id, competencia: mes, valor: a.mensalidade, vencimento: mes.slice(0, 8) + P.two(a.vencimento || 10) }; });
+    var l = faltam().map(function (a) { return { aluno: a.id, competencia: mes, valor: a.mensalidade, vencimento: P.vencDe(mes, a.vencimento) }; });
     b.classList.add("loading");
     P.q(function (sb) { return sb.from("mensalidades").insert(l); }).then(carregar).then(function () { P.toast(l.length + (l.length === 1 ? " mensalidade lançada" : " mensalidades lançadas") + " em " + P.mesNome(mes) + "."); })
       .catch(function (e) { b.classList.remove("loading"); P.erro(e, "Não deu para lançar"); });

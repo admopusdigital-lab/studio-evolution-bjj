@@ -706,6 +706,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <a class="ap-row ap-rowbtn" href="https://wa.me/5515996741812" target="_blank" rel="noopener" id="apWa"><span>Falar com o Studio</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></a>
           <a class="ap-row ap-rowbtn" href="index.html"><span>Site do Studio</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></a>
           <button class="ap-row ap-rowbtn" type="button" id="apReset" hidden><span>Recomeçar a demonstração</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+          <button class="ap-row ap-rowbtn" type="button" id="apSenha"><span>Trocar minha senha</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
           <a class="ap-row ap-rowbtn app-sair" href="entrar.html" data-sair><span>Sair</span></a>
           <p class="ap-mut app-demo" id="apDemoNote" hidden>Dados de exemplo: Marina é uma aluna fictícia. Com o sistema do Studio ligado, aparecem os seus.</p>
         </div>
@@ -2274,6 +2275,19 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     }).catch(function (e) { toast(erroFoto(e)); }).then(function () { btn.classList.remove("enviando"); });
   });
   if (!demo) Fotos.liga(Acesso.cliente());
+  /* trocar a senha: o link chega no e-mail da conta (o mesmo do "Esqueci a senha" da entrada) */
+  $("#apSenha").addEventListener("click", function () {
+    var b = this;
+    if (demo) return toast("Na demonstração não há senha para trocar.");
+    if (b.classList.contains("loading")) return;
+    b.classList.add("loading");
+    Acesso.meuEmail().then(function (email) {
+      if (!email) return { ok: false, msg: "Não achamos o e-mail da sua conta. Fale com o Studio no WhatsApp." };
+      return Acesso.esqueci(email).then(function (r) {
+        return r.ok ? { ok: true, msg: "Mandamos o link para " + email + ". Abra o e-mail e escolha a senha nova (confira o spam)." } : r;
+      });
+    }).then(function (r) { toast(r.msg); b.classList.remove("loading"); });
+  });
 
   /* ---------- a faixa em 3D: desenhada aqui (SVG) para qualquer faixa, inclusive as do Kids com listra ---------- */
   var beltN = 0;

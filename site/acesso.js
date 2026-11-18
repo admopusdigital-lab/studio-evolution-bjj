@@ -170,14 +170,24 @@
       if (!REAL) return Promise.resolve({ ok: false, demo: true });
       var e = String(email || "").trim();
       if (e.indexOf("@") < 0) return Promise.resolve({ ok: false, msg: "Digite seu e-mail no campo acima e toque de novo em Esqueci a senha." });
-      return sb().then(function (c) { return c.auth.resetPasswordForEmail(e, { redirectTo: new URL("nova-senha.html", location.href).href }); })
+      /* no domínio (endereços sem .html) o link volta direto em /nova-senha, sem redirecionamento no meio */
+      var limpo = !/\.html$/.test(location.pathname) && location.pathname !== "/";
+      var volta = new URL(limpo || /evolutionbjj\.com\.br$/.test(location.hostname) ? "nova-senha" : "nova-senha.html", location.href).href;
+      return sb().then(function (c) { return c.auth.resetPasswordForEmail(e, { redirectTo: volta }); })
         .then(function (r) {
           if (r.error && semRede(r.error)) return { ok: false, msg: MSG_REDE };
+          /* pediu de novo em menos de 1 minuto */
+          if (r.error && (r.error.status === 429 || /rate|security purposes/i.test(r.error.message || ""))) return { ok: false, msg: "Já mandamos um link há pouco. Espere 1 minuto e confira a caixa de entrada e o spam." };
           /* mesma resposta com ou sem conta: não dá para descobrir quem é aluno digitando e-mails */
           return { ok: true, msg: "Se esse e-mail estiver cadastrado, o link para criar uma senha nova chega em alguns minutos." };
         }, function () { return { ok: false, msg: MSG_REDE }; });
     },
 
+    /* o e-mail da conta logada (para o "Trocar minha senha" do app) */
+    meuEmail: function () {
+      if (!REAL) return Promise.resolve("");
+      return sb().then(function (c) { return c.auth.getUser(); }).then(function (r) { return (r.data && r.data.user && r.data.user.email) || ""; }, function () { return ""; });
+    },
     /* nova senha: a página nova-senha.html recebe a sessão de recuperação pelo link do e-mail */
     recuperacao: function () {
       if (!REAL) return Promise.resolve(false);
