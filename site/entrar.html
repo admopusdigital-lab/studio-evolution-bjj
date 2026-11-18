@@ -115,6 +115,20 @@
           <p class="lg-foot" id="lgFoot">Ainda não treina com a gente? <a href="agendamento.html" data-int>Agende uma aula grátis</a>.</p>
           <p class="lg-note" id="lgNote">A conta é criada pelo Studio na matrícula. Para receber ou trocar a senha, chame no WhatsApp.</p>
         </form>
+
+        <!-- esqueci a senha: o aluno cria uma senha nova confirmando dados do cadastro (função trocar-senha) -->
+        <form id="rcForm" class="rc" novalidate hidden>
+          <p class="rc-t">Criar uma senha nova</p>
+          <p class="rc-sub">Confirme dois dados do seu cadastro no Studio. No plano família, vale a data de nascimento sua ou de um dos seus filhos cadastrados.</p>
+          <div class="field"><input id="rcEmail" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder=" "><label for="rcEmail">E-mail do cadastro</label></div>
+          <div class="field up"><input id="rcNasc" type="date" placeholder=" "><label for="rcNasc">Data de nascimento</label></div>
+          <div class="field"><input id="rcFinal" inputmode="numeric" maxlength="4" autocomplete="off" placeholder=" "><label for="rcFinal">4 últimos números do WhatsApp do cadastro</label></div>
+          <div class="field pw"><input id="rcSenha" type="password" autocomplete="new-password" placeholder=" "><label for="rcSenha">Senha nova</label><button class="pw-tg" type="button" id="rcTg" aria-controls="rcSenha" aria-pressed="false">Mostrar</button></div>
+          <div class="field"><input id="rcSenha2" type="password" autocomplete="new-password" placeholder=" "><label for="rcSenha2">Repita a senha nova</label></div>
+          <p class="lg-err" id="rcErr" aria-live="assertive"></p>
+          <button class="btn btn-ink" type="submit" id="rcBtn">Salvar e entrar<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button>
+          <p class="lg-foot"><button class="link" type="button" id="rcVolta">Voltar para a entrada</button> · <a id="rcWa" href="https://wa.me/5515996741812" target="_blank" rel="noopener">Falar com o Studio</a></p>
+        </form>
       </div>
     </div>
   </section>
@@ -178,17 +192,51 @@
   /* voltou de nova-senha.html */
   if (/[?&]senha=nova/.test(location.search)) say("Senha nova salva. Agora é só entrar.", null, true);
 
-  /* esqueci a senha: com o servidor, o link chega por e-mail; sem ele (ou se a pessoa preferir), pelo WhatsApp */
+  /* esqueci a senha: o aluno cria uma senha nova ali mesmo, confirmando dados do cadastro (sem e-mail).
+     Professor (e a demonstração) continuam pelo WhatsApp */
+  var rc = $("#rcForm"), rcErr = $("#rcErr"), rcBtn = $("#rcBtn");
+  function rcSay(msg, field, ok) {
+    rcErr.textContent = msg; rcErr.classList.toggle("ok", !!ok);
+    $$("input", rc).forEach(function (f) { f.setAttribute("aria-invalid", f === field ? "true" : "false"); });
+    if (field) field.focus();
+  }
+  function rcAbre(abre) {
+    rc.hidden = !abre; form.hidden = abre;
+    if (abre) { $("#rcEmail").value = user.value.trim(); rcSay(""); ($("#rcEmail").value ? $("#rcNasc") : $("#rcEmail")).focus(); }
+    else user.focus();
+  }
   $("#esqueci").addEventListener("click", function (e) {
-    if (!Acesso.real) return;
+    if (!Acesso.real || role() === "professor") return;
     e.preventDefault();
-    var wa = this.href;
-    Acesso.esqueci(user.value).then(function (r) {
-      if (!r.ok && !user.value.trim()) return say(r.msg, user);
-      say(r.msg, r.ok ? null : user, r.ok);
-      var a = document.createElement("a");
-      a.href = wa; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Não chegou? Chame no WhatsApp.";
-      err.appendChild(document.createTextNode(" ")); err.appendChild(a);
+    rcAbre(true);
+  });
+  $("#rcVolta").addEventListener("click", function () { rcAbre(false); });
+  $("#rcWa").href = WA + encodeURIComponent(TXT.aluno.wa);
+  $("#rcFinal").addEventListener("input", function () { this.value = this.value.replace(/\D/g, "").slice(0, 4); });
+  $("#rcTg").addEventListener("click", function () {
+    var show = $("#rcSenha").type === "password";
+    $("#rcSenha").type = $("#rcSenha2").type = show ? "text" : "password";
+    this.textContent = show ? "Ocultar" : "Mostrar";
+    this.setAttribute("aria-pressed", show ? "true" : "false");
+  });
+  var rcBusy = false;
+  rc.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (rcBusy) return;
+    var em = $("#rcEmail").value.trim(), nasc = $("#rcNasc").value, fin = $("#rcFinal").value, s1 = $("#rcSenha").value, s2 = $("#rcSenha2").value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return rcSay("Digite o e-mail do seu cadastro.", $("#rcEmail"));
+    if (!nasc) return rcSay("Escolha a data de nascimento.", $("#rcNasc"));
+    if (fin.length !== 4) return rcSay("Digite os 4 últimos números do WhatsApp do cadastro.", $("#rcFinal"));
+    if (s1.length < 8 || !/[a-z]/i.test(s1) || !/[0-9]/.test(s1)) return rcSay("A senha nova precisa de pelo menos 8 caracteres, com letras e números.", $("#rcSenha"));
+    if (s1 !== s2) return rcSay("As duas senhas estão diferentes.", $("#rcSenha2"));
+    rcBusy = true; rcBtn.setAttribute("aria-busy", "true");
+    Acesso.trocarSenha({ email: em, nascimento: nasc, final: fin, senha: s1 }).then(function (r) {
+      if (!r.ok) { rcBusy = false; rcBtn.removeAttribute("aria-busy"); return rcSay(r.msg); }
+      rcSay("Senha nova salva. Entrando…", null, true);
+      return Acesso.entrar(em, s1, "aluno", true).then(function (r2) {
+        if (!r2.ok) { rcBusy = false; rcBtn.removeAttribute("aria-busy"); rcAbre(false); user.value = em; return say("Senha nova salva. Agora é só entrar.", null, true); }
+        if (Site.leave) Site.leave(r2.destino); else location.href = r2.destino;
+      });
     });
   });
 

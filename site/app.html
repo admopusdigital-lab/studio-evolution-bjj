@@ -217,6 +217,15 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-foto .cam svg { width: 14px; height: 14px; }
 .ap-foto.enviando .av { animation: apFotoP 1s ease-in-out infinite; }
 @keyframes apFotoP { 50% { opacity: .45; } }
+/* Perfil: trocar a senha */
+.ap-senha { display: grid; gap: 10px; padding: 12px 0 14px; border-top: 1px solid var(--rule); }
+.ap-senha label { display: grid; gap: 4px; font-size: 12px; color: var(--ink-2); }
+.ap-senha input { min-height: 42px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); font: 400 15px/1 var(--sans); }
+.ap-senha input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+.ap-senha-e { min-height: 1em; margin: 0; font-size: 12.5px; color: var(--warn, oklch(0.62 0.2 27)); }
+.ap-senha-e:empty { display: none; }
+.ap-senha button { min-height: 42px; border-radius: 12px; border: 0; background: var(--gold); color: oklch(0.15 0.01 75); font: 700 13px/1 var(--sans); cursor: pointer; }
+.ap-senha button.loading { opacity: .55; pointer-events: none; }
 /* Movimentos: técnicas da semana e "quero aprender" */
 .ap-sem-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .ap-sem-n { font-size: 11.5px; color: var(--ink-2); white-space: nowrap; }
@@ -706,7 +715,13 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <a class="ap-row ap-rowbtn" href="https://wa.me/5515996741812" target="_blank" rel="noopener" id="apWa"><span>Falar com o Studio</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></a>
           <a class="ap-row ap-rowbtn" href="index.html"><span>Site do Studio</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></a>
           <button class="ap-row ap-rowbtn" type="button" id="apReset" hidden><span>Recomeçar a demonstração</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
-          <button class="ap-row ap-rowbtn" type="button" id="apSenha"><span>Trocar minha senha</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+          <button class="ap-row ap-rowbtn" type="button" id="apSenha" aria-expanded="false" aria-controls="apSenhaF"><span>Trocar minha senha</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+          <form class="ap-senha" id="apSenhaF" novalidate hidden>
+            <label><span>Senha nova</span><input type="password" id="apS1" autocomplete="new-password" minlength="8"></label>
+            <label><span>Repita a senha nova</span><input type="password" id="apS2" autocomplete="new-password" minlength="8"></label>
+            <p class="ap-senha-e" id="apSErr" aria-live="assertive"></p>
+            <button type="submit" id="apSBtn">Salvar senha</button>
+          </form>
           <a class="ap-row ap-rowbtn app-sair" href="entrar.html" data-sair><span>Sair</span></a>
           <p class="ap-mut app-demo" id="apDemoNote" hidden>Dados de exemplo: Marina é uma aluna fictícia. Com o sistema do Studio ligado, aparecem os seus.</p>
         </div>
@@ -2275,18 +2290,27 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     }).catch(function (e) { toast(erroFoto(e)); }).then(function () { btn.classList.remove("enviando"); });
   });
   if (!demo) Fotos.liga(Acesso.cliente());
-  /* trocar a senha: o link chega no e-mail da conta (o mesmo do "Esqueci a senha" da entrada) */
+  /* trocar a senha estando logado: direto no Perfil, sem e-mail */
   $("#apSenha").addEventListener("click", function () {
-    var b = this;
     if (demo) return toast("Na demonstração não há senha para trocar.");
-    if (b.classList.contains("loading")) return;
-    b.classList.add("loading");
-    Acesso.meuEmail().then(function (email) {
-      if (!email) return { ok: false, msg: "Não achamos o e-mail da sua conta. Fale com o Studio no WhatsApp." };
-      return Acesso.esqueci(email).then(function (r) {
-        return r.ok ? { ok: true, msg: "Mandamos o link para " + email + ". Abra o e-mail e escolha a senha nova (confira o spam)." } : r;
-      });
-    }).then(function (r) { toast(r.msg); b.classList.remove("loading"); });
+    var f = $("#apSenhaF"), abre = f.hidden;
+    f.hidden = !abre; this.setAttribute("aria-expanded", String(abre));
+    if (abre) { $("#apSErr").textContent = ""; $("#apS1").focus(); }
+  });
+  $("#apSenhaF").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var a = $("#apS1").value, b = $("#apS2").value, er = $("#apSErr"), bt = $("#apSBtn");
+    if (a.length < 8 || !/[a-z]/i.test(a) || !/[0-9]/.test(a)) { er.textContent = "Use pelo menos 8 caracteres, com letras e números."; return $("#apS1").focus(); }
+    if (a !== b) { er.textContent = "As duas senhas estão diferentes."; return $("#apS2").focus(); }
+    if (bt.classList.contains("loading")) return;
+    bt.classList.add("loading"); er.textContent = "";
+    Acesso.minhaSenha(a).then(function (r) {
+      bt.classList.remove("loading");
+      if (!r.ok) { er.textContent = r.msg; return; }
+      $("#apS1").value = $("#apS2").value = "";
+      $("#apSenhaF").hidden = true; $("#apSenha").setAttribute("aria-expanded", "false");
+      toast("Senha nova salva. Use ela da próxima vez que entrar.");
+    });
   });
 
   /* ---------- a faixa em 3D: desenhada aqui (SVG) para qualquer faixa, inclusive as do Kids com listra ---------- */
@@ -2385,7 +2409,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     /* aulas feitas antes do app (lançadas pelo professor) contam se o último grau é anterior a elas */
     /* grau marcado "já tinha antes do app" pelo professor não zera as aulas de antes */
     var gAntes = g && g.nota && /ao entrar no Studio|antes do app/i.test(g.nota);
-    var antes = a.aulas_antes && (!g || gAntes || !a.aulas_antes_ate || g.data <= a.aulas_antes_ate) ? a.aulas_antes : 0;
+    /* as aulas de antes do app são o total no Studio: cada grau já "usou" 50 (1 grau e 61 aulas = 11 desde o grau) */
+    var antes = a.aulas_antes && (!g || gAntes || !a.aulas_antes_ate || g.data <= a.aulas_antes_ate) ? Math.max(0, a.aulas_antes - 50 * (g ? g.graus || 0 : graus)) : 0;
     var desde = (g ? MEUS.pres.filter(function (x) { return x.data > g.data; }).length : MEUS.pres.length) + antes, s = semanas();
     $("#apSince").textContent = desde;
     paintFaixa(fx, graus, desde, kid);

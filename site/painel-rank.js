@@ -24,7 +24,7 @@
   function paint() {
     $("#rkPer").innerHTML = PER.map(function (x) { return '<button type="button" data-p="' + x[0] + '" aria-pressed="' + (per === x[0]) + '">' + x[1] + "</button>"; }).join("");
     $("#rkGr").innerHTML = GR.map(function (x) { return '<button type="button" data-g="' + x[0] + '" aria-pressed="' + (gr === x[0]) + '">' + x[1] + "</button>"; }).join("");
-    var l = P.ativos().filter(function (a) { return gr === "todos" || (gr === "kids") === P.kid(a.turma); })
+    var l = P.alunosDeVerdade().filter(function (a) { return gr === "todos" || (gr === "kids") === P.kid(a.turma); })
       .map(function (a) { return { a: a, n: conta(a) }; }).filter(function (x) { return x.n > 0; })
       .sort(function (x, y) { return y.n - x.n || x.a.nome.localeCompare(y.a.nome); });
     /* empate divide a posição: 1, 2, 2, 4 */

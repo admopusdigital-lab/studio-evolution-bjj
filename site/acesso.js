@@ -183,6 +183,26 @@
         }, function () { return { ok: false, msg: MSG_REDE }; });
     },
 
+    /* esqueci a senha, sem e-mail: a função trocar-senha confere dados do cadastro e troca a senha */
+    trocarSenha: function (d) {
+      if (!REAL) return Promise.resolve({ ok: false, msg: "Na demonstração não há senha para trocar." });
+      return sb().then(function (c) { return c.functions.invoke("trocar-senha", { body: d }); }).then(function (r) {
+        if (!r.error) return { ok: true };
+        var ctx = r.error.context, st = ctx && ctx.status;
+        if (st === 404) return { ok: false, msg: "A troca de senha pelo app ainda não foi ativada. Fale com o Studio no WhatsApp." };
+        var lerErro = ctx && typeof ctx.json === "function" ? ctx.json().catch(function () { return {}; }) : Promise.resolve({});
+        return lerErro.then(function (b) { return { ok: false, msg: (b && b.erro) || MSG_REDE }; });
+      }).catch(function () { return { ok: false, msg: MSG_REDE }; });
+    },
+    /* trocar a senha estando logado (Perfil do app) */
+    minhaSenha: function (senha) {
+      if (!REAL) return Promise.resolve({ ok: false, msg: "Na demonstração não há senha para trocar." });
+      return sb().then(function (c) { return c.auth.updateUser({ password: senha }); }).then(function (r) {
+        if (!r.error) return { ok: true };
+        var e = r.error;
+        return { ok: false, msg: semRede(e) ? MSG_REDE : e.code === "same_password" ? "A senha nova precisa ser diferente da atual." : e.code === "weak_password" ? "Senha fraca. Use pelo menos 8 caracteres, com letras e números." : e.code === "reauthentication_needed" ? "Por segurança, saia e use “Esqueci a senha” na tela de entrada." : "Não deu para salvar a senha. Tente de novo." };
+      }, function () { return { ok: false, msg: MSG_REDE }; });
+    },
     /* o e-mail da conta logada (para o "Trocar minha senha" do app) */
     meuEmail: function () {
       if (!REAL) return Promise.resolve("");

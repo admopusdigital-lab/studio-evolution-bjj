@@ -163,3 +163,18 @@ O service worker do app (`site/sw.js`) não guarda nada do Supabase: login e dad
 
 Dentro do artifact (claude.ai), o login de verdade não funciona: a página bloqueia conexões com outros sites. Lá vale
 o modo demonstração. O login real vale no domínio da academia.
+
+
+## Esqueci a senha sem e-mail (função trocar-senha)
+
+O aluno que esqueceu a senha cria uma nova na tela de entrada, confirmando o e-mail do cadastro, a data de nascimento
+(a dele ou a de um dependente) e os 4 últimos números do WhatsApp do cadastro. Não precisa de SMTP.
+
+1. Rodar `supabase/migrations/20261118140000_senha_vencimento.sql` no SQL Editor (cria o controle de tentativas e
+   libera o vencimento até o dia 31).
+2. **Edge Functions → Deploy a new function → Via Editor**: nome `trocar-senha`, colar
+   `supabase/functions/trocar-senha/index.ts` e, em **Advanced settings**, desligar **Verify JWT**. **Deploy function**.
+
+Travas: só contas de aluno ativas (professor nunca), no máximo 5 erros por e-mail e 20 tentativas por rede por hora,
+e a mesma resposta para e-mail inexistente e dados errados. Aluno sem data de nascimento ou WhatsApp no cadastro não
+consegue: o professor completa a ficha (Editar dados) ou gera uma senha nova pela ficha.

@@ -29,7 +29,7 @@
   P.prontosGrau = function () {
     if (!ULT) return [];
     var adiado = ler(ADIA_K);
-    return P.ativos().map(function (a) { return { a: a, n: P.desdeGrau(a) }; })
+    return P.alunosDeVerdade().map(function (a) { return { a: a, n: P.desdeGrau(a) }; })
       .filter(function (x) { return x.n >= BLOCO - 1 && !(adiado[x.a.id] >= bloco(x.n)); })
       .sort(function (x, y) { return y.n - x.n || x.a.nome.localeCompare(y.a.nome); });
   };

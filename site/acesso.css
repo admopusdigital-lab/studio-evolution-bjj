@@ -91,3 +91,9 @@
 .ac-res button.link { border: 0; color: var(--ink); cursor: pointer; background: none; }
 .ac-res .lg-note { margin-top: 14px; }
 .lg-back { display: inline-block; margin-top: 26px; }
+
+/* esqueci a senha: a senha nova confirmando dados do cadastro */
+.rc-t { margin-top: 18px; font: 400 24px/1.15 var(--serif); }
+.rc-sub { margin-top: 8px; color: var(--ink-2); font-size: 14.5px; line-height: 1.45; }
+.field.up label { transform: translateY(-20px) scale(0.78); color: var(--gold-text); }
+.rc .lg-foot .link { padding: 0; border: 0; background: none; color: var(--ink); font: inherit; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }

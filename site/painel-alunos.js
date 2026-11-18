@@ -547,7 +547,7 @@
   }
   function desde(a) { var g = ultGrau[a.id], ref = g ? g.data : null; return P.pres.filter(function (p) { return p.aluno === a.id && (!ref || p.data > ref); }).length + P.antes(a, g || null); }
   function paintGrad() {
-    var l = P.ativos().map(function (a) { return { a: a, n: desde(a) }; }).sort(function (x, y) { return y.n - x.n; });
+    var l = P.alunosDeVerdade().map(function (a) { return { a: a, n: desde(a) }; }).sort(function (x, y) { return y.n - x.n; });
     $("#grTbl tbody").innerHTML = l.map(function (x) {
       var g = ultGrau[x.a.id];
       return '<tr><td><div class="nm"><span class="av"' + Fotos.attr(x.a.foto) + '>' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + esc(P.turmaTx(x.a)) + (g ? " · último grau em " + P.dataBRano(g.data) : "") + "</small></div></div></td>" +
@@ -555,7 +555,7 @@
     }).join("");
     $("#grTbl").hidden = !l.length;
     /* quem está com as aulas de antes do app fora da conta por causa de um grau registrado depois delas */
-    var fora = P.ativos().filter(function (a) { return P.antesFora(a, ultGrau[a.id]); }), box = $("#grFora");
+    var fora = P.alunosDeVerdade().filter(function (a) { return P.antesFora(a, ultGrau[a.id]); }), box = $("#grFora");
     box.hidden = !fora.length;
     box.innerHTML = fora.length ? '<p><b>' + fora.length + (fora.length === 1 ? " aluno está" : " alunos estão") + " com as aulas de antes do app fora de “desde o último grau”.</b> " +
       "Um grau foi registrado depois que essas aulas foram lançadas, e o sistema entendeu como grau novo. Se o aluno já tinha esse grau antes do app, toque em “Já tinha”.</p><ul>" +

@@ -68,17 +68,24 @@
   /* aulas feitas antes do app: somam no total e também em "desde o último grau", a não ser que o último grau
      seja NOVO (dado depois de lançadas essas aulas). Grau marcado "já tinha antes do app" nunca zera a conta.
      g: a última graduação (objeto) ou só a data dela */
+  /* As aulas de antes do app são o total feito no Studio; cada grau "custa" 50 aulas (regra do Studio).
+     Quem tem 1 grau e 61 aulas no Studio tem 61 - 50 = 11 desde o último grau. */
+  P.AULAS_GRAU = 50;
   P.antes = function (a, g) {
     var n = (a && a.aulas_antes) || 0;
     if (!n) return 0;
-    if (g && typeof g === "object") { if (P.doCadastro(g)) return n; g = g.data; }
-    return !g || !a.aulas_antes_ate || g <= a.aulas_antes_ate ? n : 0;
+    var graus = g && typeof g === "object" ? (g.graus || 0) : (a.graus || 0);
+    if (g && typeof g === "object") {
+      if (!P.doCadastro(g) && a.aulas_antes_ate && g.data > a.aulas_antes_ate) return 0;
+      return Math.max(0, n - P.AULAS_GRAU * graus);
+    }
+    return !g || !a.aulas_antes_ate || g <= a.aulas_antes_ate ? Math.max(0, n - P.AULAS_GRAU * graus) : 0;
   };
   /* as aulas de antes do app ficaram fora de "desde o último grau" por causa de um grau registrado depois */
   P.antesFora = function (a, g) {
     /* só no começo (até 30 dias depois de lançadas as aulas de antes), quando um grau antigo pode ter sido registrado
        como novo; depois disso, um grau novo é promoção de verdade e zerar a conta é o certo */
-    return !!(a && a.aulas_antes > 0 && g && P.antes(a, g) === 0 && a.aulas_antes_ate && g.data <= P.somaDias(a.aulas_antes_ate, 30));
+    return !!(a && a.aulas_antes > 0 && g && !P.doCadastro(g) && a.aulas_antes_ate && g.data > a.aulas_antes_ate && g.data <= P.somaDias(a.aulas_antes_ate, 30));
   };
   P.TURMAS = { adulto: "Adulto", feminino: "Feminino", kids1: "Kids 1", kids2: "Kids 2" };
   /* a turma na grade (Site.GRADE): o Feminino treina junto com o Adulto */
@@ -142,7 +149,7 @@
   };
   /* o SQL de 03/11 (faixas do Kids, aulas antes do app, reserva em 48 h e ranking no app) */
   /* o SQL mais novo que o painel precisa (o plano família); os anteriores já foram rodados */
-  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261118130000_vencimento_31.sql";
+  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261118140000_senha_vencimento.sql";
   P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto|foto|tecnicas|vencimento_check/.test(m); };
   P.avisoBanco = function () {
     var el = $("#dbAviso");
@@ -287,11 +294,24 @@
   P.doCadastro = function (g) { return !!(g && g.nota && /ao entrar no Studio|antes do app/i.test(g.nota)); };
   P.notaGrau = function (g) { return P.doCadastro(g) ? "já tinha antes do app" : (g && g.nota) || ""; };
   P.ativos = function () { return P.alunos.filter(function (a) { return a.ativo; }); };
+  /* o professor (Tiago Dias Camargo) pode ter cadastro de aluno para marcar presença: fica fora do ranking e
+     das listas de graduação. Vale a conta de professor ligada ao cadastro ou o nome */
+  P.contasProf = {};
+  P.ehProfessor = function (a) {
+    if (!a) return false;
+    if (a.conta && P.contasProf[a.conta]) return true;
+    var n = String(a.nome || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+    return n === "tiago dias camargo";
+  };
+  P.alunosDeVerdade = function () { return P.ativos().filter(function (a) { return !P.ehProfessor(a); }); };
 
   /* ---------- volta para a aba em que estava ---------- */
   var aba = null;
   try { aba = sessionStorage.getItem("evo-painel-aba"); } catch (e) {}
   P.iniciar = function () {
+    P.db.then(function (sb) { return sb.from("perfis").select("id").eq("papel", "professor"); }).then(function (r) {
+      (r && r.data || []).forEach(function (x) { P.contasProf[x.id] = true; });
+    }).catch(function () {});
     /* o banco já recebeu a atualização de 03/11? (a coluna aulas_antes existe) */
     P.db.then(function (sb) { return Promise.all([sb.from("alunos").select("aulas_antes, responsavel_conta, foto").limit(1), sb.from("tecnicas_semana").select("id").limit(1)]); })
       .then(function (rs) { if (rs.some(function (r) { return r && r.error && P.faltaAtualizar(r.error); })) P.avisoBanco(); }).catch(function () {});
