@@ -322,44 +322,14 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   background: radial-gradient(48% 42% at 18% 18%, color-mix(in oklch, var(--gold) 30%, transparent), transparent 70%),
     radial-gradient(42% 36% at 88% 52%, color-mix(in oklch, #b98b35 26%, transparent), transparent 70%),
     radial-gradient(55% 32% at 35% 96%, color-mix(in oklch, var(--gold) 16%, transparent), transparent 70%); }
+:root[data-look="black"] .ap.app .ap-card:not(.ap-hero), :root[data-look="black"] .ap.app .ap-trio, :root[data-look="black"] .ap.app .ap-tk,
+:root:not([data-look]) .ap.app .ap-card:not(.ap-hero), :root:not([data-look]) .ap.app .ap-trio, :root:not([data-look]) .ap.app .ap-tk {
+  background: var(--vc-brilho), radial-gradient(110% 80% at 0% 0%, color-mix(in oklch, var(--gold) 10%, transparent), transparent 60%), var(--vc);
+  border-color: var(--vc-borda); border-top-color: oklch(1 0 0 / 0.22);
+  box-shadow: inset 0 1px 0 var(--vc-luz), inset 0 -1px 0 oklch(0 0 0 / 0.25), 0 24px 44px -26px oklch(0 0 0 / 0.95), 0 2px 8px -3px oklch(0 0 0 / 0.5); }
+:root[data-look="black"] .ap.app .ap-tk.atual, :root:not([data-look]) .ap.app .ap-tk.atual { border-color: var(--gold); }
 :root[data-look="black"] .ap.app .ap-dock button:not(.ap-dock-go)[aria-current="true"]::before,
 :root:not([data-look]) .ap.app .ap-dock button:not(.ap-dock-go)[aria-current="true"]::before { background: oklch(1 0 0 / 0.1); box-shadow: inset 0 0.5px 0 oklch(1 0 0 / 0.3); }
-/* ===== vidro líquido: aro de luz em degradê (refrata no canto de cima e some nas laterais), mais transparência,
-   reflexo marcado e brilho interno. Os preenchimentos ficam dentro da borda (padding-box) e o aro, na borda (border-box) */
-.ap.app { --aro: linear-gradient(155deg, oklch(1 0 0 / 0.6), oklch(1 0 0 / 0.1) 30%, oklch(1 0 0 / 0.04) 62%, oklch(1 0 0 / 0.3) 100%);
-  --aro-ouro: linear-gradient(155deg, color-mix(in oklch, var(--gold) 95%, white), color-mix(in oklch, var(--gold) 45%, transparent) 40%, color-mix(in oklch, var(--gold) 80%, transparent));
-  --vl: oklch(1 0 0 / 0.07); --vl-brilho: linear-gradient(165deg, oklch(1 0 0 / 0.2) 0%, oklch(1 0 0 / 0.06) 26%, oklch(1 0 0 / 0) 55%);
-  --vl-fundo: radial-gradient(120% 60% at 50% 120%, oklch(1 0 0 / 0.07), transparent 60%); }
-:root:not([data-look="black"]) .ap.app {
-  --aro: linear-gradient(155deg, oklch(1 0 0 / 1), oklch(1 0 0 / 0.55) 35%, oklch(0.85 0.03 80 / 0.5) 70%, oklch(1 0 0 / 0.9));
-  --vl: oklch(1 0 0 / 0.42); --vl-brilho: linear-gradient(165deg, oklch(1 0 0 / 0.85) 0%, oklch(1 0 0 / 0.25) 30%, oklch(1 0 0 / 0) 60%);
-  --vl-fundo: radial-gradient(120% 60% at 50% 120%, color-mix(in oklch, var(--gold) 10%, transparent), transparent 60%); }
-/* o fundo: luz dourada mais viva, com um segundo foco que se move devagar (é o que o vidro "refrata") */
-.ap.app .ap-views::after { content: ""; position: absolute; inset: 10% -20% auto; height: 120%; z-index: 0; pointer-events: none;
-  background: radial-gradient(30% 22% at 70% 30%, color-mix(in oklch, var(--gold) 22%, transparent), transparent 70%),
-    radial-gradient(26% 20% at 25% 70%, color-mix(in oklch, #c9772e 18%, transparent), transparent 70%);
-  filter: blur(14px); animation: ap-aurora2 18s ease-in-out infinite alternate; }
-@keyframes ap-aurora2 { to { transform: translate3d(-8%, -6%, 0) scale(1.12); } }
-.ap.app .ap-card:not(.ap-hero), .ap.app .ap-trio, .ap.app .ap-tk {
-  border: 1px solid transparent;
-  background: var(--vl-brilho) padding-box, var(--vl-fundo) padding-box,
-    radial-gradient(110% 80% at 0% 0%, color-mix(in oklch, var(--gold) 10%, transparent), transparent 60%) padding-box,
-    linear-gradient(var(--vl), var(--vl)) padding-box, var(--aro) border-box;
-  box-shadow: inset 0 1px 1px oklch(1 0 0 / 0.18), 0 26px 46px -26px oklch(0 0 0 / 0.95), 0 3px 10px -4px oklch(0 0 0 / 0.5); }
-:root:not([data-look="black"]) .ap.app .ap-card:not(.ap-hero), :root:not([data-look="black"]) .ap.app .ap-trio, :root:not([data-look="black"]) .ap.app .ap-tk {
-  box-shadow: inset 0 1px 1px oklch(1 0 0 / 0.9), 0 20px 38px -24px oklch(0.35 0.04 75 / 0.38), 0 2px 6px -2px oklch(0.35 0.04 75 / 0.14); }
-.ap.app .ap-tk.atual { background: var(--vl-brilho) padding-box, linear-gradient(color-mix(in oklch, var(--gold) 12%, var(--vl)), color-mix(in oklch, var(--gold) 12%, var(--vl))) padding-box, var(--aro-ouro) border-box; }
-/* menu de baixo e barra do topo com o mesmo aro */
-.ap.app .ap-dock { border: 1px solid transparent;
-  background: var(--vl-brilho) padding-box, linear-gradient(var(--vidro), var(--vidro)) padding-box, var(--aro) border-box; }
-/* chips e botões de escolha: aro de luz também */
-.ap.app .ap-cats button:not([aria-pressed="true"]), .ap.app .ap-fam button:not([aria-pressed="true"]), .ap.app .ap-aulas button:not([aria-pressed="true"]),
-.ap.app .ap-sem-ok:not([aria-pressed="true"]), .ap.app .ap-quero-l button {
-  border: 1px solid transparent; background: var(--vl-brilho) padding-box, linear-gradient(var(--vl), var(--vl)) padding-box, var(--aro) border-box; }
-.ap.app .ap-fam button[aria-pressed="true"], .ap.app .ap-aulas button[aria-pressed="true"] {
-  border: 1px solid transparent; background: var(--vl-brilho) padding-box, linear-gradient(color-mix(in oklch, var(--gold) 16%, var(--vl)), color-mix(in oklch, var(--gold) 16%, var(--vl))) padding-box, var(--aro-ouro) border-box; }
-@media (prefers-reduced-motion: reduce) { .ap.app .ap-views::after { animation: none; } }
-@media (prefers-reduced-transparency: reduce) { .ap.app { --vl: var(--paper-2); } }
 /* ===== faixa 3D: tecido com volume, ponteira e graus em fita; flutua, brilha e inclina com o dedo ===== */
 .b3d { position: relative; isolation: isolate; display: block; margin-top: 16px; perspective: 760px; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
 .b3d::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: -16px; height: 16px; border-radius: 50%;
