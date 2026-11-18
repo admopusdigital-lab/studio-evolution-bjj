@@ -82,7 +82,11 @@
     return !g || !a.aulas_antes_ate || g <= a.aulas_antes_ate ? Math.max(0, n - P.AULAS_GRAU * graus) : 0;
   };
   /* as aulas de antes do app ficaram fora de "desde o último grau" por causa de um grau registrado depois */
+  /* o aviso "aulas de antes fora" foi desligado a pedido do professor (os graus registrados depois foram promoções
+     de verdade). Para um caso de cadastro, a correção é em Editar dados (faixa e graus) */
+  P.AVISO_ANTES_FORA = false;
   P.antesFora = function (a, g) {
+    if (!P.AVISO_ANTES_FORA) return false;
     /* só no começo (até 30 dias depois de lançadas as aulas de antes), quando um grau antigo pode ter sido registrado
        como novo; depois disso, um grau novo é promoção de verdade e zerar a conta é o certo */
     return !!(a && a.aulas_antes > 0 && g && !P.doCadastro(g) && a.aulas_antes_ate && g.data > a.aulas_antes_ate && g.data <= P.somaDias(a.aulas_antes_ate, 30));
