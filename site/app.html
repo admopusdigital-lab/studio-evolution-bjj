@@ -252,7 +252,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
    Material "espesso" (80 a 88% opaco): onde o aparelho não desfoca, o texto de trás nunca compete com os ícones */
 .ap.app { --vidro: color-mix(in oklch, var(--paper) 80%, transparent); --vidro-forte: color-mix(in oklch, var(--paper) 88%, transparent);
   --luz: oklch(1 0 0 / 0.14); --luz-borda: oklch(1 0 0 / 0.1); --vidro-blur: saturate(180%) blur(22px); }
-:root:not([data-look="black"]) .ap.app { --vidro: color-mix(in oklch, var(--paper) 78%, transparent); --vidro-forte: color-mix(in oklch, var(--paper) 88%, transparent);
+:root:not([data-look="black"]) .ap.app { --vidro: color-mix(in oklch, var(--paper) 86%, transparent); --vidro-forte: color-mix(in oklch, var(--paper) 88%, transparent);
   --luz: oklch(1 0 0 / 0.75); --luz-borda: oklch(0.2 0.01 75 / 0.08); }
 .ap.app .app-top { background: var(--vidro); -webkit-backdrop-filter: var(--vidro-blur); backdrop-filter: var(--vidro-blur);
   border-bottom: 0; box-shadow: inset 0 -0.5px 0 var(--luz-borda), 0 10px 24px -22px oklch(0 0 0 / 0.6); }
@@ -281,6 +281,35 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   .ap.app { --vidro: var(--paper); --vidro-forte: var(--paper-2); }
   .ap.app .app-top, .ap.app .ap-dock, .ap.app .ap-toast, .ap.app .ap-sheet { -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+/* ===== vidro nos cartões e controles: translúcidos sobre a luz dourada do fundo (que se move ao rolar),
+   com reflexo no alto, borda de luz e sombra macia. Sem desfoque aqui: atrás dos cartões só há o fundo liso */
+.ap.app { --vc: color-mix(in oklch, var(--paper-2) 60%, transparent); --vc-borda: oklch(1 0 0 / 0.08); --vc-luz: oklch(1 0 0 / 0.14);
+  --vc-brilho: linear-gradient(180deg, oklch(1 0 0 / 0.06), oklch(1 0 0 / 0) 46%); --vc-campo: color-mix(in oklch, var(--paper) 55%, transparent); }
+:root:not([data-look="black"]) .ap.app { --vc: color-mix(in oklch, white 58%, transparent); --vc-borda: oklch(1 0 0 / 0.85); --vc-luz: oklch(1 0 0 / 0.95);
+  --vc-brilho: linear-gradient(180deg, oklch(1 0 0 / 0.7), oklch(1 0 0 / 0) 55%); --vc-campo: color-mix(in oklch, white 70%, transparent); }
+/* a luz do fundo um pouco mais presente, para o vidro ter o que tingir */
+.ap.app .ap-views::before { background: radial-gradient(45% 40% at 20% 20%, color-mix(in oklch, var(--gold) 22%, transparent), transparent 70%),
+  radial-gradient(40% 35% at 85% 55%, color-mix(in oklch, #b98b35 18%, transparent), transparent 70%), radial-gradient(50% 30% at 40% 95%, color-mix(in oklch, var(--gold) 10%, transparent), transparent 70%); }
+.ap.app .ap-card:not(.ap-hero), .ap.app .ap-trio, .ap.app .ap-tk {
+  background: var(--vc-brilho), radial-gradient(120% 90% at 0% 0%, color-mix(in oklch, var(--gold) 8%, transparent), transparent 60%), var(--vc);
+  border: 1px solid var(--vc-borda); border-top-color: color-mix(in oklch, var(--gold) 35%, var(--vc-borda));
+  box-shadow: inset 0 1px 0 var(--vc-luz), 0 22px 40px -28px oklch(0 0 0 / 0.8), 0 2px 6px -3px oklch(0 0 0 / 0.3); }
+:root:not([data-look="black"]) .ap.app .ap-card:not(.ap-hero), :root:not([data-look="black"]) .ap.app .ap-trio, :root:not([data-look="black"]) .ap.app .ap-tk {
+  box-shadow: inset 0 1px 0 var(--vc-luz), 0 18px 34px -24px oklch(0.3 0.03 75 / 0.35), 0 1px 3px oklch(0.3 0.03 75 / 0.12); }
+.ap.app .ap-tk.atual { border-color: var(--gold); }
+/* controles: chips, segmentos e botões de escolha viram pílulas de vidro */
+.ap.app .ap-cats button, .ap.app .ap-fam button, .ap.app .ap-aulas button, .ap.app .ap-sem-ok, .ap.app .ap-quero-l button {
+  background: var(--vc-brilho), var(--vc); border-color: var(--vc-borda); box-shadow: inset 0 0.5px 0 var(--vc-luz), 0 6px 14px -10px oklch(0 0 0 / 0.6); }
+.ap.app .ap-cats button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); box-shadow: 0 8px 18px -10px oklch(0 0 0 / 0.6); }
+.ap.app .ap-aulas button[aria-pressed="true"], .ap.app .ap-fam button[aria-pressed="true"] { border-color: var(--gold);
+  background: var(--vc-brilho), color-mix(in oklch, var(--gold) 16%, var(--vc)); }
+.ap.app .ap-sem-ok[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.5), 0 8px 18px -10px color-mix(in oklch, var(--gold) 70%, transparent); }
+.ap.app .ap-rk-per { background: var(--vc-brilho), var(--vc); box-shadow: inset 0 0.5px 0 var(--vc-luz), inset 0 0 0 0.5px var(--vc-borda); }
+.ap.app .ap-rk-per button[aria-pressed="true"] { box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.5), 0 4px 10px -6px oklch(0 0 0 / 0.5); }
+/* ranking sem ninguém ainda: a mensagem ocupa a linha inteira (não a coluna da posição) */
+.ap.app .ap-rk li.ap-rk-vazio { display: block; padding: 10px 6px; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+/* campos de texto: vidro mais claro, borda de luz */
+.ap.app .ap-quero-f input, .ap.app .ap-senha input { background: var(--vc-campo); border-color: var(--vc-borda); box-shadow: inset 0 1px 2px oklch(0 0 0 / 0.18), inset 0 -0.5px 0 var(--vc-luz); }
 /* ===== faixa 3D: tecido com volume, ponteira e graus em fita; flutua, brilha e inclina com o dedo ===== */
 .b3d { position: relative; isolation: isolate; display: block; margin-top: 16px; perspective: 760px; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
 .b3d::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: -16px; height: 16px; border-radius: 50%;
