@@ -310,6 +310,26 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap.app .ap-rk li.ap-rk-vazio { display: block; padding: 10px 6px; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
 /* campos de texto: vidro mais claro, borda de luz */
 .ap.app .ap-quero-f input, .ap.app .ap-senha input { background: var(--vc-campo); border-color: var(--vc-borda); box-shadow: inset 0 1px 2px oklch(0 0 0 / 0.18), inset 0 -0.5px 0 var(--vc-luz); }
+/* ===== vidro no tema escuro: o material é um pouco mais claro que o fundo, com reflexo forte no alto e bordas de luz
+   (como o vidro escuro do iPhone). O tema claro já usa o branco translúcido acima */
+:root[data-look="black"] .ap.app, :root:not([data-look]) .ap.app {
+  --vc: oklch(1 0 0 / 0.045);
+  --vc-brilho: linear-gradient(160deg, oklch(1 0 0 / 0.13) 0%, oklch(1 0 0 / 0.04) 34%, oklch(1 0 0 / 0) 68%);
+  --vc-borda: oklch(1 0 0 / 0.13); --vc-luz: oklch(1 0 0 / 0.3); --vc-campo: oklch(1 0 0 / 0.06);
+  --vidro: color-mix(in oklch, oklch(0.27 0.008 75) 80%, transparent); --vidro-forte: color-mix(in oklch, oklch(0.27 0.008 75) 90%, transparent);
+  --luz: oklch(1 0 0 / 0.28); --luz-borda: oklch(1 0 0 / 0.14); }
+:root[data-look="black"] .ap.app .ap-views::before, :root:not([data-look]) .ap.app .ap-views::before {
+  background: radial-gradient(48% 42% at 18% 18%, color-mix(in oklch, var(--gold) 30%, transparent), transparent 70%),
+    radial-gradient(42% 36% at 88% 52%, color-mix(in oklch, #b98b35 26%, transparent), transparent 70%),
+    radial-gradient(55% 32% at 35% 96%, color-mix(in oklch, var(--gold) 16%, transparent), transparent 70%); }
+:root[data-look="black"] .ap.app .ap-card:not(.ap-hero), :root[data-look="black"] .ap.app .ap-trio, :root[data-look="black"] .ap.app .ap-tk,
+:root:not([data-look]) .ap.app .ap-card:not(.ap-hero), :root:not([data-look]) .ap.app .ap-trio, :root:not([data-look]) .ap.app .ap-tk {
+  background: var(--vc-brilho), radial-gradient(110% 80% at 0% 0%, color-mix(in oklch, var(--gold) 10%, transparent), transparent 60%), var(--vc);
+  border-color: var(--vc-borda); border-top-color: oklch(1 0 0 / 0.22);
+  box-shadow: inset 0 1px 0 var(--vc-luz), inset 0 -1px 0 oklch(0 0 0 / 0.25), 0 24px 44px -26px oklch(0 0 0 / 0.95), 0 2px 8px -3px oklch(0 0 0 / 0.5); }
+:root[data-look="black"] .ap.app .ap-tk.atual, :root:not([data-look]) .ap.app .ap-tk.atual { border-color: var(--gold); }
+:root[data-look="black"] .ap.app .ap-dock button:not(.ap-dock-go)[aria-current="true"]::before,
+:root:not([data-look]) .ap.app .ap-dock button:not(.ap-dock-go)[aria-current="true"]::before { background: oklch(1 0 0 / 0.1); box-shadow: inset 0 0.5px 0 oklch(1 0 0 / 0.3); }
 /* ===== faixa 3D: tecido com volume, ponteira e graus em fita; flutua, brilha e inclina com o dedo ===== */
 .b3d { position: relative; isolation: isolate; display: block; margin-top: 16px; perspective: 760px; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
 .b3d::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: -16px; height: 16px; border-radius: 50%;
