@@ -2229,7 +2229,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $(".r", row).textContent = graus + " de 4 graus";
     $(".ap-degs", pf).innerHTML = [0, 1, 2, 3].map(function (i) { return "<i" + (i < graus ? ' class="on"' : "") + "></i>"; }).join("");
     /* aulas feitas antes do app (lançadas pelo professor) contam se o último grau é anterior a elas */
-    var antes = a.aulas_antes && (!g || !a.aulas_antes_ate || g.data <= a.aulas_antes_ate) ? a.aulas_antes : 0;
+    /* grau marcado "já tinha antes do app" pelo professor não zera as aulas de antes */
+    var gAntes = g && g.nota && /ao entrar no Studio|antes do app/i.test(g.nota);
+    var antes = a.aulas_antes && (!g || gAntes || !a.aulas_antes_ate || g.data <= a.aulas_antes_ate) ? a.aulas_antes : 0;
     var desde = (g ? MEUS.pres.filter(function (x) { return x.data > g.data; }).length : MEUS.pres.length) + antes, s = semanas();
     $("#apSince").textContent = desde;
     paintFaixa(fx, graus, desde);

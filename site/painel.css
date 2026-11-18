@@ -538,3 +538,12 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .ficha-foto { display: flex; gap: 14px; align-items: center; }
 .ficha-foto > .av { width: 64px; height: 64px; flex-shrink: 0; font-size: 18px; box-shadow: 0 0 0 2px var(--gold); color: var(--gold-text); }
 .ficha-foto .muted { margin: 2px 0 8px; font-size: 12.5px; }
+
+/* aulas de antes do app fora da conta: aviso com a correção de um toque */
+.antes-fora { margin-top: 14px; padding: 14px 16px; border: 1px solid color-mix(in oklch, var(--gold) 55%, var(--rule)); border-radius: 14px;
+  background: color-mix(in oklch, var(--gold) 8%, transparent); font-size: 13px; line-height: 1.45; }
+.antes-fora p { margin: 0 0 8px; }
+.antes-fora .muted { font-size: 12.5px; }
+.antes-fora ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.antes-fora li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 8px; border-top: 1px solid var(--rule); }
+.dv[data-v="grad"] .antes-fora { margin: 0 0 18px; }

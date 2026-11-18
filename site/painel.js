@@ -59,11 +59,20 @@
   P.FX_KD.concat(P.FX_AD).forEach(function (f) { P.FAIXAS[f] = Site.faixaNome(f); });
   P.beltTxt = function (f, g) { return (P.FAIXAS[f] || Site.faixaNome(f)) + " · " + (g ? g + (g === 1 ? " grau" : " graus") : "sem grau"); };
   P.belt = function (f, g) { return '<span class="bl"><i class="belt-s" style="' + Site.faixaCss(f) + '"></i><span>' + P.beltTxt(f, g) + "</span></span>"; };
-  /* aulas feitas antes do app: somam no total e, se o último grau é anterior a elas, também "desde o último grau" */
-  P.antes = function (a, dataGrau) {
+  /* aulas feitas antes do app: somam no total e também em "desde o último grau", a não ser que o último grau
+     seja NOVO (dado depois de lançadas essas aulas). Grau marcado "já tinha antes do app" nunca zera a conta.
+     g: a última graduação (objeto) ou só a data dela */
+  P.antes = function (a, g) {
     var n = (a && a.aulas_antes) || 0;
     if (!n) return 0;
-    return !dataGrau || !a.aulas_antes_ate || dataGrau <= a.aulas_antes_ate ? n : 0;
+    if (g && typeof g === "object") { if (P.doCadastro(g)) return n; g = g.data; }
+    return !g || !a.aulas_antes_ate || g <= a.aulas_antes_ate ? n : 0;
+  };
+  /* as aulas de antes do app ficaram fora de "desde o último grau" por causa de um grau registrado depois */
+  P.antesFora = function (a, g) {
+    /* só no começo (até 30 dias depois de lançadas as aulas de antes), quando um grau antigo pode ter sido registrado
+       como novo; depois disso, um grau novo é promoção de verdade e zerar a conta é o certo */
+    return !!(a && a.aulas_antes > 0 && g && P.antes(a, g) === 0 && a.aulas_antes_ate && g.data <= P.somaDias(a.aulas_antes_ate, 30));
   };
   P.TURMAS = { adulto: "Adulto", feminino: "Feminino", kids1: "Kids 1", kids2: "Kids 2" };
   /* a turma na grade (Site.GRADE): o Feminino treina junto com o Adulto */

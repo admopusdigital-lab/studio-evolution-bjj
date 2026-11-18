@@ -5,9 +5,9 @@
   var filtro = "ativos";
 
   /* ---------- a lista ---------- */
-  var FILTROS = [["ativos", "Ativos"], ["sumidos", "Sem treinar"], ["kids", "Kids"], ["semnasc", "Sem aniversário"], ["inativos", "Inativos"], ["todos", "Todos"]];
+  var FILTROS = [["ativos", "Ativos"], ["sumidos", "Sem treinar"], ["kids", "Kids"], ["semnasc", "Sem aniversário"], ["semantes", "Sem aulas de antes"], ["inativos", "Inativos"], ["todos", "Todos"]];
   function passa(a, f) {
-    return f === "semnasc" ? a.ativo && !a.nascimento : f === "ativos" ? a.ativo : f === "sumidos" ? P.sumido(a) : f === "kids" ? a.ativo && P.kid(a.turma) : f === "inativos" ? !a.ativo : true;
+    return f === "semantes" ? a.ativo && !(a.aulas_antes > 0) : f === "semnasc" ? a.ativo && !a.nascimento : f === "ativos" ? a.ativo : f === "sumidos" ? P.sumido(a) : f === "kids" ? a.ativo && P.kid(a.turma) : f === "inativos" ? !a.ativo : true;
   }
   P.filtroAlunos = function (f) { filtro = f; paintLista(); };
   function paintLista() {
@@ -206,6 +206,24 @@
   /* frequência da ficha: os números em cartões e o calendário dos últimos 30 dias (segunda a sábado),
      com o número de cada dia; dourado quando veio, mais forte e com dois pontos quando fez duas aulas */
   var DS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"], MS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  /* aviso na ficha: as aulas de antes do app ficaram fora por causa de um grau registrado depois delas */
+  function foraHTML(a, g) {
+    if (!P.antesFora(a, g)) return "";
+    return '<div class="antes-fora"><p><b>' + a.aulas_antes + " aulas de antes do app não estão entrando em “desde o último grau”.</b> " +
+      "O grau " + esc(P.beltTxt(g.faixa, g.graus).toLowerCase()) + " foi registrado em " + P.dataBR(g.data) + ", depois que essas aulas foram lançadas (" + P.dataBR(a.aulas_antes_ate) + "), então o sistema entendeu como grau novo.</p>" +
+      '<p class="muted">Se ' + esc(P.first(a.nome)) + " já tinha esse grau antes de usar o app, toque abaixo e as aulas voltam para a conta.</p>" +
+      '<button class="mini-btn" type="button" data-ja-tinha="' + g.id + '">Já tinha esse grau</button></div>';
+  }
+  /* marca a graduação como "já tinha antes do app": as aulas de antes voltam para "desde o último grau" */
+  P.jaTinha = function (gid, alunoId) {
+    return P.q(function (sb) { return sb.from("graduacoes").select("nota").eq("id", gid).maybeSingle(); }).then(function (g) {
+      var nota = P.NOTA_CADASTRO + (g && g.nota && !P.doCadastro(g) ? " · " + g.nota : "");
+      return P.q(function (sb) { return sb.from("graduacoes").update({ nota: nota }).eq("id", gid); });
+    }).then(function () { return carregarGrad().catch(function () {}); }).then(function () {
+      var a = P.porId[alunoId];
+      P.toast("Pronto: as aulas de antes do app de " + P.first(a ? a.nome : "") + " voltaram para a conta.");
+    });
+  };
   function freqHTML(id, total, antes, desdeGrau) {
     var hoje = P.hoje(), d0 = P.dia(hoje), ini = P.somaDias(hoje, -29);
     var dias = {};
@@ -361,7 +379,7 @@
     ]).then(function (r) {
       if (minha !== P.fichaN) return;
       var mens = r[0] || [], grads = r[1] || [], cobs = r[2], pres = P.pres.filter(function (p) { return p.aluno === id; });
-      var antes = a.aulas_antes || 0, total = pres.length, desdeGrau = (grads.length ? pres.filter(function (p) { return p.data > grads[0].data; }).length : total) + P.antes(a, grads.length ? grads[0].data : null);
+      var antes = a.aulas_antes || 0, total = pres.length, desdeGrau = (grads.length ? pres.filter(function (p) { return p.data > grads[0].data; }).length : total) + P.antes(a, grads[0] || null);
       var idade = a.nascimento ? Math.floor(P.difDias(a.nascimento, P.hoje()) / 365.25) : null;
       var html =
         (cred ? '<div class="cred"><b>Acesso ao app ' + (cred.reenvio ? "com senha nova" : "criado") + "</b><p>E-mail: <code>" + esc(cred.email) + "</code><br>Senha provisória: <code>" + esc(cred.senha) + '</code></p><div class="msg-acts">' +
@@ -377,7 +395,7 @@
           "<dt>No Studio desde</dt><dd>" + P.dataBRano(a.inicio) + (a.saida ? " · saiu em " + P.dataBRano(a.saida) : "") + "</dd>" +
           (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
         "</dl></div>" +
-        '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + "</div>" +
+        '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + foraHTML(a, grads[0]) + "</div>" +
         '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return '<li data-mens="' + m.id + '"><span>' + P.mesNome(m.competencia) + " · " + P.brl(m.valor) + '</span><span class="row-acts">' + statusMens(m) + (m.pago_em ? "" : '<button class="mini-btn" type="button" data-mens-paga>Recebi</button>') + "</span></li>"; }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
         outrosHTML(a, cobs) +
         '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return '<li data-grad="' + g.id + '"><span>' + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + '</span><span class="row-acts">' + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + '<button class="mini-btn ghost" type="button" data-grad-apaga>Apagar</button></span></li>'; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
@@ -420,6 +438,10 @@
         else if (b.hasAttribute("data-edit")) editar(a, dr);
         else if (b.hasAttribute("data-grau")) P.registrarGrau(a.id);
         else if (b.dataset.ficha2) P.abrirAluno(b.dataset.ficha2);
+        else if (b.hasAttribute("data-ja-tinha")) {
+          b.classList.add("loading");
+          P.jaTinha(b.dataset.jaTinha, a.id).then(function () { P.abrirAluno(a.id); }).catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+        }
         else if (b.hasAttribute("data-mens-paga")) {
           var mid = b.closest("[data-mens]").dataset.mens;
           b.classList.add("loading");
@@ -517,7 +539,7 @@
       paintGrad();
     });
   }
-  function desde(a) { var g = ultGrau[a.id], ref = g ? g.data : null; return P.pres.filter(function (p) { return p.aluno === a.id && (!ref || p.data > ref); }).length + P.antes(a, ref); }
+  function desde(a) { var g = ultGrau[a.id], ref = g ? g.data : null; return P.pres.filter(function (p) { return p.aluno === a.id && (!ref || p.data > ref); }).length + P.antes(a, g || null); }
   function paintGrad() {
     var l = P.ativos().map(function (a) { return { a: a, n: desde(a) }; }).sort(function (x, y) { return y.n - x.n; });
     $("#grTbl tbody").innerHTML = l.map(function (x) {
@@ -526,6 +548,15 @@
         "<td>" + P.belt(x.a.faixa, x.a.graus) + '</td><td class="num">' + x.n + '</td><td class="act"><button class="mini-btn" type="button" data-grau="' + x.a.id + '">Registrar grau</button></td></tr>';
     }).join("");
     $("#grTbl").hidden = !l.length;
+    /* quem está com as aulas de antes do app fora da conta por causa de um grau registrado depois delas */
+    var fora = P.ativos().filter(function (a) { return P.antesFora(a, ultGrau[a.id]); }), box = $("#grFora");
+    box.hidden = !fora.length;
+    box.innerHTML = fora.length ? '<p><b>' + fora.length + (fora.length === 1 ? " aluno está" : " alunos estão") + " com as aulas de antes do app fora de “desde o último grau”.</b> " +
+      "Um grau foi registrado depois que essas aulas foram lançadas, e o sistema entendeu como grau novo. Se o aluno já tinha esse grau antes do app, toque em “Já tinha”.</p><ul>" +
+      fora.map(function (a) {
+        var g = ultGrau[a.id];
+        return '<li><span><b>' + esc(a.nome) + "</b> · " + esc(P.beltTxt(g.faixa, g.graus).toLowerCase()) + " registrado em " + P.dataBR(g.data) + " · " + a.aulas_antes + ' aulas de antes fora</span><button class="mini-btn" type="button" data-ja-tinha="' + g.id + '" data-aluno="' + a.id + '">Já tinha</button></li>';
+      }).join("") + "</ul>" : "";
     var e = $("#grEmpty");
     e.hidden = !!l.length;
     e.innerHTML = "<b>Nenhum aluno ativo.</b>Cadastre os alunos em Alunos para acompanhar os graus.";
@@ -568,11 +599,13 @@
       '<label class="crm-f"><span>Graus</span><select class="sel" id="gfG">' + [0, 1, 2, 3, 4, 5, 6].map(function (g) { return "<option" + (g === prox.g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></label>" +
       '<label class="crm-f"><span>Data</span><input class="crm-in" type="date" id="gfD" max="' + P.hoje() + '" value="' + P.hoje() + '"></label>' +
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><input class="crm-in" id="gfN" autocomplete="off" placeholder="Ex.: entregue no treino de sexta"></label></div>' +
+      '<label class="mf-pub"><input type="checkbox" id="gfJa"><span>' + esc(P.first(a.nome)) + ' já tinha esse grau antes do app (não zera as aulas desde o último grau)</span></label>' +
       '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Registrar</button><button class="mini-btn ghost" type="button" data-dr-x>Cancelar</button></div></form>', "Grau de " + a.nome);
     $("#drSub").textContent = P.turmaTx(a);
     $("#grForm", dr).onsubmit = function (e) {
       e.preventDefault();
-      var f = $("#gfF").value, g = +$("#gfG").value, d = $("#gfD").value || P.hoje(), n = $("#gfN").value.trim();
+      var f = $("#gfF").value, g = +$("#gfG").value, d = $("#gfD").value || P.hoje(), n = $("#gfN").value.trim(), ja = $("#gfJa").checked;
+      if (ja) n = P.NOTA_CADASTRO + (n ? " · " + n : "");
       if (f === a.faixa && g === a.graus) return P.erroForm(e.target, $("#gfG"), "Escolha um grau ou faixa diferente do atual.");
       if (d > P.hoje()) return P.erroForm(e.target, $("#gfD"), "A data do grau não pode ser no futuro.");
       $('[type="submit"]', e.target).classList.add("loading");
@@ -587,6 +620,12 @@
         .catch(function (e2) { $('[type="submit"]', e.target).classList.remove("loading"); P.erro(e2, "Não deu para registrar o grau"); });
     };
   };
+  $("#grFora").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-ja-tinha]");
+    if (!b) return;
+    b.classList.add("loading");
+    P.jaTinha(b.dataset.jaTinha, b.dataset.aluno).catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+  });
   P.aoAbrir("grad", function () { carregarGrad().catch(function (e) { P.erro(e, "Não deu para carregar as graduações"); }); });
   P.aoMudarAlunos(function () { if (P.atual() === "grad") paintGrad(); });
 })();
