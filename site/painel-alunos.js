@@ -574,19 +574,33 @@
       };
     }).catch(function (e) { if (minha === P.fichaN) P.erro(e, "Não deu para abrir a ficha"); });
   };
+  /* corrige a faixa e os graus do aluno: ajusta a graduação mais recente (ou cria a do cadastro, se não houver) */
+  function corrigeFaixa(a, fx, gr) {
+    return P.q(function (sb) { return sb.from("graduacoes").select("id, data, criado_em").eq("aluno", a.id).order("data", { ascending: false }).order("criado_em", { ascending: false }).limit(1); })
+      .then(function (l) {
+        var g = l && l[0];
+        if (g) return P.q(function (sb) { return sb.from("graduacoes").update({ faixa: fx, graus: gr }).eq("id", g.id); });
+        return P.q(function (sb) { return sb.from("graduacoes").insert({ aluno: a.id, faixa: fx, graus: gr, data: a.inicio || P.hoje(), nota: P.NOTA_CADASTRO }); });
+      })
+      .then(function () { return P.q(function (sb) { return sb.from("alunos").update({ faixa: fx, graus: gr }).eq("id", a.id); }); });
+  }
   function editar(a, dr) {
     var f = $("#frEdit", dr);
     f.innerHTML = formHTML(a);
     formSync(f, a);
     f.hidden = false;
-    f.onchange = function (e) { if (e.target.dataset.k === "turma") formSync(f); };
+    f.onchange = function (e) { if (e.target.dataset.k === "turma" || e.target.dataset.k === "faixa") formSync(f); };
     f.onclick = function (e) { if (e.target.closest("[data-cancel]")) { f.hidden = true; } };
     f.onsubmit = function (e) {
       e.preventDefault();
       var x = ler(f);
       if (!validar(f, x)) return;
       var d = x.d;
-      delete d.faixa; delete d.graus;  /* faixa e graus mudam pelo registro de grau (fica o histórico) */
+      /* faixa e graus aqui são CORREÇÃO do cadastro: ajustam a graduação atual, sem criar grau novo nem zerar as aulas.
+         Promoção de verdade continua em Registrar grau (fica o histórico com a data) */
+      var fx = d.faixa, gr = d.graus, corrige = fx && (fx !== a.faixa || gr !== (a.graus || 0));
+      delete d.faixa; delete d.graus;
+      if (corrige) { var av = P.avisoIdade(fx, d.nascimento || a.nascimento); if (av && !confirm(av)) return; }
       delete d.responsavel_conta;  /* a família muda na seção Plano família */
       if (d.aulas_antes !== (a.aulas_antes || 0)) d.aulas_antes_ate = d.aulas_antes ? P.hoje() : null;
       else delete d.aulas_antes;
@@ -594,12 +608,13 @@
       var novoDia = d.vencimento && d.vencimento !== (a.vencimento || 10) ? d.vencimento : 0, mudou = [];
       P.q(function (sb) { return sb.from("alunos").update(d).eq("id", a.id); })
         .then(function () { return novoDia ? P.moverVencimento(a.id, novoDia).then(function (m) { mudou = m; }) : null; })
-        .then(P.carregarAlunos).then(function () { P.toast("Dados de " + P.first(d.nome) + " salvos." + (mudou.length ? " A mensalidade em aberto passou para " + mudou.join(" e ") + "." : "")); P.abrirAluno(a.id); })
+        .then(function () { return corrige ? corrigeFaixa(a, fx, gr) : null; })
+        .then(P.carregarAlunos).then(function () { P.toast("Dados de " + P.first(d.nome) + " salvos." + (corrige ? " Faixa corrigida: " + P.beltTxt(fx, gr).toLowerCase() + "." : "") + (mudou.length ? " A mensalidade em aberto passou para " + mudou.join(" e ") + "." : "")); P.abrirAluno(a.id); })
         .catch(function (e2) { $('[type="submit"]', f).classList.remove("loading"); P.erro(e2); });
     };
-    $('[data-k="faixa"]', f).disabled = true;
-    $('[data-k="graus"]', f).disabled = true;
-    $('[data-k="faixa"]', f).closest("label").title = "A faixa muda em Registrar grau";
+    var lf = $('[data-k="faixa"]', f).closest("label");
+    lf.title = "Corrige a faixa do cadastro. Grau novo (promoção) é em Registrar grau";
+    $("span", lf).innerHTML = 'Faixa <small>(correção; grau novo é em Registrar grau)</small>';
     f.scrollIntoView({ block: "start", behavior: "smooth" });
     P.focusSoft($('[data-k="nome"]', f), { preventScroll: true });
   }
