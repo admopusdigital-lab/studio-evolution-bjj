@@ -475,8 +475,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-prod { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: 16px; overflow: hidden;
   background: radial-gradient(80% 70% at 30% 20%, color-mix(in oklch, var(--gold) 28%, transparent), transparent 70%), linear-gradient(160deg, color-mix(in oklch, var(--ink) 10%, var(--paper-2)), var(--paper-2));
   box-shadow: 0 14px 22px -14px oklch(0 0 0 / 0.85), inset 0 1px 0 oklch(1 0 0 / 0.08), inset 0 0 0 1px color-mix(in oklch, var(--gold) 22%, transparent); }
+.ap-prod .ap-prod-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ap-prod svg { width: 52%; height: 52%; margin-top: 10%; filter: drop-shadow(0 8px 10px oklch(0 0 0 / 0.55)); transform: perspective(300px) rotateY(-8deg) rotateX(6deg); }
-.ap-prod .tag { position: absolute; top: 7px; left: 7px; padding: 2px 6px; font-size: 8px !important; border-radius: 999px; background: oklch(0 0 0 / 0.45); font: 600 9px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
+.ap-prod .tag { position: absolute; z-index: 1; top: 7px; left: 7px; padding: 2px 6px; font-size: 8px !important; border-radius: 999px; background: oklch(0 0 0 / 0.45); font: 600 9px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
 .ap-shop-list { display: grid; gap: 14px; margin-top: 16px; }
 .ap-pc { display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 14px; padding: 12px; border-radius: 18px; border: 1px solid var(--rule); background: linear-gradient(160deg, color-mix(in oklch, var(--gold) 6%, var(--paper-2)), var(--paper-2) 60%); box-shadow: 0 16px 28px -22px oklch(0 0 0 / 0.85); }
 .ap-pc h3 { font: 400 16px/1.15 var(--serif); }
@@ -1254,6 +1255,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   var LOJA = [], MEUSPED = [], ESCOLHA = {};
   var CAT_P = { kimono: "Kimono", rashguard: "Rashguard", faixa: "Faixa", camiseta: "Camiseta", acessorio: "Acessório", outro: "Item" };
   /* o desenho do produto, em ouro: kimono, rashguard/camiseta, faixa ou caixa */
+  /* a foto do item (o professor coloca no estoque) ou, sem foto, o desenho do tipo */
+  function prodImg(g) { return g.foto ? '<img class="ap-prod-foto" src="' + esc(g.foto) + '" alt="" loading="lazy" decoding="async">' : prodSvg(g.cat); }
   function prodSvg(cat) {
     var g = '<defs><linearGradient id="pg' + cat + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b3"/><stop offset=".55" stop-color="#e2b65a"/><stop offset="1" stop-color="#a87a26"/></linearGradient></defs>';
     var f = 'fill="url(#pg' + cat + ')" stroke="#7d5a1f" stroke-width=".6" stroke-linejoin="round"';
@@ -1269,6 +1272,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       var k = p.nome + "|" + (p.cor || "");
       if (!m[k]) { m[k] = { k: k, nome: p.nome, cor: p.cor, cat: p.categoria, desc: p.descricao, itens: [] }; l.push(m[k]); }
       m[k].itens.push(p);
+      if (!m[k].foto && p.foto) m[k].foto = p.foto;
       if (!m[k].desc && p.descricao) m[k].desc = p.descricao;
     });
     l.forEach(function (g) { g.disp = g.itens.filter(function (p) { return p.quantidade > 0; }); g.min = Math.min.apply(null, g.itens.map(function (p) { return Number(p.preco); })); });
@@ -1280,13 +1284,13 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     box.hidden = !gs.length;
     if (!gs.length) return;
     $("#apShopRow").innerHTML = gs.map(function (g, i) {
-      return '<button class="ap-shop-t" type="button" data-shop="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodSvg(g.cat) + "</span><b>" + esc(nomeG(g)) + "</b><span>" + brl(g.min) + "</span></button>";
+      return '<button class="ap-shop-t" type="button" data-shop="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodImg(g) + "</span><b>" + esc(nomeG(g)) + "</b><span>" + brl(g.min) + "</span></button>";
     }).join("");
     $("#apShopList").innerHTML = gs.map(function (g, i) {
       /* o tamanho escolhido acabou: a escolha sai (não trava a loja) */
       if (ESCOLHA[g.k] && !g.disp.some(function (p) { return p.id === ESCOLHA[g.k]; })) delete ESCOLHA[g.k];
       var sel = ESCOLHA[g.k];
-      return '<article class="ap-pc" data-g="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodSvg(g.cat) + "</span><div><h3>" + esc(nomeG(g)) + '</h3><p class="pr">' + brl(g.min) + "</p>" + (g.desc ? "<p>" + esc(g.desc) + "</p>" : "") +
+      return '<article class="ap-pc" data-g="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodImg(g) + "</span><div><h3>" + esc(nomeG(g)) + '</h3><p class="pr">' + brl(g.min) + "</p>" + (g.desc ? "<p>" + esc(g.desc) + "</p>" : "") +
         '<div class="ap-sz" role="group" aria-label="Tamanho">' + g.disp.map(function (p) { return '<button type="button" data-sz="' + p.id + '" aria-pressed="' + (sel === p.id) + '">' + esc(p.tamanho) + "</button>"; }).join("") +
         (g.disp.length < g.itens.length ? "<small>outros tamanhos esgotados</small>" : "") + "</div>" +
         '<button class="ap-btn" type="button" data-pedir' + (sel ? "" : ' aria-disabled="true"') + '><span>' + (sel ? "Quero este · " + esc(g.disp.filter(function (p) { return p.id === sel; })[0].tamanho) : "Escolha o tamanho") + "</span></button></div></article>";

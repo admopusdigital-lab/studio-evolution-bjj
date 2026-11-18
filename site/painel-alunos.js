@@ -36,6 +36,18 @@
       : q ? "Nenhum aluno com “" + esc($("#alQ").value.trim()) + "”." : "Ninguém neste filtro.";
     $("#alTbl").hidden = !l.length;
   }
+  /* mudou o dia do vencimento: a mensalidade em aberto deste mês em diante passa para o dia novo (devolve as datas novas) */
+  P.moverVencimento = function (alunoId, dia) {
+    var mes = P.mesIni(P.hoje()), mudou = [];
+    return P.q(function (sb) { return sb.from("mensalidades").select("id, competencia, vencimento").eq("aluno", alunoId).is("pago_em", null).gte("competencia", mes); }).then(function (abertas) {
+      return Promise.all((abertas || []).map(function (m) {
+        var nova = P.vencDe(m.competencia, dia);
+        if (nova === m.vencimento) return null;
+        mudou.push(P.dataBR(nova));
+        return P.q(function (sb) { return sb.from("mensalidades").update({ vencimento: nova }).eq("id", m.id); });
+      }));
+    }).then(function () { if (mudou.length && P.recarregarFin) P.recarregarFin(); return mudou; });
+  };
   /* o dia do vencimento direto na lista: escolheu, salvou (e a mensalidade em aberto deste mês em diante acompanha) */
   function vencSel(a) {
     if (!(a.mensalidade > 0)) return '<span class="muted" title="Sem mensalidade">—</span>';
@@ -49,17 +61,10 @@
     var a = P.porId[sel.dataset.venc], dia = +sel.value, antes = a.vencimento || 10;
     if (!a || dia === antes) return;
     sel.disabled = true;
-    var mes = P.mesIni(P.hoje()), mudou = [];
+    var mudou = [];
     P.q(function (sb) { return sb.from("alunos").update({ vencimento: dia }).eq("id", a.id); }).then(function () {
-      return P.q(function (sb) { return sb.from("mensalidades").select("id, competencia, vencimento").eq("aluno", a.id).is("pago_em", null).gte("competencia", mes); });
-    }).then(function (abertas) {
-      return Promise.all((abertas || []).map(function (m) {
-        var nova = P.vencDe(m.competencia, dia);
-        if (nova === m.vencimento) return null;
-        mudou.push(P.dataBR(nova));
-        return P.q(function (sb) { return sb.from("mensalidades").update({ vencimento: nova }).eq("id", m.id); });
-      }));
-    }).then(function () { return P.carregarAlunos(); }).then(function () {
+      return P.moverVencimento(a.id, dia);
+    }).then(function (m) { mudou = m; return P.carregarAlunos(); }).then(function () {
       P.toast("Vencimento de " + P.first(a.nome) + " agora é dia " + dia + "." + (mudou.length ? " A mensalidade em aberto passou para " + mudou.join(" e ") + "." : ""));
     }).catch(function (er) { sel.value = String(antes); sel.disabled = false; P.erro(er, "Não deu para mudar o vencimento"); });
   });
@@ -550,7 +555,10 @@
       if (d.aulas_antes !== (a.aulas_antes || 0)) d.aulas_antes_ate = d.aulas_antes ? P.hoje() : null;
       else delete d.aulas_antes;
       $('[type="submit"]', f).classList.add("loading");
-      P.q(function (sb) { return sb.from("alunos").update(d).eq("id", a.id); }).then(P.carregarAlunos).then(function () { P.toast("Dados de " + P.first(d.nome) + " salvos."); P.abrirAluno(a.id); })
+      var novoDia = d.vencimento && d.vencimento !== (a.vencimento || 10) ? d.vencimento : 0, mudou = [];
+      P.q(function (sb) { return sb.from("alunos").update(d).eq("id", a.id); })
+        .then(function () { return novoDia ? P.moverVencimento(a.id, novoDia).then(function (m) { mudou = m; }) : null; })
+        .then(P.carregarAlunos).then(function () { P.toast("Dados de " + P.first(d.nome) + " salvos." + (mudou.length ? " A mensalidade em aberto passou para " + mudou.join(" e ") + "." : "")); P.abrirAluno(a.id); })
         .catch(function (e2) { $('[type="submit"]', f).classList.remove("loading"); P.erro(e2); });
     };
     $('[data-k="faixa"]', f).disabled = true;

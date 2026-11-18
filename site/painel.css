@@ -576,3 +576,11 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 
 /* Alunos: o dia do vencimento direto na lista */
 .venc-sel .sel { height: 32px; min-width: 76px; padding: 0 6px; font-size: 12.5px; }
+
+/* Estoque: foto do item */
+.es-foto-mini { background-size: cover !important; background-position: center !important; }
+.es-foto-row { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+.es-foto-prev { display: grid; place-items: center; width: 72px; height: 72px; flex-shrink: 0; border-radius: 12px; overflow: hidden; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); }
+.es-foto-prev img { width: 100%; height: 100%; object-fit: cover; }
+.es-foto-prev .es-ic { width: 44px; height: 44px; background-size: 26px; }
+.es-foto .msg-acts { margin: 0; }

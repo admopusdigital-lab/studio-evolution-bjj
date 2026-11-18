@@ -436,6 +436,7 @@
   var rz;
   window.addEventListener("resize", function () { clearTimeout(rz); rz = setTimeout(function () { if (P.atual() === "fin" && aba === "geral" && ok) paintGeral(); }, 200); });
 
+  P.recarregarFin = function () { return carregar().catch(function () {}); };
   P.aoAbrir("fin", function () { carregar().catch(function (e) { P.erro(e, "Não deu para carregar o Financeiro"); }); });
   /* pagou, editou ou lançou valor pela ficha do aluno com o Financeiro na tela: recarrega a lista */
   P.aoFecharFicha(function (aba) { if (aba === "fin") carregar().catch(function () {}); });

@@ -57,7 +57,7 @@
     var cats = Object.keys(CAT).filter(function (k) { return PROD.some(function (p) { return p.categoria === k; }); });
     $("#esChips").innerHTML = ["todos"].concat(cats).map(function (k) { return '<button type="button" data-c="' + k + '" aria-pressed="' + (catF === k) + '">' + (k === "todos" ? "Tudo" : CAT[k]) + "</button>"; }).join("");
     $("#esTbl tbody").innerHTML = vis.map(function (p) {
-      return '<tr data-id="' + p.id + '"' + (p.ativo ? "" : ' class="off"') + '><td><div class="nm"><span class="es-ic ' + p.categoria + '" aria-hidden="true"></span><div><b>' + esc(nomeP(p)) + "</b><small>" + CAT[p.categoria] + (p.ativo ? "" : " · fora da loja") + "</small></div></div></td>" +
+      return '<tr data-id="' + p.id + '"' + (p.ativo ? "" : ' class="off"') + '><td><div class="nm">' + (p.foto ? '<span class="es-ic es-foto-mini" aria-hidden="true" style="background-image:url(&quot;' + esc(p.foto) + '&quot;)"></span>' : '<span class="es-ic ' + p.categoria + '" aria-hidden="true"></span>') + '<div><b>' + esc(nomeP(p)) + "</b><small>" + CAT[p.categoria] + (p.ativo ? "" : " · fora da loja") + "</small></div></div></td>" +
         '<td><span class="pill-s">' + esc(p.tamanho) + '</span></td><td class="num">' + P.brl(p.preco) + "</td>" +
         '<td><div class="es-qtd"><button type="button" data-menos aria-label="Tirar uma peça"' + (p.quantidade ? "" : " disabled") + '>−</button><b' + (p.quantidade === 0 ? ' class="zero"' : "") + ">" + p.quantidade + '</b><button type="button" data-mais aria-label="Pôr uma peça">+</button></div></td>' +
         '<td class="act"><div class="row-acts">' + (p.quantidade ? '<button class="mini-btn" type="button" data-vende>Vender</button>' : "") + '<button class="mini-btn ghost" type="button" data-edita>Editar</button></div></td></tr>';
@@ -73,6 +73,11 @@
   function formHTML(p) {
     p = p || {};
     return '<p class="fin-k">' + (p.id ? "Editar " + esc(nomeP(p)) + " · " + esc(p.tamanho) : "Novo item no estoque") + "</p><div class=\"crm-grid\">" +
+      '<div class="crm-f wide es-foto"><span>Foto <small>(opcional: aparece na loja do app e vale para todos os tamanhos)</small></span><div class="es-foto-row">' +
+      '<span class="es-foto-prev">' + (p.foto ? '<img src="' + esc(p.foto) + '" alt="">' : '<span class="es-ic ' + (p.categoria || "kimono") + '" aria-hidden="true"></span>') + "</span>" +
+      '<div class="msg-acts"><button class="mini-btn ghost" type="button" data-foto-escolhe>' + (p.foto ? "Trocar foto" : "Escolher foto") + "</button>" +
+      '<button class="mini-btn ghost" type="button" data-foto-tira' + (p.foto ? "" : " hidden") + ">Tirar foto</button></div></div>" +
+      '<input type="file" accept="image/*" hidden data-foto-in></div>' +
       '<label class="crm-f"><span>Produto</span><input class="crm-in" data-f="nome" placeholder="Kimono Evolution" autocomplete="off" value="' + esc(p.nome || "") + '"></label>' +
       '<label class="crm-f"><span>Tipo</span><select class="sel" data-f="categoria">' + Object.keys(CAT).map(function (k) { return '<option value="' + k + '"' + (p.categoria === k ? " selected" : "") + ">" + CAT[k] + "</option>"; }).join("") + "</select></label>" +
       '<label class="crm-f"><span>Cor <small>(opcional)</small></span><input class="crm-in" data-f="cor" placeholder="Branco" autocomplete="off" value="' + esc(p.cor || "") + '"></label>' +
@@ -86,6 +91,49 @@
       '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">' + (p.id ? "Salvar" : "Adicionar ao estoque") + '</button><button class="mini-btn ghost" type="button" data-cancel>Cancelar</button>' +
       (p.id ? '<button class="mini-btn ghost" type="button" data-apaga>Apagar do estoque</button>' : "") + "</div>";
   }
+  /* a foto escolhida no formulário: reduzida no aparelho e enviada só ao salvar */
+  function ligaFoto(f, atual) {
+    f._foto = { blob: null, tirar: false, atual: atual || null };
+    var inp = $("[data-foto-in]", f), prev = $(".es-foto-prev", f), tira = $("[data-foto-tira]", f), esc1 = $("[data-foto-escolhe]", f);
+    esc1.onclick = function () { inp.click(); };
+    inp.onchange = function () {
+      var file = inp.files && inp.files[0];
+      inp.value = "";
+      if (!file) return;
+      esc1.classList.add("loading");
+      Fotos.reduzLivre(file).then(function (b) {
+        f._foto.blob = b; f._foto.tirar = false;
+        prev.innerHTML = '<img src="' + URL.createObjectURL(b) + '" alt="">';
+        esc1.textContent = "Trocar foto"; tira.hidden = false;
+      }, function (er) { P.toast(er.message); }).then(function () { esc1.classList.remove("loading"); });
+    };
+    tira.onclick = function () {
+      f._foto.blob = null; f._foto.tirar = true;
+      prev.innerHTML = '<span class="es-ic ' + ($('[data-f="categoria"]', f).value || "kimono") + '" aria-hidden="true"></span>';
+      esc1.textContent = "Escolher foto"; tira.hidden = true;
+    };
+  }
+  /* envia a foto ao bucket público "loja" e devolve o endereço */
+  function enviaFoto(blob) {
+    var nome = Date.now().toString(36) + Math.random().toString(36).slice(2, 7) + ".jpg";
+    return P.db.then(function (sb) {
+      return sb.storage.from("loja").upload(nome, blob, { contentType: "image/jpeg", cacheControl: "31536000", upsert: false }).then(function (r) {
+        if (r.error) throw r.error;
+        return sb.storage.from("loja").getPublicUrl(nome).data.publicUrl;
+      });
+    });
+  }
+  function apagaFoto(url) {
+    var k = url && String(url).split("/object/public/loja/")[1];
+    if (!k) return;
+    P.db.then(function (sb) { return sb.storage.from("loja").remove([decodeURIComponent(k)]); }).catch(function () {});
+  }
+  /* a foto que vai para o banco: a nova (enviada agora), nenhuma (tirou) ou a de antes */
+  function fotoFinal(f) {
+    var st = f._foto || {};
+    if (st.blob) return enviaFoto(st.blob);
+    return Promise.resolve(st.tirar ? null : st.atual);
+  }
   function ler(f) {
     var g = function (k) { var el = $('[data-f="' + k + '"]', f); return el ? (el.type === "checkbox" ? el.checked : el.value.trim()) : null; };
     return { nome: g("nome").replace(/\s+/g, " "), categoria: g("categoria"), cor: g("cor") || null, preco: P.num(g("preco")), descricao: g("descricao") || null,
@@ -93,7 +141,7 @@
   }
   add.addEventListener("click", function () {
     if (!form.hidden) { form.hidden = true; add.setAttribute("aria-expanded", "false"); return; }
-    form.innerHTML = formHTML(); form.hidden = false; add.setAttribute("aria-expanded", "true"); P.aparece(form); P.focusSoft($('[data-f="nome"]', form));
+    form.innerHTML = formHTML(); ligaFoto(form, null); form.hidden = false; add.setAttribute("aria-expanded", "true"); P.aparece(form); P.focusSoft($('[data-f="nome"]', form));
   });
   form.addEventListener("click", function (e) { if (e.target.closest("[data-cancel]")) { form.hidden = true; add.setAttribute("aria-expanded", "false"); P.focusSoft(add); } });
   form.addEventListener("submit", function (e) {
@@ -108,7 +156,10 @@
     if (!(qt >= 0 && qt <= 999)) return P.erroForm(form, el("quantidade"), "Quantidade de 0 a 999.");
     var rows = tams.map(function (t) { return { nome: d.nome, categoria: d.categoria, cor: d.cor, preco: d.preco, descricao: d.descricao, tamanho: t, quantidade: qt }; });
     $('[type="submit"]', form).classList.add("loading");
-    P.q(function (sb) { return sb.from("produtos").insert(rows); }).then(carregar).then(function () {
+    fotoFinal(form).then(function (url) {
+      if (url) rows.forEach(function (r) { r.foto = url; });
+      return P.q(function (sb) { return sb.from("produtos").insert(rows); });
+    }).then(carregar).then(function () {
       form.hidden = true; add.setAttribute("aria-expanded", "false");
       P.toast(d.nome + (rows.length > 1 ? " em " + rows.length + " tamanhos" : "") + " no estoque." + (qt ? " A loja já aparece no app." : ""));
     }).catch(function (er) { $('[type="submit"]', form).classList.remove("loading"); P.erro(er); });
@@ -119,6 +170,7 @@
     var dr = P.abrirFicha('<form class="crm-form" id="esEd" novalidate>' + formHTML(p) + "</form>", nomeP(p));
     $("#drSub").textContent = CAT[p.categoria] + " · tamanho " + p.tamanho;
     var f = $("#esEd", dr);
+    ligaFoto(f, p.foto);
     f.onsubmit = function (e) {
       e.preventDefault();
       var d = ler(f), el = function (k) { return $('[data-f="' + k + '"]', f); }, qt = parseInt(d.quantidade, 10);
@@ -127,7 +179,20 @@
       if (!d.tamanho) return P.erroForm(f, el("tamanho"), "Digite o tamanho, como A2 ou M.");
       if (!(qt >= 0 && qt <= 999)) return P.erroForm(f, el("quantidade"), "Quantidade de 0 a 999.");
       $('[type="submit"]', f).classList.add("loading");
-      P.q(function (sb) { return sb.from("produtos").update({ nome: d.nome, categoria: d.categoria, cor: d.cor, preco: d.preco, descricao: d.descricao, tamanho: d.tamanho.toUpperCase().slice(0, 12), quantidade: qt, ativo: !!d.ativo }).eq("id", p.id); })
+      var trocou = !!(f._foto.blob || f._foto.tirar);
+      fotoFinal(f).then(function (url) {
+        var dados = { nome: d.nome, categoria: d.categoria, cor: d.cor, preco: d.preco, descricao: d.descricao, tamanho: d.tamanho.toUpperCase().slice(0, 12), quantidade: qt, ativo: !!d.ativo };
+        if (trocou) dados.foto = url;  /* sem trocar a foto, nem manda o campo (funciona mesmo antes da atualização do banco) */
+        return P.q(function (sb) { return sb.from("produtos").update(dados).eq("id", p.id); })
+          .then(function () {
+            if (!trocou) return;
+            /* a foto vale para todos os tamanhos do mesmo produto e cor */
+            return P.q(function (sb) {
+              var q = sb.from("produtos").update({ foto: url }).eq("nome", p.nome);
+              return p.cor ? q.eq("cor", p.cor) : q.is("cor", null);
+            }).then(function () { if (p.foto && p.foto !== url) apagaFoto(p.foto); });
+          });
+      })
         .then(carregar).then(function () { P.fecharFicha(); P.toast("Item salvo."); })
         .catch(function (er) { $('[type="submit"]', f).classList.remove("loading"); P.erro(er); });
     };
