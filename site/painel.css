@@ -589,3 +589,22 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .ficha-list li[data-mens] { flex-wrap: wrap; }
 .mens-ed { flex-basis: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; margin-top: 10px; }
 .mens-ed .msg-acts { grid-column: 1 / -1; margin: 0; }
+
+/* Equipe: usuários de gestão e as áreas que cada um vê */
+.dash-side button[hidden] { display: none !important; }
+.eq-l { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
+.eq-p { padding: 14px 16px; border: 1px solid var(--rule); border-radius: 14px; }
+.eq-p.off { opacity: .6; }
+.eq-top { display: flex; align-items: center; gap: 12px; }
+.eq-top > div { flex: 1; min-width: 0; }
+.eq-top b { display: block; }
+.eq-top small { display: block; color: var(--ink-2); font-size: 12px; }
+.eq-areas { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.eq-area { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1px solid var(--rule); border-radius: 999px; font-size: 12.5px; cursor: pointer; }
+.eq-area:has(input:checked) { border-color: var(--gold); background: color-mix(in oklch, var(--gold) 14%, transparent); }
+.eq-area input { accent-color: var(--gold); }
+.eq-salvo { margin: 8px 0 0; font-size: 12px; min-height: 1em; }
+.eq-cred { margin-top: 14px; }
+.eq-cred { padding: 14px 16px; border: 1px solid color-mix(in oklch, var(--gold) 55%, var(--rule)); border-radius: 14px; background: color-mix(in oklch, var(--gold) 8%, transparent); font-size: 13px; }
+.eq-cred code { padding: 1px 6px; border-radius: 5px; background: var(--paper-2); font-size: 13px; }
+.eq-cred p { margin: 6px 0; }

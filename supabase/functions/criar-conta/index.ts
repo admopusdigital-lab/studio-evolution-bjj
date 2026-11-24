@@ -1,6 +1,7 @@
 // Studio Evolution BJJ · função criar-conta (Supabase Edge Function)
 // Chamada pela página acessos.html. Só um professor ativo pode usar:
-//   { acao: "criar", nome, email, whatsapp?, papel: "aluno" | "professor" } → cria a conta e o perfil
+//   { acao: "criar", nome, email, whatsapp?, papel: "aluno" | "professor" | "gestao", permissoes? } → cria a conta e o perfil
+//     (gestao: usuário da equipe com as áreas do painel em permissoes, ex.: ["financeiro", "alunos"])
 //   { acao: "nova-senha", email }                                         → gera uma senha provisória nova
 // Responde { email, nome, senha } com a senha provisória, que o professor manda pelo WhatsApp.
 // Deploy: supabase functions deploy criar-conta --no-verify-jwt  (a função confere o login ela mesma)
@@ -77,7 +78,11 @@ Deno.serve(async (req) => {
 
   if (acao !== "criar") return resposta({ erro: "Ação desconhecida." }, 400);
   const nome = String(corpo.nome ?? "").trim();
-  const papel = corpo.papel === "professor" ? "professor" : "aluno";
+  const papel = corpo.papel === "professor" ? "professor" : corpo.papel === "gestao" ? "gestao" : "aluno";
+  const AREAS = ["hoje", "alunos", "graduacoes", "ranking", "movimentos", "interessados", "financeiro", "estoque", "configuracoes"];
+  const permissoes = papel === "gestao" && Array.isArray(corpo.permissoes)
+    ? [...new Set((corpo.permissoes as unknown[]).map(String).filter((a) => AREAS.includes(a)))]
+    : [];
   let whatsapp = String(corpo.whatsapp ?? "").replace(/\D/g, "");
   if (whatsapp.length === 10 || whatsapp.length === 11) whatsapp = "55" + whatsapp;
   if (nome.length < 3) return resposta({ erro: "Digite o nome completo." }, 400);
@@ -99,6 +104,7 @@ Deno.serve(async (req) => {
     papel,
     nome,
     whatsapp: whatsapp || null,
+    ...(papel === "gestao" ? { permissoes, email } : {}),
   });
   if (erroPerfil) {
     // sem perfil a conta não entra: desfaz para não sobrar conta órfã

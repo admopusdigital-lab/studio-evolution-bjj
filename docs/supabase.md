@@ -178,3 +178,15 @@ O aluno que esqueceu a senha cria uma nova na tela de entrada, confirmando o e-m
 Travas: só contas de aluno ativas (professor nunca), no máximo 5 erros por e-mail e 20 tentativas por rede por hora,
 e a mesma resposta para e-mail inexistente e dados errados. Aluno sem data de nascimento ou WhatsApp no cadastro não
 consegue: o professor completa a ficha (Editar dados) ou gera uma senha nova pela ficha.
+
+## Equipe: usuários de gestão com permissões
+
+O professor cria acessos de gestão na aba **Equipe** do painel e marca o que cada pessoa pode ver e mexer
+(Hoje e Modo tatame, Alunos, Graduações, Ranking, Movimentos, Interessados, Financeiro, Estoque e loja, Configurações).
+A regra vale no banco: sem a área, os dados dela não saem do servidor. Toda a equipe lê o cadastro dos alunos, as
+presenças e as graduações (aparecem em quase todas as telas); mudar qualquer coisa pede a área. A Equipe e os Acessos
+são só do professor. A pessoa entra em /entrar escolhendo "Sou professor".
+
+1. Rodar `supabase/migrations/20261124120000_equipe_gestao.sql` no SQL Editor.
+2. Atualizar a função `criar-conta` (Edge Functions → criar-conta → colar `supabase/functions/criar-conta/index.ts`
+   → Deploy), para ela criar o papel `gestao` com as permissões.

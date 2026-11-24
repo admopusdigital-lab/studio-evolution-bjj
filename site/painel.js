@@ -153,8 +153,8 @@
   };
   /* o SQL de 03/11 (faixas do Kids, aulas antes do app, reserva em 48 h e ranking no app) */
   /* o SQL mais novo que o painel precisa (o plano família); os anteriores já foram rodados */
-  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261119120000_loja_fotos.sql";
-  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto|foto|tecnicas|vencimento_check|produtos_foto|Bucket not found/.test(m); };
+  P.SQL_ATUALIZA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261124120000_equipe_gestao.sql";
+  P.faltaAtualizar = function (e) { var m = (e && (e.message || "")) + " " + (e && e.code || ""); return /aulas_antes|responsavel_conta|faixa_check|42703|42P01|PGRST205|ranking_frequencia|produtos|cobrancas|pedidos_loja|vender_produto|foto|tecnicas|vencimento_check|produtos_foto|Bucket not found|permissoes|perfis_papel_check/.test(m); };
   P.avisoBanco = function () {
     var el = $("#dbAviso");
     if (!el || !el.hidden) return;
@@ -174,8 +174,19 @@
   var ses = Acesso.sessao();
   if (ses && ses.nome) {
     $("#whoAv").textContent = P.ini(ses.nome);
-    $("#whoNome").innerHTML = P.esc(ses.nome) + "<br><small>Professor · Studio Evolution</small>";
+    $("#whoNome").innerHTML = P.esc(ses.nome) + "<br><small>" + (ses.papel === "gestao" ? "Equipe" : "Professor") + " · Studio Evolution</small>";
   }
+
+  /* ---------- quem pode o quê: o professor vê tudo; o usuário de gestão, só as áreas que o professor liberou.
+     A regra de verdade está no banco (privado.pode); aqui o painel só mostra as abas certas ---------- */
+  P.papel = (ses && ses.papel) || "professor";
+  P.permissoes = [];
+  P.AREAS = [["hoje", "Hoje e Modo tatame"], ["alunos", "Alunos"], ["graduacoes", "Graduações"], ["ranking", "Ranking"], ["movimentos", "Movimentos"],
+    ["interessados", "Interessados"], ["financeiro", "Financeiro"], ["estoque", "Estoque e loja"], ["configuracoes", "Configurações"]];
+  var AREA_ABA = { hoje: "hoje", tatame: "hoje", alunos: "alunos", grad: "graduacoes", rank: "ranking", mov: "movimentos", leads: "interessados", fin: "financeiro", estoque: "estoque", config: "configuracoes", equipe: "dono" };
+  P.ehDono = function () { return P.papel !== "gestao"; };
+  P.pode = function (area) { if (P.ehDono()) return true; return area !== "dono" && P.permissoes.indexOf(area) >= 0; };
+  P.podeAba = function (aba) { var ar = AREA_ABA[aba]; return !ar || P.pode(ar); };
 
   /* ---------- tema (o botão do topo) ---------- */
   var pnLook = $("#pnLook");
@@ -189,7 +200,34 @@
   var views = $$(".dv"), side = $$(".dash-side button[data-go]"), cur = "hoje", aoAbrir = {};
   P.aoAbrir = function (nome, fn) { (aoAbrir[nome] = aoAbrir[nome] || []).push(fn); };
   P.atual = function () { return cur; };
+  /* esconde as abas que a pessoa não pode ver (e o link de Acessos, que é só do professor) */
+  function aplicaPermissoes() {
+    side.forEach(function (b) { b.hidden = !P.podeAba(b.dataset.go); });
+    var ac = $('.pn-nav a[href="acessos.html"], a[href="acessos.html"]');
+    if (ac) ac.hidden = !P.ehDono();
+  }
+  aplicaPermissoes();
+  P.carregarPermissoes = function () {
+    if (P.ehDono()) return Promise.resolve();
+    return P.db.then(function (sb) {
+      return sb.auth.getUser().then(function (u) {
+        var id = u && u.data && u.data.user && u.data.user.id;
+        return id ? sb.from("perfis").select("papel, permissoes").eq("id", id).maybeSingle() : { data: null };
+      });
+    }).then(function (r) {
+      var p = r && r.data;
+      if (p && p.papel === "professor") P.papel = "professor";
+      P.permissoes = (p && p.permissoes) || [];
+      aplicaPermissoes();
+    }).catch(function () { aplicaPermissoes(); });
+  };
   P.go = function (nome, foco) {
+    /* aba sem permissão: vai para a primeira liberada */
+    if (!P.podeAba(nome)) {
+      var livre = side.filter(function (b) { return P.podeAba(b.dataset.go); })[0];
+      if (!livre) { P.semAreas(); return; }
+      nome = livre.dataset.go;
+    }
     P.fecharFicha();
     cur = nome;
     views.forEach(function (v) { v.classList.toggle("on", v.dataset.v === nome); });
@@ -312,6 +350,13 @@
   /* ---------- volta para a aba em que estava ---------- */
   var aba = null;
   try { aba = sessionStorage.getItem("evo-painel-aba"); } catch (e) {}
+  /* usuário de gestão sem nenhuma área liberada */
+  P.semAreas = function () {
+    views.forEach(function (v) { v.classList.remove("on"); });
+    var m = $(".dash-main"), av = $("#semAreas");
+    if (!av) { av = document.createElement("div"); av.id = "semAreas"; av.className = "empty-big"; m.appendChild(av); }
+    av.innerHTML = "<b>Ainda sem áreas liberadas.</b>Peça ao professor para marcar, na aba Equipe, o que você pode ver no painel.";
+  };
   P.iniciar = function () {
     P.db.then(function (sb) { return sb.from("perfis").select("id").eq("papel", "professor"); }).then(function (r) {
       (r && r.data || []).forEach(function (x) { P.contasProf[x.id] = true; });
@@ -319,7 +364,7 @@
     /* o banco já recebeu a atualização de 03/11? (a coluna aulas_antes existe) */
     P.db.then(function (sb) { return Promise.all([sb.from("alunos").select("aulas_antes, responsavel_conta, foto").limit(1), sb.from("tecnicas_semana").select("id").limit(1)]); })
       .then(function (rs) { if (rs.some(function (r) { return r && r.error && P.faltaAtualizar(r.error); })) P.avisoBanco(); }).catch(function () {});
-    return Promise.all([P.carregarAlunos(), P.carregarPresencas()]).catch(function (e) { P.erro(e, "Não deu para carregar os dados"); })
+    return P.carregarPermissoes().then(function () { return Promise.all([P.carregarAlunos(), P.carregarPresencas()]); }).catch(function (e) { P.erro(e, "Não deu para carregar os dados"); })
       .then(function () { P.go(aba && $('.dv[data-v="' + aba + '"]') ? aba : "hoje"); });
   };
   /* os outros arquivos registram as abas; o início roda depois de todos carregarem */

@@ -434,7 +434,7 @@
       var html =
         (cred ? '<div class="cred"><b>Acesso ao app ' + (cred.reenvio ? "com senha nova" : "criado") + "</b><p>E-mail: <code>" + esc(cred.email) + "</code><br>Senha provisória: <code>" + esc(cred.senha) + '</code></p><div class="msg-acts">' +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-envia>Mandar pelo WhatsApp</button>' : "") + '<button class="mini-btn ghost" type="button" data-copia>Copiar mensagem</button></div><p class="muted" style="margin-top:6px;font-size:12px">A senha aparece só agora. Depois de entrar, o aluno pode trocar em "Esqueci a senha".</p></div>' : "") +
-        fotoHTML(a) +
+        (P.pode("alunos") ? fotoHTML(a) : "") +
         '<div class="ficha-sec"><h5>Dados</h5><dl class="ficha-dl">' +
           (a.responsavel ? "<dt>Responsável</dt><dd>" + esc(a.responsavel) + "</dd>" : "") +
           (idade !== null ? "<dt>Idade</dt><dd>" + idade + " anos</dd>" : "") +
@@ -446,10 +446,10 @@
           (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
         "</dl></div>" +
         '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + foraHTML(a, grads[0]) + "</div>" +
-        '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return mensLi(a, m); }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
-        outrosHTML(a, cobs) +
+        (!P.pode("financeiro") ? "" : '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return mensLi(a, m); }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" ) +
+        (P.pode("financeiro") ? outrosHTML(a, cobs) : "") +
         '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return '<li data-grad="' + g.id + '"><span>' + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + '</span><span class="row-acts">' + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + '<button class="mini-btn ghost" type="button" data-grad-apaga>Apagar</button></span></li>'; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
-        familiaHTML(a) +
+        (P.pode("alunos") ? familiaHTML(a) : "") +
         '<form class="crm-form" id="frAntes" novalidate hidden>' +
           '<p class="fin-k">Aulas no Studio antes do app</p>' +
           '<p class="muted" style="font-size:13px;margin:4px 0 10px">Quantas aulas ' + esc(P.first(a.nome)) + " fez aqui no Studio Evolution antes de usar o app, desde o último grau (na faixa e grau de hoje). Somam no total e nas aulas desde o último grau, no painel e no app do aluno.</p>" +
@@ -459,12 +459,12 @@
         "</form>" +
         '<form class="crm-form" id="frEdit" novalidate hidden></form>' +
         '<div class="ficha-sec msg-acts">' +
-          '<button class="mini-btn" type="button" data-edit>Editar dados</button>' +
-          '<button class="mini-btn ghost" type="button" data-grau>Registrar grau</button>' +
-          '<button class="mini-btn ghost" type="button" data-antes aria-expanded="false">Aulas no Studio antes do app' + (antes ? " · " + antes : "") + "</button>" +
+          (P.pode("alunos") ? '<button class="mini-btn" type="button" data-edit>Editar dados</button>' : "") +
+          (P.pode("graduacoes") ? '<button class="mini-btn ghost" type="button" data-grau>Registrar grau</button>' : "") +
+          (!P.pode("alunos") ? "" : '<button class="mini-btn ghost" type="button" data-antes aria-expanded="false">Aulas no Studio antes do app' + (antes ? " · " + antes : "") + "</button>" ) +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
-          (a.email ? '<button class="mini-btn ghost" type="button" data-acesso>' + (a.conta ? "Senha nova do app" : "Criar acesso ao app") + "</button>" : "") +
-          '<button class="mini-btn ghost" type="button" data-ativo>' + (a.ativo ? "Desativar aluno" : "Reativar aluno") + "</button>" +
+          (a.email && P.pode("alunos") ? '<button class="mini-btn ghost" type="button" data-acesso>' + (a.conta ? "Senha nova do app" : "Criar acesso ao app") + "</button>" : "") +
+          (P.pode("alunos") ? '<button class="mini-btn ghost" type="button" data-ativo>' + (a.ativo ? "Desativar aluno" : "Reativar aluno") + "</button>" : "") +
         "</div>";
       $(".dr-body", dr).innerHTML = html;
       ligaOutros(a, dr);

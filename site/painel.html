@@ -155,6 +155,7 @@ body.pr { background: var(--paper); }
       <button type="button" data-go="fin" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin" hidden></span></button>
       <button type="button" data-go="estoque" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-box"/></svg>Estoque<span class="badge" id="bEst" hidden></span></button>
       <button type="button" data-go="config" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-gear"/></svg>Configurações</button>
+      <button type="button" data-go="equipe" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-users"/></svg>Equipe</button>
       <div class="who"><span class="av" id="whoAv">··</span><span id="whoNome">Professor<br><small>Studio Evolution</small></span></div>
     </nav>
     <div class="dash-main">
@@ -336,6 +337,15 @@ body.pr { background: var(--paper); }
         <div class="empty-big" id="esEmpty" hidden></div>
       </section>
 
+      <!-- Equipe (só o professor): usuários de gestão e o que cada um pode ver -->
+      <section class="dv" data-v="equipe" aria-labelledby="t-equipe">
+        <div class="dv-h"><div><p class="dv-k" id="eqK"></p><h3 id="t-equipe">Equipe</h3></div><p>Acessos de gestão ao painel. Marque o que cada pessoa pode ver e mexer: o resto fica fechado, inclusive no servidor.</p></div>
+        <div class="crm-bar"><button class="mini-btn crm-add" type="button" id="eqAdd" aria-expanded="false" aria-controls="eqForm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Adicionar pessoa</button></div>
+        <form class="crm-form" id="eqForm" novalidate hidden></form>
+        <div class="cred eq-cred" id="eqCred" hidden></div>
+        <div id="eqBox"><ul class="eq-l" id="eqL"></ul></div>
+      </section>
+
       <section class="dv" data-v="config" aria-labelledby="t-config">
         <div class="dv-h"><div><p class="dv-k">Do Studio</p><h3 id="t-config">Configurações</h3></div></div>
         <div id="cfgBox"></div>
@@ -358,6 +368,7 @@ body.pr { background: var(--paper); }
 <script src="painel-mov.js"></script>
 <script src="painel-tecnicas.js"></script>
 <script src="painel-grau.js"></script>
+<script src="painel-equipe.js"></script>
 <script src="painel-rank.js"></script>
 <script src="painel-estoque.js"></script>
 </body>

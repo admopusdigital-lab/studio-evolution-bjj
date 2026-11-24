@@ -16,6 +16,7 @@
      As vitrines (area-do-aluno.html e area-do-professor.html) continuam abertas para quem tem login */
   /* no modo Supabase, o professor vai para o painel de verdade (painel.html); na demonstração, para o painel de exemplo */
   var AREA = { aluno: "app.html", professor: REAL ? "painel.html" : "area-do-professor.html?painel" };
+  AREA.gestao = AREA.professor;  /* usuário de gestão (equipe): o mesmo painel, só com as áreas liberadas pelo professor */
   var DEMO_SENHA = "evolution";
 
   /* armazenamento: sessionStorage por padrão, localStorage com "Manter conectado"; aba privada sem nenhum dos dois não quebra */
@@ -43,7 +44,7 @@
     if (REAL && !ler(TOKEN)) return null;
     return s;
   }
-  function permite(papel, area) { return papel === area || (area === "aluno" && papel === "professor"); }
+  function permite(papel, area) { return papel === area || (area === "aluno" && papel === "professor") || (area === "professor" && papel === "gestao"); }
 
   /* a biblioteca do Supabase só baixa no modo Supabase, e uma vez só */
   var cliente = null, carregando = null;
