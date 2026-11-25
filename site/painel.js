@@ -137,6 +137,8 @@
   /* fotos dos alunos: troca as iniciais pela foto em qualquer lista do painel */
   if (window.Fotos && Acesso.real) Fotos.liga(P.db);
   /* uma consulta: devolve os dados ou falha com a mensagem do banco */
+  /* o banco ainda não tem a coluna (migração pendente): PostgREST responde PGRST204 */
+  P.semColuna = function (e) { return !!e && (/PGRST204/.test(e.code || "") || /column .* does not exist|schema cache/i.test(e.message || "")); };
   P.q = function (fn) {
     return P.db.then(fn).then(function (r) { if (r && r.error) throw r.error; return r ? r.data : null; });
   };

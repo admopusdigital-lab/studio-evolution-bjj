@@ -208,3 +208,12 @@ não tem login; gravar continua só com o professor (ou a equipe com a área Con
 
 1. Rodar `supabase/migrations/20261125130000_grade_aulas.sql` no SQL Editor (pode rodar mais de uma vez).
    Sem ela, o painel já salva, mas o site e o app do aluno continuam com a grade padrão.
+
+## Autorização do responsável (Kids)
+
+No cadastro de criança, o painel pede a autorização do responsável (LGPD, art. 14) e guarda quando e quem
+autorizou; a ficha mostra "Autorização: falta registrar" para as crianças cadastradas antes. A política de
+privacidade está em `site/privacidade.html` (link no rodapé do site e em Perfil, no app).
+
+1. Rodar `supabase/migrations/20261125140000_consentimento_kids.sql` no SQL Editor (pode rodar mais de uma vez).
+   Sem ela, o aluno é cadastrado normalmente, mas a autorização não fica guardada (o painel avisa).

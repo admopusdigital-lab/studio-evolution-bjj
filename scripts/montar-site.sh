@@ -13,7 +13,7 @@ printf 'User-agent: *\nAllow: /\nDisallow: /app\nDisallow: /entrar\nDisallow: /a
 {
   echo '<?xml version="1.0" encoding="UTF-8"?>'
   echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-  for pg in "" aulas agendamento contato perguntas; do echo "  <url><loc>$DOMINIO/$pg</loc></url>"; done
+  for pg in "" aulas agendamento contato perguntas privacidade; do echo "  <url><loc>$DOMINIO/$pg</loc></url>"; done
   echo '</urlset>'
 } > _site/sitemap.xml
 echo "Site montado em _site/ ($(du -sh _site | cut -f1))"

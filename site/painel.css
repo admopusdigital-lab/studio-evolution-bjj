@@ -731,3 +731,4 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .grd-d input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
 @media (max-width: 760px) { .grd-r { grid-template-columns: minmax(0, 1fr) 110px; } .grd-d { grid-column: 1 / -1; } .grd-r [data-grd-rm] { grid-column: 1 / -1; justify-self: start; } }
 @media (pointer: coarse) { .grd-d span { height: 40px; min-width: 44px; } }
+.warn-tx { color: var(--warn); font-weight: 600; }

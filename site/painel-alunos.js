@@ -104,6 +104,11 @@
       '<label class="crm-f wide"><span>Anotação <small>(opcional)</small></span><textarea class="crm-in" data-k="nota" rows="2">' + v("nota") + "</textarea></label>" +
       (pre.responsavel_conta ? '<input type="hidden" data-k="responsavel_conta" value="' + esc(pre.responsavel_conta) + '"><p class="muted wide" style="font-size:12.5px">Vai entrar no plano família de <b>' + esc(pre.titular || "") + "</b>: a conta do app dele marca as aulas e faz o check-in.</p>" : "") +
       "</div>" +
+      /* Kids: a autorização do responsável (LGPD, art. 14) fica registrada com a data */
+      '<label class="mf-pub f-kid"><input type="checkbox" data-k="consentimento"' + (a.consentimento_em ? " checked disabled" : "") + "><span>" +
+        (a.consentimento_em ? "Autorização do responsável registrada em " + P.dataBRano(a.consentimento_em) + (a.consentimento_por ? " (" + esc(a.consentimento_por) + ")" : "")
+          : "O responsável autorizou o cadastro da criança e o uso dos dados e da foto pelo Studio (LGPD, art. 14)") +
+        ' · <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a></span></label>' +
       (a.id ? "" : '<div class="crm-grid" style="margin-top:4px"><label class="crm-f"><span>Taxa de matrícula (R$) <small>(opcional)</small></span><input class="crm-in" data-k="taxa" inputmode="decimal" placeholder="0" autocomplete="off"></label></div>' +
         '<label class="mf-pub"><input type="checkbox" data-k="mens1" checked><span>Lançar a mensalidade deste mês no Financeiro</span></label>' +
         '<label class="mf-pub"><input type="checkbox" data-k="app"' + (pre.email ? " checked" : "") + '><span>Criar o acesso ao app <small>(precisa do e-mail; no Kids, a conta é do responsável)</small></span></label>') +
@@ -137,13 +142,14 @@
         faixa: g("faixa"), graus: +g("graus"), mensalidade: val ? P.num(val) : null, vencimento: +g("vencimento"), inicio: g("inicio") || P.hoje(),
         nota: g("nota") || null, responsavel_conta: g("responsavel_conta") || undefined, aulas_antes: g("aulas_antes") ? parseInt(g("aulas_antes").replace(/\D/g, ""), 10) || 0 : 0
       },
-      foneTxt: g("whatsapp"), mens1: g("mens1"), app: g("app"), taxa: g("taxa") ? P.num(g("taxa")) : 0
+      foneTxt: g("whatsapp"), mens1: g("mens1"), app: g("app"), taxa: g("taxa") ? P.num(g("taxa")) : 0, consent: !!g("consentimento")
     };
   }
   function validar(f, x) {
     var d = x.d, el = function (k) { return $('[data-k="' + k + '"]', f); };
     if (d.nome.length < 3) return P.erroForm(f, el("nome"), "Digite o nome completo.");
     if (P.kid(d.turma) && (!d.responsavel || d.responsavel.length < 3)) return P.erroForm(f, el("responsavel"), "No Kids, digite o nome do responsável.");
+    if (P.kid(d.turma) && !f.dataset.editando && !x.consent) return P.erroForm(f, el("consentimento"), "No Kids, marque a autorização do responsável para o cadastro da criança.");
     if (x.foneTxt && !d.whatsapp) return P.erroForm(f, el("whatsapp"), "Confira o WhatsApp: DDD e número, como (15) 99999-9999.");
     if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) return P.erroForm(f, el("email"), "Confira o e-mail.");
     if (x.app && !d.email) return P.erroForm(f, el("email"), "Para criar o acesso ao app, digite o e-mail.");
@@ -188,8 +194,15 @@
     /* só manda o campo quando há aulas antes do app (assim funciona mesmo antes da migração das faixas do Kids) */
     if (x.d.aulas_antes) x.d.aulas_antes_ate = P.hoje(); else delete x.d.aulas_antes;
     if (!x.d.responsavel_conta) delete x.d.responsavel_conta;
+    if (P.kid(x.d.turma) && x.consent) { x.d.consentimento_em = new Date().toISOString(); x.d.consentimento_por = x.d.responsavel; }
     var criado = null;
-    P.q(function (sb) { return sb.from("alunos").insert(x.d).select().single(); }).then(function (novo) {
+    P.q(function (sb) { return sb.from("alunos").insert(x.d).select().single(); }).catch(function (er) {
+      /* banco sem a coluna da autorização (migração de 25/11 ainda não rodou): grava o aluno sem ela e avisa */
+      if (!x.d.consentimento_em || !P.semColuna(er)) throw er;
+      delete x.d.consentimento_em; delete x.d.consentimento_por;
+      setTimeout(function () { P.toast("A autorização do responsável não foi guardada: falta rodar a atualização do banco de 25/11."); }, 3500);
+      return P.q(function (sb) { return sb.from("alunos").insert(x.d).select().single(); });
+    }).then(function (novo) {
       criado = novo;
       var passos = [];
       if (x.mens1 && x.d.mensalidade > 0) {
@@ -437,6 +450,7 @@
         (P.pode("alunos") ? fotoHTML(a) : "") +
         '<div class="ficha-sec"><h5>Dados</h5><dl class="ficha-dl">' +
           (a.responsavel ? "<dt>Responsável</dt><dd>" + esc(a.responsavel) + "</dd>" : "") +
+          (P.kid(a.turma) ? "<dt>Autorização</dt><dd>" + (a.consentimento_em ? "do responsável, em " + P.dataBRano(a.consentimento_em) : '<span class="warn-tx">falta registrar (Editar dados)</span>') + "</dd>" : "") +
           (idade !== null ? "<dt>Idade</dt><dd>" + idade + " anos</dd>" : "") +
           "<dt>WhatsApp</dt><dd>" + (a.whatsapp ? P.fone(a.whatsapp) : "—") + "</dd>" +
           "<dt>E-mail</dt><dd>" + (a.email ? esc(a.email) : "—") + "</dd>" +
@@ -587,6 +601,7 @@
   function editar(a, dr) {
     var f = $("#frEdit", dr);
     f.innerHTML = formHTML(a);
+    f.dataset.editando = "1";
     formSync(f, a);
     f.hidden = false;
     f.onchange = function (e) { if (e.target.dataset.k === "turma" || e.target.dataset.k === "faixa") formSync(f); };
@@ -606,7 +621,12 @@
       else delete d.aulas_antes;
       $('[type="submit"]', f).classList.add("loading");
       var novoDia = d.vencimento && d.vencimento !== (a.vencimento || 10) ? d.vencimento : 0, mudou = [];
-      P.q(function (sb) { return sb.from("alunos").update(d).eq("id", a.id); })
+      if (P.kid(d.turma) && x.consent && !a.consentimento_em) { d.consentimento_em = new Date().toISOString(); d.consentimento_por = d.responsavel; }
+      P.q(function (sb) { return sb.from("alunos").update(d).eq("id", a.id); }).catch(function (er) {
+        if (!d.consentimento_em || !P.semColuna(er)) throw er;
+        delete d.consentimento_em; delete d.consentimento_por;
+        return P.q(function (sb) { return sb.from("alunos").update(d).eq("id", a.id); });
+      })
         .then(function () { return novoDia ? P.moverVencimento(a.id, novoDia).then(function (m) { mudou = m; }) : null; })
         .then(function () { return corrige ? corrigeFaixa(a, fx, gr) : null; })
         .then(P.carregarAlunos).then(function () { P.toast("Dados de " + P.first(d.nome) + " salvos." + (corrige ? " Faixa corrigida: " + P.beltTxt(fx, gr).toLowerCase() + "." : "") + (mudou.length ? " A mensalidade em aberto passou para " + mudou.join(" e ") + "." : "")); P.abrirAluno(a.id); })
