@@ -5,9 +5,53 @@
   var filtro = "ativos";
 
   /* ---------- a lista ---------- */
-  var FILTROS = [["ativos", "Ativos"], ["sumidos", "Sem treinar"], ["kids", "Kids"], ["semnasc", "Sem aniversário"], ["semantes", "Sem aulas de antes"], ["inativos", "Inativos"], ["todos", "Todos"]];
+  var FILTROS = [["ativos", "Ativos"], ["sumidos", "Sem treinar"], ["atrasados", "Mensalidade atrasada"], ["prontos", "Prontos para o grau"], ["kids", "Kids"], ["semnasc", "Sem aniversário"], ["semantes", "Sem aulas de antes"], ["inativos", "Inativos"], ["todos", "Todos"]];
+  /* a mensalidade de cada aluno: atrasadas (com os dias) e a do mês. Sem a área Financeiro, a coluna fica com o vencimento */
+  var MENS = null;
+  function carregarMens() {
+    if (!P.pode("financeiro")) { MENS = null; return Promise.resolve(); }
+    var mes = P.mesIni(P.hoje());
+    return P.todos(function (sb) { return sb.from("mensalidades").select("aluno, competencia, vencimento, pago_em").or("pago_em.is.null,competencia.eq." + mes); }).then(function (l) {
+      MENS = {};
+      (l || []).forEach(function (m) {
+        var x = MENS[m.aluno] = MENS[m.aluno] || { atr: 0, desde: null, mes: null };
+        if (!m.pago_em && m.vencimento < P.hoje()) { x.atr++; if (!x.desde || m.vencimento < x.desde) x.desde = m.vencimento; }
+        if (m.competencia === mes) x.mes = m;
+      });
+      paintLista();
+    }).catch(function () { MENS = null; });
+  }
+  P.recarregarMensAlunos = carregarMens;
+  function atrasado(a) { return !!(MENS && MENS[a.id] && MENS[a.id].atr); }
   function passa(a, f) {
-    return f === "semantes" ? a.ativo && !(a.aulas_antes > 0) : f === "semnasc" ? a.ativo && !a.nascimento : f === "ativos" ? a.ativo : f === "sumidos" ? P.sumido(a) : f === "kids" ? a.ativo && P.kid(a.turma) : f === "inativos" ? !a.ativo : true;
+    return f === "semantes" ? a.ativo && !(a.aulas_antes > 0) : f === "semnasc" ? a.ativo && !a.nascimento : f === "ativos" ? a.ativo : f === "sumidos" ? P.sumido(a)
+      : f === "atrasados" ? a.ativo && atrasado(a) : f === "prontos" ? a.ativo && !!P.desdeGrau && (P.desdeGrau(a) || 0) >= 49
+      : f === "kids" ? a.ativo && P.kid(a.turma) : f === "inativos" ? !a.ativo : true;
+  }
+  /* as últimas 4 semanas (segunda a domingo): um quadrado por semana, cheio quando o aluno treinou */
+  function semanas(id) {
+    var h = P.dia(P.hoje()), seg = new Date(h.getFullYear(), h.getMonth(), h.getDate() - (h.getDay() + 6) % 7), l = [];
+    for (var k = 3; k >= 0; k--) {
+      var ini = new Date(seg.getFullYear(), seg.getMonth(), seg.getDate() - 7 * k), fim = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + 6);
+      var a0 = P.iso(ini), a1 = P.iso(fim);
+      l.push(P.pres.filter(function (p) { return p.aluno === id && p.data >= a0 && p.data <= a1; }).length);
+    }
+    return '<span class="sem4" title="Aulas por semana, da mais antiga para esta: ' + l.join(", ") + '">' + l.map(function (n) { return "<i" + (n ? ' class="' + (n > 1 ? "on2" : "on") + '"' : "") + "></i>"; }).join("") + "</span>";
+  }
+  function regua(a) {
+    if (!P.desdeGrau) return "";
+    var n = P.desdeGrau(a);
+    if (n === null) return "";
+    var cor = Site.COR_FAIXA[Site.faixaBase(a.faixa)] || Site.COR_FAIXA.branca;
+    return '<span class="gr-bar mini" style="--cor:' + cor + '"><i style="width:' + Math.min(100, Math.round(n / 50 * 100)) + '%"></i></span><span class="gr-n">' + n + "/50</span>";
+  }
+  function mensTx(a) {
+    if (!(a.mensalidade > 0)) return '<span class="muted">sem mensalidade</span>';
+    if (!MENS) return vencSel(a);
+    var x = MENS[a.id];
+    var st = x && x.atr ? '<span class="pill-s warn">Atrasada ' + P.difDias(x.desde, P.hoje()) + (P.difDias(x.desde, P.hoje()) === 1 ? " dia" : " dias") + "</span>"
+      : x && x.mes && x.mes.pago_em ? '<span class="pill-s in">Em dia</span>' : '<span class="pill-s">A vencer</span>';
+    return '<span class="mens-c">' + st + vencSel(a) + "</span>";
   }
   P.filtroAlunos = function (f) { filtro = f; paintLista(); };
   function paintLista() {
@@ -25,10 +69,11 @@
       return '<tr data-id="' + a.id + '"' + (a.ativo ? "" : ' class="off"') + '><td><div class="nm"><span class="av"' + Fotos.attr(a.foto) + '>' + P.ini(a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + a.id + '">' + esc(a.nome) + "</button><small>" +
         esc(P.turmaTx(a)) + (a.responsavel ? " · resp. " + esc(P.first(a.responsavel)) : "") + (a.ativo ? "" : " · inativo") + "</small></div></div></td>" +
         "<td>" + P.belt(a.faixa, a.graus, a.turma) + "</td>" +
+        '<td class="hide-s">' + regua(a) + "</td>" +
+        '<td class="hide-s">' + semanas(a.id) + "</td>" +
         "<td>" + (sum && a.ativo ? '<span class="pill-s warn">' + (u ? "há " + dias + " dias" : "nunca veio") + "</span>" : P.quando(u)) + "</td>" +
-        '<td class="num hide-s">' + P.noMes(a.id, mes) + "</td>" +
-        "<td>" + vencSel(a) + "</td>" +
-        '<td class="act"><div class="row-acts">' + (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa="' + a.id + '">WhatsApp</button>' : "") + "</div></td></tr>";
+        "<td>" + mensTx(a) + "</td>" +
+        '<td class="act"><div class="row-acts">' + (a.whatsapp ? '<button class="ic-btn wa" type="button" data-wa="' + a.id + '" aria-label="WhatsApp de ' + esc(a.nome) + '" title="WhatsApp"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg></button>' : "") + "</div></td></tr>";
     }).join("");
     var vazio = $("#alEmpty");
     vazio.hidden = l.length > 0;
@@ -77,7 +122,7 @@
     else if (b.dataset.wa) { var a = P.porId[b.dataset.wa]; P.wa(a.whatsapp, "Oi, " + P.first(a.responsavel || a.nome) + "! Aqui é do Studio Evolution BJJ. "); }
   });
   P.aoMudarAlunos(function () { paintLista(); paintGrad(); });
-  P.aoAbrir("alunos", function () { P.carregarPresencas().then(paintLista).catch(function () {}); paintLista(); });
+  P.aoAbrir("alunos", function () { P.carregarPresencas().then(paintLista).catch(function () {}); carregarMens(); paintLista(); });
 
   /* ---------- o formulário (novo e editar) ---------- */
   function formHTML(a, pre) {
