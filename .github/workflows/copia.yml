@@ -1,0 +1,90 @@
+# Cópia de segurança do banco, toda segunda de madrugada (e quando rodar à mão em Actions).
+# 1) pg_dump dos dados do Studio (schemas public e privado); 2) restaura num Postgres vazio aqui mesmo e confere
+#    que as tabelas voltaram com o mesmo número de linhas (a cópia é testada toda vez); 3) criptografa com a senha
+#    do segredo BACKUP_SENHA e guarda como artefato por 30 dias.
+# Precisa de dois segredos no repositório (Settings → Secrets and variables → Actions), passo a passo em
+# docs/operacao.md: SUPABASE_DB_URL (a conexão "Session pooler" do Supabase) e BACKUP_SENHA. Sem eles, só avisa.
+name: Cópia de segurança
+
+on:
+  schedule:
+    - cron: "23 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  copia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      teste:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: teste
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      SENHA: ${{ secrets.BACKUP_SENHA }}
+      TESTE: postgresql://postgres:teste@localhost:5432/postgres
+    steps:
+      - name: Conferir os segredos
+        run: |
+          if [ -z "$DB_URL" ] || [ -z "$SENHA" ]; then
+            echo "::warning::Faltam os segredos SUPABASE_DB_URL e BACKUP_SENHA. Veja docs/operacao.md. Nenhuma cópia foi feita."
+            echo "PULAR=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Instalar o cliente do Postgres 17
+        if: env.PULAR != '1'
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Fazer a cópia
+        if: env.PULAR != '1'
+        run: pg_dump "$DB_URL" --format=custom --no-owner --no-privileges --schema=public --schema=privado --file=copia.dump
+
+      - name: Testar a restauração num banco vazio
+        if: env.PULAR != '1'
+        run: |
+          # o que o Supabase tem por fora dos dados do Studio: os papéis e o auth.uid() que as regras usam
+          psql "$TESTE" -v ON_ERROR_STOP=1 -q <<'SQL'
+          create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;
+          create schema auth; create table auth.users (id uuid primary key, email text);
+          create function auth.uid() returns uuid language sql stable as $$ select null::uuid $$;
+          create function auth.jwt() returns jsonb language sql stable as $$ select '{}'::jsonb $$;
+          create schema storage; create table storage.objects (id uuid, bucket_id text, name text, owner uuid);
+          SQL
+          pg_restore --no-owner --no-privileges -d "$TESTE" copia.dump 2> restauracao.log || true
+          grep -c "error" restauracao.log || true
+          # as mesmas tabelas, com o mesmo número de linhas, na origem e na cópia restaurada
+          q="select string_agg(c.relname || '=' || (xpath('/row/n/text()', query_to_xml('select count(*) as n from public.' || quote_ident(c.relname), false, true, '')))[1]::text, ' ' order by c.relname) from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r'"
+          origem=$(psql "$DB_URL" -At -c "$q")
+          copia=$(psql "$TESTE" -At -c "$q")
+          echo "origem: $origem"
+          echo "cópia:  $copia"
+          [ -n "$origem" ] && [ "$origem" = "$copia" ] || { echo "::error::A cópia restaurada não bate com o banco."; cat restauracao.log; exit 1; }
+          echo "Cópia restaurada e conferida."
+
+      - name: Criptografar
+        if: env.PULAR != '1'
+        run: |
+          nome="copia-$(date -u +%Y-%m-%d).dump.gpg"
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$SENHA" --symmetric --cipher-algo AES256 -o "$nome" copia.dump
+          shred -u copia.dump
+          echo "ARQ=$nome" >> "$GITHUB_ENV"
+
+      - name: Guardar a cópia (30 dias)
+        if: env.PULAR != '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: copia-do-banco
+          path: ${{ env.ARQ }}
+          retention-days: 30

@@ -1,0 +1,42 @@
+# Monitoramento: de hora em hora confere se o site, o app, o painel e o banco respondem.
+# Se algo cair, a execução fica vermelha e o GitHub avisa por e-mail quem cuida do repositório.
+# A chave usada é a publicável do site (pública por natureza), lida de site/supabase-config.js.
+name: Monitoramento
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  no-ar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Páginas respondem
+        run: |
+          falhou=""
+          for pg in "" aulas agendamento perguntas contato privacidade entrar app painel; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 20 "https://evolutionbjj.com.br/$pg")
+            echo "/$pg -> $code"
+            [ "$code" = "200" ] || falhou="sim"
+          done
+          [ -z "$falhou" ] || { echo "::error::Alguma página do site não respondeu 200."; exit 1; }
+
+      - name: Banco e login respondem
+        run: |
+          url=$(grep -o 'https://[a-z0-9]*\.supabase\.co' site/supabase-config.js)
+          chave=$(grep -o 'sb_publishable_[A-Za-z0-9_-]*' site/supabase-config.js)
+          [ -n "$url" ] && [ -n "$chave" ] || { echo "Supabase não configurado no site; nada a conferir."; exit 0; }
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$url/auth/v1/health" -H "apikey: $chave")
+          echo "login -> $code"
+          [ "$code" = "200" ] || { echo "::error::O login do Supabase não respondeu."; exit 1; }
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 -X POST "$url/rest/v1/rpc/grade_aulas" -H "apikey: $chave" -H "Content-Type: application/json" -d '{}')
+          echo "banco -> $code"
+          # 404 = a migração da grade ainda não rodou: o banco respondeu, só falta a função
+          [ "$code" = "200" ] || [ "$code" = "404" ] || { echo "::error::O banco não respondeu."; exit 1; }

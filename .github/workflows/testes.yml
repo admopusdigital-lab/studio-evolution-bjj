@@ -1,0 +1,34 @@
+# Testes de fumaça a cada push: monta o site e abre as páginas, o painel e o app com o banco simulado
+# (tests/simulador.js). O banco de verdade não é tocado. Vermelho aqui = algo quebrou antes de o cliente ver.
+name: Testes
+
+on:
+  push:
+    branches: [main-kr1apn]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fumaca:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar o navegador de teste
+        run: |
+          npm install --no-save --no-package-lock playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: Montar o site
+        run: bash scripts/montar-site.sh
+
+      - name: Testes de fumaça
+        run: node tests/fumaca.js

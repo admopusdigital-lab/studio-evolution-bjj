@@ -40,6 +40,13 @@ Versão publicada (privada): https://claude.ai/artifact/7PbBFQCkuSw1SPbBvzXHuw
 - `tools/simbolo-true.py`: vetoriza o símbolo da Equipe TRUE a partir de `tools/fontes/logo-true.png` (logo oficial, baixada de bjjtrue.com) e gera `site/img/true-simbolo.svg`. O mesmo desenho vai embutido na seção "Equipe TRUE", onde a rolagem o desenha e enche de ouro.
 - `area-do-aluno-evolution.html`: estudo inicial de direções para a Área do Aluno.
 
+## Testes, monitoramento e cópia de segurança
+
+`tests/fumaca.js` abre o site, o painel e o app com o banco simulado a cada push (`.github/workflows/testes.yml`);
+`.github/workflows/monitor.yml` confere de hora em hora se o site e o banco respondem; `.github/workflows/copia.yml`
+faz a cópia semanal do banco, testa a restauração e guarda criptografada. Detalhes e como ligar a cópia em
+`docs/operacao.md`.
+
 ## Publicar
 
 `scripts/montar-site.sh` monta a pasta `_site/`: copia `site/`, acrescenta o esqueleto ao `index.html` e escreve um
