@@ -298,7 +298,12 @@ body.pr { background: var(--paper); }
 
       <!-- Movimentos -->
       <section class="dv" data-v="mov" aria-labelledby="t-mov">
-        <div class="dv-h"><div><p class="dv-k">Biblioteca da academia</p><h3 id="t-mov">Movimentos</h3></div><p>Os vídeos e quizzes que os alunos veem no app, separados por faixa. O aluno assiste e, aos 90% do vídeo, faz o quiz.</p></div>
+        <div class="dv-h"><div><p class="dv-k" id="mvKk">Biblioteca da academia</p><h3 id="t-mov">Movimentos</h3></div><p>O que foi ensinado no tatame nesta semana e a biblioteca de vídeos com quiz que os alunos veem no app, separada por faixa.</p></div>
+        <div class="seg mv-abas" role="tablist" aria-label="Partes de Movimentos">
+          <button type="button" role="tab" id="mvtSem" aria-selected="true" aria-controls="mvpSem">Técnicas da semana<span class="es-n" id="mvtPed" hidden></span></button>
+          <button type="button" role="tab" id="mvtBib" aria-selected="false" aria-controls="mvpBib" tabindex="-1">Biblioteca</button>
+        </div>
+        <div role="tabpanel" id="mvpSem" aria-labelledby="mvtSem">
         <div class="tec-box" id="tecBox" aria-labelledby="t-tec">
           <div class="tec-h"><h4 class="fin-k" id="t-tec">Técnicas da semana</h4>
             <div class="tec-nav"><button class="mini-btn ghost" type="button" id="tecPrev" aria-label="Semana anterior">‹</button><b id="tecSem">Esta semana</b><button class="mini-btn ghost" type="button" id="tecNext" aria-label="Próxima semana">›</button><button class="mini-btn ghost" type="button" id="tecHoje">Hoje</button></div></div>
@@ -314,6 +319,8 @@ body.pr { background: var(--paper); }
           <div class="tec-h" style="margin-top:20px"><h4 class="fin-k">Quero aprender · pedidos dos alunos</h4><span class="muted" id="tecPedN"></span></div>
           <ul class="tec-l" id="tecPed"></ul>
         </div>
+        </div>
+        <div role="tabpanel" id="mvpBib" aria-labelledby="mvtBib" hidden>
         <div class="kpis">
           <div class="kpi"><b id="mvK1">0</b><span>publicados no app</span></div>
           <div class="kpi"><b id="mvK2">0</b><span>com vídeo</span></div>
@@ -341,9 +348,10 @@ body.pr { background: var(--paper); }
           <div class="msg-acts"><button class="mini-btn" type="submit">Salvar movimento</button><button class="mini-btn ghost" type="button" id="mfCancel">Cancelar</button><button class="mini-btn ghost mf-del" type="button" id="mfDel" hidden>Apagar movimento</button></div>
           <div class="cfg-panel ask" id="mfDelAsk" hidden><p id="mfDelT"></p><div class="msg-acts"><button class="mini-btn" type="button" id="mfDelYes">Apagar</button><button class="mini-btn ghost" type="button" id="mfDelNo">Manter</button></div></div>
         </form>
-        <ul class="mv-list" id="mvList"></ul>
+        <div class="mv-lib" id="mvList"></div>
         <p class="crm-empty" id="mvEmpty" hidden></p>
         <p class="fin-how"><b>Como publicar um vídeo:</b> no YouTube, envie o vídeo com a visibilidade <b>Não listado</b> (só assiste quem tem o link), copie o link e cole aqui. Também vale o link direto de um arquivo .mp4. Grave na horizontal, com a técnica inteira no quadro; de 3 a 8 minutos funciona bem no celular.</p>
+        </div>
       </section>
 
       <!-- Interessados -->

@@ -107,6 +107,11 @@ async function pagina(b, opcoes, papel) {
     confere('Frequência: mapa com uma linha por aula da grade', (await p.$$('#fqMapa tbody tr')).length === await p.evaluate(() => Site.GRADE.length) || !(await p.isHidden('#fqMEmpty')));
     await p.click('#fqtRank'); await p.waitForTimeout(300);
     confere('Frequência: ranking continua numa aba', !(await p.isHidden('#fqpRank')) && (await p.$$('#rkPer button')).length === 6);
+    /* Movimentos: abre em Técnicas da semana; a Biblioteca fica na outra aba */
+    await p.evaluate(() => P.go('mov')); await p.clock.runFor(1500); await p.waitForTimeout(500);
+    const semAntes = await p.isVisible('#tecBox') && await p.isHidden('#mvpBib');
+    await p.click('#mvtBib'); await p.waitForTimeout(300);
+    confere('Movimentos em abas Semana e Biblioteca', semAntes && await p.isVisible('#mvAdd') && await p.isHidden('#tecBox'));
     confere('painel sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }

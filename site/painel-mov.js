@@ -24,23 +24,49 @@
     if (mvF !== "todas" && fx.indexOf(mvF) < 0) mvF = "todas";
     $("#mvF").innerHTML = ["todas"].concat(fx).map(function (f) { return '<button type="button" data-f="' + f + '" aria-pressed="' + (f === mvF) + '">' + (f === "todas" ? "Todas" : Mov.FAIXAS[f]) + "</button>"; }).join("");
     var q = P.norm($("#mvQ").value.trim()), vis = MV.filter(function (m) { return (mvF === "todas" || m.faixa === mvF) && (!q || P.norm(m.nome).indexOf(q) >= 0); });
-    $("#mvList").innerHTML = vis.map(function (m) {
-      var c = mvCapa(m), n = (mvEst[m.id] || []).length;
-      return '<li class="mv" data-id="' + m.id + '"><span class="mv-th">' + (c ? '<img src="' + c + '" alt="">' : '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>') + "</span>" +
-        "<div><b>" + esc(m.nome) + '</b><span class="mv-tags">' + mvFaixa(m.faixa) + '<span class="pill-s">' + Mov.CATS[m.cat] + "</span>" +
-        (!m.video ? '<span class="pill-s gold">Esperando vídeo</span>' : '<span class="pill-s in">' + (m.video.tipo === "youtube" ? "YouTube" : "Vídeo") + "</span>") +
+    /* um cartão por movimento: a capa do vídeo em cima (com a duração), o nome e os selos embaixo */
+    function card(m) {
+      var c = mvCapa(m), n = (mvEst[m.id] || []).length, dur = m.video && m.video.dur;
+      return '<li class="mv' + (m.publicado ? "" : " rasc") + '" data-id="' + m.id + '"><span class="mv-th"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>' + (c ? '<img src="' + c + '" alt="" loading="lazy">' : "") +
+        (dur ? '<span class="mv-dur">' + esc(dur) + "</span>" : "") + (!m.video ? '<span class="mv-sv">Esperando vídeo</span>' : "") + "</span>" +
+        '<div class="mv-b"><b>' + esc(m.nome) + '</b><span class="mv-tags">' + (porFaixa ? "" : mvFaixa(m.faixa)) + '<span class="pill-s">' + Mov.CATS[m.cat] + "</span>" +
         '<span class="pill-s">' + (m.quiz.length ? "Quiz: " + m.quiz.length + (m.quiz.length === 1 ? " pergunta" : " perguntas") : "Sem quiz") + "</span>" +
         (m.publicado ? "" : '<span class="pill-s warn">Rascunho</span>') + "</span>" +
         "<small>" + (n ? "Estudaram: " + n + (n === 1 ? " aluno" : " alunos") : "Ninguém fez o quiz ainda") + "</small></div>" +
         '<div class="acts">' + (n ? '<button class="mini-btn ghost" type="button" data-mv-who aria-expanded="false">Quem estudou</button>' : "") +
         '<button class="mini-btn" type="button" data-mv-edit aria-label="Editar ' + esc(m.nome) + '">Editar</button></div>' +
         '<div class="mv-who" hidden><ul>' + (mvEst[m.id] || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div></li>";
-    }).join("");
+    }
+    /* em "Todas" e sem busca, a biblioteca vira o currículo: um bloco por faixa, na ordem das faixas */
+    var porFaixa = mvF === "todas" && !q;
+    if (porFaixa) {
+      $("#mvList").innerHTML = Mov.ORDEM.filter(function (f) { return vis.some(function (m) { return m.faixa === f; }); }).map(function (f) {
+        var l = vis.filter(function (m) { return m.faixa === f; });
+        return '<section class="mv-g" aria-label="Faixa ' + Mov.FAIXAS[f].toLowerCase() + '"><h4>' + mvFaixa(f) + " <small>" + l.length + (l.length === 1 ? " movimento" : " movimentos") + "</small></h4>" +
+          '<ul class="mv-list">' + l.map(card).join("") + "</ul></section>";
+      }).join("");
+    } else $("#mvList").innerHTML = vis.length ? '<ul class="mv-list">' + vis.map(card).join("") + "</ul>" : "";
     $$("#mvList img").forEach(function (im) { im.onerror = function () { im.hidden = true; }; });
     var e = $("#mvEmpty");
     e.hidden = vis.length > 0;
     e.textContent = q ? "Nenhum movimento com “" + $("#mvQ").value.trim() + "”." : MV.length ? "Nenhum movimento nesta faixa ainda." : "Nenhum movimento cadastrado ainda. Toque em Adicionar movimento: o vídeo pode ser um link do YouTube (não listado).";
   }
+  /* duas abas: o que foi ensinado na semana (o uso de toda semana) e a biblioteca de vídeos */
+  var MV_ABAS = [["sem", "#mvtSem", "#mvpSem"], ["bib", "#mvtBib", "#mvpBib"]];
+  function mvAba(k, foco) {
+    MV_ABAS.forEach(function (t) { var on = t[0] === k; $(t[1]).setAttribute("aria-selected", on); $(t[1]).tabIndex = on ? 0 : -1; $(t[2]).hidden = !on; if (on && foco) focusSoft($(t[1])); });
+    $("#mvKk").textContent = k === "sem" ? "No tatame" : "Biblioteca da academia";
+  }
+  P.mvAba = mvAba;
+  MV_ABAS.forEach(function (t, i) {
+    $(t[1]).addEventListener("click", function () { mvAba(t[0]); });
+    $(t[1]).addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
+      mvAba(MV_ABAS[(i + 1) % 2][0], true);
+    });
+  });
+  mvAba("sem");
   $("#mvF").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; mvF = b.dataset.f; mvPaint(); });
   $("#mvQ").addEventListener("input", mvPaint);
   $("#mvList").addEventListener("click", function (e) {

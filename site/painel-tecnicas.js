@@ -61,6 +61,9 @@
     Object.keys(grupos).forEach(function (k) { var t = grupos[k].titulo; grupos[k].titulo = t.charAt(0).toUpperCase() + t.slice(1); });
     var gl = Object.keys(grupos).map(function (k) { return grupos[k]; }).sort(function (a, b) { return b.l.length - a.l.length; });
     $("#tecPedN").textContent = PED.length ? PED.length + (PED.length === 1 ? " pedido" : " pedidos") : "";
+    /* o número de pedidos também aparece na aba, para ser visto de dentro da Biblioteca */
+    var nb = $("#mvtPed");
+    if (nb) { nb.hidden = !gl.length; nb.textContent = gl.length; $("#mvtSem").setAttribute("aria-label", "Técnicas da semana" + (gl.length ? ", " + gl.length + (gl.length === 1 ? " pedido dos alunos" : " pedidos dos alunos") : "")); }
     $("#tecPed").innerHTML = gl.length ? gl.map(function (g, i) {
       return '<li><div><b>' + esc(g.titulo) + '</b><small>' + g.l.length + (g.l.length === 1 ? " pedido · " : " pedidos · ") +
         esc(g.l.map(function (m) { return nomeAluno(m.aluno); }).join(", ")) + " · desde " + P.dataBR(g.l[g.l.length - 1].criado_em) + "</small></div>" +
