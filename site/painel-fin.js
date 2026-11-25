@@ -348,7 +348,7 @@
     t.style.left = Math.max(0, Math.min(bw - w, x + 14 > bw - w ? x - w - 14 : x + 14)) + "px";
     t.style.top = "6px";
   }
-  function semDados(box, txt) { box.innerHTML = '<p class="muted" style="padding:26px 0;text-align:center;font-size:13px">' + txt + "</p>"; box.removeAttribute("tabindex"); }
+  function semDados(box, txt) { box.innerHTML = '<p class="muted" style="padding:26px 0;text-align:center;font-size:13px">' + txt + "</p>"; box.removeAttribute("tabindex"); box.setAttribute("aria-label", txt); }
   function vizLinha(box, c) {
     var W = box.clientWidth;
     if (!W) return;
