@@ -223,6 +223,18 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap.app.sem-dados #apFee, .ap.app.sem-dados #apReceipt, .ap.app.sem-dados .ap-trio, .ap.app.sem-dados #apBadge,
 .ap.app.sem-dados .ap-notes, .ap.app.sem-dados #apCalW, .ap.app.sem-dados #apNext { visibility: hidden; }
 /* perfil: a foto do aluno ao lado do nome, com o botão da câmera */
+/* cartão para Stories: a prévia em tela cheia, com compartilhar e salvar */
+.ap-story-btn { width: 100%; margin-top: 10px; }
+.ap-story-btn .ic, .ap-tl-st .ic { width: 15px; height: 15px; }
+.ap-tl-st { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; margin-top: 8px; padding: 0 12px; border: 1px solid var(--rule); border-radius: 999px; background: none; color: var(--ink-2); font: 600 11.5px/1 var(--sans); cursor: pointer; }
+.ap-tl-st:hover { border-color: var(--gold); color: var(--ink); }
+.ap-story { position: fixed; inset: 0; z-index: 92; display: grid; place-items: center; padding: calc(18px + env(safe-area-inset-top, 0px)) 20px calc(18px + env(safe-area-inset-bottom, 0px)); background: color-mix(in oklch, var(--paper) 94%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); overflow-y: auto; }
+.ap-story[hidden] { display: none; }
+.ap-story-in { width: 100%; max-width: 360px; display: grid; justify-items: center; gap: 12px; text-align: center; }
+.ap-story-prev { width: min(62vw, 300px); aspect-ratio: 9 / 16; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px -24px oklch(0 0 0 / 0.9), 0 0 0 1px var(--rule); background: #0c0a08; }
+.ap-story-prev img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ap-story-acts { display: grid; gap: 8px; width: 100%; }
+.ap-story-acts .ap-btn { width: 100%; text-decoration: none; }
 /* passaporte: a carteirinha do aluno (dados, foto, faixa e graus) e a linha do tempo */
 .ap-pass { position: relative; margin-top: 4px; padding: 16px 16px 14px; border-radius: 22px; overflow: hidden;
   background: radial-gradient(120% 80% at 100% 0%, color-mix(in oklch, var(--gold) 26%, transparent), transparent 62%), linear-gradient(165deg, color-mix(in oklch, var(--gold) 9%, var(--paper-2)), var(--paper-2) 70%);
@@ -633,6 +645,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     <symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><path d="M8 12.5l2.8 2.8L16.5 9" style="stroke:var(--paper)"/></symbol>
     <symbol id="i-todo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/></symbol>
     <symbol id="i-touch" viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 9.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3l-1.6-2.9a1.5 1.5 0 0 1 2.6-1.5L9 15"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
   </defs>
 </svg>
@@ -651,6 +664,19 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       <button class="app-bell" type="button" id="apBell" aria-label="Avisos, 3 novos" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-bell"/></svg><span class="app-badge" id="apBadge" aria-hidden="true">3</span></button>
     </header>
     <div class="ap-toast" id="apToast" role="status" aria-live="polite"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span></span></div>
+    <!-- cartão para Stories: a imagem 9:16 com a marca do Studio, para o aluno postar -->
+    <div class="ap-story" id="apStory" role="dialog" aria-modal="true" aria-labelledby="apStoryT" hidden>
+      <div class="ap-story-in">
+        <p class="ap-lb gold" id="apStoryT">Para os seus Stories</p>
+        <div class="ap-story-prev"><img id="apStoryImg" alt=""></div>
+        <p class="ap-mut" id="apStoryDica">Poste e marque o Studio. A imagem já vai com a marca.</p>
+        <div class="ap-story-acts">
+          <button class="ap-btn" type="button" id="apStoryShare">Compartilhar</button>
+          <a class="ap-btn ghost" id="apStorySave" download="evolution-stories.png" href="#">Salvar imagem</a>
+          <button class="ap-link" type="button" id="apStoryX">Fechar</button>
+        </div>
+      </div>
+    </div>
     <!-- presença confirmada: tela cheia logo depois de registrar (código ou QR), com a meta da semana e o caminho do grau -->
     <div class="ap-ok" id="apOk" role="dialog" aria-modal="true" aria-labelledby="apOkT" aria-describedby="apOkS" hidden>
       <div class="ap-ok-in">
@@ -841,6 +867,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <div class="ap-degs"><i class="on"></i><i class="on"></i><i></i><i></i></div>
         <p class="ap-pass-foot"><span>Studio Evolution BJJ · Sorocaba</span><span id="apPassAulas"></span></p>
         </div>
+        <button class="ap-btn ghost ap-story-btn" type="button" data-story="passaporte"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-share"/></svg><span>Postar nos Stories</span></button>
         <!-- "aulas desde o último grau" conta as presenças registradas: a de hoje leva 21 a 22 (register) -->
         <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b id="apStreak">6</b><span id="apStreakT">semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
         <!-- os últimos 30 dias em calendário (segunda a sábado): dourado quando veio, dois pontos quando fez duas aulas -->
@@ -1937,7 +1964,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   function paintLib() {
     var n = MOVS.length, feitos = MOVS.filter(function (m) { return estudado(m.id); }).length;
-    $("#apMovLb").textContent = "Faixa " + Mov.FAIXAS[FAIXA].toLowerCase() + " · " + feitos + " de " + n + " estudados";
+    $("#apMovLb").textContent = "Faixa " + Mov.FAIXAS[FAIXA].toLowerCase() + (n ? " · " + feitos + " de " + n + " estudados" : "");
     $("#apMov2").innerHTML = feitos + "<small> de " + n + "</small>";
     /* continue assistindo: o último começado; sem nenhum começado, o primeiro com vídeo ainda não estudado */
     var com = MOVS.filter(function (m) { return m.video && !estudado(m.id); });
@@ -2381,6 +2408,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     inicio: function () { leave("inicio"); },
     mens: function () { leave("inicio", openSheet); },
     perfil: function () { leave("perfil"); },
+    story: function () { var g = MEUS.grads[0]; if (g) story({ tipo: "grau", fx: g.faixa, tit: g.graus ? g.graus + "º grau na faixa " + Site.faixaNome(g.faixa).toLowerCase() : "Faixa " + Site.faixaNome(g.faixa).toLowerCase(), data: g.data }); },
     mov: function (arg) { leave("movimentos", function () { if (arg) abrir(arg); }); },
     comprovante: function (arg) {
       var nome = ALUNO && ALUNO.nome ? ALUNO.nome.split(" ")[0] : "";
@@ -2718,13 +2746,125 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $("#apPassAulas").textContent = totalStudio + (totalStudio === 1 ? " aula" : " aulas");
     paintTl(linhaDoTempo(a));
   }
+  /* ---------- cartão para Stories: 1080 × 1920, desenhado no aparelho ---------- */
+  var FX_HEX = { branca: "#f1efe9", cinza: "#8d929b", amarela: "#f0c43c", laranja: "#e5823a", verde: "#2e9659", azul: "#2560c6", roxa: "#6a3a9e", marrom: "#6b4a2e", preta: "#18181c" };
+  var logoImg = null;
+  function carregaLogo() {
+    if (logoImg) return logoImg;
+    logoImg = new Promise(function (ok) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = function () { ok(null); }; im.src = "img/logo-evolution.png"; });
+    return logoImg;
+  }
+  function faixaCanvas(c, fx, graus, x, y, w, h) {
+    var base = Site.faixaBase(fx), listra = String(fx || "").split("-")[1], preta = base === "preta";
+    c.save();
+    c.shadowColor = "rgba(0,0,0,.55)"; c.shadowBlur = 40; c.shadowOffsetY = 18;
+    c.fillStyle = FX_HEX[base] || FX_HEX.branca; c.beginPath(); c.roundRect(x, y, w, h, 14); c.fill();
+    c.restore();
+    if (listra) { c.fillStyle = FX_HEX[listra] || "#fff"; c.fillRect(x, y + h * 0.4, w, h * 0.2); }
+    /* a ponta: preta (vermelha na faixa preta), com os graus em fita branca */
+    var pw = w * 0.24, px = x + w - pw - w * 0.06;
+    c.fillStyle = preta ? "#c8202b" : "#111"; c.fillRect(px, y, pw, h);
+    c.fillStyle = "#f4f2ec";
+    for (var i = 0; i < Math.min(graus || 0, 6); i++) c.fillRect(px + pw - 26 - i * 34, y, 16, h);
+    /* brilho de tecido */
+    var gr = c.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, "rgba(255,255,255,.22)"); gr.addColorStop(0.5, "rgba(255,255,255,0)"); gr.addColorStop(1, "rgba(0,0,0,.28)");
+    c.fillStyle = gr; c.beginPath(); c.roundRect(x, y, w, h, 14); c.fill();
+  }
+  function quebra(c, txt, maxW) {
+    var ps = String(txt).split(" "), l = [], cur = "";
+    ps.forEach(function (w) { var t = cur ? cur + " " + w : w; if (c.measureText(t).width > maxW && cur) { l.push(cur); cur = w; } else cur = t; });
+    if (cur) l.push(cur);
+    return l;
+  }
+  function desenhaStory(o) {
+    var W = 1080, H = 1920, cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    var c = cv.getContext("2d"), a = ALUNO || { nome: "Marina Alves", faixa: "azul", graus: 2 };
+    var fundo = c.createLinearGradient(0, 0, 0, H); fundo.addColorStop(0, "#17130d"); fundo.addColorStop(1, "#070605");
+    c.fillStyle = fundo; c.fillRect(0, 0, W, H);
+    var glow = c.createRadialGradient(W * 0.72, H * 0.22, 40, W * 0.72, H * 0.22, 900); glow.addColorStop(0, "rgba(226,182,90,.38)"); glow.addColorStop(1, "rgba(226,182,90,0)");
+    c.fillStyle = glow; c.fillRect(0, 0, W, H);
+    /* ideograma de fundo (道, o caminho), bem apagado */
+    c.fillStyle = "rgba(226,182,90,.06)"; c.font = "900 980px serif"; c.textAlign = "center"; c.fillText("道", W / 2, H * 0.78);
+    return Promise.all([carregaLogo(), document.fonts && document.fonts.load ? Promise.all([document.fonts.load('120px "Archivo Black"'), document.fonts.load('600 40px "JetBrains Mono"'), document.fonts.load('500 44px "Archivo"')]).catch(function () {}) : null]).then(function (r) {
+      var logo = r[0];
+      if (logo) { var lw = 560, lh = lw * logo.height / logo.width; c.drawImage(logo, (W - lw) / 2, 150, lw, lh); }
+      c.textAlign = "left";
+      var x0 = 96, ouro = c.createLinearGradient(0, 600, 0, 1150); ouro.addColorStop(0, "#fff1b3"); ouro.addColorStop(0.5, "#e2b65a"); ouro.addColorStop(1, "#a87a26");
+      c.fillStyle = "#e2b65a"; c.font = '600 34px "JetBrains Mono", monospace';
+      var kick = o.tipo === "grau" ? "GRADUAÇÃO" : o.tipo === "marco" ? "MARCO NO TATAME" : "PASSAPORTE DO ALUNO";
+      c.fillText(kick.split("").join(" "), x0, 740);
+      var tit = o.tipo === "passaporte" ? "Faixa " + Site.faixaNome(a.faixa).toLowerCase() : o.tit;
+      c.font = '128px "Archivo Black", sans-serif';
+      var linhas = quebra(c, tit.toUpperCase(), W - x0 * 2);
+      if (linhas.length > 3) { c.font = '96px "Archivo Black", sans-serif'; linhas = quebra(c, tit.toUpperCase(), W - x0 * 2); }
+      var lh2 = parseInt(c.font, 10) * 0.98, y = 890;
+      c.fillStyle = ouro;
+      linhas.forEach(function (l, i) { c.fillText(l, x0, y + i * lh2); });
+      y += (linhas.length - 1) * lh2 + 90;
+      var fx = o.fx || a.faixa || "branca", graus = o.tipo === "grau" ? (parseInt(o.tit, 10) || 0) : a.graus || 0;
+      faixaCanvas(c, fx, o.tipo === "marco" ? a.graus || 0 : graus, x0, y, W - x0 * 2, 120);
+      y += 260;
+      c.fillStyle = "#f4f1ea"; c.font = '86px "Archivo Black", sans-serif';
+      quebra(c, a.nome, W - x0 * 2).slice(0, 2).forEach(function (l, i) { c.fillText(l, x0, y + i * 92); y += i ? 92 : 0; });
+      c.fillStyle = "rgba(244,241,234,.72)"; c.font = '500 42px "Archivo", sans-serif';
+      var sub = o.tipo === "passaporte" ? (a.inicio ? "No tatame desde " + MESES[diaDe(a.inicio).getMonth()] + " de " + diaDe(a.inicio).getFullYear() : "Studio Evolution BJJ") : dataLonga(o.data);
+      c.fillText(sub, x0, y + 80);
+      /* rodapé: a casa */
+      c.strokeStyle = "rgba(226,182,90,.45)"; c.lineWidth = 2; c.beginPath(); c.moveTo(x0, H - 250); c.lineTo(W - x0, H - 250); c.stroke();
+      c.fillStyle = "#e2b65a"; c.font = '600 32px "JetBrains Mono", monospace';
+      c.fillText("STUDIO EVOLUTION BJJ · EQUIPE TRUE", x0, H - 180);
+      c.fillStyle = "rgba(244,241,234,.6)"; c.font = '500 34px "Archivo", sans-serif';
+      c.fillText("Sorocaba/SP · evolutionbjj.com.br", x0, H - 126);
+      return new Promise(function (ok) { cv.toBlob(function (b) { ok(b); }, "image/png"); });
+    });
+  }
+  var stEl = $("#apStory"), stBlob = null, stUrl = null, stVolta = null;
+  function story(o) {
+    stVolta = document.activeElement;
+    desenhaStory(o).then(function (b) {
+      if (!b) return toast("Não deu para montar a imagem neste aparelho.");
+      stBlob = b;
+      if (stUrl) URL.revokeObjectURL(stUrl);
+      stUrl = URL.createObjectURL(b);
+      $("#apStoryImg").src = stUrl;
+      $("#apStorySave").href = stUrl;
+      var f = new File([b], "evolution-stories.png", { type: "image/png" });
+      $("#apStoryShare").hidden = !(navigator.canShare && navigator.canShare({ files: [f] }));
+      stEl.hidden = false;
+      document.documentElement.classList.add("ap-ok-on");
+      Site.focusSoft($("#apStoryShare").hidden ? $("#apStorySave") : $("#apStoryShare"), { preventScroll: true });
+    });
+  }
+  function fechaStory() {
+    if (stEl.hidden) return;
+    stEl.hidden = true;
+    document.documentElement.classList.remove("ap-ok-on");
+    if (stVolta) Site.focusSoft(stVolta, { preventScroll: true });
+  }
+  $("#apStoryShare").addEventListener("click", function () {
+    if (!stBlob) return;
+    var f = new File([stBlob], "evolution-stories.png", { type: "image/png" });
+    navigator.share({ files: [f] }).then(fechaStory, function () {});
+  });
+  $("#apStorySave").addEventListener("click", function () { later(function () { toast("Imagem salva. Poste nos Stories e marque o Studio."); }, 300); });
+  $("#apStoryX").addEventListener("click", fechaStory);
+  stEl.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.preventDefault(); fechaStory(); } });
+  stEl.addEventListener("click", function (e) { if (e.target === stEl) fechaStory(); });
+  screenOf("perfil").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-story]");
+    if (!b) return;
+    story({ tipo: b.dataset.story, fx: b.dataset.fx, tit: b.dataset.tit, data: b.dataset.data });
+  });
   /* ---------- passaporte: a linha do tempo (o mais novo em cima) ---------- */
   function paintTl(itens) {
     $("#apTlW").hidden = !itens.length;
     $("#apTl").innerHTML = itens.map(function (x) {
       var mk = x.fx ? '<i class="belt-s" style="' + Site.faixaCss(x.fx) + '"></i>' : "";
+      var st = x.t === "grad" && !/^Chegou/.test(x.tit) ? ' data-story="grau" data-fx="' + esc(x.fx) + '" data-tit="' + esc(x.tit) + '" data-data="' + x.data + '"'
+        : x.t === "marco" && /^\d+ª aula/.test(x.tit) ? ' data-story="marco" data-tit="' + esc(x.tit) + '" data-data="' + x.data + '"' : "";
       return '<li class="' + x.t + '"><span class="mk" aria-hidden="true">' + mk + '</span><div><time datetime="' + x.data + '">' + dataLonga(x.data) + "</time><b>" + esc(x.tit) + "</b>" +
-        (x.nota ? "<small>" + esc(x.nota) + "</small>" : "") + "</div></li>";
+        (x.nota ? "<small>" + esc(x.nota) + "</small>" : "") + (st ? '<button class="ap-tl-st" type="button"' + st + '><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-share"/></svg>Postar</button>' : "") + "</div></li>";
     }).join("");
   }
   function dataLonga(iso) { var d = diaDe(iso); return d.getDate() + " de " + MESES[d.getMonth()] + " de " + d.getFullYear(); }
@@ -2760,7 +2900,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (trained < goal) l.push({ k: "meta", t: "Falta" + (goal - trained === 1 ? " 1 treino" : "m " + (goal - trained) + " treinos") + " para a meta da semana", d: "Meta: " + goal + (goal === 1 ? " treino" : " treinos") + ". Se não der, tudo bem.", a: [["Ver as aulas", "agenda"]] });
     var g = MEUS.grads[0];
     /* o grau lançado no cadastro é o que o aluno já tinha: não é graduação nova, não dá parabéns */
-    if (g && !/ao entrar no Studio|antes do app/i.test(g.nota || "") && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push({ k: "perfil", t: "Parabéns pelo grau!", d: Site.faixaNome(g.faixa) + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + ".", a: [["Ver no Perfil", "perfil"]] });
+    if (g && !/ao entrar no Studio|antes do app/i.test(g.nota || "") && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push({ k: "perfil", t: "Parabéns pelo grau!", d: Site.faixaNome(g.faixa) + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + ".", a: [["Postar nos Stories", "story"], ["Ver no Perfil", "perfil"]] });
     var box = $(".app-notes", noteV);
     box.innerHTML = l.map(noteHTML).join("") || '<p class="app-notes-none">Nenhum aviso agora.</p>';
     var badge = $("#apBadge"), vendo = current === "avisos";

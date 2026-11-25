@@ -133,6 +133,9 @@ async function pagina(b, opcoes, papel) {
     confere('app: avisos com botão de ação', (await p.$$('.app-notes .ap-note [data-act]')).length >= 1 || !!(await p.$('.app-notes-none')));
     await p.click('.ap-dock [data-go="perfil"]'); await p.clock.runFor(1200); await p.waitForTimeout(300);
     confere('app: Perfil com a carteirinha', await p.isVisible('.ap-pass'));
+    await p.evaluate(() => document.querySelector('.ap-story-btn').click());
+    await p.clock.runFor(1500); await p.waitForTimeout(1500);
+    confere('app: cartão para Stories gerado', await p.isVisible('#apStory') && /^blob:/.test(await p.getAttribute('#apStoryImg', 'src') || ''));
     confere('app sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }
