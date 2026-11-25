@@ -205,14 +205,20 @@
   function card(t, st, txt) { return '<article class="cfg-card"><div class="cfg-top"><h4>' + t + "</h4>" + st + '</div><p class="cfg-what">' + txt + "</p></article>"; }
   function paintCfg() {
     var c = P.cfg, v = function (k) { return esc(c[k] == null ? "" : c[k]); };
+    var abas = [["aulas", "Aulas e horários"], ["studio", "Dados do Studio"], ["integ", "Integrações"]].concat(P.ehDono && P.ehDono() ? [["exp", "Exportar"]] : []);
+    if (!abas.some(function (a) { return a[0] === cfgAba; })) cfgAba = "aulas";
+    $('.dv[data-v="config"]').setAttribute("data-aba", cfgAba);
     $("#cfgBox").innerHTML =
-      '<h4 class="fin-k" style="margin-top:8px">Integrações</h4><div class="cfg-grid">' +
+      '<div class="seg cfg-abas" role="tablist" aria-label="Partes das Configurações">' + abas.map(function (a) {
+        return '<button type="button" role="tab" data-cfg="' + a[0] + '" id="cfgT-' + a[0] + '" aria-selected="' + (a[0] === cfgAba) + '"' + (a[0] === cfgAba ? "" : ' tabindex="-1"') + ">" + a[1] + "</button>";
+      }).join("") + "</div>" +
+      '<div class="cfg-p" data-p="integ" role="tabpanel" aria-labelledby="cfgT-integ"><div class="cfg-grid">' +
         card("Login e dados", '<span class="pill-s in">Ligado</span>', "Supabase: contas do app, alunos, presenças, mensalidades e o resto deste painel ficam no banco do Studio.") +
         card("Pedidos do site", '<span class="pill-s in">Ligado</span>', "Cada pedido de aula experimental feito no site entra em Interessados, com a turma, o dia e o horário.") +
         card("Cobrança automática", '<span class="pill-s">Não ligada</span>', "Boleto, Pix e cartão com baixa automática (Asaas). Por enquanto, a cobrança sai pelo seu WhatsApp, com a mensagem pronta, e você dá baixa em Mensalidades.") +
         card("WhatsApp de avisos", '<span class="pill-s">Não ligado</span>', "Lembretes automáticos de aula e de mensalidade por um número só de avisos (Evolution API). Por enquanto, as mensagens abrem no seu WhatsApp para você enviar.") +
-      "</div>" +
-      '<form class="crm-form" id="cfgForm" novalidate style="margin-top:22px"><p class="fin-k">Dados do Studio</p><div class="crm-grid">' +
+      "</div></div>" +
+      '<div class="cfg-p" data-p="studio" role="tabpanel" aria-labelledby="cfgT-studio"><form class="crm-form" id="cfgForm" novalidate style="margin-top:18px"><p class="fin-k">Dados do Studio</p><div class="crm-grid">' +
         '<label class="crm-f"><span>Nome</span><input class="crm-in" id="cfNome" value="' + v("nome") + '"></label>' +
         '<label class="crm-f"><span>WhatsApp do Studio</span><input class="crm-in" id="cfFone" inputmode="tel" value="' + esc(P.fone(c.whatsapp)) + '"></label>' +
         '<label class="crm-f"><span>Chave Pix <small>(vai na mensagem de cobrança)</small></span><input class="crm-in" id="cfPix" value="' + v("pix") + '" autocomplete="off"></label>' +
@@ -220,13 +226,36 @@
         '<label class="crm-f wide"><span>Endereço</span><input class="crm-in" id="cfEnd" value="' + v("endereco") + '"></label>' +
         '<label class="crm-f wide"><span>Atendimento</span><input class="crm-in" id="cfAt" value="' + v("atendimento") + '"></label></div>' +
         '<p class="muted" style="font-size:12px;margin-top:8px">O limite de vagas no app é 10 por aula.</p>' +
-        '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Salvar dados</button></div></form>' +
-      '<form class="crm-form" id="grdForm" novalidate style="margin-top:22px"><p class="fin-k">Aulas e horários</p>' +
-        '<p class="muted" style="font-size:12.5px;margin-top:4px">A grade vale para o site, o agendamento, o app e o painel. O Feminino treina junto com o Adulto.</p>' +
+        '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Salvar dados</button></div></form></div>' +
+      '<div class="cfg-p" data-p="aulas" role="tabpanel" aria-labelledby="cfgT-aulas">' +
+      '<div class="grd-sem" id="grdSem"></div>' +
+      '<form class="crm-form" id="grdForm" novalidate style="margin-top:18px"><p class="fin-k">Editar a grade</p>' +
+        '<p class="muted" style="font-size:12.5px;margin-top:4px">A grade vale para o site, o agendamento, o app e o painel. O Feminino treina junto com o Adulto. A semana acima muda enquanto você edita; só vale depois de salvar.</p>' +
         '<div class="grd-l" id="grdL">' + Site.GRADE.map(linhaGrade).join("") + "</div>" +
         '<button class="mini-btn ghost" type="button" id="grdAdd" style="margin-top:10px">Adicionar aula</button>' +
         '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Salvar grade</button>' +
-        (JSON.stringify(Site.GRADE) !== Site.GRADE_PADRAO ? '<button class="mini-btn ghost" type="button" id="grdPadrao">Voltar à grade padrão</button>' : "") + "</div></form>";
+        (JSON.stringify(Site.GRADE) !== Site.GRADE_PADRAO ? '<button class="mini-btn ghost" type="button" id="grdPadrao">Voltar à grade padrão</button>' : "") + "</div></form></div>";
+    paintSemana();
+  }
+  var cfgAba = "aulas";
+  function abaCfg(k, foco) {
+    cfgAba = k;
+    $('.dv[data-v="config"]').setAttribute("data-aba", k);
+    $$("#cfgBox [data-cfg]").forEach(function (b) { var on = b.dataset.cfg === k; b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1; if (on && foco) focusSoft(b); });
+  }
+  P.abaCfg = function (k) { if ($("#cfgBox [data-cfg]")) abaCfg(k); else cfgAba = k; };
+  /* a semana inteira de relance: uma coluna por dia com as aulas em ordem de horário (lê o que está no formulário) */
+  var TOM = { "Adulto": "ad", "Kids 1": "k1", "Kids 2": "k2", "Open Mat": "om" };
+  function paintSemana() {
+    var box = $("#grdSem");
+    if (!box) return;
+    var g = $("#grdL") ? lerGrade() : Site.GRADE, dias = [1, 2, 3, 4, 5, 6];
+    if (g.some(function (c) { return c.d.indexOf(0) >= 0; })) dias.push(0);
+    box.style.setProperty("--n", dias.length);
+    box.innerHTML = dias.map(function (d) {
+      var l = g.filter(function (c) { return c.d.indexOf(d) >= 0 && c.t; }).sort(function (a, b) { return a.t < b.t ? -1 : 1; });
+      return "<div><b>" + DIAS_C[d] + "</b>" + (l.length ? l.map(function (c) { return '<span class="' + (TOM[c.n] || "ad") + '"><i>' + esc(Site.hora(c.t)) + "</i>" + esc(c.n) + "</span>"; }).join("") : '<em>sem aula</em>') + "</div>";
+    }).join("");
   }
   /* ---------- a grade de aulas: uma linha por aula (turma, horário e dias da semana) ---------- */
   var DIAS_C = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"], gradeN = 0;
@@ -251,16 +280,28 @@
       else if (JSON.stringify(Site.GRADE) !== Site.GRADE_PADRAO) Site.usarGrade(JSON.parse(Site.GRADE_PADRAO));
     }).catch(function () {});
   }
+  $("#cfgBox").addEventListener("keydown", function (e) {
+    var t = e.target.closest("[data-cfg]");
+    if (!t || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+    e.preventDefault();
+    var bs = $$("#cfgBox [data-cfg]"), i = bs.indexOf(t);
+    abaCfg(bs[(i + (e.key === "ArrowRight" ? 1 : bs.length - 1)) % bs.length].dataset.cfg, true);
+  });
+  $("#cfgBox").addEventListener("change", function (e) { if (e.target.closest("#grdForm")) paintSemana(); });
+  $("#cfgBox").addEventListener("input", function (e) { if (e.target.closest("#grdForm")) paintSemana(); });
   $("#cfgBox").addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;
+    if (b.hasAttribute("data-cfg")) return abaCfg(b.dataset.cfg);
     if (b.id === "grdAdd") {
       $("#grdL").insertAdjacentHTML("beforeend", linhaGrade({ n: "Adulto", t: "19:00", d: [1, 2, 3, 4, 5] }));
+      paintSemana();
       return P.focusSoft($("#grdL .grd-r:last-child select"), { preventScroll: false });
     }
     if (b.hasAttribute("data-grd-rm")) {
       if ($$("#grdL .grd-r").length < 2) return P.toast("A grade precisa de pelo menos uma aula.");
-      return b.closest(".grd-r").remove();
+      b.closest(".grd-r").remove();
+      return paintSemana();
     }
     if (b.id === "grdPadrao") {
       if (!confirm("Voltar para a grade padrão do site? A grade salva será apagada.")) return;
