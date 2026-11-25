@@ -94,7 +94,12 @@
   P.TURMAS = { adulto: "Adulto", feminino: "Feminino", kids1: "Kids 1", kids2: "Kids 2" };
   /* a turma na grade (Site.GRADE): o Feminino treina junto com o Adulto */
   P.GRADE_TURMA = { adulto: "Adulto", feminino: "Adulto", kids1: "Kids 1", kids2: "Kids 2" };
-  P.HORAS = { adulto: ["08:00", "11:00", "19:00", "20:30"], feminino: ["08:00", "11:00", "19:00", "20:30"], kids1: ["09:00", "18:00"], kids2: ["09:00", "18:00"] };
+  /* os horários de cada turma vêm da grade (Configurações → Aulas e horários); o Feminino treina com o Adulto */
+  P.horasDa = function (t) {
+    var n = { adulto: "Adulto", feminino: "Adulto", kids1: "Kids 1", kids2: "Kids 2" }[t], h = {};
+    Site.GRADE.forEach(function (c) { if (c.n === n) h[c.t] = 1; });
+    return Object.keys(h).sort();
+  };
   P.kid = function (t) { return /^kids/.test(t); };
   /* idade mínima da IBJJF para a faixa kids (cinza 4, amarela 7, laranja 10, verde 13): a mensagem, ou "" se está ok ou sem nascimento */
   P.avisoIdade = function (faixa, nascimento) {

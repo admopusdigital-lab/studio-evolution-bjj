@@ -8,7 +8,7 @@ var VERSAO = "evo-app-v40";
 var TELAS = [
   "app.html", "painel.html", "painel.js", "painel-hoje.js", "painel-alunos.js", "painel-crm.js", "painel-fin.js", "painel-mov.js", "painel-tecnicas.js", "painel-grau.js", "painel-equipe.js", "painel-rank.js", "painel-estoque.js", "painel.css", "area-do-professor.html", "entrar.html", "nova-senha.html", "acessos.html",
   "site.css", "app.css", "tema.css", "acesso.css",
-  "site.js", "acesso.js", "movimentos.js", "fotos.js", "supabase-config.js", "manifest.webmanifest",
+  "painel-export.js", "painel-celular.js", "site.js", "acesso.js", "movimentos.js", "fotos.js", "supabase-config.js", "manifest.webmanifest",
   "img/logo-evolution-mask.webp", "img/logo-evolution-bjj.webp",
   "img/app/icone-192.png", "img/app/favicon-32.png",
   "img/takes/guarda.jpg", "img/takes/tecnica.jpg", "img/takes/aquecimento.jpg", "img/takes/adulto.jpg",

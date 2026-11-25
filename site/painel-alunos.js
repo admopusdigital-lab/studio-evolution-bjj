@@ -116,7 +116,7 @@
       '<div class="msg-acts"><button class="mini-btn" type="submit">' + (a.id ? "Salvar" : "Cadastrar aluno") + '</button><button class="mini-btn ghost" type="button" data-cancel>Cancelar</button></div>';
   }
   function formSync(f, a) {
-    var t = $('[data-k="turma"]', f).value, kid = P.kid(t), hs = P.HORAS[t], h = $('[data-k="horario"]', f), fx = $('[data-k="faixa"]', f), cur = h.value || (a && a.horario) || "", cf = fx.value || (a && a.faixa) || "branca";
+    var t = $('[data-k="turma"]', f).value, kid = P.kid(t), hs = P.horasDa(t), h = $('[data-k="horario"]', f), fx = $('[data-k="faixa"]', f), cur = h.value || (a && a.horario) || "", cf = fx.value || (a && a.faixa) || "branca";
     h.innerHTML = '<option value="">Sem horário fixo</option>' + hs.map(function (x) { return '<option value="' + x + '">' + (P.TURMAS[t]) + " " + Site.hora(x) + "</option>"; }).join("");
     h.value = hs.indexOf(cur) >= 0 ? cur : "";
     var fxs = kid ? P.FX_KD : P.FX_AD;
