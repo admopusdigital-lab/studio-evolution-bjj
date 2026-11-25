@@ -74,21 +74,38 @@ body.pr { background: var(--paper); }
 .pr .room-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .pr .room-tools label { font-size: 12px; color: var(--ink-3); }
 /* Modo tatame: a TV da aula, em letras grandes */
-.tt { margin-top: 20px; padding: clamp(24px, 4vw, 56px); border-radius: 12px; background: oklch(0.12 0.006 75); color: oklch(0.96 0.006 85); display: grid; gap: 18px; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: start; }
-.tt:fullscreen { border-radius: 0; align-content: center; padding: 6vw; }
-.tt .k { font: 600 clamp(11px, 1.1vw, 15px)/1.3 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.82 0.13 86); }
-.tt .aula { margin-top: 6px; font: 400 clamp(22px, 2.6vw, 40px)/1.1 var(--serif); }
-.tt .cd { margin-top: 18px; font: 400 clamp(56px, 9vw, 150px)/0.9 var(--serif); letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
-.tt .cd.hold { font-size: clamp(22px, 2.6vw, 40px); letter-spacing: 0; color: oklch(0.75 0.01 85); }
-.tt .val { margin-top: 14px; font-size: clamp(13px, 1.2vw, 18px); color: oklch(0.78 0.01 85); }
+/* Modo tatame: a tela da TV, lida a cinco metros. À esquerda a aula, o QR e o código; à direita quem já chegou */
+.tt { margin-top: 20px; padding: clamp(22px, 3.4vw, 56px); border-radius: 12px; background: oklch(0.12 0.006 75); color: oklch(0.96 0.006 85); display: grid; gap: clamp(18px, 3vw, 48px);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; align-items: start; }
+.tt:fullscreen { border-radius: 0; width: 100vw; height: 100vh; padding: 4.5vh 5vw 3.5vh; align-items: center; }
+.tt .aula { font: 400 clamp(28px, 3.6vw, 76px)/1 var(--serif); letter-spacing: -0.02em; }
+.tt-st { margin-top: 12px; display: flex; align-items: center; gap: 10px; font-size: clamp(14px, 1.4vw, 26px); color: oklch(0.78 0.01 85); }
+.tt-st.on::before { content: ""; width: 0.55em; height: 0.55em; border-radius: 50%; background: oklch(0.82 0.13 86); box-shadow: 0 0 0 0.25em oklch(0.82 0.13 86 / 0.2); }
+.tt-ent { margin-top: clamp(18px, 3vh, 44px); display: flex; align-items: center; gap: clamp(16px, 2.4vw, 44px); flex-wrap: wrap; }
+.tt-qr { flex: none; width: clamp(150px, 17vw, 340px); aspect-ratio: 1; padding: clamp(8px, 0.8vw, 16px); border-radius: 14px; background: #fff; }
+.tt-qr svg { display: block; width: 100%; height: 100%; }
+.tt-cd { min-width: 0; }
+.tt .how { max-width: 26ch; font-size: clamp(13px, 1.2vw, 22px); line-height: 1.35; color: oklch(0.78 0.01 85); }
+.tt .cd { margin-top: 10px; font: 400 clamp(44px, 6.4vw, 140px)/1 var(--serif); letter-spacing: 0.06em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tt .cd.hold { font-size: clamp(28px, 3vw, 56px); letter-spacing: 0.12em; color: oklch(0.5 0.01 85); }
+.tt-bar { margin-top: clamp(12px, 1.6vh, 24px); height: clamp(6px, 0.7vh, 12px); border-radius: 99px; background: oklch(0.26 0.01 80); overflow: hidden; }
+.tt-bar i { display: block; height: 100%; background: oklch(0.82 0.13 86); transform-origin: left; transition: transform 1s linear; }
+.tt .val { margin-top: 10px; font-size: clamp(13px, 1.2vw, 22px); color: oklch(0.78 0.01 85); }
 .tt .val b { color: oklch(0.96 0.006 85); }
-.tt .how { margin-top: 18px; font-size: clamp(12px, 1.1vw, 16px); color: oklch(0.72 0.01 85); }
-.tt .n { font: 400 clamp(40px, 5vw, 80px)/1 var(--serif); }
-.tt .n small { font-size: 0.4em; color: oklch(0.72 0.01 85); }
-.tt ol { margin-top: 12px; display: grid; gap: 6px; }
-.tt li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid oklch(0.3 0.01 80); font-size: clamp(14px, 1.3vw, 20px); }
-.tt li span { color: oklch(0.72 0.01 85); font-variant-numeric: tabular-nums; }
-@media (max-width: 760px) { .tt { grid-template-columns: minmax(0, 1fr); } }
+.tt .n { font: 400 clamp(64px, 8vw, 180px)/0.9 var(--serif); color: oklch(0.82 0.13 86); }
+.tt .n small { font-size: 0.38em; color: oklch(0.96 0.006 85); }
+.tt-sub { margin-top: 6px; font-size: clamp(14px, 1.4vw, 26px); color: oklch(0.78 0.01 85); }
+.tt-mural { margin-top: clamp(16px, 3vh, 40px); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 26px) clamp(8px, 1vw, 20px); }
+.tt-mural li { display: grid; justify-items: center; gap: 8px; min-width: 0; }
+.tt-mural .av { width: 100%; max-width: clamp(54px, 6.2vw, 128px); height: auto; aspect-ratio: 1; font: 600 clamp(15px, 1.5vw, 30px)/1 var(--sans); color: oklch(0.96 0.006 85); background: oklch(0.2 0.008 78);
+  box-shadow: 0 0 0 clamp(3px, 0.32vw, 6px) var(--anel, oklch(0.96 0.004 90)); }
+.tt-mural b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 clamp(12px, 1.1vw, 21px)/1.2 var(--sans); }
+.tt-mural li.arrive { animation: arrive 900ms var(--ease); }
+.tt-mural .vaga .av { background: transparent; box-shadow: inset 0 0 0 2px oklch(0.32 0.01 80); outline: 0; }
+.tt-rod { grid-column: 1 / -1; padding-top: clamp(12px, 2vh, 24px); border-top: 1px solid oklch(0.3 0.01 80); font-size: clamp(13px, 1.2vw, 22px); color: oklch(0.78 0.01 85); }
+.tt-rod:empty { display: none; }
+.tt-rod b { color: oklch(0.96 0.006 85); font-weight: 600; }
+@media (max-width: 760px) { .tt { grid-template-columns: minmax(0, 1fr); } .tt-mural { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 /* ficha */
 .ficha-sec { margin-top: 20px; }
 .ficha-sec h5 { font: 600 10.5px/1.3 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
@@ -129,6 +146,8 @@ body.pr { background: var(--paper); }
     <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11M17 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5M12 14v3.5M8.5 20.5h7M9.5 17.5h5"/></symbol>
     <symbol id="i-box" viewBox="0 0 24 24"><path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
+    <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="12.5" rx="2"/><path d="M8 20.5h8M12 17v3.5"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M5 21V11h14v10"/><path d="M3 21h18M12 11V7.5M9 11V8.5M15 11V8.5"/><path d="M12 4.5c.6.8.6 1.6 0 2.2-.6-.6-.6-1.4 0-2.2z"/></symbol>
   </defs>
 </svg>
 
@@ -146,7 +165,7 @@ body.pr { background: var(--paper); }
   <div class="dash-in">
     <nav class="dash-side" aria-label="Menu do painel">
       <button type="button" data-go="hoje" aria-current="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-home"/></svg>Hoje</button>
-      <button type="button" data-go="tatame" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-code"/></svg>Modo tatame</button>
+      <button type="button" data-go="tatame" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-tv"/></svg>Modo tatame</button>
       <button type="button" data-go="alunos" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-users"/></svg>Alunos<span class="badge" id="bAlunos" hidden></span></button>
       <button type="button" data-go="grad" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad" hidden></span></button>
       <button type="button" data-go="rank" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-trophy"/></svg>Ranking</button>
@@ -164,17 +183,18 @@ body.pr { background: var(--paper); }
       <!-- Hoje: as aulas do dia, o código da aula, quem confirmou e quem chegou -->
       <section class="dv on" data-v="hoje" aria-labelledby="t-hoje">
         <div class="dv-h"><div><p class="dv-k" id="hData"></p><h3 id="t-hoje">Hoje</h3></div><p id="hAgora"></p></div>
-        <div class="kpis">
+        <div class="hj">
+          <div class="room" id="room"></div>
+          <aside class="hj-lado">
+            <section class="hj-box" aria-labelledby="hjAulasT"><h4 class="hj-t" id="hjAulasT">Aulas de hoje</h4><div class="classes" id="classes" role="group" aria-label="Aulas de hoje"></div></section>
+            <section class="hj-box" aria-labelledby="hjFilaT"><h4 class="hj-t" id="hjFilaT">Precisa de você</h4><ul class="fila" id="hFila"></ul></section>
+          </aside>
+        </div>
+        <div class="kpis hj-kpis">
           <button class="kpi" type="button" data-goto="alunos" data-chip="ativos"><b id="kAtivos">–</b><span id="kAtivosT">alunos ativos</span></button>
           <div class="kpi"><b id="kPres">–</b><span>presenças nos últimos 7 dias</span></div>
-          <button class="kpi warn" type="button" data-goto="alunos" data-chip="sumidos"><b id="kSumidos">–</b><span>sem treinar há 14 dias ou mais</span></button>
+          <button class="kpi" type="button" data-goto="alunos" data-chip="sumidos" id="kSumidosB"><b id="kSumidos">–</b><span>sem treinar há 14 dias ou mais</span></button>
           <button class="kpi" type="button" data-goto="leads"><b id="kLeads">–</b><span>interessados esperando retorno</span></button>
-        </div>
-        <div class="niver" id="hNiver" hidden></div>
-        <div class="niver grau-aviso" id="hGrau" hidden></div>
-        <div class="day-grid">
-          <div class="classes" id="classes" role="group" aria-label="Aulas de hoje"></div>
-          <div class="room" id="room"></div>
         </div>
       </section>
 
@@ -182,18 +202,25 @@ body.pr { background: var(--paper); }
       <section class="dv" data-v="tatame" aria-labelledby="t-tatame">
         <div class="dv-h"><div><p class="dv-k">Para a TV do tatame</p><h3 id="t-tatame">Modo tatame</h3></div><button class="mini-btn" type="button" id="ttFull">Abrir em tela cheia</button></div>
         <div class="tt" id="tt">
-          <div>
-            <p class="k">Código da aula</p>
+          <div class="tt-l">
             <p class="aula" id="ttAula">Nenhuma aula aberta</p>
-            <p class="cd hold" id="ttCode">Gere o código em Hoje</p>
-            <p class="val" id="ttVal"></p>
-            <p class="how">No app: Presença → digite o código.</p>
+            <p class="tt-st" id="ttSt"></p>
+            <div class="tt-ent">
+              <div class="tt-qr" id="ttQr" role="img" aria-label="QR code da presença"></div>
+              <div class="tt-cd">
+                <p class="how" id="ttHow">Aponte a câmera do celular para o QR ou digite o código no app, em Presença.</p>
+                <p class="cd hold" id="ttCode">Gere o código em Hoje</p>
+                <div class="tt-bar" aria-hidden="true"><i id="ttBar"></i></div>
+                <p class="val" id="ttVal"></p>
+              </div>
+            </div>
           </div>
-          <div>
-            <p class="k">Já chegaram</p>
+          <div class="tt-r">
             <p class="n" id="ttN">0<small> de 10</small></p>
-            <ol id="ttList"></ol>
+            <p class="tt-sub">já chegaram</p>
+            <ol class="tt-mural" id="ttList"></ol>
           </div>
+          <p class="tt-rod" id="ttRod"></p>
         </div>
       </section>
 
@@ -357,6 +384,7 @@ body.pr { background: var(--paper); }
 </main>
 <div class="dash-toast" id="dashToast" role="status" aria-live="polite"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span></span></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha512-ZDSPMa/JM1D+7kdg2x3BsruQ6T/JpJo3jWDWkCZsP+5yVyp1KfESqLI+7RqB5k24F7p2cV7i2YHh/890y6P6Sw==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 <script src="site.js"></script>
 <script src="movimentos.js"></script>
 <script src="fotos.js"></script>

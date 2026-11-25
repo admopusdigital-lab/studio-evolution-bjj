@@ -1432,13 +1432,14 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (FAMILIA.length > 1) carregarRank();
       if (window.recarregarMov) window.recarregarMov();
       carregarLoja();
-      return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]);
+      return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]).then(presencaDoLink);
     }).catch(function () { toast("Sem conexão com o Studio. Assim que a internet voltar, o app atualiza sozinho."); });
   }
   var carregou = false;
   /* a internet voltou, ou o app voltou para a tela sem ter carregado: tenta de novo */
   function tentaDeNovo() { if (!demo && !carregou && !document.hidden) carregarReal(); }
   window.addEventListener("online", function () { if (!carregou) tentaDeNovo(); else renovar(); });
+  if (demo) setTimeout(presencaDoLink, 400);
   if (!demo) {
     $("#ap").classList.add("sem-dados");
     carregarReal();
@@ -1700,6 +1701,20 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   /* fresh: acabou de registrar (conta na meta, anima e avisa); senão, o app abriu com a presença já feita */
   /* o check-in volta a aparecer para a aula escolhida: dá para registrar duas aulas no mesmo dia,
      cada uma com o código dela (cada aula conta uma presença) */
+  /* o QR da TV abre app.html?presenca=TRU482: o app vai direto para a presença e registra com o código do link */
+  var doLink = (/[?&]presenca=([A-Za-z0-9 %-]{6,12})/.exec(location.search) || [])[1] || null;
+  function presencaDoLink() {
+    if (!doLink) return;
+    var c = clean(decodeURIComponent(doLink));
+    doLink = null;
+    try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
+    if (!/^[A-Z]{3}[0-9]{3}$/.test(c)) return;
+    show("presenca");
+    if (registered) { toast("Sua presença nesta aula já está registrada."); return; }
+    if ($("#apCodeWrap").hidden) abrirCheckin();
+    inp.value = c;
+    onCode();
+  }
   function abrirCheckin() {
     var wrap = $("#apCodeWrap"), done = $("#apDone");
     if (window.gsap) gsap.killTweensOf(wrap);

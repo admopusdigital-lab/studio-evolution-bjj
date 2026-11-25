@@ -119,7 +119,9 @@
           }
           if (!permite(p.papel, papel)) return c.auth.signOut().then(function () { return { ok: false, campo: "usuario", msg: trocado }; });
           gravar(SESSAO, JSON.stringify({ papel: p.papel, nome: p.nome, desde: new Date().toISOString() }));
-          return { ok: true, papel: p.papel, destino: AREA[papel] };
+          var depois = null;
+          try { depois = papel === "aluno" ? sessionStorage.getItem("evo-volta") : null; sessionStorage.removeItem("evo-volta"); } catch (e) {}
+          return { ok: true, papel: p.papel, destino: depois && /^app\.html\?presenca=[A-Za-z0-9]{6}$/.test(depois) ? depois : AREA[papel] };
         });
       }).catch(function () { return { ok: false, campo: "senha", msg: MSG_REDE }; });
     },
@@ -135,6 +137,8 @@
     /* portão das áreas: chamado no <head>, antes da primeira pintura. Sem sessão para esta área, volta para a entrada */
     portao: function (area) {
       var volta = function () {
+        /* veio pelo QR da TV sem estar conectado: depois de entrar, volta para registrar a presença */
+        if (area === "aluno" && /[?&]presenca=/.test(location.search)) { try { sessionStorage.setItem("evo-volta", "app.html" + location.search); } catch (e) {} }
         document.documentElement.style.display = "none";
         location.replace("entrar.html" + (area === "professor" ? "#professor" : ""));
       };
