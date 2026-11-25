@@ -788,3 +788,41 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
   #alTbl td:nth-child(6) { grid-column: 1 / -1; grid-row: 3; padding-left: 40px; }
   #alTbl td.act { grid-column: 2; grid-row: 2; }
 }
+
+/* ---------- Ficha do aluno em página inteira: cabeçalho com a faixa, selos e ações; abas embaixo ---------- */
+.pr .drawer.pagina { left: 0; right: 0; width: auto; box-shadow: none; }
+.drawer.pagina .dr-top, .drawer.pagina .dr-body { max-width: 1080px; margin-inline: auto; }
+.drawer.pagina .dr-top { border-bottom: 0; padding-top: 22px; }
+.drawer.pagina #drName { font-size: clamp(26px, 3vw, 38px); line-height: 1.05; }
+.drawer.pagina .dr-body { padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+.fp-cab { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px 18px; align-items: center; padding: 4px 0 18px; border-bottom: 1px solid var(--rule); }
+.fp-av { width: 68px; height: 68px; font-size: 20px; }
+.fp-id { display: grid; gap: 8px; min-width: 0; }
+.fp-belt .bl { font-size: 14px; }
+.fp-selos { display: flex; flex-wrap: wrap; gap: 6px; }
+.fp-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.fp-acts .mini-btn { height: 38px; padding: 0 14px; }
+.fp-gold { background: var(--gold) !important; color: oklch(0.13 0.005 70) !important; }
+.fp-tabs { display: flex; gap: 2px; margin-top: 14px; border-bottom: 1px solid var(--rule); overflow-x: auto; scrollbar-width: none; }
+.fp-tabs::-webkit-scrollbar { display: none; }
+.fp-tabs button { flex-shrink: 0; min-height: 44px; padding: 0 16px; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; color: var(--ink-3); font: 500 14px/1 var(--sans); cursor: pointer; }
+.fp-tabs button:hover { color: var(--ink); }
+.fp-tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gold); }
+.fp-tabs button:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.fp-cam-t { font-size: 15px; color: var(--ink-2); }
+.fp-cam-t b { color: var(--ink); font-weight: 600; }
+.gr-bar.fp-bar { display: block; width: 100%; max-width: 520px; height: 14px; margin: 10px 0 8px; border-radius: 4px; }
+.fp-cam-s { font-size: 13px; }
+.fp-obs p { padding: 12px 14px; border-radius: 10px; background: color-mix(in oklch, var(--gold) 9%, var(--paper-2)); color: var(--ink); font-size: 14px; line-height: 1.5; }
+.fp-perigo { color: var(--warn) !important; }
+@media (min-width: 1000px) {
+  #fpp-resumo:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 0 32px; align-items: start; }
+  #fpp-resumo > .ficha-sec:last-child { grid-column: 2; grid-row: 1 / span 3; }
+}
+@media (max-width: 700px) {
+  .fp-cab { grid-template-columns: auto minmax(0, 1fr); }
+  .fp-av { width: 56px; height: 56px; }
+  .fp-acts { grid-column: 1 / -1; justify-content: flex-start; }
+  .fp-acts .mini-btn { flex: 1 1 auto; height: 44px; }
+}
+@media (max-width: 860px) { html.tem-dock .drawer.pagina .dr-body { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); } }

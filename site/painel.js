@@ -259,8 +259,10 @@
 
   /* ---------- a ficha (gaveta à direita) ---------- */
   var drawer = $("#drawer"), scrim = $("#drScrim"), voltaFoco = null;
-  P.abrirFicha = function (html, titulo) {
+  P.abrirFicha = function (html, titulo, op) {
     if (!drawer.classList.contains("on")) voltaFoco = document.activeElement;
+    /* a ficha do aluno abre em página inteira; as outras (interessado, registrar grau) continuam na gaveta */
+    drawer.classList.toggle("pagina", !!(op && op.pagina));
     /* cada ficha põe o próprio onclick; o da ficha anterior sai */
     drawer.onclick = null;
     /* cada ficha aberta ganha um número: a resposta que chega depois de trocar de ficha é descartada */

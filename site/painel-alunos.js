@@ -474,11 +474,13 @@
       grava(null).then(function () { P.toast("Foto tirada."); }).catch(erro);
     });
   }
+  var abaFicha = { id: null, aba: "resumo" };
   P.abrirAluno = function (id, cred) {
     var a = P.porId[id];
     if (!a) return;
-    var dr = P.abrirFicha('<p class="muted">Carregando a ficha…</p>', a.nome), minha = P.fichaN;
-    $("#drSub").textContent = P.turmaTx(a) + " · " + P.beltTxt(a.faixa, a.graus) + (a.ativo ? "" : " · inativo");
+    var dr = P.abrirFicha('<p class="muted">Carregando a ficha…</p>', a.nome, { pagina: true }), minha = P.fichaN;
+    /* a faixa já vem desenhada no cabeçalho da ficha: o subtítulo fica com a turma e quem é o responsável */
+    $("#drSub").textContent = P.turmaTx(a) + (a.responsavel ? " · responsável: " + a.responsavel : "") + (a.ativo ? "" : " · inativo");
     Promise.all([
       P.q(function (sb) { return sb.from("mensalidades").select("*").eq("aluno", id).order("competencia", { ascending: false }).limit(6); }),
       P.q(function (sb) { return sb.from("graduacoes").select("*").eq("aluno", id).order("data", { ascending: false }); }),
@@ -489,42 +491,76 @@
       var mens = r[0] || [], grads = r[1] || [], cobs = r[2], pres = P.pres.filter(function (p) { return p.aluno === id; });
       var antes = a.aulas_antes || 0, total = pres.length, desdeGrau = (grads.length ? pres.filter(function (p) { return p.data > grads[0].data; }).length : total) + P.antes(a, grads[0] || null);
       var idade = a.nascimento ? Math.floor(P.difDias(a.nascimento, P.hoje()) / 365.25) : null;
+      /* ---------- cabeçalho: faixa desenhada, selos e as ações principais ---------- */
+      var mAtr = mens.filter(function (m) { return !m.pago_em && m.vencimento < P.hoje(); }), mMes = mens.filter(function (m) { return m.competencia === P.mesIni(P.hoje()); })[0];
+      var seloMens = !(a.mensalidade > 0) ? "" : mAtr.length ? '<span class="pill-s warn">Mensalidade atrasada há ' + P.difDias(mAtr[mAtr.length - 1].vencimento, P.hoje()) + " dias</span>"
+        : mMes && mMes.pago_em ? '<span class="pill-s in">Em dia · vence dia ' + (a.vencimento || 10) + "</span>" : '<span class="pill-s">Vence dia ' + (a.vencimento || 10) + "</span>";
+      var px = proxPasso(a), corF = Site.COR_FAIXA[Site.faixaBase(a.faixa)] || Site.COR_FAIXA.branca;
+      var naFx = grads.filter(function (g) { return g.faixa === a.faixa; }), desdeFx = naFx.length ? naFx[naFx.length - 1].data : a.inicio;
+      var mFx = desdeFx ? Math.max(0, Math.floor(P.difDias(desdeFx, P.hoje()) / 30.44)) : null;
+      var cab = '<div class="fp-cab">' +
+        '<span class="av fp-av"' + Fotos.attr(a.foto) + ">" + P.ini(a.nome) + "</span>" +
+        '<div class="fp-id"><p class="fp-belt">' + P.belt(a.faixa, a.graus, a.turma) + '</p><p class="fp-selos">' + seloMens +
+          (a.conta ? '<span class="pill-s in">App ativo</span>' : '<span class="pill-s">Sem app</span>') + (a.ativo ? "" : '<span class="pill-s warn">Inativo</span>') + "</p></div>" +
+        '<div class="fp-acts">' +
+          (P.pode("graduacoes") ? '<button class="mini-btn fp-gold" type="button" data-grau>Registrar grau</button>' : "") +
+          (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
+          (P.pode("alunos") ? '<button class="mini-btn ghost" type="button" data-edit>Editar dados</button>' : "") +
+        "</div></div>";
+      /* ---------- as abas ---------- */
+      var ABAS = [["resumo", "Resumo"], ["fin", "Financeiro", P.pode("financeiro")], ["grad", "Graduação"], ["fam", "Família", P.pode("alunos")], ["dados", "Dados"]].filter(function (x) { return x[2] !== false; });
+      var abaAtual = abaFicha.id === id && ABAS.some(function (x) { return x[0] === abaFicha.aba; }) ? abaFicha.aba : "resumo";
+      if (cred) abaAtual = "resumo";
+      abaFicha = { id: id, aba: abaAtual };
+      var tabs = '<div class="fp-tabs" role="tablist" aria-label="Partes da ficha">' + ABAS.map(function (x) {
+        return '<button type="button" role="tab" id="fpt-' + x[0] + '" aria-controls="fpp-' + x[0] + '" aria-selected="' + (x[0] === abaAtual) + '" tabindex="' + (x[0] === abaAtual ? 0 : -1) + '" data-fp-aba="' + x[0] + '">' + x[1] + "</button>";
+      }).join("") + "</div>";
+      function painel(k, conteudo) { return '<section class="fp-p" role="tabpanel" id="fpp-' + k + '" aria-labelledby="fpt-' + k + '"' + (k === abaAtual ? "" : " hidden") + ">" + conteudo + "</section>"; }
+      var caminho = '<div class="ficha-sec fp-cam"><h5>Caminho do grau</h5>' +
+        '<p class="fp-cam-t"><b>' + esc(P.beltTxt(a.faixa, a.graus)) + "</b>" + (px ? " · próximo passo: " + esc(px.tx.toLowerCase()) : "") + "</p>" +
+        '<span class="gr-bar fp-bar" style="--cor:' + corF + '"><i style="width:' + Math.min(100, Math.round(desdeGrau / 50 * 100)) + '%"></i></span>' +
+        '<p class="muted fp-cam-s">' + desdeGrau + " de 50 aulas desde o último grau" + (mFx !== null ? " · na faixa há " + (mFx < 12 ? mFx + (mFx === 1 ? " mês" : " meses") : Math.floor(mFx / 12) + (mFx < 24 ? " ano" : " anos") + (mFx % 12 ? " e " + (mFx % 12) + (mFx % 12 === 1 ? " mês" : " meses") : "")) : "") + "</p></div>";
+      var obs = a.nota ? '<div class="ficha-sec fp-obs"><h5>Observações</h5><p>' + esc(a.nota) + "</p></div>" : "";
       var html =
         (cred ? '<div class="cred"><b>Acesso ao app ' + (cred.reenvio ? "com senha nova" : "criado") + "</b><p>E-mail: <code>" + esc(cred.email) + "</code><br>Senha provisória: <code>" + esc(cred.senha) + '</code></p><div class="msg-acts">' +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-envia>Mandar pelo WhatsApp</button>' : "") + '<button class="mini-btn ghost" type="button" data-copia>Copiar mensagem</button></div><p class="muted" style="margin-top:6px;font-size:12px">A senha aparece só agora. Depois de entrar, o aluno pode trocar em "Esqueci a senha".</p></div>' : "") +
-        (P.pode("alunos") ? fotoHTML(a) : "") +
-        '<div class="ficha-sec"><h5>Dados</h5><dl class="ficha-dl">' +
-          (a.responsavel ? "<dt>Responsável</dt><dd>" + esc(a.responsavel) + "</dd>" : "") +
-          (P.kid(a.turma) ? "<dt>Autorização</dt><dd>" + (a.consentimento_em ? "do responsável, em " + P.dataBRano(a.consentimento_em) : '<span class="warn-tx">falta registrar (Editar dados)</span>') + "</dd>" : "") +
-          (idade !== null ? "<dt>Idade</dt><dd>" + idade + " anos</dd>" : "") +
-          "<dt>WhatsApp</dt><dd>" + (a.whatsapp ? P.fone(a.whatsapp) : "—") + "</dd>" +
-          "<dt>E-mail</dt><dd>" + (a.email ? esc(a.email) : "—") + "</dd>" +
-          "<dt>App</dt><dd>" + (a.conta ? '<span class="pill-s in">Com acesso</span>' : '<span class="pill-s">Sem acesso</span>') + "</dd>" +
-          "<dt>Mensalidade</dt><dd>" + (a.mensalidade != null ? P.brl(a.mensalidade) + " · vence dia " + (a.vencimento || 10) : "—") + "</dd>" +
-          "<dt>No Studio desde</dt><dd>" + P.dataBRano(a.inicio) + (a.saida ? " · saiu em " + P.dataBRano(a.saida) : "") + "</dd>" +
-          (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
-        "</dl></div>" +
-        '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + foraHTML(a, grads[0]) + "</div>" +
-        (!P.pode("financeiro") ? "" : '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return mensLi(a, m); }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" ) +
-        (P.pode("financeiro") ? outrosHTML(a, cobs) : "") +
-        '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return '<li data-grad="' + g.id + '"><span>' + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + '</span><span class="row-acts">' + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + '<button class="mini-btn ghost" type="button" data-grad-apaga>Apagar</button></span></li>'; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
-        (P.pode("alunos") ? familiaHTML(a) : "") +
-        '<form class="crm-form" id="frAntes" novalidate hidden>' +
-          '<p class="fin-k">Aulas no Studio antes do app</p>' +
-          '<p class="muted" style="font-size:13px;margin:4px 0 10px">Quantas aulas ' + esc(P.first(a.nome)) + " fez aqui no Studio Evolution antes de usar o app, desde o último grau (na faixa e grau de hoje). Somam no total e nas aulas desde o último grau, no painel e no app do aluno.</p>" +
-          '<div class="crm-grid"><label class="crm-f"><span>Número de aulas</span><input class="crm-in" id="faN" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (antes || "") + '"></label></div>' +
-          '<p class="crm-err" role="alert"></p>' +
-          '<div class="msg-acts"><button class="mini-btn" type="submit">Salvar</button><button class="mini-btn ghost" type="button" data-cancel>Cancelar</button></div>' +
-        "</form>" +
-        '<form class="crm-form" id="frEdit" novalidate hidden></form>' +
-        '<div class="ficha-sec msg-acts">' +
-          (P.pode("alunos") ? '<button class="mini-btn" type="button" data-edit>Editar dados</button>' : "") +
-          (P.pode("graduacoes") ? '<button class="mini-btn ghost" type="button" data-grau>Registrar grau</button>' : "") +
-          (!P.pode("alunos") ? "" : '<button class="mini-btn ghost" type="button" data-antes aria-expanded="false">Aulas no Studio antes do app' + (antes ? " · " + antes : "") + "</button>" ) +
-          (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
-          (a.email && P.pode("alunos") ? '<button class="mini-btn ghost" type="button" data-acesso>' + (a.conta ? "Senha nova do app" : "Criar acesso ao app") + "</button>" : "") +
-          (P.pode("alunos") ? '<button class="mini-btn ghost" type="button" data-ativo>' + (a.ativo ? "Desativar aluno" : "Reativar aluno") + "</button>" : "") +
-        "</div>";
+        cab + tabs +
+        painel("resumo", caminho + obs + '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + foraHTML(a, grads[0]) + "</div>") +
+        (!P.pode("financeiro") ? "" : painel("fin",
+          '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return mensLi(a, m); }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
+          outrosHTML(a, cobs))) +
+        painel("grad",
+          '<div class="ficha-sec"><h5>Graduações</h5>' + (grads.length ? '<ul class="ficha-list">' + grads.map(function (g) { return '<li data-grad="' + g.id + '"><span>' + P.beltTxt(g.faixa, g.graus) + (P.notaGrau(g) ? " · " + esc(P.notaGrau(g)) : "") + '</span><span class="row-acts">' + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + '<button class="mini-btn ghost" type="button" data-grad-apaga>Apagar</button></span></li>'; }).join("") + "</ul>" : '<p class="muted">Nenhum grau registrado.</p>') + "</div>" +
+          '<div class="ficha-sec msg-acts">' + (P.pode("graduacoes") ? '<button class="mini-btn" type="button" data-grau>Registrar grau</button>' : "") +
+            (!P.pode("alunos") ? "" : '<button class="mini-btn ghost" type="button" data-antes aria-expanded="false">Aulas no Studio antes do app' + (antes ? " · " + antes : "") + "</button>") + "</div>" +
+          '<form class="crm-form" id="frAntes" novalidate hidden>' +
+            '<p class="fin-k">Aulas no Studio antes do app</p>' +
+            '<p class="muted" style="font-size:13px;margin:4px 0 10px">Quantas aulas ' + esc(P.first(a.nome)) + " fez aqui no Studio Evolution antes de usar o app, desde o último grau (na faixa e grau de hoje). Somam no total e nas aulas desde o último grau, no painel e no app do aluno.</p>" +
+            '<div class="crm-grid"><label class="crm-f"><span>Número de aulas</span><input class="crm-in" id="faN" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (antes || "") + '"></label></div>' +
+            '<p class="crm-err" role="alert"></p>' +
+            '<div class="msg-acts"><button class="mini-btn" type="submit">Salvar</button><button class="mini-btn ghost" type="button" data-cancel>Cancelar</button></div>' +
+          "</form>") +
+        (P.pode("alunos") ? painel("fam", familiaHTML(a)) : "") +
+        painel("dados",
+          (P.pode("alunos") ? fotoHTML(a) : "") +
+          '<div class="ficha-sec"><h5>Dados</h5><dl class="ficha-dl">' +
+            "<dt>Turma</dt><dd>" + esc(P.turmaTx(a)) + "</dd>" +
+            (a.responsavel ? "<dt>Responsável</dt><dd>" + esc(a.responsavel) + "</dd>" : "") +
+            (P.kid(a.turma) ? "<dt>Autorização</dt><dd>" + (a.consentimento_em ? "do responsável, em " + P.dataBRano(a.consentimento_em) : '<span class="warn-tx">falta registrar (Editar dados)</span>') + "</dd>" : "") +
+            (idade !== null ? "<dt>Idade</dt><dd>" + idade + " anos</dd>" : "") +
+            "<dt>WhatsApp</dt><dd>" + (a.whatsapp ? P.fone(a.whatsapp) : "—") + "</dd>" +
+            "<dt>E-mail</dt><dd>" + (a.email ? esc(a.email) : "—") + "</dd>" +
+            "<dt>App</dt><dd>" + (a.conta ? '<span class="pill-s in">Com acesso</span>' : '<span class="pill-s">Sem acesso</span>') + "</dd>" +
+            "<dt>Mensalidade</dt><dd>" + (a.mensalidade != null ? P.brl(a.mensalidade) + " · vence dia " + (a.vencimento || 10) : "—") + "</dd>" +
+            "<dt>No Studio desde</dt><dd>" + P.dataBRano(a.inicio) + (a.saida ? " · saiu em " + P.dataBRano(a.saida) : "") + "</dd>" +
+            (a.nota ? "<dt>Anotação</dt><dd>" + esc(a.nota) + "</dd>" : "") +
+          "</dl></div>" +
+          '<form class="crm-form" id="frEdit" novalidate hidden></form>' +
+          '<div class="ficha-sec msg-acts">' +
+            (P.pode("alunos") ? '<button class="mini-btn" type="button" data-edit>Editar dados</button>' : "") +
+            (a.email && P.pode("alunos") ? '<button class="mini-btn ghost" type="button" data-acesso>' + (a.conta ? "Senha nova do app" : "Criar acesso ao app") + "</button>" : "") +
+            (P.pode("alunos") ? '<button class="mini-btn ghost fp-perigo" type="button" data-ativo>' + (a.ativo ? "Desativar aluno" : "Reativar aluno") + "</button>" : "") +
+          "</div>");
       $(".dr-body", dr).innerHTML = html;
       ligaOutros(a, dr);
       ligaFoto(a, dr);
@@ -551,9 +587,24 @@
           .catch(function (e2) { $('[type="submit"]', f).classList.remove("loading"); P.erro(e2); });
       };
       var w = function (r) { return msgAcesso(a, r); };
+      function vaiAba(k, foco) {
+        abaFicha.aba = k;
+        $$(".fp-tabs [data-fp-aba]", dr).forEach(function (t) { var on = t.dataset.fpAba === k; t.setAttribute("aria-selected", on ? "true" : "false"); t.tabIndex = on ? 0 : -1; if (on && foco) t.focus(); });
+        $$(".fp-p", dr).forEach(function (p) { p.hidden = p.id !== "fpp-" + k; });
+      }
+      var tl = $(".fp-tabs", dr);
+      if (tl) tl.addEventListener("keydown", function (e) {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        var l = $$("[data-fp-aba]", tl), i = l.indexOf(document.activeElement);
+        if (i < 0) return;
+        e.preventDefault();
+        vaiAba(l[(i + (e.key === "ArrowRight" ? 1 : l.length - 1)) % l.length].dataset.fpAba, true);
+      });
       dr.onclick = function (e) {
         var b = e.target.closest("button");
         if (!b) return;
+        if (b.dataset.fpAba) return vaiAba(b.dataset.fpAba);
+        if (b.hasAttribute("data-edit")) vaiAba("dados");
         if (b.hasAttribute("data-envia")) P.wa(a.whatsapp, w(cred));
         else if (b.hasAttribute("data-copia")) { navigator.clipboard.writeText(w(cred)).then(function () { P.toast("Mensagem copiada."); }, function () { P.toast("Não deu para copiar."); }); }
         else if (b.hasAttribute("data-wa")) P.wa(a.whatsapp, "Oi, " + P.first(a.responsavel || a.nome) + "! Aqui é do Studio Evolution BJJ. ");
@@ -625,6 +676,8 @@
           if (a.conta) Acesso.conta({ acao: "nova-senha", email: a.email }).then(function (r) { if (r.ok) { r.reenvio = true; P.abrirAluno(a.id, r); } else { b.classList.remove("loading"); P.toast(r.msg); } });
           else criarAcesso(a, false);
         } else if (b.hasAttribute("data-ativo")) {
+          /* desativar pede um segundo toque: tira o aluno das listas e da cobrança */
+          if (a.ativo && b.dataset.certo !== "1") { b.dataset.certo = "1"; b.textContent = "Desativar mesmo?"; return; }
           var ativo = !a.ativo;
           P.q(function (sb) { return sb.from("alunos").update({ ativo: ativo, saida: ativo ? null : P.hoje() }).eq("id", a.id); })
             .then(P.carregarAlunos).then(function () { P.toast(P.first(a.nome) + (ativo ? " voltou para os ativos." : " foi para os inativos. O histórico fica guardado.")); P.abrirAluno(a.id); })
