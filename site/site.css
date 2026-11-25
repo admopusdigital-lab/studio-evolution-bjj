@@ -526,3 +526,25 @@ main > section { overflow-x: clip; }
 .swipe-dots { display: flex; justify-content: center; gap: 8px; margin-top: 22px; }
 .swipe-dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--rule); transition: width 450ms var(--ease), background-color 450ms var(--ease); }
 .swipe-dots i.on { width: 24px; background: var(--gold); }
+
+/* ===== celular: o fecho (bloco amarelo) e o rodapé mais curtos =====
+   Eram ~2.500 px em toda página. A foto do fecho sai, os horários ficam só no rodapé (antes apareciam duas vezes)
+   e o rodapé vira duas colunas: Site e Contato lado a lado, as aulas embaixo. */
+@media (max-width: 700px) {
+  .cta-inner { padding-block: 72px 64px; }
+  .cta-grid { gap: 0; }
+  .cta .h2 { margin-top: 18px; font-size: 38px; }
+  .cta .lead { margin-top: 16px; }
+  .cta .btn { margin-top: 26px; }
+  .cta-photo { display: none; }
+  .contact { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; margin-top: 36px; padding-top: 20px; }
+  .contact > div:has([data-grade-linha]) { display: none; }
+  .contact dd { font-size: 14px; }
+  .foot { padding-top: 56px; }
+  .foot-grid { gap: 28px 18px; }
+  .foot .about { font-size: 14px; }
+  .foot li { font-size: 14px; padding-block: 2px; }
+  .foot-grid > :nth-child(3) { grid-column: 1 / -1; order: 9; }
+  .foot-grid > :last-child { grid-column: auto; }
+  .foot-logo-wrap { margin-top: 40px; padding-bottom: 14px; }
+}

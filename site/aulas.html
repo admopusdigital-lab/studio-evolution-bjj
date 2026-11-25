@@ -65,6 +65,20 @@
 .bi-pts .ic { width: 18px; height: 18px; margin-top: 3px; color: var(--gold); stroke-width: 2; }
 .bi-photo { margin-top: 28px; aspect-ratio: 4 / 3; }
 @media (min-width: 1000px) { .bi-photo { display: none; } }
+/* celular: os três benefícios viram cartões que deslizam para o lado (eram ~3.000 px um embaixo do outro) */
+@media (max-width: 999px) {
+  .a-ben { padding-block: 72px; }
+  .ben-grid { margin-top: 28px; }
+  .ben-items { display: flex; gap: 14px; margin-left: calc(-1 * var(--gut)); margin-right: calc(-1 * var(--gut-r)); padding-inline: var(--gut) var(--gut-r); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .ben-items::-webkit-scrollbar { display: none; }
+  .bi { flex: 0 0 min(86%, 420px); display: flex; flex-direction: column; align-content: start; padding: 14px 16px 18px; border-radius: 8px; background: var(--paper); box-shadow: 0 0 0 1px var(--rule); scroll-snap-align: start; }
+  .bi::before { top: auto; bottom: -6px; right: 8px; translate: none; font-size: 110px; }
+  .bi-photo { order: -1; margin: 0 0 14px; aspect-ratio: 16 / 10; }
+  .bi h3 { margin-top: 10px; font-size: 32px; }
+  .bi > p { margin-top: 10px; font-size: 15px; }
+  .bi-pts { margin-top: 14px; }
+  .bi-pts li { padding-block: 8px; font-size: 14px; }
+}
 
 /* turmas em cartazes: a foto ocupa o cartão, o texto vem por cima e o cartão inclina com o mouse */
 .a-progs { padding-block: clamp(100px, 12vw, 180px); }
@@ -100,6 +114,20 @@
 .dgrid li { position: relative; overflow: hidden; padding: 30px 28px 36px 0; border-bottom: 1px solid var(--rule); }
 @media (min-width: 700px) { .dgrid li + li { padding-left: 28px; } .dgrid li:nth-child(odd) { border-right: 1px solid var(--rule); } }
 @media (min-width: 1100px) { .dgrid li { border-right: 1px solid var(--rule); } .dgrid li:last-child { border-right: 0; } }
+/* celular: os quatro diferenciais em 2 × 2 */
+@media (max-width: 699px) {
+  .a-dif { padding-bottom: 72px; }
+  .dgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 32px; }
+  .dgrid li { padding: 20px 12px 22px 0; }
+  .dgrid li:nth-child(odd) { border-right: 1px solid var(--rule); }
+  .dgrid li:nth-child(even) { padding-left: 12px; }
+  .dgrid li::before { font-size: 54px; right: 8px; }
+  .dgrid .ic { width: 28px; height: 28px; }
+  .dgrid h3 { margin-top: 14px; font-size: 15px; overflow-wrap: anywhere; }
+  .dgrid p { font-size: 13.5px; }
+  .a-progs { padding-block: 72px; }
+  .a-space { min-height: 0; padding-block: 160px 56px; }
+}
 .dgrid li::before { content: attr(data-n); position: absolute; right: 14px; top: 8px; font: 400 clamp(72px, 7vw, 120px)/1 var(--serif); color: transparent; -webkit-text-stroke: 1px color-mix(in oklch, var(--gold) 30%, transparent); pointer-events: none; }
 .dgrid .ic { width: 38px; height: 38px; color: var(--gold); stroke-width: 1.3; filter: drop-shadow(0 0 12px color-mix(in oklch, var(--gold) 55%, transparent)); }
 .dgrid h3 { margin-top: 30px; font-size: clamp(22px, 1.8vw, 28px); line-height: 1.02; text-transform: uppercase; }
@@ -196,6 +224,38 @@
     </div></div>
   </div>
 
+  <section class="a-progs" id="turmas" aria-labelledby="t-turmas">
+    <div class="wrap">
+      <div class="sec-head split2">
+        <div><p class="label">Programas</p><h2 class="h2 split" id="t-turmas">Uma turma para cada <em>momento da vida</em>.</h2></div>
+        <p class="lead">Escolha a turma e já reserve a aula experimental no horário que encaixa na sua rotina.</p>
+      </div>
+      <div class="pgrid" data-rise data-swipe>
+        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#adulto" data-int data-tilt3d="10" data-glare>
+          <div class="rimg"><img src="img/programa-adulto-real.jpg" alt="Aluno adulto trabalhando a guarda no tatame" loading="lazy" width="1264" height="848" style="object-position:62% 50%"></div>
+          <div class="pc-tx" data-z="64">
+            <div class="meta"><span data-grade-dias="Adulto">Seg a sex</span><span class="tnum" data-grade-horas="Adulto">8h · 11h · 19h · 20h30</span></div>
+            <div><h3>Adulto</h3><p>Treino progressivo que respeita seu condicionamento.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+          </div>
+        </a>
+        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#kids" data-int data-tilt3d="10" data-glare>
+          <div class="rimg"><img src="img/jiu-jitsu-kids.webp" alt="Professor sentado no tatame com uma criança nos ombros" loading="lazy" width="741" height="1100" style="object-position:50% 18%"></div>
+          <div class="pc-tx" data-z="64">
+            <div class="meta"><span>4 a 12 anos</span><span class="tnum" data-grade-horas="Kids 1">9h · 18h</span></div>
+            <div><h3><em>Kids</em></h3><p>Disciplina, foco e diversão para crianças de 4 a 12 anos. Kids 1 às terças e quintas, Kids 2 às segundas e quartas.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+          </div>
+        </a>
+        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#feminino" data-int data-tilt3d="10" data-glare>
+          <div class="rimg"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame" loading="lazy" width="1264" height="848" style="object-position:52% 60%"></div>
+          <div class="pc-tx" data-z="64">
+            <div class="meta"><span>Junto com o adulto</span><span class="tnum" data-grade-horas="Adulto">8h · 11h · 19h · 20h30</span></div>
+            <div><h3>Feminino</h3><p>As mulheres treinam nas aulas de adulto, nos mesmos horários e no ritmo de cada uma.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <section class="a-ben" id="beneficios" aria-labelledby="t-ben">
     <div class="wrap">
       <div class="sec-head">
@@ -251,37 +311,6 @@
     </div>
   </section>
 
-  <section class="a-progs" id="turmas" aria-labelledby="t-turmas">
-    <div class="wrap">
-      <div class="sec-head split2">
-        <div><p class="label">Programas</p><h2 class="h2 split" id="t-turmas">Uma turma para cada <em>momento da vida</em>.</h2></div>
-        <p class="lead">Escolha a turma e já reserve a aula experimental no horário que encaixa na sua rotina.</p>
-      </div>
-      <div class="pgrid" data-rise data-swipe>
-        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#adulto" data-int data-tilt3d="10" data-glare>
-          <div class="rimg"><img src="img/programa-adulto-real.jpg" alt="Aluno adulto trabalhando a guarda no tatame" loading="lazy" width="1264" height="848" style="object-position:62% 50%"></div>
-          <div class="pc-tx" data-z="64">
-            <div class="meta"><span data-grade-dias="Adulto">Seg a sex</span><span class="tnum" data-grade-horas="Adulto">8h · 11h · 19h · 20h30</span></div>
-            <div><h3>Adulto</h3><p>Treino progressivo que respeita seu condicionamento.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
-          </div>
-        </a>
-        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#kids" data-int data-tilt3d="10" data-glare>
-          <div class="rimg"><img src="img/jiu-jitsu-kids.webp" alt="Professor sentado no tatame com uma criança nos ombros" loading="lazy" width="741" height="1100" style="object-position:50% 18%"></div>
-          <div class="pc-tx" data-z="64">
-            <div class="meta"><span>4 a 12 anos</span><span class="tnum" data-grade-horas="Kids 1">9h · 18h</span></div>
-            <div><h3><em>Kids</em></h3><p>Disciplina, foco e diversão para crianças de 4 a 12 anos. Kids 1 às terças e quintas, Kids 2 às segundas e quartas.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
-          </div>
-        </a>
-        <a class="pc" data-vt-card data-cursor="Agendar" href="agendamento.html#feminino" data-int data-tilt3d="10" data-glare>
-          <div class="rimg"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame" loading="lazy" width="1264" height="848" style="object-position:52% 60%"></div>
-          <div class="pc-tx" data-z="64">
-            <div class="meta"><span>Junto com o adulto</span><span class="tnum" data-grade-horas="Adulto">8h · 11h · 19h · 20h30</span></div>
-            <div><h3>Feminino</h3><p>As mulheres treinam nas aulas de adulto, nos mesmos horários e no ritmo de cada uma.</p><span class="go">Agendar nesta turma<svg class="ic"><use href="#i-arrow"/></svg></span></div>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
 
   <section class="a-dif" aria-labelledby="t-dif">
     <div class="wrap">

@@ -49,6 +49,13 @@
 .c-body { padding-block: clamp(56px, 6vw, 96px) clamp(100px, 12vw, 180px); }
 .c-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 64px; align-items: start; }
 @media (min-width: 1000px) { .c-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 6vw; } }
+@media (max-width: 999px) {
+  .c-body { padding-block: 48px 64px; }
+  .c-grid { gap: 0; }
+  .c-grid > .loc { display: none; }
+  .c-row { padding: 20px 0; }
+  .c-fach { margin-top: 16px; }
+}
 .c-list { margin-top: 40px; border-top: 1px solid var(--rule); }
 .c-row { position: relative; isolation: isolate; display: grid; gap: 14px 32px; padding: 30px 0; border-bottom: 1px solid var(--rule); }
 .c-row::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, color-mix(in oklch, var(--gold) 12%, transparent), color-mix(in oklch, var(--gold) 3%, transparent) 62%, transparent); transform: scaleX(0); transform-origin: left; transition: transform 800ms var(--ease); }
