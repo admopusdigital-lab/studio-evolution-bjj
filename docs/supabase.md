@@ -217,3 +217,6 @@ privacidade está em `site/privacidade.html` (link no rodapé do site e em Perfi
 
 1. Rodar `supabase/migrations/20261125140000_consentimento_kids.sql` no SQL Editor (pode rodar mais de uma vez).
    Sem ela, o aluno é cadastrado normalmente, mas a autorização não fica guardada (o painel avisa).
+
+> As três atualizações de 25/11 (pedido com WhatsApp, grade de aulas e autorização do Kids) também estão juntas em
+> `supabase/atualizar-2026-11-25.sql`: uma colada só no SQL Editor faz as três.

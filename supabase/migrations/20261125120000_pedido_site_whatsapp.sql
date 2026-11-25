@@ -15,7 +15,7 @@ set search_path = ''
 as $$
 declare
   novo uuid;
-  nm text := nullif(trim(coalesce(p_nome, '')), '');
+  nm text := case when char_length(trim(coalesce(p_nome, ''))) >= 2 then trim(p_nome) end;  -- nome de 1 letra vira "Pedido pelo site"
   prog text := case when p_programa in ('kids1', 'kids2', 'kids') then 'kids' when p_programa = 'feminino' then 'feminino' else 'adulto' end;
   fone text := regexp_replace(coalesce(p_whatsapp, ''), '[^0-9]', '', 'g');
   txt text;
