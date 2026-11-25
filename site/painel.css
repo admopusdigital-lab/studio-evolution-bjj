@@ -876,8 +876,8 @@ details.mais > div button.perigo { color: var(--warn); }
 
 /* ===== Estoque em duas abas: Vender (cartões por produto) e Estoque (grade produto × tamanho) ===== */
 .es-abas { margin-top: 22px; }
-.es-abas .es-n { display: inline-grid; place-items: center; min-width: 19px; height: 19px; margin-left: 7px; padding: 0 5px; border-radius: 10px; background: var(--gold); color: oklch(0.18 0.01 75); font: 600 11px/1 var(--sans); vertical-align: 1px; }
-.es-abas .es-n[hidden] { display: none; }
+.pr .seg .es-n { display: inline-grid; place-items: center; min-width: 19px; height: 19px; margin-left: 7px; padding: 0 5px; border-radius: 10px; background: var(--gold); color: oklch(0.18 0.01 75); font: 600 11px/1 var(--sans); vertical-align: 1px; }
+.pr .seg .es-n[hidden] { display: none; }
 #epVender, #epEstoque { margin-top: 6px; }
 /* pedidos do app: no alto da aba Vender, com a ação principal à vista */
 .es-pedbox { margin-top: 14px; padding: 14px 16px 6px; border-radius: 14px; background: color-mix(in oklch, var(--gold) 9%, var(--paper-2)); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--gold) 30%, transparent); }
@@ -975,4 +975,63 @@ details.mais > div button.perigo { color: var(--warn); }
   .es-mx td[data-t] { display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .es-mx td[data-t]::before { content: attr(data-t); font: 600 10.5px/1 var(--sans); letter-spacing: 0.08em; color: var(--ink-3); }
   .es-ed-h, .es-ed-l { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) minmax(0, 0.8fr) 44px; gap: 6px; }
+}
+
+/* ===== Frequência: em queda, mapa turma × dia e o ranking ===== */
+.fq-abas { margin-top: 22px; }
+#fqpQueda, #fqpMapa, #fqpRank { margin-top: 6px; }
+#fqKpis .kpi em { font-style: normal; font-weight: 600; }
+#fqKpis .kpi em.up { color: var(--ok); }
+#fqKpis .kpi em.dn { color: var(--warn); }
+.fq-sub { max-width: 70ch; margin: 16px 0 4px; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.fq-sub b { color: var(--ink); font-weight: 600; }
+.fq-ql { margin: 6px 0 0; padding: 0; list-style: none; }
+.fq-ql li { display: grid; grid-template-columns: 36px minmax(0, 1fr) 128px 132px 124px; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.fq-ql .av { width: 36px; height: 36px; }
+.fq-qn { min-width: 0; }
+.fq-qn .nm-btn { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font-weight: 500; }
+.fq-qn small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-3); }
+/* as 8 semanas: as 4 de antes em cinza, as 4 de agora em dourado; sem aula, um traço baixo */
+.fq-sp { display: flex; align-items: flex-end; gap: 3px; height: 30px; }
+.fq-sp i { flex: 1; height: var(--h); min-height: 3px; border-radius: 2px 2px 0 0; background: color-mix(in oklch, var(--ink) 28%, transparent); }
+.fq-sp i.r { background: var(--gold); }
+.fq-sp i.z { height: 3px; opacity: 0.6; }
+.fq-qv { text-align: right; }
+.fq-qv b { display: block; font: 400 20px/1 var(--serif); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fq-qv b span { color: var(--warn); }
+.fq-qv small { display: block; margin-top: 3px; font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.fq-ql .row-acts { justify-content: flex-end; }
+.fq-ql .row-acts .ic { width: 15px; height: 15px; margin-right: 5px; color: var(--wa, #25d366); vertical-align: -3px; }
+/* mapa de calor: um tom só (dourado), do claro ao forte; o número fica sempre escrito na casa */
+.fq-mapa-wrap { overflow-x: auto; margin-top: 12px; }
+.fq-mapa { border-collapse: separate; border-spacing: 4px; font-variant-numeric: tabular-nums; }
+.fq-mapa thead th { padding: 4px 0 6px; font: 600 10.5px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); text-align: center; }
+.fq-mapa thead th:first-child { text-align: left; }
+.fq-mapa abbr { text-decoration: none; }
+.fq-mapa th[scope="row"] { padding-right: 12px; font-size: 13px; font-weight: 400; color: var(--ink-2); text-align: left; white-space: nowrap; }
+.fq-mapa th[scope="row"] b { font-weight: 600; color: var(--ink); }
+.fq-mapa td { width: 72px; height: 44px; border-radius: 8px; text-align: center; font: 500 14px/1 var(--sans); color: var(--ink); }
+.fq-mapa td.fora { background: none; }
+.fq-mapa td.nada { color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--rule); }
+.fq-mapa td.s1, .fq-leg .s1 { background: color-mix(in oklch, var(--gold) 12%, var(--paper-2)); }
+.fq-mapa td.s2, .fq-leg .s2 { background: color-mix(in oklch, var(--gold) 26%, var(--paper-2)); }
+.fq-mapa td.s3, .fq-leg .s3 { background: color-mix(in oklch, var(--gold) 44%, var(--paper-2)); }
+.fq-mapa td.s4, .fq-leg .s4 { background: color-mix(in oklch, var(--gold) 66%, var(--paper-2)); }
+.fq-mapa td.s5, .fq-leg .s5 { background: var(--gold); }
+.fq-mapa td.s4, .fq-mapa td.s5 { color: oklch(0.2 0.01 75); font-weight: 600; }
+.fq-mapa td[title]:hover { box-shadow: inset 0 0 0 2px var(--ink); }
+.fq-leg { display: flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 11.5px; color: var(--ink-3); }
+.fq-leg i { width: 22px; height: 12px; border-radius: 3px; }
+.fq-leg span:first-child { margin-right: 4px; }
+.fq-leg span:last-child { margin-left: 4px; }
+@media (max-width: 600px) {
+  .fq-ql li { grid-template-columns: 36px minmax(0, 1fr) auto; grid-template-areas: "av nm v" "av sp ac"; row-gap: 8px; }
+  .fq-ql li > .av { grid-area: av; align-self: start; }
+  .fq-qn { grid-area: nm; }
+  .fq-sp { grid-area: sp; width: 120px; height: 24px; }
+  .fq-qv { grid-area: v; }
+  .fq-ql .row-acts { grid-area: ac; }
+  .fq-mapa td { width: 48px; height: 40px; font-size: 13px; }
+  .fq-mapa th[scope="row"] { padding-right: 6px; font-size: 12px; }
+  .fq-mapa { border-spacing: 3px; }
 }

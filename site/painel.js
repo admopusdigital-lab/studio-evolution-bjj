@@ -188,7 +188,7 @@
      A regra de verdade está no banco (privado.pode); aqui o painel só mostra as abas certas ---------- */
   P.papel = (ses && ses.papel) || "professor";
   P.permissoes = [];
-  P.AREAS = [["hoje", "Hoje e Modo tatame"], ["alunos", "Alunos"], ["graduacoes", "Graduações"], ["ranking", "Ranking"], ["movimentos", "Movimentos"],
+  P.AREAS = [["hoje", "Hoje e Modo tatame"], ["alunos", "Alunos"], ["graduacoes", "Graduações"], ["ranking", "Frequência e ranking"], ["movimentos", "Movimentos"],
     ["interessados", "Interessados"], ["financeiro", "Financeiro"], ["estoque", "Estoque e loja"], ["configuracoes", "Configurações"]];
   var AREA_ABA = { hoje: "hoje", tatame: "hoje", alunos: "alunos", grad: "graduacoes", rank: "ranking", mov: "movimentos", leads: "interessados", fin: "financeiro", estoque: "estoque", config: "configuracoes", equipe: "dono" };
   P.ehDono = function () { return P.papel !== "gestao"; };

@@ -149,6 +149,7 @@ body.pr { background: var(--paper); }
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.3 18.4z"/><path d="M9 9.2c0 2.9 2.9 5.8 5.8 5.8l1.2-1.4-2-1-1 .8a4 4 0 0 1-2.4-2.4l.8-1-1-2z"/></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
     <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2.5 12.5h4l2.5-6 4 12 3-8 1.5 2h4"/></symbol>
     <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="12.5" rx="2"/><path d="M8 20.5h8M12 17v3.5"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="M5 21V11h14v10"/><path d="M3 21h18M12 11V7.5M9 11V8.5M15 11V8.5"/><path d="M12 4.5c.6.8.6 1.6 0 2.2-.6-.6-.6-1.4 0-2.2z"/></symbol>
   </defs>
@@ -171,7 +172,7 @@ body.pr { background: var(--paper); }
       <button type="button" data-go="tatame" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-tv"/></svg>Modo tatame</button>
       <button type="button" data-go="alunos" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-users"/></svg>Alunos<span class="badge" id="bAlunos" hidden></span></button>
       <button type="button" data-go="grad" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-belt"/></svg>Graduações<span class="badge" id="bGrad" hidden></span></button>
-      <button type="button" data-go="rank" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-trophy"/></svg>Ranking</button>
+      <button type="button" data-go="rank" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pulse"/></svg>Frequência</button>
       <button type="button" data-go="mov" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
       <button type="button" data-go="leads" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads" hidden></span></button>
       <button type="button" data-go="fin" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin" hidden></span></button>
@@ -261,19 +262,38 @@ body.pr { background: var(--paper); }
         <ul class="ficha-list" id="grHist" hidden></ul>
       </section>
 
-      <!-- Ranking de frequência -->
+      <!-- Frequência: quem está sumindo, as aulas que enchem e o ranking -->
       <section class="dv" data-v="rank" aria-labelledby="t-rank">
-        <div class="dv-h"><div><p class="dv-k" id="rkK">Frequência</p><h3 id="t-rank">Ranking</h3></div><p>Quem mais treinou em cada mês. Os 10 primeiros do mês também aparecem no app, cada um no ranking da sua turma (Adulto ou Kids).</p></div>
-        <div class="crm-bar rk-bar">
-          <div class="chips" id="rkPer" role="group" aria-label="Período"></div>
-          <div class="chips" id="rkGr" role="group" aria-label="Turma"></div>
+        <div class="dv-h"><div><p class="dv-k" id="rkK">Últimas 4 semanas</p><h3 id="t-rank">Frequência</h3></div><p>Quem está treinando menos do que treinava, quais aulas enchem e quem mais treinou. Os 10 primeiros do mês também aparecem no ranking do app, cada um na sua turma.</p></div>
+        <div class="kpis" id="fqKpis"></div>
+        <div class="seg fq-abas" role="tablist" aria-label="Partes da Frequência">
+          <button type="button" role="tab" id="fqtQueda" aria-selected="true" aria-controls="fqpQueda">Em queda<span class="es-n" id="fqN" hidden></span></button>
+          <button type="button" role="tab" id="fqtMapa" aria-selected="false" aria-controls="fqpMapa" tabindex="-1">Aulas e dias</button>
+          <button type="button" role="tab" id="fqtRank" aria-selected="false" aria-controls="fqpRank" tabindex="-1">Ranking</button>
         </div>
-        <ol class="rk-podio" id="rkPodio" aria-label="Os três primeiros"></ol>
-        <table class="tbl" id="rkTbl">
-          <thead><tr><th scope="col" class="num">#</th><th scope="col">Aluno</th><th scope="col">Faixa</th><th scope="col" class="num">Aulas</th><th scope="col" class="hide-s"><span class="sr-only">Comparação</span></th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="empty-big" id="rkEmpty" hidden></div>
+        <div role="tabpanel" id="fqpQueda" aria-labelledby="fqtQueda">
+          <p class="fq-sub" id="fqQSub"></p>
+          <ul class="fq-ql" id="fqQ"></ul>
+          <div class="empty-big" id="fqQEmpty" hidden></div>
+        </div>
+        <div role="tabpanel" id="fqpMapa" aria-labelledby="fqtMapa" hidden>
+          <p class="fq-sub" id="fqMSub"></p>
+          <div class="fq-mapa-wrap"><table class="fq-mapa" id="fqMapa"></table></div>
+          <div class="fq-leg" id="fqLeg" aria-hidden="true"></div>
+          <div class="empty-big" id="fqMEmpty" hidden></div>
+        </div>
+        <div role="tabpanel" id="fqpRank" aria-labelledby="fqtRank" hidden>
+          <div class="crm-bar rk-bar">
+            <div class="chips" id="rkPer" role="group" aria-label="Período"></div>
+            <div class="chips" id="rkGr" role="group" aria-label="Turma"></div>
+          </div>
+          <ol class="rk-podio" id="rkPodio" aria-label="Os três primeiros"></ol>
+          <table class="tbl" id="rkTbl">
+            <thead><tr><th scope="col" class="num">#</th><th scope="col">Aluno</th><th scope="col">Faixa</th><th scope="col" class="num">Aulas</th><th scope="col" class="hide-s"><span class="sr-only">Comparação</span></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="empty-big" id="rkEmpty" hidden></div>
+        </div>
       </section>
 
       <!-- Movimentos -->

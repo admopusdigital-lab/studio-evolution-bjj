@@ -100,6 +100,13 @@ async function pagina(b, opcoes, papel) {
     global.__w = [];
     await p.click('.es-st[data-id="pr2"] [data-mais]'); await p.clock.runFor(800); await p.waitForTimeout(400);
     confere('Estoque: grade produto × tamanho e o + grava', (await p.$$('.es-mx tbody tr')).length === 1 && global.__w.some(x => /^PATCH produtos\?id=eq\.pr2 \{"quantidade":2\}/.test(x)), global.__w.join(' | '));
+    /* Frequência: os números do topo, a lista de quem caiu e o mapa com uma linha por aula da grade */
+    await p.evaluate(() => P.go('rank')); await p.clock.runFor(2000); await p.waitForTimeout(600);
+    confere('Frequência mostra os 4 números e a lista Em queda', (await p.$$('#fqKpis .kpi')).length === 4 && !(await p.isHidden('#fqpQueda')));
+    await p.click('#fqtMapa'); await p.waitForTimeout(300);
+    confere('Frequência: mapa com uma linha por aula da grade', (await p.$$('#fqMapa tbody tr')).length === await p.evaluate(() => Site.GRADE.length) || !(await p.isHidden('#fqMEmpty')));
+    await p.click('#fqtRank'); await p.waitForTimeout(300);
+    confere('Frequência: ranking continua numa aba', !(await p.isHidden('#fqpRank')) && (await p.$$('#rkPer button')).length === 6);
     confere('painel sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }
