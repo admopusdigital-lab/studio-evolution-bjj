@@ -89,6 +89,17 @@ async function pagina(b, opcoes, papel) {
     confere('TV mostra o código e o QR', /TRU 482/.test(await p.textContent('#ttCode')) && !!(await p.$('#ttQr svg')));
     await p.evaluate(() => P.go('config')); await p.clock.runFor(1500); await p.waitForTimeout(600);
     confere('Configurações tem o editor da grade', (await p.$$('#grdL .grd-r')).length >= 1);
+    /* Estoque: um produto em dois tamanhos vira uma linha só na grade, e o + grava a quantidade */
+    simula.T.produtos.push(
+      { id: 'pr1', nome: 'Kimono Teste', cor: 'Branco', categoria: 'kimono', preco: 380, tamanho: 'A1', quantidade: 2, ativo: true },
+      { id: 'pr2', nome: 'Kimono Teste', cor: 'Branco', categoria: 'kimono', preco: 380, tamanho: 'A2', quantidade: 1, ativo: true });
+    await p.evaluate(() => P.go('estoque')); await p.clock.runFor(2500); await p.waitForTimeout(800);
+    await p.click('#etVender'); await p.waitForTimeout(300);
+    confere('Estoque mostra um cartão por produto com os tamanhos', (await p.$$('.es-card')).length === 1 && (await p.$$('.es-card [data-vende]')).length === 2);
+    await p.click('#etEstoque'); await p.waitForTimeout(300);
+    global.__w = [];
+    await p.click('.es-st[data-id="pr2"] [data-mais]'); await p.clock.runFor(800); await p.waitForTimeout(400);
+    confere('Estoque: grade produto × tamanho e o + grava', (await p.$$('.es-mx tbody tr')).length === 1 && global.__w.some(x => /^PATCH produtos\?id=eq\.pr2 \{"quantidade":2\}/.test(x)), global.__w.join(' | '));
     confere('painel sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }

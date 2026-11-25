@@ -361,17 +361,23 @@ body.pr { background: var(--paper); }
       <section class="dv" data-v="estoque" aria-labelledby="t-estoque">
         <div class="dv-h"><div><p class="dv-k" id="esK">Loja do Studio</p><h3 id="t-estoque">Estoque</h3></div><p>Kimonos, rashguards e o que mais o Studio vende. A loja aparece no app dos alunos só quando há pelo menos uma peça.</p></div>
         <div class="kpis" id="esKpis"></div>
-        <div id="esPed"></div>
+        <div class="seg es-abas" role="tablist" aria-label="Partes do Estoque">
+          <button type="button" role="tab" id="etVender" aria-selected="true" aria-controls="epVender">Vender<span class="es-n" id="etPed" hidden></span></button>
+          <button type="button" role="tab" id="etEstoque" aria-selected="false" aria-controls="epEstoque" tabindex="-1">Estoque</button>
+        </div>
         <div class="crm-bar">
           <label class="crm-search"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-search"/></svg><span class="sr-only">Buscar no estoque</span><input class="crm-in" type="search" id="esQ" placeholder="Buscar produto ou tamanho" autocomplete="off"></label>
           <div class="chips" id="esChips" role="group" aria-label="Filtrar por tipo"></div>
-          <button class="mini-btn crm-add" type="button" id="esAdd" aria-expanded="false" aria-controls="esForm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Adicionar item</button>
+          <button class="mini-btn crm-add" type="button" id="esAdd" aria-expanded="false" aria-controls="esForm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Adicionar produto</button>
         </div>
-        <form class="crm-form" id="esForm" novalidate hidden></form>
-        <table class="tbl" id="esTbl">
-          <thead><tr><th scope="col">Produto</th><th scope="col">Tamanho</th><th scope="col" class="num">Preço</th><th scope="col">Quantidade</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <div role="tabpanel" id="epVender" aria-labelledby="etVender">
+          <div id="esPed"></div>
+          <div class="es-vgrid" id="esCards"></div>
+        </div>
+        <div role="tabpanel" id="epEstoque" aria-labelledby="etEstoque" hidden>
+          <form class="crm-form" id="esForm" novalidate hidden></form>
+          <div id="esMx"></div>
+        </div>
         <div class="empty-big" id="esEmpty" hidden></div>
       </section>
 
