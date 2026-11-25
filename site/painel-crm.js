@@ -2,7 +2,7 @@
    Etapas: novo → em atendimento → aula agendada → matriculado (vira aluno) ou sem interesse. Cada mudança fica no histórico. */
 (function () {
   var $ = P.$, $$ = P.$$, esc = P.esc;
-  var LEADS = [], etapaF = "abertos";
+  var LEADS = [], etapaF = "abertos", modo = "quadro";
   var ETAPA = { novo: "Novo", atendimento: "Em atendimento", agendado: "Aula agendada", matriculado: "Matriculado", perdido: "Sem interesse" };
   var ORIGEM = { site: "Pelo site", instagram: "Instagram", indicacao: "Indicação", visita: "Passou no Studio", whatsapp: "WhatsApp", google: "Google", outro: "Outro" };
   var PROG = { adulto: "Adulto", feminino: "Feminino", kids: "Kids" };
@@ -24,6 +24,10 @@
     var mes = P.mesIni(P.hoje()), doMes = LEADS.filter(function (l) { return P.mesIni(P.d10(l.criado_em)) === mes; });
     $("#ldK").textContent = abertos + " em aberto · " + doMes.length + " neste mês · " + (function (n) { return n + (n === 1 ? " matrícula" : " matrículas"); })(doMes.filter(function (l) { return l.etapa === "matriculado"; }).length);
     P.selo("bLeads", novos);
+    paintFunil(doMes);
+    var q0 = $("#ldQ").value.trim(), quadro = modo === "quadro" && !q0;
+    $("#ldQuadro").hidden = !quadro; $("#ldList").hidden = quadro; $("#ldChips").hidden = quadro;
+    if (quadro) { paintQuadro(); $("#ldEmpty").hidden = !!LEADS.length; if (!LEADS.length) $("#ldEmpty").innerHTML = "<b>Nenhum interessado ainda.</b>Os pedidos de aula experimental feitos no site aparecem aqui sozinhos. Contatos do Instagram, indicações e visitas, adicione em Adicionar contato."; return; }
     $("#ldChips").innerHTML = FILTROS.map(function (f) { var n = LEADS.filter(function (l) { return passa(l, f[0]); }).length; return '<button type="button" data-f="' + f[0] + '" aria-pressed="' + (etapaF === f[0]) + '">' + f[1] + " · " + n + "</button>"; }).join("");
     var q = P.norm($("#ldQ").value.trim()), qd = P.digitos($("#ldQ").value);
     var vis = LEADS.filter(function (l) { return passa(l, etapaF) && (!q || P.norm(l.nome).indexOf(q) >= 0 || P.norm(l.crianca).indexOf(q) >= 0 || (qd.length >= 4 && P.digitos(l.whatsapp).indexOf(qd) >= 0)); });
@@ -40,6 +44,64 @@
       : q ? "Ninguém com “" + esc($("#ldQ").value.trim()) + "”." : "Ninguém nesta etapa.";
   }
   $("#ldChips").addEventListener("click", function (e) { var b = e.target.closest("button[data-f]"); if (b) { etapaF = b.dataset.f; paint(); } });
+
+  /* ---------- o funil em quadro: quatro colunas, uma ação por cartão ---------- */
+  var COLS = [["novo", "Novos"], ["atendimento", "Em atendimento"], ["agendado", "Aula agendada"], ["matriculado", "Matriculados"]];
+  var PROX = { novo: "atendimento", atendimento: "agendado", agendado: "matriculado" };
+  /* há quanto tempo o contato espera: em minutos, horas ou dias */
+  function espera(ts) {
+    var m = Math.max(0, Math.round((Date.now() - new Date(ts).getTime()) / 60000));
+    return { m: m, tx: m < 60 ? "há " + Math.max(1, m) + " min" : m < 1440 ? "há " + Math.floor(m / 60) + " h" : "há " + Math.floor(m / 1440) + (m < 2880 ? " dia" : " dias") };
+  }
+  function paintFunil(doMes) {
+    var n = doMes.length, at = doMes.filter(function (l) { return l.etapa !== "novo" && l.etapa !== "perdido"; }).length + doMes.filter(function (l) { return l.etapa === "perdido"; }).length;
+    var ag = doMes.filter(function (l) { return l.etapa === "agendado" || l.etapa === "matriculado"; }).length, mt = doMes.filter(function (l) { return l.etapa === "matriculado"; }).length;
+    var mes = new Intl.DateTimeFormat("pt-BR", { month: "long" }).format(P.dia(P.hoje()));
+    $("#ldFunil").innerHTML = n ? "<b>" + mes.charAt(0).toUpperCase() + mes.slice(1) + ":</b> " + n + (n === 1 ? " contato" : " contatos") + " → " + at + " atendidos → " + ag + (ag === 1 ? " agendou" : " agendaram") + " → " +
+      mt + (mt === 1 ? " matrícula" : " matrículas") + ' <span class="ld-conv">· conversão de ' + Math.round(mt / n * 100) + "%</span>" : "";
+  }
+  function paintQuadro() {
+    var lim = P.somaDias(P.hoje(), -30);
+    var velho = {};
+    /* o dourado vai só no novo que espera há mais tempo */
+    var novos = LEADS.filter(function (l) { return l.etapa === "novo"; }).sort(function (a, b) { return a.criado_em < b.criado_em ? -1 : 1; });
+    if (novos[0]) velho[novos[0].id] = 1;
+    $("#ldQuadro").innerHTML = COLS.map(function (c) {
+      var l = LEADS.filter(function (x) { return x.etapa === c[0] && (c[0] !== "matriculado" || P.d10(x.atualizado_em || x.criado_em) >= lim); })
+        .sort(function (a, b) { return c[0] === "agendado" ? String(a.aula_data || "9").localeCompare(String(b.aula_data || "9")) : a.criado_em < b.criado_em ? -1 : 1; });
+      return '<section class="ld-col" aria-label="' + c[1] + '"><h4>' + c[1] + " <span>" + l.length + "</span></h4>" + (c[0] === "matriculado" ? '<p class="ld-col-s">últimos 30 dias</p>' : "") +
+        '<ul class="ld-cards">' + (l.length ? l.map(function (x) {
+          var e = espera(c[0] === "novo" ? x.criado_em : x.atualizado_em || x.criado_em), atraso = c[0] === "novo" && e.m >= 60;
+          var info = c[0] === "agendado" && x.aula_data ? "Aula " + aulaTx(x) : (c[0] === "novo" ? "esperando " : "") + e.tx;
+          var acao = c[0] === "novo" ? (x.whatsapp ? '<button class="mini-btn" type="button" data-wa>Responder</button>' : '<button class="mini-btn" type="button" data-av>Atender</button>')
+            : c[0] === "atendimento" ? '<button class="mini-btn" type="button" data-ficha>Agendar aula</button>'
+            : c[0] === "agendado" ? '<button class="mini-btn" type="button" data-av>Matriculou</button>'
+            : '<button class="mini-btn" type="button" data-matricula>Cadastrar aluno</button>';
+          return '<li class="ld-card' + (velho[x.id] ? " velho" : "") + '" data-id="' + x.id + '"><button class="nm-btn" type="button" data-ficha>' + esc(x.nome) + "</button>" +
+            "<small>" + esc(ORIGEM[x.origem] + " · " + oQue(x)) + "</small>" +
+            '<span class="ld-esp' + (atraso ? " warn" : "") + '">' + esc(info) + "</span>" +
+            '<span class="ld-acts">' + acao + (x.whatsapp && c[0] !== "novo" ? '<button class="mini-btn ghost wa-ic" type="button" data-wa aria-label="WhatsApp de ' + esc(x.nome) + '">WhatsApp</button>' : "") +
+            (c[0] !== "matriculado" ? '<button class="mini-btn ghost" type="button" data-perdido aria-label="' + esc(x.nome) + ' sem interesse">Sem interesse</button>' : "") + "</span></li>";
+        }).join("") : '<li class="ld-vazio">' + (c[0] === "novo" ? "Nenhum contato esperando." : "Ninguém aqui.") + "</li>") + "</ul></section>";
+    }).join("");
+  }
+  $("#ldQuadro").addEventListener("click", function (e) {
+    var b = e.target.closest("button"), row = e.target.closest(".ld-card");
+    if (!b || !row) return;
+    var l = porId(row.dataset.id);
+    if (b.hasAttribute("data-ficha")) return abrir(l.id);
+    if (b.hasAttribute("data-wa")) { P.wa(l.whatsapp, msg(l)); registrar(l.id, "WhatsApp: mensagem aberta (" + ETAPA[l.etapa].toLowerCase() + ")"); if (l.etapa === "novo") mudarEtapa(l, "atendimento").catch(function () {}); return; }
+    if (b.hasAttribute("data-av") && PROX[l.etapa]) { b.classList.add("loading"); return mudarEtapa(l, PROX[l.etapa]).catch(function (er) { b.classList.remove("loading"); P.erro(er); }); }
+    if (b.hasAttribute("data-perdido")) { if (!confirm(l.nome + " fica como sem interesse?")) return; b.classList.add("loading"); return mudarEtapa(l, "perdido").catch(function (er) { b.classList.remove("loading"); P.erro(er); }); }
+    if (b.hasAttribute("data-matricula")) matricular(l);
+  });
+  $$(".ld-modo button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      modo = b.dataset.modo;
+      $$(".ld-modo button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      paint();
+    });
+  });
   $("#ldQ").addEventListener("input", paint);
   function porId(id) { return LEADS.filter(function (l) { return l.id === id; })[0]; }
   function registrar(id, texto) { return P.q(function (sb) { return sb.from("lead_eventos").insert({ lead: id, texto: texto }); }); }

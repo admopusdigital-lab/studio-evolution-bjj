@@ -328,10 +328,13 @@ body.pr { background: var(--paper); }
         <div class="dv-h"><div><p class="dv-k" id="ldK"></p><h3 id="t-leads">Interessados</h3></div><p>Os pedidos de aula experimental do site entram aqui sozinhos. Os outros contatos, o professor adiciona.</p></div>
         <div class="crm-bar">
           <label class="crm-search"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-search"/></svg><span class="sr-only">Buscar contato</span><input class="crm-in" type="search" id="ldQ" placeholder="Buscar por nome ou WhatsApp" autocomplete="off"></label>
+          <div class="seg ld-modo" role="group" aria-label="Como mostrar"><button type="button" data-modo="quadro" aria-pressed="true">Quadro</button><button type="button" data-modo="lista" aria-pressed="false">Lista</button></div>
           <div class="chips" id="ldChips" role="group" aria-label="Filtrar por etapa"></div>
           <button class="mini-btn crm-add" type="button" id="ldAdd" aria-expanded="false" aria-controls="ldForm"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Adicionar contato</button>
         </div>
         <form class="crm-form" id="ldForm" aria-labelledby="ldFormT" novalidate hidden></form>
+        <p class="ld-funil" id="ldFunil"></p>
+        <div class="ld-quadro" id="ldQuadro"></div>
         <div class="leads" id="ldList"></div>
         <div class="empty-big" id="ldEmpty" hidden></div>
       </section>
