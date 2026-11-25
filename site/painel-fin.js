@@ -77,6 +77,26 @@
       return a.mensalidade > 0 && (!a.inicio || a.inicio <= venc) && !MENS.some(function (x) { return x.aluno === a.id && x.competencia === mes; });
     });
   }
+  /* as linhas da tabela de mensalidades: só "Recebi" (e a forma) à vista; o resto no menu "⋯" */
+  var pagasAbertas = false;
+  function grupos(l) {
+    var at = l.filter(atrasada).sort(function (a, b) { return a.vencimento < b.vencimento ? -1 : 1; }),
+      av = l.filter(function (x) { return !x.pago_em && !atrasada(x); }).sort(function (a, b) { return a.vencimento < b.vencimento ? -1 : 1; }),
+      pg = l.filter(function (x) { return x.pago_em; }).sort(function (a, b) { return a.pago_em < b.pago_em ? 1 : -1; });
+    return [{ k: "atrasadas", t: "Atrasadas", l: at }, { k: "avencer", t: "A vencer", l: av }, { k: "pagas", t: "Pagas", l: pg }];
+  }
+  function linhaM(x) {
+    var a = P.porId[x.aluno];
+    return '<tr data-id="' + x.id + '"><td><div class="nm"><span class="av"' + Fotos.attr((a || {}).foto) + '>' + P.ini(nome(x.aluno)) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.aluno + '">' + esc(nome(x.aluno)) + "</button><small>" +
+        (x._extra ? esc(x.descricao) : "Mensalidade") + " · " + P.mesNome(x.competencia) + "</small></div></div></td>" +
+      '<td class="num">' + P.brl(x.valor) + "</td><td>" + statusM(x) + '</td><td class="act"><div class="row-acts">' +
+      (x.pago_em ? "" : '<select class="sel" data-forma aria-label="Forma de pagamento">' + Object.keys(FORMA).map(function (k) { return '<option value="' + k + '">' + FORMA[k] + "</option>"; }).join("") + '</select><button class="mini-btn" type="button" data-paga>Recebi</button>' +
+        (a && a.whatsapp ? '<button class="ic-btn wa" type="button" data-cobra aria-label="Cobrar ' + esc(nome(x.aluno)) + ' pelo WhatsApp" title="Cobrar pelo WhatsApp"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg></button>' : "")) +
+      '<details class="mais"><summary aria-label="Mais ações">⋯</summary><div>' +
+        (x.pago_em ? '<button type="button" data-desfaz>Desfazer a baixa</button>' : "") +
+        '<button type="button" data-editm>Editar valor e data</button><button type="button" class="perigo" data-apagam>Apagar</button></div></details>' +
+      "</div></td></tr>";
+  }
   function paintMens() {
     var l = doMes(mes), prev = soma(l), rec = soma(l.filter(function (x) { return x.pago_em; })), atr = soma(l.filter(atrasada)), fal = faltam();
     var vis = l.filter(function (x) { return mF === "todas" || (mF === "pagas" ? x.pago_em : mF === "atrasadas" ? atrasada(x) : !x.pago_em && !atrasada(x)); });
@@ -88,17 +108,13 @@
       (fal.length ? '<div class="bi-meta"><div class="head"><p><b>' + fal.length + (fal.length === 1 ? " aluno ativo ainda sem a mensalidade" : " alunos ativos ainda sem a mensalidade") + " de " + P.mesNome(mes) + ".</b> O valor e o dia vêm do cadastro de cada um.</p>" +
         '<button class="mini-btn" type="button" id="mGerar">Lançar as de ' + P.MESES[P.dia(mes).getMonth()] + "</button></div></div>" : "") +
       '<div class="chips" id="mChips">' + [["todas", "Todas"], ["abertas", "A receber"], ["atrasadas", "Atrasadas"], ["pagas", "Pagas"]].map(function (c) { return '<button type="button" data-f="' + c[0] + '" aria-pressed="' + (mF === c[0]) + '">' + c[1] + "</button>"; }).join("") + "</div>" +
-      (vis.length ? '<table class="tbl"><thead><tr><th scope="col">Aluno</th><th scope="col" class="num">Valor</th><th scope="col">Situação</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead><tbody>' +
-        vis.map(function (x) {
-          var a = P.porId[x.aluno];
-          return '<tr data-id="' + x.id + '"><td><div class="nm"><span class="av"' + Fotos.attr((P.porId[x.aluno] || {}).foto) + '>' + P.ini(nome(x.aluno)) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.aluno + '">' + esc(nome(x.aluno)) + "</button><small>" + (x._extra ? '<b style="color:var(--gold-text)">' + esc(x.descricao) + "</b> · " : "") + "vence " + P.dataBRano(x.vencimento) + "</small></div></div></td>" +
-            '<td class="num">' + P.brl(x.valor) + "</td><td>" + statusM(x) + '</td><td class="act"><div class="row-acts">' +
-            (x.pago_em ? '<button class="mini-btn ghost" type="button" data-desfaz>Desfazer</button>'
-              : '<select class="sel" data-forma aria-label="Forma de pagamento">' + Object.keys(FORMA).map(function (k) { return '<option value="' + k + '">' + FORMA[k] + "</option>"; }).join("") + '</select><button class="mini-btn" type="button" data-paga>Recebi</button>' +
-                (a && a.whatsapp ? '<button class="mini-btn wa" type="button" data-cobra>WhatsApp</button>' : "")) +
-            '<button class="mini-btn ghost" type="button" data-editm>Editar</button><button class="mini-btn ghost" type="button" data-apagam>Apagar</button>' +
-            "</div></td></tr>";
-        }).join("") + "</tbody></table>"
+      (vis.length ? grupos(vis).map(function (g) {
+        if (!g.l.length) return "";
+        var fechado = g.k === "pagas" && mF === "todas" && !pagasAbertas;
+        return '<h4 class="fin-grupo ' + g.k + '">' + (g.k === "pagas" && mF === "todas" ? '<button type="button" class="fin-g-tg" data-pagas aria-expanded="' + !fechado + '">' : "") + g.t + " · " + g.l.length + " · " + P.brl(soma(g.l)) +
+          (g.k === "pagas" && mF === "todas" ? "</button>" : "") + "</h4>" + (fechado ? "" : '<table class="tbl fin-mt"><thead><tr><th scope="col">Aluno</th><th scope="col" class="num">Valor</th><th scope="col">Situação</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead><tbody>' +
+          g.l.map(linhaM).join("") + "</tbody></table>");
+      }).join("")
         : '<div class="empty-big">' + (l.length ? "Nada neste filtro." : "<b>Nenhuma mensalidade em " + P.mesNome(mes) + ".</b>" + (P.ativos().some(function (a) { return a.mensalidade > 0; }) ? "Toque em Lançar para criar as do mês." : "Cadastre o valor da mensalidade em cada aluno (Alunos → ficha → Editar dados).")) + "</div>") +
       '<p class="fin-how"><b>Como cobrar:</b> as mensalidades saem pelo seu WhatsApp, com a mensagem pronta e a chave Pix do Studio. Quando o aluno pagar, toque em Recebi. A cobrança automática (boleto, Pix e cartão pelo Asaas) é ligada em Configurações quando o Studio tiver a conta.</p>';
   }
@@ -106,6 +122,7 @@
     var b = e.target.closest("button");
     if (!b) return;
     if (b.dataset.f) { mF = b.dataset.f; return paintMens(); }
+    if (b.hasAttribute("data-pagas")) { pagasAbertas = !pagasAbertas; return paintMens(); }
     if (b.id === "mGerar") return gerar(b);
     if (b.dataset.ficha) return P.abrirAluno(b.dataset.ficha);
     var tr = b.closest("tr"), x = tr && MENS.concat(EXTRA).filter(function (m) { return m.id === tr.dataset.id; })[0];
@@ -135,13 +152,17 @@
     }
     if (b.hasAttribute("data-paga")) salvarM(x, { pago_em: P.hoje(), forma: $("[data-forma]", tr).value }, b, "Baixa feita: " + P.first(nome(x.aluno)) + ", " + P.brl(x.valor) + ".");
     else if (b.hasAttribute("data-desfaz")) salvarM(x, { pago_em: null, forma: null }, b, "Baixa desfeita.");
-    else if (b.hasAttribute("data-cobra")) {
+    else if (b.hasAttribute("data-cobra")) cobrar(x);
+  });
+  function cobrar(x) {
+    {
       var a = P.porId[x.aluno], cfg = P.cfg || {};
+      if (!a || !a.whatsapp) return P.toast("Sem WhatsApp no cadastro de " + P.first(nome(x.aluno)) + ".");
       P.wa(a.whatsapp, "Oi, " + P.first(a.responsavel || a.nome) + "! Aqui é do Studio Evolution BJJ. " + (x._extra ? (atrasada(x) ? "O valor de " + x.descricao + " (" + P.brl(x.valor) + ") venceu em " + P.dataBR(x.vencimento) + "." : "Lembrete: " + x.descricao + " (" + P.brl(x.valor) + ") vence em " + P.dataBR(x.vencimento) + ".")
           : atrasada(x) ? "A mensalidade de " + P.mesNome(x.competencia) + " (" + P.brl(x.valor) + ") venceu em " + P.dataBR(x.vencimento) + "." : "Lembrete: a mensalidade de " + P.mesNome(x.competencia) + " (" + P.brl(x.valor) + ") vence em " + P.dataBR(x.vencimento) + ".") +
         (cfg.pix ? " A chave Pix do Studio é " + cfg.pix + "." : "") + " Se já pagou, me manda o comprovante que eu dou baixa. Obrigado!");
     }
-  });
+  }
   function salvarM(x, d, b, msg) {
     b.classList.add("loading");
     P.q(function (sb) { return sb.from(tabelaDe(x)).update(d).eq("id", x.id); }).then(carregar).then(function () { P.toast(msg); }).catch(function (e) { b.classList.remove("loading"); P.erro(e); });
@@ -229,14 +250,25 @@
     var lm = l.filter(function (x) { return !x._extra; }), pag = lm.length, tic = pag ? soma(lm) / pag : 0, res = rec - desp, meta = METAS[mes] || null, mNome = P.MESES[P.dia(mes).getMonth()];
     var g = $("#fpGeral");
     g.classList.add("viz");
+    var atrT = MENS.concat(EXTRA).filter(atrasada).sort(function (a, b) { return a.vencimento < b.vencimento ? -1 : 1; });
+    var podeCob = P.pode("financeiro");
     g.innerHTML =
-      '<div class="kpis bi-kpis">' +
-        '<div class="kpi"><span class="bi-l">Recebido em ' + mNome + "</span><b>" + P.brl(rec) + "</b><span>de " + P.brl(prev) + " previstos</span></div>" +
-        '<div class="kpi"><span class="bi-l">Despesas de ' + mNome + "</span><b>" + P.brl(desp) + "</b><span>" + P.brl(dpg) + " pagas · " + P.brl(desp - dpg) + " a pagar</span></div>" +
-        '<div class="kpi"><span class="bi-l">Resultado</span><b>' + P.brl(res) + "</b><span>recebido menos despesas" + (rec ? " · margem de " + Math.round(res / rec * 100) + "%" : "") + "</span></div>" +
-        '<div class="kpi"><span class="bi-l">Alunos ativos</span><b>' + ati + "</b><span>+" + ent + (ent === 1 ? " entrou" : " entraram") + " · " + sai + (sai === 1 ? " saiu" : " saíram") + "</span></div>" +
-        '<div class="kpi"><span class="bi-l">Ticket médio</span><b>' + P.brl(Math.round(tic)) + "</b><span>por mensalidade, no mês</span></div>" +
-        '<button class="kpi" type="button" id="biInad"><span class="bi-l">Inadimplência</span><b>' + (prev ? (atr / prev * 100).toFixed(1).replace(".", ",") + "%" : "0%") + "</b><span>" + P.brl(atr) + " em atraso</span></button>" +
+      '<div class="fin-top">' +
+        '<section class="fin-cob" aria-labelledby="finCobT"><div class="fin-cob-h"><h4 id="finCobT">Cobrar agora</h4><span>' + (atrT.length ? atrT.length + (atrT.length === 1 ? " atrasada · " : " atrasadas · ") + P.brl(soma(atrT)) : "") + "</span></div>" +
+          (atrT.length ? '<ul class="fin-cob-l">' + atrT.slice(0, 8).map(function (x) {
+            var a = P.porId[x.aluno] || {}, d = P.difDias(x.vencimento, P.hoje());
+            return '<li data-id="' + x.id + '"><span class="av"' + Fotos.attr(a.foto) + ">" + P.ini(nome(x.aluno)) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.aluno + '">' + esc(nome(x.aluno)) + "</button><small>" +
+              (x._extra ? esc(x.descricao) + " · " : "") + P.mesNome(x.competencia) + '</small></div><span class="fin-dias">há ' + d + (d === 1 ? " dia" : " dias") + '</span><b class="fin-v">' + P.brl(x.valor) + "</b>" +
+              '<span class="fin-cob-a">' + (a.whatsapp ? '<button class="mini-btn ghost" type="button" data-cob-g>Cobrar</button>' : "") + '<button class="mini-btn" type="button" data-rec-g>Recebi</button></span></li>';
+          }).join("") + "</ul>" + (atrT.length > 8 ? '<button class="mini-btn ghost fin-cob-mais" type="button" id="finVerAtr">Ver as ' + atrT.length + " atrasadas</button>" : "")
+            : '<p class="fin-ok">Ninguém em atraso. Tudo recebido até hoje.</p>') +
+        "</section>" +
+        '<section class="fin-ext" aria-labelledby="finExtT"><h4 id="finExtT">' + mNome.charAt(0).toUpperCase() + mNome.slice(1) + "</h4>" +
+          '<dl><div><dt>Previsto</dt><dd>' + P.brl(prev) + "</dd></div><div><dt>Recebido</dt><dd>" + P.brl(rec) + "</dd></div>" +
+          '<div class="warn"><dt>Em atraso</dt><dd>' + P.brl(atr) + "</dd></div><div><dt>Despesas</dt><dd>" + P.brl(desp) + (desp - dpg > 0 ? " <small>" + P.brl(desp - dpg) + " a pagar</small>" : "") + "</dd></div>" +
+          '<div class="res' + (res < 0 ? " neg" : "") + '"><dt>Resultado</dt><dd>' + P.brl(res) + (rec ? "<small>margem de " + Math.round(res / rec * 100) + "%</small>" : "") + "</dd></div></dl>" +
+          '<p class="fin-mini">' + ati + " alunos ativos (+" + ent + " · −" + sai + ") · ticket médio " + P.brl(Math.round(tic)) + ' · <button class="nm-btn" type="button" id="biInad">inadimplência ' + (prev ? (atr / prev * 100).toFixed(1).replace(".", ",") + "%" : "0%") + "</button></p>" +
+        "</section>" +
       "</div>" +
       '<div class="bi-meta" id="biMeta"></div>' +
       '<div class="bi-grid">' +
@@ -265,6 +297,11 @@
   $("#fpGeral").addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;
+    if (b.dataset.ficha) return P.abrirAluno(b.dataset.ficha);
+    if (b.id === "finVerAtr") { mF = "atrasadas"; abrirParte("mens"); return; }
+    var li = b.closest("[data-id]"), xg = li && MENS.concat(EXTRA).filter(function (m) { return m.id === li.dataset.id; })[0];
+    if (xg && b.hasAttribute("data-cob-g")) return cobrar(xg);
+    if (xg && b.hasAttribute("data-rec-g")) return salvarM(xg, { pago_em: P.hoje(), forma: "pix" }, b, "Baixa feita: " + P.first(nome(xg.aluno)) + ", " + P.brl(xg.valor) + ". Ajuste a forma em Mensalidades, se não foi Pix.");
     if (b.id === "biInad") { mF = "atrasadas"; abrirParte("mens"); return; }
     if (b.id === "metaEd") {
       var m = METAS[mes] || {}, box = $("#biMeta");
