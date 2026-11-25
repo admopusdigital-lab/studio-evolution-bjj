@@ -287,7 +287,15 @@ html.entering-img::after, .enter-cover { background-color: var(--cine-bg); backg
 }
 /* iPad em retrato (761 a 1023px): selo curto, para o menu e "Aula grátis" caberem inteiros */
 @media (max-width: 1023px) { .tagp .lg { display: none; } .tagp .sm { display: inline; } }
-@media (max-width: 760px) { .nav-cta { display: none; } }
+/* celular: "Aula grátis" compacto no topo, à vista desde a primeira tela; some quando a pílula fixa de baixo aparece
+   (rolando a página) e no próprio agendamento. Em telas muito estreitas, fica só a pílula */
+@media (max-width: 760px) {
+  .nav-cta { gap: 0; transition: opacity 300ms var(--ease), visibility 0s 300ms; }
+  .nav-cta .btn { min-height: 40px; padding: 0 14px; font-size: 11px; }
+  html.cta-on .nav-cta { opacity: 0; visibility: hidden; }
+  html:has(#agBar) .nav-cta { display: none; }
+}
+@media (max-width: 359px) { .nav-cta { display: none; } }
 @media (max-width: 520px) { .brand .logo { height: 34px; } .brandrow { gap: 10px; } .nav-right { gap: 10px; } }
 
 /* menu em tela cheia (celular e tablet) */
