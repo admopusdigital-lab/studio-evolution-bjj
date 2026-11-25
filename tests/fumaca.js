@@ -127,6 +127,12 @@ async function pagina(b, opcoes, papel) {
     confere('app registra a presença pelo link do QR', reg === 1);
     confere('app abre na tela de presença', await p.evaluate(() => document.querySelector('.ap-view.on').dataset.view === 'presenca'));
     confere('app mostra "x de 50 aulas" na faixa', /de 50 aulas|ser avaliado/.test(await p.textContent('.ap-fx-c')));
+    confere('app mostra a presença confirmada em tela cheia', await p.isVisible('#apOk') && /Bom treino/.test(await p.textContent('#apOkT')));
+    await p.click('#apOkX'); await p.waitForTimeout(300);
+    await p.click('#apBell'); await p.clock.runFor(1500); await p.waitForTimeout(400);
+    confere('app: avisos com botão de ação', (await p.$$('.app-notes .ap-note [data-act]')).length >= 1 || !!(await p.$('.app-notes-none')));
+    await p.click('.ap-dock [data-go="perfil"]'); await p.clock.runFor(1200); await p.waitForTimeout(300);
+    confere('app: Perfil com a carteirinha', await p.isVisible('.ap-pass'));
     confere('app sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }

@@ -88,9 +88,13 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-cover img[hidden] { display: none; }
 .ap-back { display: inline-flex; align-items: center; gap: 4px; height: 32px; margin-left: -6px; padding: 0 6px; border: 0; background: none; color: var(--ink-2); font: 500 12.5px/1 var(--sans); cursor: pointer; }
 .ap-back .ic { width: 14px; height: 14px; }
-.ap-player { margin: 6px -18px 0; background: oklch(0.08 0.004 75); }
+/* a aula: o vídeo fica preso no topo enquanto a pessoa lê os capítulos e responde o quiz */
+.ap-vtop { position: sticky; top: -6px; z-index: 6; margin: 6px -16px 0; background: oklch(0.08 0.004 75); box-shadow: 0 10px 24px -18px oklch(0 0 0 / 0.9); }
+.ap-vtop .ap-pbar { margin: 0; }
+.ap-vtop .ap-pbar .pg { height: 3px; }
+.ap-player { margin: 0; background: oklch(0.08 0.004 75); }
 .ap-player:empty { display: none; }
-.ap-player video { display: block; width: 100%; max-height: 340px; aspect-ratio: 16 / 9; background: oklch(0.08 0.004 75); }
+.ap-player video { display: block; width: 100%; max-height: min(340px, 34vh); aspect-ratio: 16 / 9; object-fit: contain; background: oklch(0.08 0.004 75); }
 .ap-yt { aspect-ratio: 16 / 9; }
 .ap-yt > *, .ap-yt iframe { display: block; width: 100%; height: 100%; border: 0; }
 .ap-rec { display: grid; gap: 6px; padding: 22px 18px; background: var(--paper-2); color: var(--ink-2); font-size: 12.5px; }
@@ -98,6 +102,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-rec .ap-btn { margin-top: 6px; text-decoration: none; }
 .ap-ex { margin-top: 8px; font-size: 11.5px; }
 .ap-pbar { margin-top: 10px; }
+.ap-prog { margin-top: 6px; font-size: 11.5px; }
+.ap-prog[hidden] { display: none; }
 .ap-pbar[hidden] { display: none; }
 .ap-pbar .pg { display: block; height: 3px; background: color-mix(in oklch, var(--ink) 12%, transparent); }
 .ap-pbar .pg span { display: block; width: 0; height: 100%; background: var(--gold); transition: width 300ms linear; }
@@ -105,9 +111,20 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-pts { margin-top: 6px; counter-reset: pt; }
 .ap-pts li { position: relative; padding: 8px 0 8px 28px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); counter-increment: pt; }
 .ap-pts li::before { content: counter(pt); position: absolute; left: 0; top: 8px; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: var(--paper-2); font-size: 10.5px; font-weight: 600; color: var(--gold-text); }
-.ap-qlock { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding: 12px 14px; background: var(--paper-2); font-size: 12px; color: var(--ink-2); }
-.ap-qlock[hidden] { display: none; }
-.ap-qlock .ic { width: 16px; height: 16px; flex-shrink: 0; color: var(--gold-text); }
+/* quiz fechado: uma barra presa embaixo, logo acima das abas, com quanto falta para abrir */
+.ap-qbar { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 16px; background: color-mix(in oklch, var(--paper-2) 94%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 12.5px; color: var(--ink-2); }
+.ap-qbar[hidden] { display: none; }
+.ap-qbar .ic { width: 16px; height: 16px; color: var(--gold-text); }
+.ap-qbar-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font-weight: 500; }
+.ap-qbar-n { font: 400 17px/1 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
+/* capítulos: o tempo em dourado e a linha inteira é um botão */
+.ap-pts.caps { counter-reset: none; }
+.ap-pts.caps li { padding: 0; }
+.ap-pts.caps li::before { display: none; }
+.ap-pts.caps li:not(:has(button)) { padding: 10px 2px 10px 50px; font-size: 12.5px; }
+.ap-pts.caps button { display: flex; align-items: baseline; gap: 12px; width: 100%; min-height: 44px; padding: 10px 2px; border: 0; background: none; color: var(--ink-2); font: inherit; text-align: left; cursor: pointer; }
+.ap-pts.caps button[aria-current="true"] { color: var(--ink); }
+.ap-pts.caps .tm { flex-shrink: 0; min-width: 38px; font: 600 12px/1 var(--mono, monospace); color: var(--gold-text); font-variant-numeric: tabular-nums; }
 .ap-redo { display: block; margin-top: 6px; padding: 6px 0; border: 0; background: none; color: var(--ink-2); font: 500 12px/1 var(--sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .ap-redo[hidden] { display: none; }
 #aNext { margin-top: 16px; }
@@ -206,6 +223,30 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap.app.sem-dados #apFee, .ap.app.sem-dados #apReceipt, .ap.app.sem-dados .ap-trio, .ap.app.sem-dados #apBadge,
 .ap.app.sem-dados .ap-notes, .ap.app.sem-dados #apCalW, .ap.app.sem-dados #apNext { visibility: hidden; }
 /* perfil: a foto do aluno ao lado do nome, com o botão da câmera */
+/* passaporte: a carteirinha do aluno (dados, foto, faixa e graus) e a linha do tempo */
+.ap-pass { position: relative; margin-top: 4px; padding: 16px 16px 14px; border-radius: 22px; overflow: hidden;
+  background: radial-gradient(120% 80% at 100% 0%, color-mix(in oklch, var(--gold) 26%, transparent), transparent 62%), linear-gradient(165deg, color-mix(in oklch, var(--gold) 9%, var(--paper-2)), var(--paper-2) 70%);
+  box-shadow: 0 22px 40px -28px oklch(0 0 0 / 0.9), inset 0 0 0 1px color-mix(in oklch, var(--gold) 34%, transparent); }
+.ap-pass::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: linear-gradient(115deg, transparent 30%, oklch(1 0 0 / 0.07) 45%, transparent 60%); }
+.ap-pass-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed color-mix(in oklch, var(--gold) 30%, transparent); }
+.ap-pass-logo { width: 92px; }
+.ap-pass-k { font: 600 9.5px/1.2 var(--mono, monospace); letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-text); text-align: right; }
+.ap-pass .ap-belt.lg { margin-top: 14px; }
+.ap-pass-foot { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed color-mix(in oklch, var(--gold) 30%, transparent); font: 600 9.5px/1.3 var(--mono, monospace); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.ap-pass-foot span:last-child { color: var(--gold-text); }
+.ap-tl-w { margin-top: 22px; }
+.ap-tl { margin: 10px 0 0; padding: 0; list-style: none; }
+.ap-tl li { position: relative; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; }
+.ap-tl li::before { content: ""; position: absolute; left: 12px; top: 18px; bottom: -2px; width: 2px; background: var(--rule); }
+.ap-tl li:last-child::before { display: none; }
+.ap-tl .mk { position: relative; z-index: 1; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); }
+.ap-tl .mk .belt-s { width: 16px; height: 6px; border-radius: 2px; }
+.ap-tl li.marco .mk { background: var(--gold); box-shadow: none; }
+.ap-tl li.marco .mk::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: oklch(0.2 0.01 75); }
+.ap-tl li.inicio .mk { box-shadow: inset 0 0 0 2px var(--gold); }
+.ap-tl time { display: block; font: 600 10px/1.3 var(--mono, monospace); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.ap-tl b { display: block; margin-top: 2px; font: 400 16px/1.25 var(--serif); color: var(--ink); }
+.ap-tl small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-2); }
 .ap-pf-h { display: flex; align-items: flex-start; gap: 14px; }
 .ap-pf-t { flex: 1; min-width: 0; }
 .ap.app .ap-foto { position: relative; flex-shrink: 0; margin-top: 4px; padding: 0; border: 0; background: none; border-radius: 50%; cursor: pointer; color: inherit; }
@@ -484,16 +525,22 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-prod .ap-prod-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ap-prod svg { width: 52%; height: 52%; margin-top: 10%; filter: drop-shadow(0 8px 10px oklch(0 0 0 / 0.55)); transform: perspective(300px) rotateY(-8deg) rotateX(6deg); }
 .ap-prod .tag { position: absolute; z-index: 1; top: 7px; left: 7px; padding: 2px 6px; font-size: 8px !important; border-radius: 999px; background: oklch(0 0 0 / 0.45); font: 600 9px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
-.ap-shop-list { display: grid; gap: 14px; margin-top: 16px; }
-.ap-pc { display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 14px; padding: 12px; border-radius: 18px; border: 1px solid var(--rule); background: linear-gradient(160deg, color-mix(in oklch, var(--gold) 6%, var(--paper-2)), var(--paper-2) 60%); box-shadow: 0 16px 28px -22px oklch(0 0 0 / 0.85); }
-.ap-pc h3 { font: 400 16px/1.15 var(--serif); }
-.ap-pc .pr { margin-top: 3px; font: 400 19px/1 var(--serif); color: var(--gold-text); }
+/* loja em 2 colunas: a foto em cima, o nome e o preço, os tamanhos e o pedido embaixo (tudo alinhado pela base) */
+.ap-shop-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.ap-pc { display: flex; flex-direction: column; gap: 0; padding: 8px; border-radius: 18px; border: 1px solid var(--rule); background: linear-gradient(160deg, color-mix(in oklch, var(--gold) 6%, var(--paper-2)), var(--paper-2) 60%); box-shadow: 0 16px 28px -22px oklch(0 0 0 / 0.85); }
+.ap-pc .ap-prod { aspect-ratio: 1; border-radius: 12px; }
+.ap-pc > div { flex: 1; display: flex; flex-direction: column; padding: 10px 4px 2px; }
+.ap-pc h3 { font: 400 15px/1.15 var(--serif); }
+.ap-pc .pr { margin-top: 4px; font: 400 18px/1 var(--serif); color: var(--gold-text); }
 .ap-pc p { margin-top: 4px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
-.ap-sz { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-.ap-sz button { min-width: 36px; height: 30px; padding: 0 9px; border-radius: 9px; border: 1px solid var(--rule); background: none; color: var(--ink); font: 600 11.5px/1 var(--sans); cursor: pointer; }
-.ap-sz button[aria-pressed="true"] { border-color: var(--gold); background: color-mix(in oklch, var(--gold) 18%, transparent); }
-.ap-sz small { align-self: center; font-size: 10.5px; color: var(--ink-3); }
-.ap-pc .ap-btn { margin-top: 10px; min-height: 40px; width: 100%; }
+.ap-pc p.ds { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ap-sz { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; padding-top: 10px; }
+.ap-sz button { min-width: 40px; height: 36px; padding: 0 9px; border-radius: 10px; border: 1px solid var(--rule); background: none; color: var(--ink); font: 600 12px/1 var(--sans); cursor: pointer; }
+.ap-sz button[aria-pressed="true"] { border-color: var(--gold); background: color-mix(in oklch, var(--gold) 22%, transparent); }
+.ap-sz small { flex-basis: 100%; font-size: 10.5px; color: var(--ink-3); }
+.ap-pc .ap-btn { margin-top: 10px; min-height: 44px; width: 100%; padding-inline: 8px; font-size: 13px; }
+.ap-pc .ap-btn[aria-disabled="true"] { opacity: 0.55; }
+@media (max-width: 340px) { .ap-shop-list { grid-template-columns: minmax(0, 1fr); } }
 .ap-shop-ped { margin-top: 18px; }
 .ap-shop-ped li { display: flex; justify-content: space-between; gap: 8px; padding: 9px 0; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-2); }
 /* perfil: calendário dos últimos 30 dias */
@@ -604,6 +651,20 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       <button class="app-bell" type="button" id="apBell" aria-label="Avisos, 3 novos" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-bell"/></svg><span class="app-badge" id="apBadge" aria-hidden="true">3</span></button>
     </header>
     <div class="ap-toast" id="apToast" role="status" aria-live="polite"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span></span></div>
+    <!-- presença confirmada: tela cheia logo depois de registrar (código ou QR), com a meta da semana e o caminho do grau -->
+    <div class="ap-ok" id="apOk" role="dialog" aria-modal="true" aria-labelledby="apOkT" aria-describedby="apOkS" hidden>
+      <div class="ap-ok-in">
+        <span class="ap-ok-ck" aria-hidden="true"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15.5 27l7 7 14-15"/></svg></span>
+        <p class="ap-lb gold">Presença registrada</p>
+        <h2 class="ap-ok-t" id="apOkT">Bom treino!</h2>
+        <p class="ap-ok-s" id="apOkS"></p>
+        <div class="ap-ok-g">
+          <div class="ap-ok-c"><p class="ap-lb">Semana</p><b id="apOkMeta">1 de 3</b><div class="ap-goal" id="apOkDots"></div><span id="apOkMetaT"></span></div>
+          <div class="ap-ok-c"><p class="ap-lb">Próximo grau</p><span class="ap-belt b3d" data-belt></span><span class="ap-ok-bar"><i id="apOkBar"></i></span><span id="apOkGrau"></span></div>
+        </div>
+        <button class="ap-btn" type="button" id="apOkX">Continuar</button>
+      </div>
+    </div>
     <div class="ap-views">
       <!-- Início -->
       <section class="ap-view on" data-view="inicio" aria-label="Tela Início">
@@ -745,13 +806,12 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       <!-- a aula: o vídeo (arquivo ou YouTube), os pontos-chave e o quiz, que abre aos 90% assistidos -->
       <section class="ap-view" data-view="aula" aria-label="Tela da aula">
         <button class="ap-back" type="button" id="apBack"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-back"/></svg>Movimentos</button>
-        <div class="ap-player" id="apPlayer"></div>
+        <div class="ap-vtop"><div class="ap-player" id="apPlayer"></div><div class="ap-pbar" id="aPbar"><span class="pg"><span id="aBar"></span></span></div><div class="ap-qbar" id="aLock"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg><span class="ap-qbar-t" id="aQbT">O quiz abre aos 90% do vídeo</span><span class="ap-qbar-n" id="aQbN">0%</span></div></div>
         <p class="ap-mut ap-ex" id="aEx" hidden>Vídeo de exemplo, gravado no Studio. A aula desta técnica entra quando o professor publicar.</p>
         <p class="ap-lb gold" id="aCat" style="margin-top:14px"></p>
         <p class="ap-hi" id="aNome"></p>
-        <div class="ap-pbar" id="aPbar"><span class="pg"><span id="aBar"></span></span><p class="ap-mut" id="aProg"></p></div>
-        <div id="aPts"><p class="ap-lb" style="margin-top:18px">Pontos-chave</p><ol class="ap-pts" id="aPtsL"></ol></div>
-        <p class="ap-qlock" id="aLock"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg><span>O quiz abre quando você assistir 90% do vídeo.</span></p>
+        <p class="ap-mut ap-prog" id="aProg"></p>
+        <div id="aPts"><p class="ap-lb" style="margin-top:18px" id="aPtsH">Pontos-chave</p><ol class="ap-pts" id="aPtsL"></ol></div>
         <div class="ap-quiz" id="apQuiz" hidden>
           <p class="ap-lb gold" id="apQn">Pergunta 1 de 2</p>
           <p class="q" id="apQt"></p>
@@ -765,9 +825,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
       <!-- Perfil -->
       <section class="ap-view" data-view="perfil" aria-label="Tela Perfil">
+        <div class="ap-pass">
+        <div class="ap-pass-top"><span class="logo ap-pass-logo" role="img" aria-label="Studio Evolution BJJ"></span><span class="ap-pass-k">Passaporte · Equipe TRUE</span></div>
         <div class="ap-pf-h">
           <div class="ap-pf-t">
-            <p class="ap-lb">Seu lugar no tatame</p>
+            <p class="ap-lb sr-only">Seu passaporte no tatame</p>
             <p class="ap-hi">Marina Alves</p>
             <p class="ap-mut" style="margin-top:4px">Aluna desde março de 2025 · Adulto 19h</p>
           </div>
@@ -777,6 +839,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <span class="ap-belt b3d lg" data-belt></span>
         <div class="ap-row ap-fxrow" style="border-top:0;padding-bottom:0"><span>Faixa azul</span><span class="r">2 de 4 graus</span></div>
         <div class="ap-degs"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+        <p class="ap-pass-foot"><span>Studio Evolution BJJ · Sorocaba</span><span id="apPassAulas"></span></p>
+        </div>
         <!-- "aulas desde o último grau" conta as presenças registradas: a de hoje leva 21 a 22 (register) -->
         <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b id="apStreak">6</b><span id="apStreakT">semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
         <!-- os últimos 30 dias em calendário (segunda a sábado): dourado quando veio, dois pontos quando fez duas aulas -->
@@ -785,6 +849,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <p class="ap-cal-p" id="apCalP"></p>
           <div class="ap-cal" id="apCal" role="img"></div>
           <div class="ap-cal-leg"><span><i></i>não veio</span><span><i class="l1"></i>1 aula</span><span><i class="l2"></i>2 aulas</span></div>
+        </div>
+        <div class="ap-tl-w" id="apTlW" hidden>
+          <p class="ap-lb gold">Sua história no Studio</p>
+          <ol class="ap-tl" id="apTl"></ol>
         </div>
         <button class="ap-row pulse" type="button" id="apCompBtn" aria-expanded="false" aria-controls="apComp" style="width:100%;margin-top:12px;border-left:0;border-right:0;border-bottom:0;background:none;color:inherit;font:inherit;cursor:pointer"><span>Competências da faixa</span><span class="r">3 de 8<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
         <!-- as 8 da faixa azul: 3 conquistadas e 5 a conquistar (as três últimas são exemplo) -->
@@ -833,11 +901,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       <section class="ap-view" data-view="avisos" aria-label="Tela Avisos">
         <p class="ap-lb">Avisos</p>
         <p class="ap-hi">Para você</p>
-        <div class="ap-notes app-notes">
-          <button class="ap-note" type="button" data-note="aula"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>Sua aula começa em 1 hora</b><span class="tx">Adulto 19h · ainda há 3 vagas. Toque para confirmar.</span></span></button>
-          <button class="ap-note" type="button" data-note="meta"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>ontem</span></span><b>Falta 1 treino para a meta</b><span class="tx">Se der, amanhã às 19h você fecha a semana. Se não der, tudo bem.</span></span></button>
-          <button class="ap-note" type="button" data-note="mov"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>seg</span></span><b>Movimento novo na sua faixa</b><span class="tx">“Passagem toreando” já está em Movimentos.</span></span></button>
-        </div>
+        <div class="ap-notes app-notes"></div>
         <p class="ap-mut" style="margin-top:14px">Os avisos aparecem aqui sempre que você abre o app.</p>
       </section>
     </div>
@@ -1319,10 +1383,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       /* o tamanho escolhido acabou: a escolha sai (não trava a loja) */
       if (ESCOLHA[g.k] && !g.disp.some(function (p) { return p.id === ESCOLHA[g.k]; })) delete ESCOLHA[g.k];
       var sel = ESCOLHA[g.k];
-      return '<article class="ap-pc" data-g="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodImg(g) + "</span><div><h3>" + esc(nomeG(g)) + '</h3><p class="pr">' + brl(g.min) + "</p>" + (g.desc ? "<p>" + esc(g.desc) + "</p>" : "") +
+      return '<article class="ap-pc" data-g="' + i + '"><span class="ap-prod"><span class="tag">' + CAT_P[g.cat] + "</span>" + prodImg(g) + "</span><div><h3>" + esc(nomeG(g)) + '</h3><p class="pr">' + (g.disp.some(function (p) { return Number(p.preco) !== g.min; }) ? "a partir de " : "") + brl(g.min) + "</p>" + (g.desc ? '<p class="ds">' + esc(g.desc) + "</p>" : "") +
         '<div class="ap-sz" role="group" aria-label="Tamanho">' + g.disp.map(function (p) { return '<button type="button" data-sz="' + p.id + '" aria-pressed="' + (sel === p.id) + '">' + esc(p.tamanho) + "</button>"; }).join("") +
         (g.disp.length < g.itens.length ? "<small>outros tamanhos esgotados</small>" : "") + "</div>" +
-        '<button class="ap-btn" type="button" data-pedir' + (sel ? "" : ' aria-disabled="true"') + '><span>' + (sel ? "Quero este · " + esc(g.disp.filter(function (p) { return p.id === sel; })[0].tamanho) : "Escolha o tamanho") + "</span></button></div></article>";
+        '<button class="ap-btn" type="button" data-pedir' + (sel ? "" : ' aria-disabled="true"') + '><span>' + (sel ? "Pedir " + esc(g.disp.filter(function (p) { return p.id === sel; })[0].tamanho) : "Escolha o tamanho") + "</span></button></div></article>";
     }).join("");
     var ped = $("#apShopPed");
     ped.hidden = !MEUSPED.length;
@@ -1797,15 +1861,55 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     }
     if (anim) gsap.to(wrap, { height: 0, opacity: 0, duration: 0.6, ease: "expo.inOut", onComplete: fold });
     else later(fold, 0);
+    var espera = null;
     if (demo) { $("#apToday").hidden = false; $("#apSince").textContent = "22"; }
-    else extrasReal();
+    else espera = extrasReal();
     var g = $(".ap-goal", done);
     g.classList.remove("burst"); void g.offsetWidth; g.classList.add("burst");
     if (anim) gsap.from(done, { y: 18, opacity: 0, duration: 0.8, ease: "expo.out" });
     if (had) Site.focusSoft(done, { preventScroll: true });
     later(function () { into(done); }, anim ? 650 : 0);
-    toast(trained >= goal ? "Presença registrada. Meta da semana batida!" : "Presença registrada.");
+    celebrar(espera);
   }
+  /* ---------- presença confirmada em tela cheia ---------- */
+  var okEl = $("#apOk"), okVolta = null;
+  function okGrau() {
+    /* o mesmo texto e a mesma barra do cartão da faixa no Início (já com a presença de agora) */
+    $("#apOkGrau").textContent = $(".ap-fx-c").textContent;
+    $("#apOkBar").style.width = $(".ap-fx-bar i").style.width || "0%";
+  }
+  function celebrar(espera) {
+    var nome = ((ALUNO && ALUNO.nome) || (demo ? "Marina" : "")).split(" ")[0];
+    $("#apOkT").textContent = nome ? "Bom treino, " + nome + "!" : "Bom treino!";
+    $("#apOkS").textContent = (AULA ? AULA.turma + " " + Site.hora(AULA.hora) + " · " : "") + "registrada às " + regAt + ".";
+    $("#apOkMeta").textContent = trained + " de " + goal;
+    $("#apOkDots").innerHTML = Array.apply(null, Array(goal)).map(function (_, i) { return "<i" + (i < trained ? ' class="on"' : "") + "></i>"; }).join("");
+    var falta = goal - trained;
+    $("#apOkMetaT").textContent = falta <= 0 ? "Meta da semana batida!" : "Falta" + (falta === 1 ? " 1 treino" : "m " + falta + " treinos") + " para a meta";
+    okGrau();
+    if (espera && espera.then) espera.then(okGrau, function () {});
+    okVolta = document.activeElement;
+    okEl.hidden = false;
+    document.documentElement.classList.add("ap-ok-on");
+    okEl.classList.remove("in"); void okEl.offsetWidth; okEl.classList.add("in");
+    var g = $("#apOkDots"); g.classList.add("burst");
+    /* vibra de leve, só depois de um toque na tela (aberto pelo QR, o navegador não deixa) */
+    try { var ua = navigator.userActivation; if (navigator.vibrate && !Site.reduce && (!ua || ua.hasBeenActive)) navigator.vibrate([18, 60, 28]); } catch (e) {}
+    if (anim) gsap.from($$(".ap-ok-in > *", okEl), { y: 18, opacity: 0, duration: 0.7, ease: "expo.out", stagger: 0.06, delay: 0.15, clearProps: "transform,opacity" });
+    Site.focusSoft($("#apOkX"), { preventScroll: true });
+  }
+  function fechaOk() {
+    if (okEl.hidden) return;
+    okEl.hidden = true;
+    document.documentElement.classList.remove("ap-ok-on");
+    var d = $("#apDone");
+    Site.focusSoft(d && !d.hidden ? d : okVolta, { preventScroll: true });
+  }
+  $("#apOkX").addEventListener("click", fechaOk);
+  okEl.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { e.preventDefault(); fechaOk(); }
+    if (e.key === "Tab") { e.preventDefault(); Site.focusSoft($("#apOkX")); }  /* um botão só: o foco fica nele */
+  });
 
   /* ---------- Movimentos: a biblioteca da faixa (movimentos.js), a aula com o vídeo e o quiz aos 90% ---------- */
   var MOVS = [], PROG = {}, FAIXA = "azul", catF = "todos", aula = null, trk = null, ytApi = null, ytP = null, ytT = null;
@@ -1901,8 +2005,17 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $("#aNome").textContent = m.nome;
     $("#aEx").hidden = !(m.video && m.video.exemplo);
     $("#aPts").hidden = !m.pontos.length;
-    $("#aPtsL").innerHTML = m.pontos.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+    var caps = m.video && m.pontos.some(function (t) { return CAP.test(t); });
+    $("#aPtsH").textContent = caps ? "Capítulos" : "Pontos-chave";
+    $("#aPtsL").classList.toggle("caps", !!caps);
+    $("#aPtsL").innerHTML = m.pontos.map(function (t) {
+      var c = CAP.exec(t);
+      if (!caps || !c) return "<li>" + esc(t) + "</li>";
+      var seg = (+c[1]) * 60 + (+c[2]);
+      return '<li><button type="button" data-seg="' + seg + '"><span class="tm">' + c[1] + ":" + c[2] + "</span>" + esc(c[3]) + "</button></li>";
+    }).join("");
     $("#aPbar").hidden = !m.video;
+    $("#aProg").hidden = !m.video;
     player(m);
     estadoQuiz();
     var nx = proximo(m);
@@ -1911,6 +2024,17 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     show("aula");
     screenOf("aula").scrollTop = 0;
   }
+  var CAP = /^(\d{1,2}):([0-5]\d)\s*[-–·]?\s*(.+)$/;
+  /* capítulo: o vídeo vai até o tempo e toca (pular não libera o quiz: só conta o que tocou em sequência) */
+  $("#aPtsL").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-seg]");
+    if (!b) return;
+    var t = +b.dataset.seg, v = $("#aVid");
+    if (v) { try { v.currentTime = t; v.play(); } catch (er) {} }
+    else if (ytP && ytP.seekTo) { try { ytP.seekTo(t, true); ytP.playVideo(); } catch (er) {} }
+    $$("#aPtsL [data-seg]").forEach(function (x) { x.removeAttribute("aria-current"); });
+    b.setAttribute("aria-current", "true");
+  });
   function player(m) {
     var box = $("#apPlayer");
     trk = null;
@@ -2022,6 +2146,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var v = visto(), feito = estudado(aula.id);
     $("#aBar").style.width = pct(feito ? Math.max(v, 0.9) : v) + "%";
     $("#aProg").textContent = feito ? "Estudado · quiz feito" : v >= 0.9 ? pct(v) + "% assistido · quiz liberado" : pct(v) + "% assistido · o quiz abre aos 90%";
+    $("#aQbN").textContent = pct(v) + "%";
+    /* com o quiz fechado, a faixa do topo já diz o quanto falta: a linha de baixo do título só aparece depois */
+    $("#aProg").hidden = !aula.video || (!feito && v < 0.9);
+    $("#aQbT").textContent = v > 0 ? "Quiz: falta" + (90 - pct(v) === 1 ? "" : "m") + " " + Math.max(1, 90 - pct(v)) + "% do vídeo" : "O quiz abre aos 90% do vídeo";
     if (!feito && v >= 0.9 && !qOn) liberar(false);
   }
 
@@ -2239,12 +2367,35 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (then) then();
     if (had && focusEl) Site.focusSoft(focusEl, { preventScroll: true });
   }
-  var NOTE = {
-    aula: function () { leave("inicio", confirmSpot, confBtn); },
-    meta: function () { leave("inicio"); },
-    mov: function () { leave("movimentos", function () { abrir("passagem-toreando"); }); }
+  /* cada aviso traz o botão que resolve: confirmar a aula, mandar o comprovante, assistir ao movimento... */
+  function noteHTML(n) {
+    return '<article class="ap-note" data-note="' + n.k + '"><span class="ico" aria-hidden="true"><span></span></span><div class="nb"><span class="hd"><span>Studio Evolution</span><span>' + esc(n.quando || "agora") + "</span></span>" +
+      "<b>" + esc(n.t) + '</b><span class="tx">' + esc(n.d) + "</span>" +
+      (n.a && n.a.length ? '<div class="ap-note-a">' + n.a.map(function (x, i) {
+        return '<button type="button" class="ap-na' + (i === 0 ? " pri" : "") + '" data-act="' + x[1] + '"' + (x[2] ? ' data-arg="' + esc(x[2]) + '"' : "") + ">" + esc(x[0]) + "</button>";
+      }).join("") + "</div>" : "") + "</div></article>";
+  }
+  var ACAO = {
+    confirmar: function () { leave("inicio", confirmSpot, confBtn); },
+    agenda: function () { leave("presenca"); },
+    inicio: function () { leave("inicio"); },
+    mens: function () { leave("inicio", openSheet); },
+    perfil: function () { leave("perfil"); },
+    mov: function (arg) { leave("movimentos", function () { if (arg) abrir(arg); }); },
+    comprovante: function (arg) {
+      var nome = ALUNO && ALUNO.nome ? ALUNO.nome.split(" ")[0] : "";
+      window.open(WA + encodeURIComponent("Olá! " + (nome ? "Aqui é " + nome + ". " : "") + "Segue o comprovante da mensalidade" + (arg ? " de " + arg : "") + "."), "_blank", "noopener");
+    }
   };
-  $$(".ap-note[data-note]", noteV).forEach(function (n) { n.addEventListener("click", NOTE[n.dataset.note]); });
+  noteV.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-act]");
+    if (b && ACAO[b.dataset.act]) ACAO[b.dataset.act](b.dataset.arg);
+  });
+  if (demo) $(".app-notes", noteV).innerHTML = [
+    { k: "aula", quando: "agora", t: "Sua aula começa em 1 hora", d: "Adulto 19h · ainda há 3 vagas.", a: [["Vou treinar", "confirmar"], ["Ver a aula", "agenda"]] },
+    { k: "meta", quando: "ontem", t: "Falta 1 treino para a meta", d: "Se der, amanhã às 19h você fecha a semana. Se não der, tudo bem.", a: [["Ver as aulas", "agenda"]] },
+    { k: "mov", quando: "seg", t: "Movimento novo na sua faixa", d: "“Passagem toreando” já está em Movimentos.", a: [["Assistir agora", "mov", "passagem-toreando"]] }
+  ].map(noteHTML).join("");
 
   /* ---------- modo Supabase: a semana, a mensalidade, o perfil e os avisos com os dados do aluno ---------- */
   var MEUS = { pres: [], mens: [], grads: [] };
@@ -2564,22 +2715,54 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $("#apCompBtn").hidden = true;
     $("#apComp").hidden = true;
     $("#apNote").textContent = "O próximo grau é decisão do professor. Treinar com frequência e estudar os movimentos da faixa ajudam.";
+    $("#apPassAulas").textContent = totalStudio + (totalStudio === 1 ? " aula" : " aulas");
+    paintTl(linhaDoTempo(a));
+  }
+  /* ---------- passaporte: a linha do tempo (o mais novo em cima) ---------- */
+  function paintTl(itens) {
+    $("#apTlW").hidden = !itens.length;
+    $("#apTl").innerHTML = itens.map(function (x) {
+      var mk = x.fx ? '<i class="belt-s" style="' + Site.faixaCss(x.fx) + '"></i>' : "";
+      return '<li class="' + x.t + '"><span class="mk" aria-hidden="true">' + mk + '</span><div><time datetime="' + x.data + '">' + dataLonga(x.data) + "</time><b>" + esc(x.tit) + "</b>" +
+        (x.nota ? "<small>" + esc(x.nota) + "</small>" : "") + "</div></li>";
+    }).join("");
+  }
+  function dataLonga(iso) { var d = diaDe(iso); return d.getDate() + " de " + MESES[d.getMonth()] + " de " + d.getFullYear(); }
+  var MARCOS = [10, 50, 100, 150, 200, 250, 300, 400, 500, 750, 1000];
+  function linhaDoTempo(a) {
+    var l = [], antes = a.aulas_antes || 0;
+    /* graduações: a lançada como "já tinha ao entrar" vira a chegada; as outras, faixa nova ou grau novo */
+    MEUS.grads.forEach(function (g) {
+      var nome = Site.faixaNome(g.faixa).toLowerCase(), chegada = /ao entrar no Studio|antes do app/i.test(g.nota || "");
+      var grau = g.graus ? g.graus + "º grau" : "";
+      l.push({ t: "grad", data: g.data, fx: g.faixa,
+        tit: chegada ? "Chegou com a faixa " + nome + (g.graus ? ", " + g.graus + (g.graus === 1 ? " grau" : " graus") : "") : g.graus ? grau + " na faixa " + nome : "Faixa " + nome,
+        nota: chegada ? "" : g.nota || "" });
+    });
+    /* marcos de aulas: a data da presença que completou 10, 50, 100… (contando as de antes do app) */
+    var pres = MEUS.pres.slice().sort(function (x, y) { return x.data < y.data ? -1 : x.data > y.data ? 1 : 0; });
+    MARCOS.forEach(function (n) {
+      var k = n - antes - 1;
+      if (k >= 0 && k < pres.length) l.push({ t: "marco", data: pres[k].data, tit: n + "ª aula no Studio", nota: n === 100 ? "Isso é constância." : "" });
+    });
+    if (pres.length && antes < 1) l.push({ t: "marco", data: pres[0].data, tit: "Primeira aula registrada no app" });
+    if (a.inicio) l.push({ t: "inicio", data: a.inicio, tit: "Começou no Studio Evolution", nota: TURMA[a.turma] || "Adulto" });
+    l.sort(function (x, y) { return x.data < y.data ? 1 : x.data > y.data ? -1 : (x.t === "inicio") - (y.t === "inicio"); });
+    return l.slice(0, 14);
   }
   /* os avisos nascem dos dados: a aula de hoje sem vaga confirmada, a mensalidade, a meta da semana e o grau novo */
   function paintAvisosReal() {
     if (demo || !ALUNO) return;
     var hoje = isoDia(new Date()), l = [], comp = hoje.slice(0, 8) + "01", m = MEUS.mens.filter(function (x) { return x.competencia === comp; })[0];
-    if (AULA && AULA.k === 0 && !semAula && !confirmed && !registered) l.push(["aula", "Sua aula é hoje, às " + Site.hora(AULA.hora), AULA.turma + " · " + (10 - ocupadas()) + " vagas livres. Toque para confirmar."]);
-    if (m && !m.pago_em && m.vencimento < hoje) l.push(["fee", "Mensalidade em atraso", "Venceu em " + br(m.vencimento) + ". Se já pagou, mande o comprovante pelo WhatsApp do Studio."]);
-    else if (m && !m.pago_em && (diaDe(m.vencimento) - diaDe(hoje)) / 864e5 <= 3) l.push(["fee", "A mensalidade vence em " + br(m.vencimento), brl(m.valor) + ". Toque para ver."]);
-    if (trained < goal) l.push(["meta", "Faltam " + (goal - trained) + (goal - trained === 1 ? " treino" : " treinos") + " para a meta da semana", "Meta: " + goal + (goal === 1 ? " treino" : " treinos") + ". Se não der, tudo bem."]);
+    if (AULA && AULA.k === 0 && !semAula && !confirmed && !registered) l.push({ k: "aula", t: "Sua aula é hoje, às " + Site.hora(AULA.hora), d: AULA.turma + " · " + (10 - ocupadas()) + " vagas livres.", a: [["Vou treinar", "confirmar"], ["Ver a aula", "agenda"]] });
+    if (m && !m.pago_em && m.vencimento < hoje) l.push({ k: "fee", t: "Mensalidade em atraso", d: "Venceu em " + br(m.vencimento) + ". Se já pagou, é só mandar o comprovante.", a: [["Mandar comprovante", "comprovante", MESES[+m.competencia.slice(5, 7) - 1]], ["Ver mensalidade", "mens"]] });
+    else if (m && !m.pago_em && (diaDe(m.vencimento) - diaDe(hoje)) / 864e5 <= 3) l.push({ k: "fee", t: "A mensalidade vence em " + br(m.vencimento), d: brl(m.valor) + ".", a: [["Ver mensalidade", "mens"]] });
+    if (trained < goal) l.push({ k: "meta", t: "Falta" + (goal - trained === 1 ? " 1 treino" : "m " + (goal - trained) + " treinos") + " para a meta da semana", d: "Meta: " + goal + (goal === 1 ? " treino" : " treinos") + ". Se não der, tudo bem.", a: [["Ver as aulas", "agenda"]] });
     var g = MEUS.grads[0];
     /* o grau lançado no cadastro é o que o aluno já tinha: não é graduação nova, não dá parabéns */
-    if (g && !/ao entrar no Studio|antes do app/i.test(g.nota || "") && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push(["perfil", "Parabéns pelo grau!", Site.faixaNome(g.faixa) + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + "."]);
+    if (g && !/ao entrar no Studio|antes do app/i.test(g.nota || "") && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push({ k: "perfil", t: "Parabéns pelo grau!", d: Site.faixaNome(g.faixa) + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + ".", a: [["Ver no Perfil", "perfil"]] });
     var box = $(".app-notes", noteV);
-    box.innerHTML = l.map(function (x) {
-      return '<button class="ap-note" type="button" data-note="' + x[0] + '"><span class="ico" aria-hidden="true"><span></span></span><span class="nb"><span class="hd"><span>Studio Evolution</span><span>agora</span></span><b>' + esc(x[1]) + '</b><span class="tx">' + esc(x[2]) + "</span></span></button>";
-    }).join("") || '<p class="app-notes-none">Nenhum aviso agora.</p>';
+    box.innerHTML = l.map(noteHTML).join("") || '<p class="app-notes-none">Nenhum aviso agora.</p>';
     var badge = $("#apBadge"), vendo = current === "avisos";
     badge.textContent = l.length;
     badge.hidden = !l.length || vendo;
@@ -2587,15 +2770,17 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (vendo) notes();
   }
   window.paintAvisosReal = paintAvisosReal;
-  if (!demo) noteV.addEventListener("click", function (e) {
-    var b = e.target.closest(".ap-note[data-note]");
-    if (!b) return;
-    var k = b.dataset.note;
-    if (k === "aula") leave("inicio", confirmSpot, confBtn);
-    else if (k === "fee") leave("inicio", openSheet);
-    else if (k === "perfil") leave("perfil");
-    else leave("inicio");
-  });
+  if (demo) {
+    $("#apPassAulas").textContent = "148 aulas";
+    paintTl([
+      { t: "grad", data: "2026-09-12", fx: "azul", tit: "2º grau na faixa azul", nota: "Entregue no treino de sábado." },
+      { t: "marco", data: "2026-07-03", tit: "100ª aula no Studio", nota: "Isso é constância." },
+      { t: "grad", data: "2026-04-18", fx: "azul", tit: "1º grau na faixa azul" },
+      { t: "grad", data: "2025-11-29", fx: "azul", tit: "Faixa azul", nota: "Graduação de fim de ano." },
+      { t: "marco", data: "2025-08-14", tit: "50ª aula no Studio" },
+      { t: "inicio", data: "2025-03-10", tit: "Começou no Studio Evolution", nota: "Adulto" }
+    ]);
+  }
 
   /* ---------- instalar: Android e Chrome mostram o pedido do navegador; no iPhone, a instrução do Safari ---------- */
   var inst = $("#apInstall"), pedido = null;

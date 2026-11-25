@@ -97,3 +97,26 @@
 .rc-sub { margin-top: 8px; color: var(--ink-2); font-size: 14.5px; line-height: 1.45; }
 .field.up label { transform: translateY(-20px) scale(0.78); color: var(--gold-text); }
 .rc .lg-foot .link { padding: 0; border: 0; background: none; color: var(--ink); font: inherit; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+
+/* ===== app instalado: a entrada é uma tela do app, não uma página do site =====
+   Sem o menu, o botão de aula grátis e o rodapé do site; o logo no alto, a foto do tatame em cima e o
+   formulário embaixo, perto do polegar. "Manter conectado" já vem marcado. */
+.lg-app-foot { display: none; }
+html.modo-app .nav .links, html.modo-app .nav-right, html.modo-app .menu-btn, html.modo-app .foot, html.modo-app #lgFoot, html.modo-app .lg-ghost { display: none !important; }
+html.modo-app .nav { position: absolute; background: none; border: 0; }
+html.modo-app .nav-in { justify-content: center; min-height: calc(76px + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); }
+html.modo-app .brand .logo { height: 40px; }
+html.modo-app .login { min-height: 100vh; min-height: 100dvh; }
+html.modo-app .lg-panel { align-content: end; padding-top: calc(130px + env(safe-area-inset-top, 0px)); padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+html.modo-app .lg-media img { opacity: 0.78; object-position: 55% 22%; }
+html.modo-app .lg-media::after { background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 35%, transparent) 0%, transparent 18%, color-mix(in oklch, var(--cine-bg) 55%, transparent) 34%, var(--cine-bg) 52%); }
+html.modo-app .lg-card .label { display: none; }
+html.modo-app .lg-title { margin-top: 0; font-size: 40px; }
+html.modo-app .lg-sub { margin-top: 10px; font-size: 14px; }
+html.modo-app .role { margin-top: 20px; }
+html.modo-app .lg-note { margin-top: 10px; font-size: 12px; }
+html.modo-app .lg-app-foot { display: block; margin-top: 14px; font-size: 12px; text-align: center; color: var(--cine-fg-2, var(--ink-3)); }
+html.modo-app .lg-app-foot a { color: inherit; }
+@media (min-width: 1000px) {
+  html.modo-app .lg-panel { align-content: center; padding-top: 116px; }
+}

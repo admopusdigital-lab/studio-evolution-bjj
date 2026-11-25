@@ -20,6 +20,9 @@
   if (location.hash === "#claro") l = "light";
   d.setAttribute("data-look", l);
   d.setAttribute("data-page", "entrar");
+  /* app instalado no celular (abre em entrar.html?app ou em tela cheia): tela própria, sem o menu do site */
+  var mm = window.matchMedia;
+  if (/[?&]app\b/.test(location.search) || (mm && mm("(display-mode: standalone)").matches) || navigator.standalone === true) d.classList.add("modo-app");
   try { if (sessionStorage.getItem("evo-nav")) { d.classList.add("entering"); sessionStorage.removeItem("evo-nav"); }
     var im = sessionStorage.getItem("evo-nav-img");
     if (im && d.classList.contains("entering")) { d.classList.add("entering-img"); d.style.setProperty("--enter-img", "url(\"" + im.replace(/["\\]/g, "") + "\")"); }
@@ -114,6 +117,7 @@
           <button class="btn btn-ink" type="submit" id="lgBtn">Entrar<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button>
           <p class="lg-foot" id="lgFoot">Ainda não treina com a gente? <a href="agendamento.html" data-int>Agende uma aula grátis</a>.</p>
           <p class="lg-note" id="lgNote">A conta é criada pelo Studio na matrícula. Para receber ou trocar a senha, chame no WhatsApp.</p>
+          <p class="lg-app-foot"><a href="index.html">Site do Studio</a> · <a href="privacidade.html">Privacidade</a></p>
         </form>
 
         <!-- esqueci a senha: o aluno cria uma senha nova confirmando dados do cadastro (função trocar-senha) -->
@@ -158,6 +162,7 @@
   var form = $("#lgForm"), user = $("#usuario"), pass = $("#senha"), err = $("#lgErr"), btn = $("#lgBtn");
   /* com o servidor ligado, o login é sempre pelo e-mail */
   if (Acesso.real) { user.type = "email"; user.setAttribute("autocomplete", "email"); $('label[for="usuario"]').textContent = "E-mail"; Acesso.precarregar(); }
+  if (document.documentElement.classList.contains("modo-app")) $("#manter").checked = true;
   var role = function () { return $('input[name="papel"]:checked', form).value; };
   function paintRole() {
     var r = role();
