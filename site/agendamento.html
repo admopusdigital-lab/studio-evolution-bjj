@@ -338,7 +338,7 @@
           <dl class="contact">
             <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
             <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
-            <div><dt>Aulas</dt><dd>Adulto: seg a sex, 8h, 11h, 19h e 20h30<br>Kids 1: ter e qui, 9h e 18h<br>Kids 2: seg e qua, 9h e 18h<br>Open Mat: sábado, 10h30</dd></div>
+            <div><dt>Aulas</dt><dd>Adulto: <span data-grade-linha="Adulto">seg a sex, 8h, 11h, 19h e 20h30</span><br>Kids 1: <span data-grade-linha="Kids 1">ter e qui, 9h e 18h</span><br>Kids 2: <span data-grade-linha="Kids 2">seg e qua, 9h e 18h</span><br>Open Mat: <span data-grade-linha="Open Mat">sábado, 10h30</span></dd></div>
           </dl>
         </div>
         <figure class="cta-photo"><img src="img/hero-real.jpg" alt="Dois faixas-pretas de kimono branco sorrindo lado a lado" loading="lazy" width="1531" height="1027" style="object-position:50% 35%"></figure>
@@ -352,7 +352,7 @@
     <div class="foot-grid">
       <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Adulto de segunda a sexta (o Feminino treina junto), Kids 1 e Kids 2 para crianças de 4 a 12 anos e Open Mat aos sábados.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>Aulas</h4><ul><li>Adulto · seg a sex, 8h, 11h, 19h e 20h30</li><li>Kids 1 · ter e qui, 9h e 18h</li><li>Kids 2 · seg e qua, 9h e 18h</li><li>Open Mat · sábado, 10h30</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · <span data-grade-linha="Adulto">seg a sex, 8h, 11h, 19h e 20h30</span></li><li>Kids 1 · <span data-grade-linha="Kids 1">ter e qui, 9h e 18h</span></li><li>Kids 2 · <span data-grade-linha="Kids 2">seg e qua, 9h e 18h</span></li><li>Open Mat · <span data-grade-linha="Open Mat">sábado, 10h30</span></li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
@@ -382,6 +382,23 @@
     kids2: { name: "Kids 2", code: "KD2", times: ["09:00", "18:00"], days: [1, 3], when: "às segundas e quartas" },
     feminino: { name: "Feminino", code: "FEM", times: ["08:00", "11:00", "19:00", "20:30"], days: [1, 2, 3, 4, 5], when: "de segunda a sexta, junto com o Adulto" }
   };
+  /* os dias e os horários de cada turma vêm da grade do Studio (o professor muda em Configurações no painel) */
+  var NA_GRADE = { adulto: "Adulto", kids1: "Kids 1", kids2: "Kids 2", feminino: "Adulto" };
+  function daGrade() {
+    var mudou = JSON.stringify(Site.GRADE) !== Site.GRADE_PADRAO;
+    Object.keys(PROGRAMS).forEach(function (k) {
+      var l = Site.GRADE.filter(function (c) { return c.n === NA_GRADE[k]; }), t = {}, d = {};
+      if (!l.length) return;
+      l.forEach(function (c) { t[c.t] = 1; c.d.forEach(function (x) { d[x] = 1; }); });
+      PROGRAMS[k].times = Object.keys(t).sort();
+      PROGRAMS[k].days = Object.keys(d).map(Number).sort();
+      if (!mudou) return;
+      PROGRAMS[k].when = Site.gradeLinha(NA_GRADE[k]) + (k === "feminino" ? ", junto com o Adulto" : "");
+      var tms = document.querySelector('.opt[data-prog="' + k + '"] .tms');
+      if (tms) tms.textContent = Site.gradeDias(NA_GRADE[k]) + " · " + PROGRAMS[k].times.join(" · ");
+    });
+  }
+  daGrade();
   var WD_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   var MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   var state = { program: null, date: null, time: null, name: "", fone: "", family: false };
@@ -466,7 +483,12 @@
     var box = $("#times"), empty = $("#timesEmpty");
     if (!state.program) { box.innerHTML = ""; empty.hidden = false; $("#timeHint").textContent = ""; return; }
     empty.hidden = true;
-    var times = PROGRAMS[state.program].times;
+    /* só os horários que a turma tem no dia escolhido (a grade pode ter horários só em alguns dias) */
+    var wdSel = state.date ? fromIso(state.date).getDay() : null;
+    var times = PROGRAMS[state.program].times.filter(function (t) {
+      return wdSel === null || !Site.GRADE.some(function (c) { return c.n === NA_GRADE[state.program]; }) ||
+        Site.GRADE.some(function (c) { return c.n === NA_GRADE[state.program] && c.t === t && c.d.indexOf(wdSel) >= 0; });
+    });
     $("#timeHint").textContent = PROGRAMS[state.program].name + (state.family ? " · com o Adulto " + (state.time === "09:00" ? "antes, às 8h" : state.time ? "logo depois, às 19h" : "antes ou logo depois") : "");
     box.innerHTML = times.map(function (t) {
       var ok = timeOk(t);
@@ -632,6 +654,12 @@
   }
   update();
   barCheck();
+  /* a grade chegou do banco depois de a página abrir: refaz datas e horários com ela */
+  document.addEventListener("evo-grade", function () {
+    daGrade();
+    if (state.program && state.time && PROGRAMS[state.program].times.indexOf(state.time) < 0) state.time = null;
+    resetDates(); renderTimes(); update();
+  });
 
   Site.boot({
     setup: function (S) {

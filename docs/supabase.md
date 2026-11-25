@@ -198,3 +198,13 @@ Interessados, e um segundo pedido do mesmo número atualiza o contato em aberto 
 migração, o site manda o número junto do nome ("Maria · WhatsApp (15) 99999-0000"), para nenhum pedido chegar sem contato.
 
 1. Rodar `supabase/migrations/20261125120000_pedido_site_whatsapp.sql` no SQL Editor (pode rodar mais de uma vez).
+
+## Grade de aulas editável
+
+O professor muda as aulas em **Configurações → Aulas e horários** (turma, horário e dias). A grade fica em
+`configuracoes` (chave `grade`) e vale para o site (rodapés, horários das turmas, agendamento), o app e o painel.
+Sem grade salva, tudo usa a grade padrão do `site.js`. A leitura pública é a função `grade_aulas()`, porque o site
+não tem login; gravar continua só com o professor (ou a equipe com a área Configurações).
+
+1. Rodar `supabase/migrations/20261125130000_grade_aulas.sql` no SQL Editor (pode rodar mais de uma vez).
+   Sem ela, o painel já salva, mas o site e o app do aluno continuam com a grade padrão.

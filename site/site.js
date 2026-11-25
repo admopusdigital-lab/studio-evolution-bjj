@@ -373,6 +373,81 @@
   Site.hora = function (t) { var p = t.split(":"); return +p[0] + "h" + (p[1] !== "00" ? p[1] : ""); };
   Site.aulasDo = function (wd) { return Site.GRADE.filter(function (c) { return c.d.indexOf(wd) >= 0; }); };
 
+  /* ---------- grade editável: o professor muda em Configurações; o site lê pela função pública grade_aulas().
+     A última grade fica guardada no aparelho para valer já na primeira pintura. Os textos com data-grade-* só são
+     reescritos quando a grade é diferente da padrão (acima), então a página fica como está até o professor mudar ---------- */
+  Site.TURMAS_GRADE = ["Adulto", "Kids 1", "Kids 2", "Open Mat"];
+  Site.GRADE_PADRAO = JSON.stringify(Site.GRADE);
+  function gradeOk(g) {
+    return Array.isArray(g) && g.length > 0 && g.every(function (c) {
+      return c && /^([01]\d|2[0-3]):[0-5]\d$/.test(c.t) && Site.TURMAS_GRADE.indexOf(c.n) >= 0 && Array.isArray(c.d) && c.d.length > 0 &&
+        c.d.every(function (x) { return x === +x && x >= 0 && x <= 6; });
+    });
+  }
+  Site.gradeOk = gradeOk;
+  function ordenaGrade(g) {
+    return g.map(function (c) { return { t: c.t, n: c.n, d: c.d.slice().sort() }; })
+      .sort(function (a, b) { return a.t < b.t ? -1 : a.t > b.t ? 1 : Site.TURMAS_GRADE.indexOf(a.n) - Site.TURMAS_GRADE.indexOf(b.n); });
+  }
+  var ABREV = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+  function diasTx(d) {
+    d = d.slice().sort();
+    if (d.join() === "1,2,3,4,5") return "seg a sex";
+    if (d.join() === "1,2,3,4,5,6") return "seg a sáb";
+    if (d.length === 1) return d[0] === 6 ? "sábado" : d[0] === 0 ? "domingo" : ABREV[d[0]];
+    var l = d.map(function (x) { return ABREV[x]; });
+    return l.slice(0, -1).join(", ") + " e " + l[l.length - 1];
+  }
+  function listaTx(l) { return l.length < 2 ? l.join("") : l.slice(0, -1).join(", ") + " e " + l[l.length - 1]; }
+  /* "seg a sex, 8h, 11h, 19h e 20h30" (uma turma; dias diferentes viram grupos separados por ";") */
+  Site.gradeLinha = function (n) {
+    var grupos = {};
+    Site.GRADE.filter(function (c) { return c.n === n; }).forEach(function (c) { var k = c.d.slice().sort().join(); (grupos[k] = grupos[k] || []).push(c.t); });
+    return Object.keys(grupos).map(function (k) { return diasTx(k.split(",").map(Number)) + ", " + listaTx(grupos[k].sort().map(Site.hora)); }).join("; ");
+  };
+  Site.gradeHoras = function (n) {
+    var h = {};
+    Site.GRADE.forEach(function (c) { if (c.n === n) h[c.t] = 1; });
+    return Object.keys(h).sort().map(Site.hora).join(" · ");
+  };
+  Site.gradeDias = function (n) {
+    var d = {};
+    Site.GRADE.forEach(function (c) { if (c.n === n) c.d.forEach(function (x) { d[x] = 1; }); });
+    var t = diasTx(Object.keys(d).map(Number));
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  };
+  function pintaGrade() {
+    if (JSON.stringify(Site.GRADE) === Site.GRADE_PADRAO) return;
+    $$("[data-grade-linha]").forEach(function (el) { el.textContent = Site.gradeLinha(el.getAttribute("data-grade-linha")) || "sem aula no momento"; });
+    $$("[data-grade-horas]").forEach(function (el) { el.textContent = Site.gradeHoras(el.getAttribute("data-grade-horas")) || "—"; });
+    $$("[data-grade-dias]").forEach(function (el) { el.textContent = Site.gradeDias(el.getAttribute("data-grade-dias")); });
+    $$("[data-grade-frase]").forEach(function (el) {
+      el.textContent = Site.TURMAS_GRADE.map(function (n) { var t = Site.gradeLinha(n); return t ? n + ": " + t + "." : ""; }).filter(Boolean).join(" ");
+    });
+  }
+  Site.usarGrade = function (g) {
+    if (!gradeOk(g)) return false;
+    var novo = JSON.stringify(ordenaGrade(g)), mudou = novo !== JSON.stringify(Site.GRADE);
+    Site.GRADE = JSON.parse(novo);
+    try { localStorage.setItem("evo-grade", novo); } catch (e) {}
+    if (mudou) { pintaGrade(); try { document.dispatchEvent(new CustomEvent("evo-grade")); } catch (e) {} }
+    return mudou;
+  };
+  try { var gGuardada = JSON.parse(localStorage.getItem("evo-grade") || "null"); if (gradeOk(gGuardada)) Site.GRADE = ordenaGrade(gGuardada); } catch (e) {}
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", pintaGrade); else pintaGrade();
+  (function () {
+    var C = window.EVO_SUPABASE || {};
+    if (!C.url || !C.chave || !window.fetch) return;
+    fetch(C.url + "/rest/v1/rpc/grade_aulas", { method: "POST", headers: { apikey: C.chave, "Content-Type": "application/json" }, body: "{}" })
+      .then(function (r) { return r.ok ? r.json() : undefined; })
+      .then(function (g) {
+        if (g) return Site.usarGrade(g);
+        /* o banco respondeu sem grade salva: volta para a padrão */
+        if (g === null && JSON.stringify(Site.GRADE) !== Site.GRADE_PADRAO) Site.usarGrade(JSON.parse(Site.GRADE_PADRAO));
+      })
+      .catch(function () {});
+  })();
+
   /* ---------- selos ao vivo: a próxima aula e o atendimento, pela hora de quem está vendo ---------- */
   Site.nextClass = function () {
     var d = new Date(), wd = d.getDay(), h = d.getHours() + d.getMinutes() / 60;

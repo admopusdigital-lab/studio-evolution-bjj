@@ -193,11 +193,62 @@
         '<label class="crm-f"><span>Vagas por aula</span><input class="crm-in" id="cfVagas" inputmode="numeric" value="' + v("vagas") + '"></label>' +
         '<label class="crm-f wide"><span>Endereço</span><input class="crm-in" id="cfEnd" value="' + v("endereco") + '"></label>' +
         '<label class="crm-f wide"><span>Atendimento</span><input class="crm-in" id="cfAt" value="' + v("atendimento") + '"></label></div>' +
-        '<p class="muted" style="font-size:12px;margin-top:8px">A grade de aulas (horários e turmas) fica no site; para mudar, fale com a OPUS. O limite de vagas no app é 10 por aula.</p>' +
-        '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Salvar dados</button></div></form>';
+        '<p class="muted" style="font-size:12px;margin-top:8px">O limite de vagas no app é 10 por aula.</p>' +
+        '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Salvar dados</button></div></form>' +
+      '<form class="crm-form" id="grdForm" novalidate style="margin-top:22px"><p class="fin-k">Aulas e horários</p>' +
+        '<p class="muted" style="font-size:12.5px;margin-top:4px">A grade vale para o site, o agendamento, o app e o painel. O Feminino treina junto com o Adulto.</p>' +
+        '<div class="grd-l" id="grdL">' + Site.GRADE.map(linhaGrade).join("") + "</div>" +
+        '<button class="mini-btn ghost" type="button" id="grdAdd" style="margin-top:10px">Adicionar aula</button>' +
+        '<p class="crm-err" role="alert"></p><div class="msg-acts"><button class="mini-btn" type="submit">Salvar grade</button>' +
+        (JSON.stringify(Site.GRADE) !== Site.GRADE_PADRAO ? '<button class="mini-btn ghost" type="button" id="grdPadrao">Voltar à grade padrão</button>' : "") + "</div></form>";
   }
+  /* ---------- a grade de aulas: uma linha por aula (turma, horário e dias da semana) ---------- */
+  var DIAS_C = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"], gradeN = 0;
+  function linhaGrade(c) {
+    var i = ++gradeN;
+    return '<div class="grd-r"><label class="sr-only" for="grdN' + i + '">Turma</label><select class="sel" id="grdN' + i + '" data-n>' +
+      Site.TURMAS_GRADE.map(function (n) { return "<option" + (n === c.n ? " selected" : "") + ">" + n + "</option>"; }).join("") + "</select>" +
+      '<label class="sr-only" for="grdT' + i + '">Horário</label><input class="crm-in" type="time" id="grdT' + i + '" data-t step="300" value="' + esc(c.t) + '">' +
+      '<span class="grd-d" role="group" aria-label="Dias da semana">' + DIAS_C.map(function (d, k) {
+        return '<label><input type="checkbox" value="' + k + '"' + (c.d.indexOf(k) >= 0 ? " checked" : "") + "><span>" + d + "</span></label>";
+      }).join("") + "</span>" +
+      '<button class="mini-btn ghost" type="button" data-grd-rm aria-label="Tirar esta aula">Tirar</button></div>';
+  }
+  function lerGrade() {
+    return $$("#grdL .grd-r").map(function (r) {
+      return { n: $("[data-n]", r).value, t: $("[data-t]", r).value, d: $$('input[type="checkbox"]:checked', r).map(function (x) { return +x.value; }) };
+    });
+  }
+  function carregarGrade() {
+    return P.q(function (sb) { return sb.from("configuracoes").select("valor").eq("chave", "grade").maybeSingle(); }).then(function (r) {
+      if (r && r.valor) Site.usarGrade(r.valor);
+      else if (JSON.stringify(Site.GRADE) !== Site.GRADE_PADRAO) Site.usarGrade(JSON.parse(Site.GRADE_PADRAO));
+    }).catch(function () {});
+  }
+  $("#cfgBox").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.id === "grdAdd") {
+      $("#grdL").insertAdjacentHTML("beforeend", linhaGrade({ n: "Adulto", t: "19:00", d: [1, 2, 3, 4, 5] }));
+      return P.focusSoft($("#grdL .grd-r:last-child select"), { preventScroll: false });
+    }
+    if (b.hasAttribute("data-grd-rm")) {
+      if ($$("#grdL .grd-r").length < 2) return P.toast("A grade precisa de pelo menos uma aula.");
+      return b.closest(".grd-r").remove();
+    }
+    if (b.id === "grdPadrao") {
+      if (!confirm("Voltar para a grade padrão do site? A grade salva será apagada.")) return;
+      b.classList.add("loading");
+      P.q(function (sb) { return sb.from("configuracoes").delete().eq("chave", "grade"); }).then(function () {
+        Site.usarGrade(JSON.parse(Site.GRADE_PADRAO));
+        paintCfg();
+        P.toast("Grade padrão de volta.");
+      }).catch(function (er) { b.classList.remove("loading"); P.erro(er); });
+    }
+  });
   $("#cfgBox").addEventListener("submit", function (e) {
     e.preventDefault();
+    if (e.target.id === "grdForm") return salvarGrade(e.target);
     var f = e.target, fone = P.foneBanco($("#cfFone").value), vagas = parseInt(P.digitos($("#cfVagas").value), 10);
     if (!fone) return P.erroForm(f, $("#cfFone"), "Confira o WhatsApp: DDD e número.");
     var d = { nome: $("#cfNome").value.trim() || CFG0.nome, whatsapp: fone, pix: $("#cfPix").value.trim(), vagas: vagas > 0 ? vagas : 10, endereco: $("#cfEnd").value.trim(), atendimento: $("#cfAt").value.trim() };
@@ -205,6 +256,24 @@
     P.q(function (sb) { return sb.from("configuracoes").upsert({ chave: "studio", valor: d }); }).then(carregarCfg).then(function () { paintCfg(); P.toast("Dados do Studio salvos."); })
       .catch(function (er) { $('[type="submit"]', f).classList.remove("loading"); P.erro(er); });
   });
-  P.aoAbrir("config", function () { carregarCfg().then(paintCfg).catch(function (e) { paintCfg(); P.erro(e, "Não deu para carregar as configurações"); }); });
-  window.addEventListener("load", function () { carregarCfg().catch(function () {}); });
+  function salvarGrade(f) {
+    var g = lerGrade(), ruim = null;
+    g.forEach(function (c, i) {
+      if (ruim) return;
+      var r = $$("#grdL .grd-r")[i];
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(c.t)) ruim = [r, "[data-t]", "Confira o horário."];
+      else if (!c.d.length) ruim = [r, 'input[type="checkbox"]', "Marque pelo menos um dia para cada aula."];
+    });
+    if (ruim) return P.erroForm(f, $(ruim[1], ruim[0]), ruim[2]);
+    var vistos = {}, rep = g.filter(function (c) { var k = c.n + c.t + c.d.join(); if (vistos[k]) return true; vistos[k] = 1; return false; });
+    if (rep.length) return P.erroForm(f, $("[data-t]", $$("#grdL .grd-r")[g.indexOf(rep[0])]), "Essa aula está repetida.");
+    $('[type="submit"]', f).classList.add("loading");
+    P.q(function (sb) { return sb.from("configuracoes").upsert({ chave: "grade", valor: g }); }).then(function () {
+      Site.usarGrade(g);
+      paintCfg();
+      P.toast("Grade salva. O site, o app e o painel já usam os horários novos.");
+    }).catch(function (er) { $('[type="submit"]', f).classList.remove("loading"); P.erro(er, "Não deu para salvar a grade"); });
+  }
+  P.aoAbrir("config", function () { Promise.all([carregarCfg(), carregarGrade()]).then(paintCfg).catch(function (e) { paintCfg(); P.erro(e, "Não deu para carregar as configurações"); }); });
+  window.addEventListener("load", function () { carregarCfg().catch(function () {}); carregarGrade(); });
 })();

@@ -708,7 +708,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <article class="prog" data-vt-card data-cursor="Ver turma">
           <div class="p-img"><img src="img/takes/adulto.jpg" alt="Dois alunos adultos, de kimono preto e azul, treinando no chão do tatame" width="1080" height="1350"><video class="take" data-take="img/takes/adulto" poster="img/takes/adulto.jpg" muted loop playsinline preload="none" aria-hidden="true"></video></div>
           <div>
-            <div class="p-meta"><span>Seg a sex</span><span class="tnum">8h · 11h · 19h · 20h30</span></div>
+            <div class="p-meta"><span data-grade-dias="Adulto">Seg a sex</span><span class="tnum" data-grade-horas="Adulto">8h · 11h · 19h · 20h30</span></div>
             <h3>Adulto</h3>
             <p>Treino que respeita seu corpo e seu ritmo. Mais leveza, menos estresse e mais disposição para o dia a dia.</p>
             <a class="link" href="agendamento.html#adulto" data-int>Agendar na turma Adulto</a>
@@ -717,7 +717,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <article class="prog" data-vt-card data-cursor="Ver turma">
           <div class="p-img"><img src="img/programa-kids-real.jpg" alt="Professor sentado no tatame com duas crianças de kimono" width="768" height="1376" style="object-position:50% 78%"></div>
           <div>
-            <div class="p-meta"><span>4 a 12 anos</span><span class="tnum">9h · 18h</span></div>
+            <div class="p-meta"><span>4 a 12 anos</span><span class="tnum" data-grade-horas="Kids 1">9h · 18h</span></div>
             <h3><em>Kids</em></h3>
             <p>Disciplina, foco e respeito para crianças de 4 a 12 anos, com brincadeiras que ajudam a gastar energia e a prestar atenção. Kids 1 às terças e quintas, Kids 2 às segundas e quartas.</p>
             <a class="link" href="agendamento.html#kids" data-int>Agendar na turma Kids</a>
@@ -726,7 +726,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         <article class="prog" data-vt-card data-cursor="Ver turma">
           <div class="p-img"><img src="img/programa-feminino-real.jpg" alt="Duas alunas se cumprimentando no tatame durante a aula" width="1264" height="848" style="object-position:52% 60%"></div>
           <div>
-            <div class="p-meta"><span>Junto com o adulto</span><span class="tnum">8h · 11h · 19h · 20h30</span></div>
+            <div class="p-meta"><span>Junto com o adulto</span><span class="tnum" data-grade-horas="Adulto">8h · 11h · 19h · 20h30</span></div>
             <h3>Feminino</h3>
             <p>As mulheres treinam nas aulas de adulto, nos mesmos horários e no ritmo de cada uma. Defesa pessoal, força e confiança.</p>
             <a class="link" href="agendamento.html#feminino" data-int>Agendar no Feminino</a>
@@ -841,7 +841,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
       <div>
         <p class="label">Horários</p>
         <h2 class="h2 split" id="t-hor">Aula todo dia, <em>de segunda a sábado</em>.</h2>
-        <p class="lead">Adulto às 8h, 11h, 19h e 20h30, de segunda a sexta. Kids às 9h e 18h: Kids 1 às terças e quintas, Kids 2 às segundas e quartas. No sábado, Open Mat às 10h30.</p>
+        <p class="lead" data-grade-frase>Adulto às 8h, 11h, 19h e 20h30, de segunda a sexta. Kids às 9h e 18h: Kids 1 às terças e quintas, Kids 2 às segundas e quartas. No sábado, Open Mat às 10h30.</p>
         <a class="btn btn-ink" data-magnetic href="agendamento.html" data-int>Agendar aula experimental<svg class="ic"><use href="#i-arrow"/></svg></a>
       </div>
       <div>
@@ -923,7 +923,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
           <dl class="contact">
             <div><dt>Endereço</dt><dd>Av. Getúlio Vargas, 400, sala 3, sobreloja<br>Jardim São Paulo, Sorocaba/SP<br><a href="contato.html" data-int>Como chegar</a></dd></div>
             <div><dt>WhatsApp</dt><dd class="tnum">(15) 99674-1812</dd></div>
-            <div><dt>Aulas</dt><dd>Adulto: seg a sex, 8h, 11h, 19h e 20h30<br>Kids 1: ter e qui, 9h e 18h<br>Kids 2: seg e qua, 9h e 18h<br>Open Mat: sábado, 10h30</dd></div>
+            <div><dt>Aulas</dt><dd>Adulto: <span data-grade-linha="Adulto">seg a sex, 8h, 11h, 19h e 20h30</span><br>Kids 1: <span data-grade-linha="Kids 1">ter e qui, 9h e 18h</span><br>Kids 2: <span data-grade-linha="Kids 2">seg e qua, 9h e 18h</span><br>Open Mat: <span data-grade-linha="Open Mat">sábado, 10h30</span></dd></div>
           </dl>
         </div>
         <figure class="cta-map">
@@ -947,7 +947,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     <div class="foot-grid">
       <p class="about">Academia de jiu-jitsu da Equipe TRUE no Jardim São Paulo, em Sorocaba. Adulto de segunda a sexta (o Feminino treina junto), Kids 1 e Kids 2 para crianças de 4 a 12 anos e Open Mat aos sábados.</p>
       <div><h4>Site</h4><ul><li><a href="index.html" data-int>Início</a></li><li><a href="aulas.html" data-int>Aulas</a></li><li><a href="agendamento.html" data-int>Agendar</a></li><li><a href="perguntas.html" data-int>Perguntas</a></li><li><a href="contato.html" data-int>Contato</a></li></ul></div>
-      <div><h4>Aulas</h4><ul><li>Adulto · seg a sex, 8h, 11h, 19h e 20h30</li><li>Kids 1 · ter e qui, 9h e 18h</li><li>Kids 2 · seg e qua, 9h e 18h</li><li>Open Mat · sábado, 10h30</li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
+      <div><h4>Aulas</h4><ul><li>Adulto · <span data-grade-linha="Adulto">seg a sex, 8h, 11h, 19h e 20h30</span></li><li>Kids 1 · <span data-grade-linha="Kids 1">ter e qui, 9h e 18h</span></li><li>Kids 2 · <span data-grade-linha="Kids 2">seg e qua, 9h e 18h</span></li><li>Open Mat · <span data-grade-linha="Open Mat">sábado, 10h30</span></li><li>Feminino · com o adulto</li><li><a href="entrar.html" data-int>Área do aluno</a></li><li><a href="entrar.html#professor" data-int>Área do professor</a></li></ul></div>
       <div><h4>Contato</h4><ul><li class="tnum">(15) 99674-1812</li><li>Av. Getúlio Vargas, 400</li><li>Sorocaba/SP · 18051-480</li></ul></div>
     </div>
     <div class="foot-logo-wrap shine"><span class="logo foot-logo" id="footLogo" role="img" aria-label="Studio Evolution BJJ"></span></div>
@@ -960,6 +960,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" crossorigin="anonymous"></script>
+<script src="supabase-config.js"></script>
 <script src="site.js"></script>
 <script src="faixa3d.js"></script>
 <script>

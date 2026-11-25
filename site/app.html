@@ -1468,6 +1468,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function tentaDeNovo() { if (!demo && !carregou && !document.hidden) carregarReal(); }
   window.addEventListener("online", function () { if (!carregou) tentaDeNovo(); else renovar(); });
   if (demo) setTimeout(presencaDoLink, 400);
+  /* a grade de aulas mudou no painel: a aula do cartão e a lista de aulas são refeitas */
+  document.addEventListener("evo-grade", function () { if (!demo && carregou) renovar(); });
   if (!demo) {
     $("#ap").classList.add("sem-dados");
     carregarReal();

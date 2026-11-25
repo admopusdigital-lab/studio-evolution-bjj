@@ -310,4 +310,6 @@
   P.aoAbrir("tatame", function () { atualizarTudo().catch(function () {}); ligar(); });
   P.aoMudarAlunos(function () { if (P.atual() === "hoje") { paintTopo(); paintSala(); } });
   P.atualizarHoje = atualizarTudo;
+  /* a grade mudou (Configurações ou outro aparelho): as aulas do dia são refeitas */
+  document.addEventListener("evo-grade", function () { sel = null; if (P.atual() === "hoje" || P.atual() === "tatame") atualizarTudo().catch(function () {}); });
 })();
