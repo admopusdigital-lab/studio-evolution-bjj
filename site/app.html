@@ -364,10 +364,13 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-fx-h { display: flex; justify-content: space-between; align-items: center; }
 .ap-fx-go { display: inline-flex; align-items: center; gap: 2px; font-size: 11.5px; color: var(--ink-2); }
 .ap-fx-go .ic { width: 14px; height: 14px; }
-.ap.app .ap-fx .b3d { margin: 14px 0 18px; }
-.ap-fx-r { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 2px 12px; }
-.ap-fx-n { font: 400 26px/1.05 var(--serif); }
-.ap-fx-c { grid-column: 1 / -1; font-size: 12px; color: var(--ink-2); }
+.ap-fx-r { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.ap-fx-n { font: 400 22px/1.05 var(--serif); }
+.ap-fx-r .ap-fx-g { padding-bottom: 0; }
+.ap-fx-r .ap-fx-go { justify-self: end; }
+.ap-fx-bar { display: block; height: 6px; margin-top: 12px; border-radius: 99px; background: color-mix(in oklch, var(--ink) 12%, transparent); overflow: hidden; }
+.ap-fx-bar i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--gold); transition: width 900ms var(--ease); }
+.ap-fx-c { display: block; margin-top: 7px; font-size: 12.5px; color: var(--ink-2); }
 .ap-fx-g { display: inline-flex; gap: 5px; padding-bottom: 4px; }
 .ap-fx-g i { width: 9px; height: 22px; border-radius: 2px; background: color-mix(in oklch, var(--ink) 12%, transparent); }
 .ap-fx-g i.on { background: var(--gc, oklch(0.97 0.003 90)); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.35), 0 0 12px -2px var(--gold); }
@@ -384,6 +387,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 .ap-vazio b { font: 400 17px/1.2 var(--serif); color: var(--ink); }
 .ap.app .ap-cats button { border-radius: 999px; }
 .ap.app .ap-code b { border-radius: 10px; }
+/* o código em dois grupos, como na TV: TRU · 482 (as letras de um lado, os números do outro) */
+.ap.app .ap-code { grid-template-columns: repeat(3, 1fr) 14px repeat(3, 1fr); }
+.ap.app .ap-code b:nth-child(4) { grid-column: 5; }
 .ap.app .ap-rk-t { font-size: 13px; }
 :root:not([data-look="black"]) .ap.app .ap-card { box-shadow: 0 14px 30px -24px oklch(0 0 0 / 0.3); }
 
@@ -604,11 +610,6 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <p class="ap-lb" id="apDate">Quinta, 15 de outubro</p>
         <p class="ap-hi" id="apHello">Boa noite, Marina.</p>
         <div class="ap-fam" data-fam hidden role="group" aria-label="Quem vai treinar"></div>
-        <button class="ap-card ap-fx" type="button" id="apFx" aria-label="Sua faixa: azul, 2 graus. Ver no Perfil">
-          <span class="ap-fx-h"><span class="ap-lb gold">Sua faixa</span><span class="ap-fx-go">Perfil<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></span>
-          <span class="ap-belt b3d" data-belt></span>
-          <span class="ap-fx-r"><b class="ap-fx-n">Azul</b><span class="ap-fx-g" aria-hidden="true"></span><span class="ap-fx-c">2 graus · 21 aulas desde o último grau</span></span>
-        </button>
         <div class="ap-card ap-hero" id="apHero">
           <p class="ap-lb gold">Sua aula de hoje</p>
           <div class="ap-big"><b>19h</b><span>Adulto</span></div>
@@ -624,6 +625,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
             <div class="ap-btnrow"><button class="ap-btn" type="button" id="apRelYes">Liberar</button><button class="ap-btn ghost" type="button" id="apRelNo">Manter</button></div>
           </div>
         </div>
+        <button class="ap-card ap-fx" type="button" id="apFx" aria-label="Sua faixa: azul, 2 graus. Ver no Perfil">
+          <span class="ap-fx-r"><b class="ap-fx-n">Azul</b><span class="ap-fx-g" aria-hidden="true"></span><span class="ap-fx-go" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></span>
+          <span class="ap-fx-bar" aria-hidden="true"><i></i></span>
+          <span class="ap-fx-c">21 de 50 aulas para o próximo grau</span>
+        </button>
         <!-- marcar aula: as aulas das próximas 48 h em "ingressos"; um toque marca a vaga -->
         <div class="ap-sec-h"><p class="ap-lb">Marcar aula</p><span class="ap-sec-s">próximas 48 horas</span></div>
         <div class="ap-tix" id="apTix" role="list" aria-label="Aulas que dá para marcar"></div>
@@ -644,12 +650,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           </div>
           <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
         </div>
-        <div class="ap-row" style="margin-top:10px"><span>Próximo treino</span><span class="r" id="apNext">segunda, 19 de outubro, 19h</span></div>
-        <!-- loja do Studio: só aparece quando o professor tem itens no estoque -->
-        <div class="ap-card ap-shopc" id="apShop" hidden>
-          <div class="ap-rk-h"><div><p class="ap-lb gold">Loja do Studio</p><p class="ap-rk-t">Kimonos e rashguards no tatame</p></div><button class="ap-link" type="button" id="apShopAll">Ver tudo</button></div>
-          <div class="ap-shop-row" id="apShopRow"></div>
-        </div>
+        <div class="ap-row" style="margin-top:10px" hidden><span>Próximo treino</span><span class="r" id="apNext">segunda, 19 de outubro, 19h</span></div>
+        <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
         <!-- ranking de frequência: os que mais treinaram (Adulto e Kids separados) -->
         <div class="ap-card ap-rank" id="apRank">
           <div class="ap-rk-h"><div><p class="ap-lb gold">Ranking de frequência</p><p class="ap-rk-t" id="apRkT">Quem mais treinou no mês</p></div>
@@ -658,7 +660,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <p class="ap-rk-eu" id="apRkEu" hidden></p>
           <button class="ap-link" type="button" id="apRkMais" hidden>Ver o top 10</button>
         </div>
-        <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+        <!-- loja do Studio: só aparece quando o professor tem itens no estoque -->
+        <div class="ap-card ap-shopc" id="apShop" hidden>
+          <div class="ap-rk-h"><div><p class="ap-lb gold">Loja do Studio</p><p class="ap-rk-t">Kimonos e rashguards no tatame</p></div><button class="ap-link" type="button" id="apShopAll">Ver tudo</button></div>
+          <div class="ap-shop-row" id="apShopRow"></div>
+        </div>
       </section>
 
       <!-- Presença: quem vai na aula de hoje, confirmar ou liberar a vaga e, no tatame, o código da aula -->
@@ -1027,9 +1033,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   var tixBusy = false;
   function paintTix() {
     var box = $("#apTix");
-    if (!AULAS.length) { box.innerHTML = '<p class="ap-tix-none">Sem aulas da sua turma nas próximas 48 horas.</p>'; return; }
+    var outras = AULAS.filter(function (a) { return !AULA || chaveAula(a) !== chaveAula(AULA); });
+    if (!outras.length) { box.innerHTML = '<p class="ap-tix-none">Sem outras aulas da sua turma nas próximas 48 horas.</p>'; return; }
     box.innerHTML = AULAS.map(function (a, i) {
       var k = chaveAula(a), mk = !!MINHAS[k], sel = AULA && k === chaveAula(AULA);
+      if (sel) return "";
       return '<div class="ap-tk' + (mk ? " mk" : "") + (sel ? " atual" : "") + '" role="listitem">' +
         '<span class="d">' + diaCurto(a) + "</span><b>" + Site.hora(a.hora) + "</b><span class=\"t\">" + a.turma + "</span>" +
         '<button type="button" data-tix="' + i + '" aria-label="' + (mk ? "Aula marcada: " : "Marcar a aula de ") + diaCurto(a).toLowerCase() + ", " + Site.hora(a.hora) + '">' +
@@ -1112,7 +1120,24 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var falta = ini0 - m;
     return falta > 90 ? "Começa em " + Math.floor(falta / 60) + "h" + (falta % 60 ? ("0" + falta % 60).slice(-2) : "") : "Começa em " + falta + " min";
   }
+  /* de 30 min antes até o fim da aula de hoje: hora de registrar a presença */
+  function naHora() {
+    if (semAula || !AULA || AULA.k !== 0) return false;
+    var ini0 = mins(AULA.hora), m = demo ? now : new Date().getHours() * 60 + new Date().getMinutes();
+    return m >= ini0 - 30 && m < ini0 + 60;
+  }
+  function paintDock() {
+    var go = $(".ap-dock-go"), hora = naHora() && !registered, tx = go.lastChild;
+    if (tx && tx.nodeType === 3) tx.textContent = hora ? "Presença" : "Agendar";
+    go.classList.toggle("hora", hora);
+  }
   function paintBtn(b, mine) {
+    paintDock();
+    if (b === confBtn && naHora() && !registered) {
+      $("span", b).textContent = "Registrar presença";
+      b.classList.remove("ok"); b.classList.add("pulse"); b.removeAttribute("aria-disabled");
+      return;
+    }
     $("span", b).textContent = registered ? "Presença registrada" : confirmed ? "Vaga confirmada" : b === goBtn ? "Vou treinar" : "Marcar esta aula";
     b.classList.toggle("ok", mine);
     b.classList.toggle("pulse", !mine && !semAula);
@@ -1188,7 +1213,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       return atualizarQuem();
     }).catch(function () { toast("Sem conexão. Tente de novo."); });
   }
-  confBtn.addEventListener("click", confirmSpot);
+  confBtn.addEventListener("click", function () {
+    if (naHora() && !registered) { show("presenca"); if ($("#apCodeWrap").hidden) abrirCheckin(); return Site.focusSoft(inp, { preventScroll: false }); }
+    confirmSpot();
+  });
   goBtn.addEventListener("click", confirmSpot);
   /* liberar pergunta antes, no mesmo cartão em que foi pedido (Início ou Presença) */
   function askRelease(open, box, row) {
@@ -1432,7 +1460,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (FAMILIA.length > 1) carregarRank();
       if (window.recarregarMov) window.recarregarMov();
       carregarLoja();
-      return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]).then(presencaDoLink);
+      return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]).then(presencaDoLink).then(abreNaHora);
     }).catch(function () { toast("Sem conexão com o Studio. Assim que a internet voltar, o app atualiza sozinho."); });
   }
   var carregou = false;
@@ -1714,6 +1742,13 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if ($("#apCodeWrap").hidden) abrirCheckin();
     inp.value = c;
     onCode();
+  }
+  /* na meia hora antes da aula até o fim, o app abre direto na presença (uma vez, ao carregar) */
+  var abriu = false;
+  function abreNaHora() {
+    if (abriu) return;
+    abriu = true;
+    if (current === "inicio" && naHora() && !registered) show("presenca");
   }
   function abrirCheckin() {
     var wrap = $("#apCodeWrap"), done = $("#apDone");
@@ -2486,7 +2521,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $(".ap-fx-n", card).textContent = nome;
     $(".ap-fx-g", card).innerHTML = fitas(fx, graus, kid);
     $(".ap-fx-g", card).classList.toggle("kid", !!kid);
-    $(".ap-fx-c", card).textContent = (graus ? graus + (graus === 1 ? " grau" : " graus") : "Sem grau ainda") + " · " + desde + (desde === 1 ? " aula" : " aulas") + " desde o último grau";
+    /* a cada 50 aulas desde o último grau, o professor avalia (a mesma regra do painel) */
+    var meta = 50, feito = Math.max(0, desde || 0);
+    $(".ap-fx-c", card).textContent = feito >= meta - 1 ? (feito >= meta ? feito + " aulas desde o último grau: já pode ser avaliado" : "A próxima aula é a 50ª: já pode ser avaliado") : feito + " de " + meta + " aulas para o próximo grau";
+    $(".ap-fx-bar i", card).style.width = Math.min(100, Math.round(feito / meta * 100)) + "%";
     card.setAttribute("aria-label", "Sua faixa: " + nome.toLowerCase() + ", " + (graus ? graus + (graus === 1 ? " grau" : " graus") : "sem grau") + ". Ver no Perfil");
   }
   $("#apFx").addEventListener("click", function () { show("perfil"); });
@@ -2515,7 +2553,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     /* as aulas de antes do app são o total no Studio: cada grau já "usou" 50 (1 grau e 61 aulas = 11 desde o grau) */
     var antes = a.aulas_antes && (!g || gAntes || !a.aulas_antes_ate || g.data <= a.aulas_antes_ate) ? Math.max(0, a.aulas_antes - 50 * (g ? g.graus || 0 : graus)) : 0;
     var desde = (g ? MEUS.pres.filter(function (x) { return x.data > g.data; }).length : MEUS.pres.length) + antes, s = semanas();
-    $("#apSince").textContent = desde;
+    $("#apSince").innerHTML = desde + "<small> de 50</small>";
     paintFaixa(fx, graus, desde, kid);
     paintCal();
     $("#apStreak").textContent = s.atual;
