@@ -402,6 +402,17 @@ body:has(.ag-bar.on) .snd { bottom: calc(96px + env(safe-area-inset-bottom, 0px)
 html.wa-js .wa-float { opacity: 0; visibility: hidden; transform: translateY(18px) scale(0.94); transition: opacity 400ms var(--ease), transform 600ms var(--ease), visibility 0s linear 600ms; }
 html.wa-js .wa-float.on { opacity: 1; visibility: visible; transform: none; transition: opacity 400ms var(--ease), transform 600ms var(--ease), visibility 0s; }
 @media (max-width: 760px) { .wa-float { width: 58px; height: 58px; } .wa-float .wa-ic { width: 29px; height: 29px; } }
+/* agendar fixo no celular: pílula dourada à esquerda do WhatsApp, aparece e some junto com ele */
+.cta-fixo { display: none; }
+@media (max-width: 760px) {
+  .cta-fixo { display: inline-flex; position: fixed; z-index: 70; left: calc(16px + env(safe-area-inset-left, 0px)); right: calc(20px + 58px + 12px + env(safe-area-inset-right, 0px));
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px)); min-height: 58px; padding: 0 18px; font-size: 12.5px; letter-spacing: 0.1em;
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--gold) 70%, black), 0 18px 34px -14px oklch(0 0 0 / 0.7);
+    opacity: 0; visibility: hidden; transform: translateY(18px); transition: opacity 400ms var(--ease), transform 600ms var(--ease), visibility 0s linear 600ms; }
+  .cta-fixo.on { opacity: 1; visibility: visible; transform: none; transition: opacity 400ms var(--ease), transform 600ms var(--ease), visibility 0s; }
+  /* o botão do som sobe para não ficar por cima do agendar */
+  html.cta-on .snd { bottom: calc(24px + 58px + 14px + env(safe-area-inset-bottom, 0px)); }
+}
 
 /* ---------- abertura de cinema das páginas internas: foto ao fundo e kanji em contorno ---------- */
 .cin { display: flex; flex-direction: column; justify-content: flex-end; min-height: min(100svh, 1000px); padding-top: clamp(118px, 15vh, 170px); padding-bottom: 0; isolation: isolate; }

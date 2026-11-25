@@ -22,7 +22,7 @@
   function paint() {
     var abertos = LEADS.filter(function (l) { return passa(l, "abertos"); }).length, novos = LEADS.filter(function (l) { return l.etapa === "novo"; }).length;
     var mes = P.mesIni(P.hoje()), doMes = LEADS.filter(function (l) { return P.mesIni(P.d10(l.criado_em)) === mes; });
-    $("#ldK").textContent = abertos + " em aberto · " + doMes.length + " neste mês · " + doMes.filter(function (l) { return l.etapa === "matriculado"; }).length + " matrículas";
+    $("#ldK").textContent = abertos + " em aberto · " + doMes.length + " neste mês · " + (function (n) { return n + (n === 1 ? " matrícula" : " matrículas"); })(doMes.filter(function (l) { return l.etapa === "matriculado"; }).length);
     P.selo("bLeads", novos);
     $("#ldChips").innerHTML = FILTROS.map(function (f) { var n = LEADS.filter(function (l) { return passa(l, f[0]); }).length; return '<button type="button" data-f="' + f[0] + '" aria-pressed="' + (etapaF === f[0]) + '">' + f[1] + " · " + n + "</button>"; }).join("");
     var q = P.norm($("#ldQ").value.trim()), qd = P.digitos($("#ldQ").value);

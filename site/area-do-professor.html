@@ -2770,7 +2770,7 @@ else Acesso.portao("professor");
     $("#biRes").textContent = brl(n.res);
     $("#biResS").textContent = "margem de " + pct(n.res / n.rec) + " · em setembro, " + brl(recHist(10) - HIST.desp[10]);
     $("#biAti").textContent = n.ativos;
-    $("#biAtiS").textContent = "+" + n.ent + (n.ent === 1 ? " entrou" : " entraram") + " · " + n.sai + " saiu em outubro" + (n.pend ? " · " + n.pend + (n.pend === 1 ? " matrícula esperando cadastro" : " matrículas esperando cadastro") : "");
+    $("#biAtiS").textContent = "+" + n.ent + (n.ent === 1 ? " entrou" : " entraram") + " · " + n.sai + (n.sai === 1 ? " saiu" : " saíram") + " em outubro" + (n.pend ? " · " + n.pend + (n.pend === 1 ? " matrícula esperando cadastro" : " matrículas esperando cadastro") : "");
     $("#biTic").textContent = brl(Math.round(n.ticket));
     $("#biIna").textContent = pct(n.inad, 1);
     $("#biInaS").textContent = late.n ? brl(late.v) + " em atraso · " + mens(late.n) : "nada em atraso";
@@ -2800,7 +2800,7 @@ else Acesso.portao("professor");
       extra: function (i) { return [{ v: brl(R[i] - D[i]), n: "resultado" }]; },
       resumo: "Receita e despesas por mês. Outubro: receita de " + brl(n.rec) + " e despesas de " + brl(n.desp) + ". Projeção para janeiro: receita de " + brl(R[jan]) + ". A tabela abaixo tem todos os meses." });
     vizDiv($("#vAlu"), { rot: MES, rotLongo: MES.map(longo), up: pj.ent, dn: pj.sai,
-      resumo: "Alunos que entraram e saíram por mês. Outubro: " + n.ent + " entraram e " + n.sai + " saiu. A tabela abaixo tem todos os meses." });
+      resumo: "Alunos que entraram e saíram por mês. Outubro: " + n.ent + " entraram e " + n.sai + (n.sai === 1 ? " saiu" : " saíram") + ". A tabela abaixo tem todos os meses." });
     vizLinha($("#vAti"), { rot: rot, rotLongo: rotL, proj: 12, series: [{ n: "alunos ativos", c: "in", v: A }], inteiro: true, fmt: String, tick: function (v) { return String(v); },
       ref: META ? { v: META.alu, n: "meta " + META.alu } : null,
       resumo: "Alunos ativos no fim de cada mês. Outubro: " + n.ativos + ". Projeção para janeiro: " + A[jan] + ". A tabela abaixo tem todos os meses." });

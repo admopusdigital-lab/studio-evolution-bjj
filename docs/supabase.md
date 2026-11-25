@@ -190,3 +190,11 @@ são só do professor. A pessoa entra em /entrar escolhendo "Sou professor".
 1. Rodar `supabase/migrations/20261124120000_equipe_gestao.sql` no SQL Editor.
 2. Atualizar a função `criar-conta` (Edge Functions → criar-conta → colar `supabase/functions/criar-conta/index.ts`
    → Deploy), para ela criar o papel `gestao` com as permissões.
+
+## Pedido do site com WhatsApp
+
+O agendamento do site passou a pedir nome e WhatsApp. Com a função nova, o número entra no próprio campo do contato em
+Interessados, e um segundo pedido do mesmo número atualiza o contato em aberto em vez de criar outro. Até rodar a
+migração, o site manda o número junto do nome ("Maria · WhatsApp (15) 99999-0000"), para nenhum pedido chegar sem contato.
+
+1. Rodar `supabase/migrations/20261125120000_pedido_site_whatsapp.sql` no SQL Editor (pode rodar mais de uma vez).

@@ -4,6 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Agendamento · Studio Evolution BJJ</title>
+<meta name="description" content="Agende sua aula experimental grátis de jiu-jitsu no Studio Evolution BJJ, em Sorocaba: escolha a turma, o dia e o horário, e o Studio confirma pelo WhatsApp.">
+<link rel="canonical" href="https://evolutionbjj.com.br/agendamento">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Studio Evolution BJJ">
+<meta property="og:title" content="Agendamento · Studio Evolution BJJ">
+<meta property="og:description" content="Agende sua aula experimental grátis de jiu-jitsu no Studio Evolution BJJ, em Sorocaba: escolha a turma, o dia e o horário, e o Studio confirma pelo WhatsApp.">
+<meta property="og:url" content="https://evolutionbjj.com.br/agendamento">
+<meta property="og:image" content="https://evolutionbjj.com.br/img/og-evolution.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A turma do Studio Evolution BJJ sentada no tatame, em frente ao letreiro da academia">
+<meta name="twitter:card" content="summary_large_image">
 <script>
 (function () {
   var d = document.documentElement, l = "black";
@@ -33,7 +46,7 @@
 .ag-steps-wrap { position: relative; margin-top: clamp(26px, 4vh, 50px); max-width: 760px; padding-bottom: clamp(28px, 4.5vh, 52px); }
 .ag-steps-wrap::before { content: ""; position: absolute; left: 0; right: 0; top: 17px; height: 2px; background: oklch(1 0 0 / 0.12); }
 .ag-steps-wrap .fill { position: absolute; left: 0; right: 0; top: 17px; height: 2px; background: var(--gold-metal); box-shadow: 0 0 14px var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 800ms var(--ease); }
-.ag-steps { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ag-steps { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .ag-steps li { position: relative; display: grid; gap: 12px; justify-items: start; font: 500 11.5px/1.3 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); transition: color 400ms; }
 .ag-steps .n { position: relative; z-index: 1; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 600 12px/1 var(--mono); background: var(--paper); box-shadow: inset 0 0 0 1.5px oklch(1 0 0 / 0.22); transition: background-color 400ms, box-shadow 400ms, color 400ms; }
 .ag-steps .done { color: var(--ink); }
@@ -106,6 +119,11 @@
 .field input:focus { border-bottom-color: var(--gold); }
 .field label { position: absolute; left: 0; top: 22px; font-size: 16px; color: var(--ink-3); pointer-events: none; transform-origin: left top; transition: transform 400ms var(--ease), color 300ms; }
 .field input:focus + label, .field input:not(:placeholder-shown) + label { transform: translateY(-20px) scale(0.78); color: var(--gold-text); }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; max-width: 640px; }
+.fields .field { max-width: none; }
+.field input[aria-invalid="true"] { border-bottom-color: oklch(0.7 0.17 40); }
+.field-err { min-height: 1.4em; margin-top: 6px; font-size: 13.5px; color: oklch(0.78 0.14 50); }
+@media (max-width: 640px) { .fields { grid-template-columns: minmax(0, 1fr); } }
 
 /* o ingresso */
 .ticket { position: sticky; top: 112px; isolation: isolate; overflow: hidden; border-radius: 10px; background: var(--paper-2); box-shadow: 0 0 0 1px var(--rule), 0 60px 100px -50px oklch(0 0 0 / 0.85); will-change: transform; transition: box-shadow 600ms var(--ease); }
@@ -226,6 +244,7 @@
           <li data-s="program"><span class="n">01</span>Turma</li>
           <li data-s="date"><span class="n">02</span>Data</li>
           <li data-s="time"><span class="n">03</span>Horário</li>
+          <li data-s="dados"><span class="n">04</span>Seus dados</li>
         </ol>
       </div>
     </div>
@@ -273,9 +292,13 @@
           <p class="empty" id="timesEmpty">Escolha uma turma para ver os horários.</p>
         </div>
 
-        <div class="step">
-          <div class="step-h"><h2>Seu nome <span class="opc">(opcional)</span></h2></div>
-          <div class="field"><input id="nome" type="text" maxlength="100" placeholder=" " autocomplete="given-name"><label for="nome">Seu nome (ou do responsável)</label></div>
+        <div class="step" id="stepDados">
+          <div class="step-h"><h2><span class="sn">4</span>Seus dados</h2><p>Para o professor confirmar</p></div>
+          <div class="fields">
+            <div class="field"><input id="nome" type="text" maxlength="100" placeholder=" " autocomplete="name" aria-describedby="nomeErr"><label for="nome">Seu nome (ou do responsável)</label><p class="field-err" id="nomeErr" aria-live="polite"></p></div>
+            <div class="field"><input id="fone" type="tel" inputmode="tel" maxlength="16" placeholder=" " autocomplete="tel-national" aria-describedby="foneErr"><label for="fone">Seu WhatsApp com DDD</label><p class="field-err" id="foneErr" aria-live="polite"></p></div>
+          </div>
+          <p class="hintline">O Studio confirma a aula por este número. Nada de spam.</p>
         </div>
       </div>
 
@@ -289,13 +312,14 @@
             <div><dt>Turma</dt><dd id="sumProgram" class="pending"><span>Escolha ao lado</span></dd></div>
             <div><dt>Data</dt><dd id="sumDate" class="pending"><span>Escolha ao lado</span></dd></div>
             <div><dt>Horário</dt><dd id="sumTime" class="pending"><span>Escolha ao lado</span></dd></div>
-            <div><dt>Nome</dt><dd id="sumName" class="pending"><span>Opcional</span></dd></div>
+            <div><dt>Nome</dt><dd id="sumName" class="pending"><span>Falta</span></dd></div>
+            <div><dt>WhatsApp</dt><dd id="sumFone" class="pending"><span>Falta</span></dd></div>
           </dl>
         </div>
         <div class="tk-cut" aria-hidden="true"></div>
         <div class="tk-bot">
           <a class="btn" id="waBtn" href="#" aria-disabled="true" target="_blank" rel="noopener">Enviar pelo WhatsApp<svg class="ic"><use href="#i-arrow"/></svg></a>
-          <p class="tk-note" id="waNote" aria-live="polite">Complete os três passos para montar a mensagem.</p>
+          <p class="tk-note" id="waNote" aria-live="polite">Complete os quatro passos para montar a mensagem.</p>
           <div class="tk-code" aria-hidden="true"><i></i><span id="tkCode">EVO-···</span></div>
           <p class="tk-addr">Av. Getúlio Vargas, 400, sala 3, sobreloja · Jardim São Paulo, Sorocaba/SP · 18051-480</p>
         </div>
@@ -339,7 +363,7 @@
 <a class="wa-float" href="https://wa.me/5515996741812?text=Ol%C3%A1!%20Vi%20o%20site%20do%20Studio%20Evolution%20BJJ%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener"><i aria-hidden="true"></i>WhatsApp</a>
 
 <div class="ag-bar" id="agBar" aria-live="polite">
-  <div class="ag-bar-txt"><small id="agBarStep">Passo 1 de 3</small><b id="agBarSum">Escolha a turma</b></div>
+  <div class="ag-bar-txt"><small id="agBarStep">Passo 1 de 4</small><b id="agBarSum">Escolha a turma</b></div>
   <a class="btn btn-ink" id="agBarBtn" href="#stepProgram" rel="noopener">Escolher</a>
 </div>
 
@@ -360,7 +384,7 @@
   };
   var WD_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   var MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-  var state = { program: null, date: null, time: null, name: "", family: false };
+  var state = { program: null, date: null, time: null, name: "", fone: "", family: false };
   var pad = function (n) { return String(n).padStart(2, "0"); };
   var iso = function (d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
   var fromIso = function (s) { var p = s.split("-").map(Number); return new Date(p[0], p[1] - 1, p[2]); };
@@ -458,7 +482,31 @@
     if (state.family) renderTimes();
     update();
   });
-  $("#nome").addEventListener("input", function (e) { state.name = e.target.value.trim(); update(); });
+  /* nome e WhatsApp: o WhatsApp ganha a máscara (15) 99999-9999 enquanto digita; guarda só DDD + número */
+  var digitos = function (t) { return String(t || "").replace(/\D/g, ""); };
+  function foneOk(d) { d = d.replace(/^55(?=\d{10,11}$)/, ""); return /^[1-9]{2}9?\d{8}$/.test(d) ? d : ""; }
+  function mascara(d) {
+    d = d.replace(/^55(?=\d{10,11}$)/, "").slice(0, 11);
+    if (d.length <= 2) return d.length ? "(" + d : "";
+    var r = d.length === 11 ? [d.slice(2, 7), d.slice(7)] : [d.slice(2, 6), d.slice(6)];
+    return "(" + d.slice(0, 2) + ") " + r[0] + (r[1] ? "-" + r[1] : "");
+  }
+  var tocou = { nome: false, fone: false };
+  function erros() {
+    var en = tocou.nome && state.name.length < 2 ? "Digite seu nome." : "";
+    var ef = tocou.fone && !state.fone ? "Confira o número: DDD e WhatsApp." : "";
+    $("#nomeErr").textContent = en; $("#nome").setAttribute("aria-invalid", en ? "true" : "false");
+    $("#foneErr").textContent = ef; $("#fone").setAttribute("aria-invalid", ef ? "true" : "false");
+  }
+  $("#nome").addEventListener("input", function (e) { state.name = e.target.value.trim().replace(/\s+/g, " "); erros(); update(); });
+  $("#fone").addEventListener("input", function (e) {
+    var el = e.target, d = digitos(el.value);
+    if (/^delete/.test(e.inputType || "")) { state.fone = foneOk(d); erros(); update(); return; } /* apagando: não remonta a máscara */
+    el.value = mascara(d);
+    state.fone = foneOk(d); erros(); update();
+  });
+  $("#nome").addEventListener("blur", function () { if (state.name || tocou.fone) { tocou.nome = true; erros(); } });
+  $("#fone").addEventListener("blur", function (e) { if (digitos(e.target.value)) { tocou.fone = true; e.target.value = mascara(digitos(e.target.value)); erros(); } });
 
   /* ingresso e botão do WhatsApp */
   var shown = {};
@@ -475,27 +523,29 @@
     setRow("#sumProgram", p ? p.name : "Escolha ao lado", !p);
     setRow("#sumDate", d ? weekdayLong(d) + ", " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) : "Escolha ao lado", !d);
     setRow("#sumTime", state.time || "Escolha ao lado", !state.time);
-    setRow("#sumName", state.name || "Opcional", !state.name);
-    var done = { program: !!p, date: !!d, time: !!state.time };
-    var n = (done.program ? 1 : 0) + (done.date ? 1 : 0) + (done.time ? 1 : 0);
+    setRow("#sumName", state.name || "Falta", state.name.length < 2);
+    setRow("#sumFone", state.fone ? mascara(state.fone) : "Falta", !state.fone);
+    var done = { program: !!p, date: !!d, time: !!state.time, dados: state.name.length >= 2 && !!state.fone };
+    var n = (done.program ? 1 : 0) + (done.date ? 1 : 0) + (done.time ? 1 : 0) + (done.dados ? 1 : 0);
     $$("#agSteps li").forEach(function (li) { li.classList.toggle("done", done[li.dataset.s]); });
-    $("#agFill").style.transform = "scaleX(" + n / 3 + ")";
+    $("#agFill").style.transform = "scaleX(" + n / 4 + ")";
     /* o código do ingresso nasce das escolhas: programa, dia e hora */
     var code = "EVO" + (p ? "-" + p.code : "") + (d ? "-" + pad(d.getDate()) + pad(d.getMonth() + 1) : "") + (state.time ? "-" + state.time.slice(0, 2) + "H" + (state.time.slice(3) !== "00" ? state.time.slice(3) : "") : "");
-    $("#tkCode").textContent = n === 3 ? code : code + "-···";
-    var btn = $("#waBtn"), ready = n === 3, tk = $("#ticket");
+    var escolhas = (done.program ? 1 : 0) + (done.date ? 1 : 0) + (done.time ? 1 : 0);
+    $("#tkCode").textContent = escolhas === 3 ? code : code + "-···";
+    var btn = $("#waBtn"), ready = n === 4, tk = $("#ticket");
     btn.classList.toggle("ready", ready);
     btn.setAttribute("aria-disabled", ready ? "false" : "true");
     if (ready) {
       var lines = ["Olá! Quero agendar uma aula experimental no Studio Evolution BJJ.", ""];
-      if (state.name) lines.push("Nome: " + state.name);
+      lines.push("Nome: " + state.name);
       lines.push("Turma: " + p.name, "Data: " + weekdayLong(d) + ", " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear(), "Horário: " + state.time);
       /* do quiz "para mim e uma criança": a aula de adulto colada na Kids vai no mesmo pedido */
       if (state.family) lines.push("Também quero fazer a aula de Adulto das " + familyAdult() + (familyAdult() === "08:00" ? ", antes da Kids." : ", logo depois."));
       /* o código do ingresso vai junto, para o professor conferir o pedido no painel */
       lines.push("Código do ingresso: " + code);
       btn.href = "https://wa.me/5515996741812?text=" + encodeURIComponent(lines.join("\n"));
-      $("#waNote").textContent = "Tudo pronto. O WhatsApp abre com a mensagem preenchida.";
+      if (!enviado) $("#waNote").textContent = "Tudo pronto. O WhatsApp abre com a mensagem preenchida.";
       if (!tk.classList.contains("ready")) {
         tk.classList.add("ready");
         if (anim) gsap.fromTo(tk, { scale: 0.97 }, { scale: 1, duration: 0.9, ease: "expo.out" });
@@ -503,26 +553,26 @@
     } else {
       btn.href = "#";
       tk.classList.remove("ready");
-      var missing = !done.program ? "a turma" : !done.date ? "a data" : "o horário";
-      $("#waNote").textContent = "Falta escolher " + missing + ".";
+      $("#waNote").textContent = !done.program ? "Falta escolher a turma." : !done.date ? "Falta escolher a data." : !done.time ? "Falta escolher o horário."
+        : state.name.length < 2 ? "Falta o seu nome." : "Falta o seu WhatsApp.";
     }
-    paintBar(p, d, n, ready, btn.href);
+    paintBar(p, d, n, ready, btn.href, done);
   }
 
   /* barra fixa do celular: acompanha as escolhas e leva ao próximo passo ou direto ao WhatsApp */
   var bar = $("#agBar"), barBtn = $("#agBarBtn");
-  function paintBar(p, d, n, ready, href) {
+  function paintBar(p, d, n, ready, href, done) {
     var parts = [];
     if (p) parts.push(p.short || p.name);
     if (d) parts.push(WD_SHORT[d.getDay()].toLowerCase() + " " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1));
     if (state.time) parts.push(Site.hora(state.time));
-    $("#agBarStep").textContent = ready ? "Tudo pronto" : "Passo " + (n + 1) + " de 3";
+    $("#agBarStep").textContent = ready ? "Tudo pronto" : "Passo " + Math.min(n + 1, 4) + " de 4";
     $("#agBarSum").textContent = parts.length ? parts.join(" · ") : "Escolha a turma";
     var label = ready ? "Enviar" : !p ? "Escolher" : "Continuar", bt = $(".bt", barBtn);
     if (bt) { bt.setAttribute("data-t", label); bt.firstChild.textContent = label; } else barBtn.textContent = label;
     barBtn.classList.toggle("ready", ready);
     if (ready) { barBtn.href = href; barBtn.target = "_blank"; }
-    else { barBtn.removeAttribute("target"); barBtn.href = !p ? "#stepProgram" : !d ? "#stepDate" : "#stepTime"; }
+    else { barBtn.removeAttribute("target"); barBtn.href = !p ? "#stepProgram" : !d ? "#stepDate" : !state.time ? "#stepTime" : "#stepDados"; }
   }
   var typing = false;
   function barCheck() {
@@ -535,25 +585,37 @@
   document.addEventListener("focusin", function (e) { if (e.target.matches("input")) { typing = true; barCheck(); } });
   document.addEventListener("focusout", function () { typing = false; setTimeout(barCheck, 50); });
   /* o pedido também entra em Interessados, no painel do professor (pedido_site, sem login). Um aviso por pedido */
-  var avisado = "";
+  var avisado = "", enviado = false;
   function avisarStudio() {
     var C = window.EVO_SUPABASE || {}, p = PROGRAMS[state.program], code = $("#tkCode").textContent;
-    if (!C.url || !C.chave || !p || !state.date || !state.time || avisado === code) return;
-    avisado = code;
+    confirma();
+    if (!C.url || !C.chave || !p || !state.date || !state.time || avisado === code + state.fone) return;
+    avisado = code + state.fone;
+    var corpo = { p_nome: state.name || null, p_programa: state.program, p_data: state.date, p_hora: state.time, p_turma: p.name, p_codigo: code, p_familia: !!state.family };
+    var envia = function (b) {
+      return fetch(C.url + "/rest/v1/rpc/pedido_site", { method: "POST", keepalive: true, headers: { apikey: C.chave, "Content-Type": "application/json" }, body: JSON.stringify(b) });
+    };
     try {
-      fetch(C.url + "/rest/v1/rpc/pedido_site", {
-        method: "POST", keepalive: true,
-        headers: { apikey: C.chave, "Content-Type": "application/json" },
-        body: JSON.stringify({ p_nome: state.name || null, p_programa: state.program, p_data: state.date, p_hora: state.time, p_turma: p.name, p_codigo: code, p_familia: !!state.family })
+      /* com o banco atualizado, o WhatsApp vai no próprio campo; antes disso, vai junto do nome para o pedido não chegar sem contato */
+      envia(Object.assign({ p_whatsapp: state.fone }, corpo)).then(function (r) {
+        if (!r.ok && r.status !== 429) envia(Object.assign({}, corpo, { p_nome: (state.name + " · WhatsApp " + mascara(state.fone)).slice(0, 120) }));
       }).catch(function () {});
     } catch (e) {}
+  }
+  /* depois de enviar, o próprio site confirma: o pedido já está com o Studio, mesmo que o WhatsApp não abra */
+  function confirma() {
+    enviado = true;
+    $("#waNote").textContent = "Pedido registrado. Se o WhatsApp não abrir, o Studio chama você no " + mascara(state.fone) + ".";
+    $(".tk-stamp").textContent = "Enviado";
   }
   barBtn.addEventListener("click", function () { if (barBtn.classList.contains("ready")) avisarStudio(); });
   $("#waBtn").addEventListener("click", function (e) {
     if (this.getAttribute("aria-disabled") !== "true") { avisarStudio(); return; }
     e.preventDefault();
-    var target = !state.program ? "#stepProgram" : !state.date ? "#stepDate" : "#stepTime";
+    var target = !state.program ? "#stepProgram" : !state.date ? "#stepDate" : !state.time ? "#stepTime" : "#stepDados";
+    if (target === "#stepDados") { tocou.nome = tocou.fone = true; erros(); }
     Site.scrollTo(target, -100);
+    if (target === "#stepDados") setTimeout(function () { (state.name.length < 2 ? $("#nome") : $("#fone")).focus({ preventScroll: true }); }, 600);
     if (anim) gsap.fromTo($(target + " .step-h h2"), { x: -12 }, { x: 0, duration: 0.8, ease: "expo.out" });
   });
   function pop(el) { if (anim && el) gsap.fromTo(el, { scale: 0.96 }, { scale: 1, duration: 0.7, ease: "expo.out" }); }
