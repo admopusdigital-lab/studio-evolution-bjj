@@ -619,28 +619,77 @@
     P.focusSoft($('[data-k="nome"]', f), { preventScroll: true });
   }
 
-  /* ---------- Graduações ---------- */
-  var ultGrau = {};
+  /* ---------- Graduações: Prontos (50 aulas desde o último grau), A caminho e Histórico ---------- */
+  var ultGrau = {}, GRADS = [], aba = "prontos", marcados = {};
+  /* tempo mínimo da IBJJF (adulto, a partir de 18 anos) para trocar de faixa, em meses; na preta, entre um grau e outro */
+  var MIN_FAIXA = { azul: 24, roxa: 18, marrom: 12 };
   function carregarGrad() {
     return P.todos(function (sb) { return sb.from("graduacoes").select("id, aluno, faixa, graus, data, nota").order("data", { ascending: false }); }).then(function (l) {
+      GRADS = l || [];
       ultGrau = {};
-      l.forEach(function (g) { if (!ultGrau[g.aluno]) ultGrau[g.aluno] = g; });
-      $("#grHist").innerHTML = l.filter(function (g) { return !P.doCadastro(g); }).slice(0, 15).map(function (g) {
-        var a = P.porId[g.aluno];
-        return "<li><span>" + esc(a ? a.nome : "Aluno removido") + " · " + P.beltTxt(g.faixa, g.graus) + (P.doCadastro(g) ? ' <small class="muted">· já tinha antes do app</small>' : "") + "</span><span>" + (P.doCadastro(g) ? "cadastro" : P.dataBRano(g.data)) + "</span></li>";
-      }).join("") || '<li class="muted">Nenhum grau registrado ainda.</li>';
+      GRADS.forEach(function (g) { if (!ultGrau[g.aluno]) ultGrau[g.aluno] = g; });
       paintGrad();
     });
   }
   function desde(a) { var g = ultGrau[a.id], ref = g ? g.data : null; return P.pres.filter(function (p) { return p.aluno === a.id && (!ref || p.data > ref); }).length + P.antes(a, g || null); }
+  /* desde quando o aluno está na faixa atual: a graduação mais antiga com esta faixa; sem registro, a data de início */
+  function naFaixaDesde(a) {
+    var l = GRADS.filter(function (g) { return g.aluno === a.id && g.faixa === a.faixa; });
+    return l.length ? l[l.length - 1].data : a.inicio || null;
+  }
+  function meses(iso) { if (!iso) return null; var d = P.dia(iso), h = P.dia(P.hoje()); return Math.max(0, (h.getFullYear() - d.getFullYear()) * 12 + h.getMonth() - d.getMonth() - (h.getDate() < d.getDate() ? 1 : 0)); }
+  function tempoTx(m) { if (m === null) return "—"; if (m < 1) return "menos de 1 mês"; var an = Math.floor(m / 12), r = m % 12; return (an ? an + (an === 1 ? " ano" : " anos") : "") + (an && r ? " e " : "") + (r ? r + (r === 1 ? " mês" : " meses") : ""); }
+  function proxPasso(a) {
+    var kid = P.kid(a.turma), fxs = kid ? P.FX_KD : P.FX_AD, gMax = Site.maxGraus(a.faixa, kid), i = fxs.indexOf(a.faixa);
+    if ((a.graus || 0) < gMax) return { f: a.faixa, g: (a.graus || 0) + 1, tx: ((a.graus || 0) + 1) + "º grau", troca: false };
+    if (i < 0 || i >= fxs.length - 1) return null;
+    return { f: fxs[i + 1], g: 0, tx: "Faixa " + P.FAIXAS[fxs[i + 1]].toLowerCase(), troca: true };
+  }
+  /* o que falta de tempo mínimo para o próximo passo (só adulto; Kids segue a idade) */
+  function minimo(a, px) {
+    if (!px || P.kid(a.turma)) return null;
+    var m = null, ref = null;
+    if (px.troca && MIN_FAIXA[a.faixa]) { m = MIN_FAIXA[a.faixa]; ref = naFaixaDesde(a); }
+    else if (a.faixa === "preta" && !px.troca) { m = (a.graus || 0) < 3 ? 36 : 60; ref = ultGrau[a.id] && ultGrau[a.id].faixa === "preta" ? ultGrau[a.id].data : naFaixaDesde(a); }
+    if (!m || !ref) return null;
+    var feito = meses(ref);
+    return feito >= m ? null : { pede: m, falta: m - feito };
+  }
+  function linhaGrad() {
+    var prontos = {};
+    (P.prontosGrau ? P.prontosGrau() : []).forEach(function (x) { prontos[x.a.id] = 1; });
+    return P.alunosDeVerdade().map(function (a) {
+      var n = desde(a), px = proxPasso(a);
+      return { a: a, n: n, px: px, min: minimo(a, px), pronto: !!prontos[a.id], m: meses(naFaixaDesde(a)) };
+    });
+  }
   function paintGrad() {
-    var l = P.alunosDeVerdade().map(function (a) { return { a: a, n: desde(a) }; }).sort(function (x, y) { return y.n - x.n; });
-    $("#grTbl tbody").innerHTML = l.map(function (x) {
-      var g = ultGrau[x.a.id];
-      return '<tr><td><div class="nm"><span class="av"' + Fotos.attr(x.a.foto) + '>' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + esc(P.turmaTx(x.a)) + (g ? " · último grau em " + P.dataBRano(g.data) : "") + "</small></div></div></td>" +
-        "<td>" + P.belt(x.a.faixa, x.a.graus, x.a.turma) + '</td><td class="num">' + x.n + '</td><td class="act"><button class="mini-btn" type="button" data-grau="' + x.a.id + '">Registrar grau</button></td></tr>';
+    var todas = linhaGrad(), pr = todas.filter(function (x) { return x.pronto; }), cam = todas.filter(function (x) { return !x.pronto; });
+    var hist = GRADS.filter(function (g) { return !P.doCadastro(g); });
+    $("#grAbas").innerHTML = [["prontos", "Prontos", pr.length], ["caminho", "A caminho", cam.length], ["hist", "Histórico", hist.length]].map(function (t) {
+      return '<button type="button" data-aba="' + t[0] + '" aria-pressed="' + (aba === t[0]) + '">' + t[1] + " · " + t[2] + "</button>";
     }).join("");
-    $("#grTbl").hidden = !l.length;
+    var l = aba === "prontos" ? pr.sort(function (x, y) { return y.n - x.n; }) : cam.sort(function (x, y) { return y.n - x.n || x.a.nome.localeCompare(y.a.nome); });
+    Object.keys(marcados).forEach(function (id) { if (!pr.some(function (x) { return x.a.id === id && !x.min; })) delete marcados[id]; });
+    var tbl = $("#grTbl");
+    tbl.classList.toggle("com-ck", aba === "prontos");
+    tbl.hidden = aba === "hist" || !l.length;
+    $("#grHist").hidden = aba !== "hist";
+    $("#grTbl tbody").innerHTML = aba === "hist" ? "" : l.map(function (x) {
+      var cor = Site.COR_FAIXA[Site.faixaBase(x.a.faixa)] || Site.COR_FAIXA.branca, pct = Math.min(100, Math.round(x.n / 50 * 100));
+      var ck = aba === "prontos" ? '<input type="checkbox" data-ck="' + x.a.id + '"' + (marcados[x.a.id] ? " checked" : "") + (x.min ? ' disabled title="Tempo mínimo da IBJJF ainda não fechou"' : "") + ' aria-label="Selecionar ' + esc(x.a.nome) + '">' : "";
+      return '<tr><td class="gr-ck">' + ck + '</td><td><div class="nm"><span class="av"' + Fotos.attr(x.a.foto) + '>' + P.ini(x.a.nome) + '</span><div><button class="nm-btn" type="button" data-ficha="' + x.a.id + '">' + esc(x.a.nome) + "</button><small>" + esc(P.turmaTx(x.a)) + "</small></div></div></td>" +
+        "<td>" + P.belt(x.a.faixa, x.a.graus, x.a.turma) + "</td>" +
+        '<td><span class="gr-bar" style="--cor:' + cor + '"><i style="width:' + pct + '%"></i></span><span class="gr-n">' + x.n + " de 50</span></td>" +
+        "<td>" + tempoTx(x.m) + "</td>" +
+        "<td>" + (x.px ? "<b>" + esc(x.px.tx) + "</b>" : "—") + (x.min ? '<small class="gr-min">IBJJF pede ' + tempoTx(x.min.pede) + (x.px && x.px.troca ? " na " + P.FAIXAS[x.a.faixa].toLowerCase() : " entre os graus") + ": faltam " + tempoTx(x.min.falta) + "</small>" : "") + "</td>" +
+        '<td class="act"><button class="mini-btn' + (x.pronto ? "" : " ghost") + '" type="button" data-grau="' + x.a.id + '">Registrar</button>' + (x.pronto ? '<button class="mini-btn ghost" type="button" data-adia="' + x.a.id + '">Avaliar depois</button>' : "") + "</td></tr>";
+    }).join("");
+    $("#grHist").innerHTML = hist.slice(0, 60).map(function (g) {
+      var a = P.porId[g.aluno];
+      return "<li><span>" + esc(a ? a.nome : "Aluno removido") + " · " + P.beltTxt(g.faixa, g.graus) + (g.nota ? ' <small class="muted">· ' + esc(g.nota) + "</small>" : "") + "</span><span>" + P.dataBRano(g.data) + "</span></li>";
+    }).join("") || '<li class="muted">Nenhum grau registrado ainda.</li>';
+    paintLote();
     /* quem está com as aulas de antes do app fora da conta por causa de um grau registrado depois delas */
     var fora = P.alunosDeVerdade().filter(function (a) { return P.antesFora(a, ultGrau[a.id]); }), box = $("#grFora");
     box.hidden = !fora.length;
@@ -651,14 +700,55 @@
         return '<li><span><b>' + esc(a.nome) + "</b> · " + esc(P.beltTxt(g.faixa, g.graus).toLowerCase()) + " registrado em " + P.dataBR(g.data) + " · " + a.aulas_antes + ' aulas de antes fora</span><button class="mini-btn" type="button" data-ja-tinha="' + g.id + '" data-aluno="' + a.id + '">Já tinha</button></li>';
       }).join("") + "</ul>" : "";
     var e = $("#grEmpty");
-    e.hidden = !!l.length;
-    e.innerHTML = "<b>Nenhum aluno ativo.</b>Cadastre os alunos em Alunos para acompanhar os graus.";
+    e.hidden = aba === "hist" || !!l.length;
+    e.innerHTML = !P.alunosDeVerdade().length ? "<b>Nenhum aluno ativo.</b>Cadastre os alunos em Alunos para acompanhar os graus." :
+      aba === "prontos" ? "<b>Ninguém pronto para o grau agora.</b>O aluno entra aqui quando completa 50 aulas desde o último grau." : "<b>Todos os alunos estão prontos.</b>Veja a aba Prontos.";
   }
+  function paintLote() {
+    var ids = Object.keys(marcados), box = $("#grLote");
+    box.hidden = aba !== "prontos" || !ids.length;
+    $("#grLoteN").textContent = ids.length === 1 ? "1 selecionado" : ids.length + " selecionados";
+    var d = $("#grLoteD"); if (!d.value) d.value = P.hoje(); d.max = P.hoje();
+  }
+  $("#grAbas").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-aba]");
+    if (!b) return;
+    aba = b.dataset.aba;
+    paintGrad();
+  });
+  $("#grTbl").addEventListener("change", function (e) {
+    var c = e.target.closest("[data-ck]");
+    if (!c) return;
+    if (c.checked) marcados[c.dataset.ck] = 1; else delete marcados[c.dataset.ck];
+    paintLote();
+  });
   $("#grTbl").addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;
     if (b.dataset.ficha) P.abrirAluno(b.dataset.ficha);
     if (b.dataset.grau) P.registrarGrau(b.dataset.grau);
+    if (b.dataset.adia && P.adiarGrau) { P.adiarGrau(b.dataset.adia); delete marcados[b.dataset.adia]; paintGrad(); }
+  });
+  /* registrar de uma vez: cada aluno marcado ganha o próximo passo (grau ou faixa) com a mesma data */
+  $("#grLoteBtn").addEventListener("click", function () {
+    var ids = Object.keys(marcados), d = $("#grLoteD").value || P.hoje(), b = this;
+    if (!ids.length) return;
+    if (d > P.hoje()) return P.toast("A data da graduação não pode ser no futuro.");
+    var l = ids.map(function (id) { var a = P.porId[id]; return { a: a, px: proxPasso(a) }; }).filter(function (x) { return x.a && x.px; });
+    if (!confirm("Registrar em " + P.dataBR(d) + ":\n\n" + l.map(function (x) { return "· " + x.a.nome + ": " + x.px.tx.toLowerCase(); }).join("\n"))) return;
+    b.classList.add("loading");
+    l.reduce(function (pr, x) {
+      return pr.then(function () {
+        return P.q(function (sb) { return sb.from("graduacoes").insert({ aluno: x.a.id, faixa: x.px.f, graus: x.px.g, data: d, nota: null }); }).then(function () { return P.recalcFaixa(x.a.id); });
+      });
+    }, Promise.resolve()).then(function () {
+      marcados = {};
+      return Promise.all([P.carregarAlunos(), carregarGrad()]);
+    }).then(function () {
+      b.classList.remove("loading");
+      if (P.atualizarGrau) P.atualizarGrau();
+      P.toast(l.length === 1 ? P.first(l[0].a.nome) + ": " + l[0].px.tx.toLowerCase() + ". Parabéns!" : l.length + " graduações registradas. Parabéns à turma!");
+    }).catch(function (e2) { b.classList.remove("loading"); P.erro(e2, "Não deu para registrar todas. Confira a lista"); carregarGrad().catch(function () {}); });
   });
   /* a faixa e os graus do aluno vêm da graduação mais recente (pela data e, no mesmo dia, pela ordem do registro).
      Uma graduação com data no futuro (digitada errada) volta para o dia em que foi registrada: antes ela travava

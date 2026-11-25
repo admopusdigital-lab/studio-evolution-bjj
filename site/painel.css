@@ -659,3 +659,32 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
   .hj .room-tools { width: 100%; }
   .hj .room-tools .ap-btn { flex: 1 1 auto; }
 }
+
+/* ---------- Graduações: a régua dos 50 na cor da faixa, tempo na faixa e o próximo passo ---------- */
+.gr-tbl .gr-ck { display: none; width: 34px; }
+.gr-tbl.com-ck .gr-ck { display: table-cell; }
+.gr-tbl .gr-ck input { width: 18px; height: 18px; accent-color: var(--gold); }
+.gr-bar { display: inline-block; vertical-align: middle; width: 120px; height: 10px; margin-right: 8px; border-radius: 3px; background: color-mix(in oklch, var(--ink) 10%, transparent); box-shadow: inset 0 0 0 1px var(--rule); overflow: hidden; }
+.gr-bar i { display: block; height: 100%; background: var(--cor); box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.25); }
+.gr-n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gr-min { display: block; margin-top: 3px; font-size: 11.5px; color: var(--warn); }
+.gr-tbl td.act { white-space: nowrap; }
+.gr-tbl td.act .mini-btn + .mini-btn { margin-left: 6px; }
+.gr-lote { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin-top: 14px; padding: 12px 14px; background: color-mix(in oklch, var(--gold) 10%, var(--paper-2)); border-top: 1px solid var(--gold); }
+.gr-lote b { align-self: center; margin-right: auto; }
+.gr-lote .crm-f { margin: 0; }
+#grHist { margin-top: 16px; }
+.gr-bar i { box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 28%, transparent); }
+/* celular: cada aluno vira um cartão (nome, faixa, régua, tempo, próximo passo e ações, um embaixo do outro) */
+@media (max-width: 860px) {
+  .dv .gr-tbl, .dv .gr-tbl tbody { display: block; }
+  .dv .gr-tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .dv .gr-tbl tr { display: block; position: relative; padding: 14px 0; border-top: 1px solid var(--rule); }
+  .dv .gr-tbl.com-ck tr { padding-left: 34px; }
+  .dv .gr-tbl td { display: block; padding: 0; border: 0; text-align: left; grid-column: auto; grid-row: auto; }
+  .dv .gr-tbl td + td { margin-top: 6px; }
+  .dv .gr-tbl td.gr-ck { display: none; }
+  .dv .gr-tbl.com-ck td.gr-ck { display: block; position: absolute; left: 0; top: 22px; margin: 0; }
+  .dv .gr-tbl td.act { margin-top: 10px; white-space: normal; text-align: left; }
+  .dv .gr-tbl td:nth-child(5)::before { content: "Na faixa há "; color: var(--ink-3); }
+}

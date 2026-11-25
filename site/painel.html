@@ -242,15 +242,20 @@ body.pr { background: var(--paper); }
 
       <!-- Graduações -->
       <section class="dv" data-v="grad" aria-labelledby="t-grad">
-        <div class="dv-h"><div><p class="dv-k">Faixa e graus</p><h3 id="t-grad">Graduações</h3></div><p>Aulas contadas desde o último grau de cada aluno.</p></div>
+        <div class="dv-h"><div><p class="dv-k">Faixa e graus</p><h3 id="t-grad">Graduações</h3></div><p>A cada 50 aulas desde o último grau, o aluno pode ser avaliado. Na troca de faixa, o painel avisa o tempo mínimo da IBJJF.</p></div>
+        <div class="chips" id="grAbas" role="group" aria-label="Mostrar"></div>
         <div class="antes-fora" id="grFora" hidden></div>
-        <table class="tbl" id="grTbl">
-          <thead><tr><th scope="col">Aluno</th><th scope="col">Faixa atual</th><th scope="col" class="num">Aulas desde o grau</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
+        <div class="gr-lote" id="grLote" hidden>
+          <b id="grLoteN">0 selecionados</b>
+          <label class="crm-f"><span>Data</span><input class="crm-in" type="date" id="grLoteD"></label>
+          <button class="mini-btn" type="button" id="grLoteBtn">Registrar graduação</button>
+        </div>
+        <table class="tbl gr-tbl" id="grTbl">
+          <thead><tr><th scope="col" class="gr-ck"><span class="sr-only">Selecionar</span></th><th scope="col">Aluno</th><th scope="col">Faixa</th><th scope="col">Aulas desde o grau</th><th scope="col">Tempo na faixa</th><th scope="col">Próximo passo</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
           <tbody></tbody>
         </table>
         <div class="empty-big" id="grEmpty" hidden></div>
-        <h4 class="fin-k" style="margin-top:28px">Últimas graduações</h4>
-        <ul class="ficha-list" id="grHist"></ul>
+        <ul class="ficha-list" id="grHist" hidden></ul>
       </section>
 
       <!-- Ranking de frequência -->

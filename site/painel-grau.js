@@ -82,6 +82,17 @@
     }).catch(function () { try { new Notification(t, op); } catch (e) {} });
   }
 
+  /* "Avaliar depois": o aluno sai dos prontos até completar mais 50 aulas (fica guardado neste aparelho) */
+  P.adiarGrau = function (id) {
+    var a = P.porId[id], n = P.desdeGrau(a);
+    if (n === null) return;
+    var ad = ler(ADIA_K);
+    ad[id] = bloco(n);
+    grava(ADIA_K, ad);
+    P.toast((a ? P.first(a.nome) : "O aluno") + " sai da lista até completar mais " + BLOCO + " aulas.");
+    paint();
+  };
+  P.atualizarGrau = paint;
   document.addEventListener("click", function (e) {
     var b = e.target.closest("#hGrau button");
     if (!b) return;
