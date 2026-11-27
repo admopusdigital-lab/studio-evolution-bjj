@@ -20,7 +20,7 @@
 .ar-switch { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--rule); border-radius: 999px; margin-top: 30px; }
 .ar-switch a { padding: 9px 18px; border-radius: 999px; font: 500 14px/1 var(--sans); text-decoration: none; color: var(--ink-2); transition: background-color 300ms var(--ease), color 300ms var(--ease); }
 .ar-switch a[aria-current="page"] { background: var(--ink); color: var(--paper); }
-.ar-switch a:not([aria-current]):hover { color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .ar-switch a:not([aria-current]):hover { color: var(--ink); } }
 .ar-note { font-size: 13px; color: var(--ink-3); }
 
 /* ---------- demonstração guiada: aparelho fixo + capítulos ---------- */
@@ -40,7 +40,7 @@
 .dch .try { display: inline-flex; align-items: center; gap: 10px; margin-top: 24px; padding: 0; border: 0; background: none; color: var(--ink); font: 500 15px/1 var(--sans); cursor: pointer; }
 .dch .try i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: oklch(0.14 0.006 75); font-style: normal; }
 .dch .try i .ic { width: 14px; height: 14px; stroke-width: 2.2; }
-.dch .try:hover span { text-decoration: underline; text-underline-offset: 4px; }
+@media (hover: hover) and (pointer: fine) { .dch .try:hover span { text-decoration: underline; text-underline-offset: 4px; } }
 @media (min-width: 1024px) {
   .demo-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 6vw; align-items: start; }
   /* o aparelho fica abaixo da barra fixa do site (80 px), para ela nunca cobrir o topo do celular */
@@ -131,7 +131,7 @@
 .ap-cover img { width: 100%; height: 100%; object-fit: cover; }
 .ap-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, oklch(0.12 0.01 75 / 0.6), transparent 55%); }
 .ap-cover .play { position: absolute; z-index: 2; left: 12px; bottom: 14px; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: oklch(0.98 0.004 95); color: oklch(0.2 0.01 75); transition: transform 300ms var(--ease); }
-.ap-cover:hover .play { transform: scale(1.08); }
+@media (hover: hover) and (pointer: fine) { .ap-cover:hover .play { transform: scale(1.08); } }
 .ap-cover .play svg { width: 14px; height: 14px; margin-left: 2px; fill: currentColor; }
 .ap-cover .dur { position: absolute; z-index: 2; right: 12px; bottom: 16px; padding: 2px 6px; border-radius: 4px; background: oklch(0 0 0 / 0.55); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: oklch(0.98 0.004 95); }  /* fundo próprio: legível sobre qualquer foto */
 .ap-cover .pg { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 3px; background: oklch(1 0 0 / 0.35); }
@@ -145,7 +145,7 @@
 .ap-quiz { margin-top: 12px; padding: 14px; background: var(--paper-2); border-top: 1px solid var(--gold); }
 .ap-quiz p { font: 400 16px/1.25 var(--serif); }
 .ap-quiz button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; margin-top: 8px; padding: 10px 12px; border: 0; background: var(--paper); color: var(--ink); font: 400 12.5px/1.3 var(--sans); text-align: left; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; transition: box-shadow 300ms, background-color 300ms, color 300ms; }
-.ap-quiz button:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
+@media (hover: hover) and (pointer: fine) { .ap-quiz button:hover { box-shadow: inset 0 0 0 1px var(--ink-3); } }
 .ap-quiz button.right { box-shadow: inset 0 0 0 1.5px var(--ok); color: var(--ok); }
 .ap-quiz button.wrong { box-shadow: inset 0 0 0 1px var(--warn); color: var(--warn); }
 .ap-quiz .fb { margin-top: 10px; font-size: 12px; color: var(--ink-2); }
@@ -191,7 +191,7 @@
 .dash-side .logo { width: 132px; margin: 4px 10px 22px; }
 .dash-side button { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font: 500 14px/1 var(--sans); text-align: left; cursor: pointer; transition: background-color 300ms, color 300ms; }
 .dash-side button .ic { width: 17px; height: 17px; }
-.dash-side button:hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 5%, transparent); }
+@media (hover: hover) and (pointer: fine) { .dash-side button:hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 5%, transparent); } }
 .dash-side button[aria-current="true"] { color: var(--ink); background: color-mix(in oklch, var(--gold) 16%, transparent); }
 .dash-side .badge { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; display: grid; place-items: center; background: var(--gold); color: oklch(0.14 0.006 75); font-size: 11px; font-weight: 600; }
 .dash-side .who { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 10px 0; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); }
@@ -324,12 +324,12 @@ li.me .av.com-foto, .av.me.com-foto { box-shadow: 0 0 0 2px var(--gold); }
 .bridge { padding-block: clamp(90px, 10vw, 150px); }
 .bridge a { display: grid; gap: 24px; align-items: end; padding: clamp(28px, 4vw, 56px); border-top: 1px solid var(--gold); background: var(--paper-2); text-decoration: none; transition: background-color 500ms var(--ease); }
 @media (min-width: 900px) { .bridge a { grid-template-columns: minmax(0, 1fr) auto; } }
-.bridge a:hover { background: color-mix(in oklch, var(--gold) 10%, var(--paper-2)); }
+@media (hover: hover) and (pointer: fine) { .bridge a:hover { background: color-mix(in oklch, var(--gold) 10%, var(--paper-2)); } }
 .bridge .label { color: var(--gold-text); }
 .bridge h2 { margin-top: 16px; font-size: clamp(36px, 4.6vw, 72px); line-height: 1; letter-spacing: -0.035em; }
 .bridge h2 em { color: var(--gold-text); }
 .bridge .go { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--paper); transition: transform 500ms var(--ease); }
-.bridge a:hover .go { transform: translateX(8px); }
+@media (hover: hover) and (pointer: fine) { .bridge a:hover .go { transform: translateX(8px); } }
 .bridge .go .ic { width: 24px; height: 24px; }
 
 /* ---------- responsivo ---------- */
@@ -449,7 +449,7 @@ li.me .av.com-foto, .av.me.com-foto { box-shadow: 0 0 0 2px var(--gold); }
 .dash-side .more li { padding-block: 5px; font-size: 13px; color: var(--ink-3); }
 .dash-side .who small { color: var(--ink-3); }
 button.kpi { display: block; width: 100%; border: 0; border-top: 1px solid var(--gold); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: background-color 300ms var(--ease); }
-button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-2)); }
+@media (hover: hover) and (pointer: fine) { button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-2)); } }
 .kpi.warn b { color: var(--warn); }
 .kpi .go-s { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 11.5px; font-weight: 600; color: var(--gold-text); }
 .kpi .go-s .ic { width: 12px; height: 12px; stroke-width: 2.2; }
@@ -470,11 +470,11 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 .roster li > div { min-width: 0; }
 .walkin { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--rule); }
 .walkin > button { display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; color: var(--ink-2); font: 500 13px/1.3 var(--sans); cursor: pointer; }
-.walkin > button:hover { color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .walkin > button:hover { color: var(--ink); } }
 .walkin > button .ic { width: 15px; height: 15px; }
 .walkin ul { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .walkin li button { padding: 8px 12px; border: 1px dashed var(--rule); border-radius: 999px; background: var(--paper); color: var(--ink); font: 500 12.5px/1 var(--sans); cursor: pointer; }
-.walkin li button:hover { border-style: solid; border-color: var(--ink-3); }
+@media (hover: hover) and (pointer: fine) { .walkin li button:hover { border-style: solid; border-color: var(--ink-3); } }
 .tbl-wrap { overflow-x: auto; }
 .tbl small { display: block; font-size: 11.5px; color: var(--ink-3); }
 .tbl .bl { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -589,7 +589,7 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
   .demo-rail button { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--ink-3); font: 500 12.5px/1 var(--sans); cursor: pointer; transition: color 300ms var(--ease), background-color 300ms var(--ease); }
   .demo-rail button b { font: 600 11px/1 var(--sans); letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
   .demo-rail button span { display: none; }
-  .demo-rail button:hover { color: var(--ink); }
+  @media (hover: hover) and (pointer: fine) { .demo-rail button:hover { color: var(--ink); } }
   .demo-rail button[aria-current="true"] { background: var(--ink); color: var(--paper); }
   .demo-rail button[aria-current="true"] b { color: var(--inv-accent); }  /* ouro feito para fundo invertido: legível nos dois temas */
   .demo-rail button[aria-current="true"] span { display: inline; }
@@ -605,15 +605,15 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 /* ficha do aluno: abre por cima da lista, com o mapa de presenças */
 /* só a tabela de Alunos abre a ficha pela linha; as linhas do Financeiro não têm ação */
 #tbl tbody tr { cursor: pointer; transition: background-color 250ms var(--ease); }
-#tbl tbody tr:hover { background: color-mix(in oklch, var(--gold) 8%, transparent); }
+@media (hover: hover) and (pointer: fine) { #tbl tbody tr:hover { background: color-mix(in oklch, var(--gold) 8%, transparent); } }
 .nm-btn { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
-.nm-btn:hover { text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) { .nm-btn:hover { text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; } }
 .drawer-scrim { position: absolute; inset: 0; z-index: 8; background: color-mix(in oklch, var(--ink) 24%, transparent); opacity: 0; visibility: hidden; transition: opacity 450ms var(--ease), visibility 0s linear 450ms; }
 .drawer-scrim.on { opacity: 1; visibility: visible; transition: opacity 450ms var(--ease), visibility 0s; }
 .drawer { position: absolute; z-index: 9; top: 0; right: 0; bottom: 0; width: min(440px, 100%); overflow-y: auto; overscroll-behavior: contain; padding: 26px 26px 30px; background: var(--paper); box-shadow: -40px 0 80px -40px oklch(0 0 0 / 0.45), -1px 0 0 var(--rule); transform: translateX(104%); visibility: hidden; transition: transform 700ms var(--ease), visibility 0s linear 700ms; }
 .drawer.on { transform: none; visibility: visible; transition: transform 700ms var(--ease), visibility 0s; }
 .dr-close { position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--paper-2); color: var(--ink); cursor: pointer; transition: background-color 300ms var(--ease); }
-.dr-close:hover { background: color-mix(in oklch, var(--gold) 20%, var(--paper-2)); }
+@media (hover: hover) and (pointer: fine) { .dr-close:hover { background: color-mix(in oklch, var(--gold) 20%, var(--paper-2)); } }
 .dr-close .ic { width: 16px; height: 16px; }
 .dr-h { display: flex; align-items: center; gap: 14px; padding-right: 44px; }
 .dr-h .av { width: 54px; height: 54px; flex-shrink: 0; font-size: 15px; box-shadow: inset 0 0 0 1px var(--gold); color: var(--gold-text); }
@@ -699,7 +699,7 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 /* utilitários do celular simulado, para caber mais sem rolar */
 /* link de texto (ex.: liberar a vaga), com 44 px de toque */
 .ap-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; border: 0; background: none; color: var(--ink-2); font: 500 12.5px/1.2 var(--sans); text-decoration: underline; text-decoration-color: color-mix(in oklch, var(--ink-2) 55%, transparent); text-underline-offset: 3px; cursor: pointer; }
-.ap-link:hover { color: var(--ink); text-decoration-color: var(--gold); }
+@media (hover: hover) and (pointer: fine) { .ap-link:hover { color: var(--ink); text-decoration-color: var(--gold); } }
 /* botão e link na mesma linha: o botão ocupa o resto */
 .ap-btnrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
 .ap-btnrow .ap-btn { flex: 1; min-width: 0; margin-top: 0; }
@@ -721,11 +721,11 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 .ap-wkh { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 18px; }
 .ap-wkb { position: relative; flex-shrink: 0; padding: 0; border: 0; background: none; color: var(--ink-2); font: 500 12px/1.15 var(--sans); text-decoration: underline; text-decoration-color: color-mix(in oklch, var(--ink-2) 55%, transparent); text-underline-offset: 3px; cursor: pointer; }
 .ap-wkb::before { content: ""; position: absolute; inset: -15px -12px; }
-.ap-wkb:hover { color: var(--ink); text-decoration-color: var(--gold); }
+@media (hover: hover) and (pointer: fine) { .ap-wkb:hover { color: var(--ink); text-decoration-color: var(--gold); } }
 /* linha que é botão (mensalidade): o mesmo desenho da .ap-row, com a seta */
 .ap-rowbtn { width: 100%; border: 0; border-top: 1px solid var(--rule); background: none; color: inherit; font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; }
 .ap-rowbtn .r .ic { transition: transform 300ms var(--ease); }
-.ap-rowbtn:hover .r .ic { transform: translateX(2px); }
+@media (hover: hover) and (pointer: fine) { .ap-rowbtn:hover .r .ic { transform: translateX(2px); } }
 /* liberar a vaga: o link fica na linha do botão (cerca de 222 px); o botão perde a folga interna do navegador
    para "Vaga confirmada" caber numa linha só. A pergunta aparece dentro do cartão, no lugar dos dois */
 #apBtnRow { gap: 10px; }
@@ -768,7 +768,7 @@ button.kpi:hover { background: color-mix(in oklch, var(--gold) 12%, var(--paper-
 /* Avisos: cada aviso é um botão que leva à tela certa; o relógio volta ao Início */
 .ap-note { width: 100%; border: 0; color: inherit; font: inherit; text-align: left; }
 button.ap-note { cursor: pointer; }
-button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); }
+@media (hover: hover) and (pointer: fine) { button.ap-note:hover { background: oklch(0.98 0.004 95 / 0.26); } }
 .ap-note .nb { display: block; min-width: 0; }
 .ap-note .tx { display: block; font-size: 12px; line-height: 1.35; opacity: 0.92; }
 .ap-lock .clock { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
@@ -822,7 +822,7 @@ html.ap-ok-on, html.ap-ok-on body { overflow: hidden; }
 .ap-note .nb { display: block; min-width: 0; }
 .ap-note-a { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .ap-na { min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--rule); background: none; color: var(--ink); font: 600 12.5px/1 var(--sans); cursor: pointer; }
-.ap-na:hover { border-color: var(--gold); }
+@media (hover: hover) and (pointer: fine) { .ap-na:hover { border-color: var(--gold); } }
 .ap-na.pri { border-color: var(--gold); background: var(--gold); color: oklch(0.18 0.01 75); }
 .app-notes .ap-note { cursor: default; }
 
@@ -866,3 +866,32 @@ html.ap-vivo-on, html.ap-vivo-on body { overflow: hidden; }
 /* virada por estilo (iPhone): a caixa do vídeo gira 90° e cobre o celular; o nome e os botões giram junto */
 .ap-vivo.deitada { overflow: hidden; }
 .ap-vivo.deitada .ap-vivo-v { position: fixed; z-index: 2; left: 50%; top: 50%; width: 100vh; width: 100dvh; height: 100vw; aspect-ratio: auto; border-radius: 0; transform: translate(-50%, -50%) rotate(90deg); }
+
+/* ===== Sensação de app no celular (toque, teclado, rolagem) =====
+   - sem o clarão cinza do navegador ao tocar: cada controle tem a própria resposta de toque
+   - o toque dispara na hora (sem a espera do toque duplo) e segurar o dedo não seleciona o texto do botão
+   - campos com 16 px no celular: abaixo disso o iPhone dá zoom na página ao focar e não volta
+   - telas que cobrem o app não arrastam a página de trás ao chegar no fim da rolagem */
+html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+button, a, summary, label, select, [role="button"], [role="switch"], [role="tab"] { touch-action: manipulation; }
+button, summary, [role="button"], [role="switch"], [role="tab"], .ap-dock a, .dash-side button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select { font-size: 16px !important; }
+}
+.ap-vivo, .ap-ok, .ap-story, .drawer, .ficha, .tt { overscroll-behavior: contain; }
+/* resposta ao toque no instante em que o dedo encosta (não ao soltar): encolhe um pouco, rápido */
+.mini-btn, .ap-rowbtn, .ap-link, .ap-vivo-x, .ap-vivo-volta, .chips > *, .seg > button, .ic-btn, .nm-btn, .cam-tx-cheia, .ap-strip, .ap-fx, .ap-tix > * {
+  transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms ease-out, color 160ms ease-out, box-shadow 160ms ease-out, opacity 160ms ease-out; }
+.mini-btn:active, .ap-vivo-x:active, .ap-vivo-volta:active, .chips > *:active, .seg > button:active, .ic-btn:active, .cam-tx-cheia:active, .ap-tix > *:active { transform: scale(0.97); }
+.ap-rowbtn:active, .ap-link:active, .nm-btn:active, .ap-strip:active, .ap-fx:active { opacity: 0.7; }
+.mini-btn:disabled:active, .ic-btn:disabled:active { transform: none; }
+/* telas que sobem por cima do app: entram de baixo, curtas e desacelerando; quem pediu menos movimento só vê o esmaecer */
+@keyframes ap-sobe { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes ap-surge { from { opacity: 0; } to { opacity: 1; } }
+.ap-vivo:not([hidden]) { animation: ap-surge 180ms ease-out both; }
+.ap-vivo:not([hidden]) .ap-vivo-in { animation: ap-sobe 260ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.ap-cam { animation: ap-sobe 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .ap-vivo:not([hidden]) .ap-vivo-in, .ap-cam { animation-name: ap-surge; animation-duration: 160ms; }
+  .mini-btn:active, .chips > *:active, .seg > button:active, .ic-btn:active, .ap-tix > *:active { transform: none; }
+}

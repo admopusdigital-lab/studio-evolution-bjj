@@ -45,11 +45,11 @@
 .field input:-webkit-autofill { -webkit-text-fill-color: var(--ink); transition: background-color 9999s; }
 .field.pw input { padding-right: 84px; }
 .pw-tg { position: absolute; right: 0; bottom: 8px; height: 36px; padding: 0 4px; border: 0; background: none; color: var(--ink-2); font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
-.pw-tg:hover { color: var(--gold-text); }
+@media (hover: hover) and (pointer: fine) { .pw-tg:hover { color: var(--gold-text); } }
 
 .lg-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 20px; margin-top: 22px; font-size: 14.5px; color: var(--ink-2); }
 .lg-row a { color: var(--ink); text-underline-offset: 4px; text-decoration-color: color-mix(in oklch, var(--gold) 70%, transparent); }
-.lg-row a:hover { color: var(--gold-text); }
+@media (hover: hover) and (pointer: fine) { .lg-row a:hover { color: var(--gold-text); } }
 .chk { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
 .chk input { appearance: none; -webkit-appearance: none; display: grid; place-items: center; width: 20px; height: 20px; margin: 0; border-radius: 5px; box-shadow: inset 0 0 0 1.5px var(--ink-3); cursor: pointer; transition: background-color 200ms var(--ease), box-shadow 200ms var(--ease); }
 .chk input::after { content: ""; width: 10px; height: 6px; margin-top: -2px; border: solid oklch(0.13 0.005 70); border-width: 0 0 2px 2px; transform: rotate(-45deg) scale(0); transition: transform 200ms var(--ease); }
@@ -120,3 +120,9 @@ html.modo-app .lg-app-foot a { color: inherit; }
 @media (min-width: 1000px) {
   html.modo-app .lg-panel { align-content: center; padding-top: 116px; }
 }
+
+/* sensação de app no celular (o mesmo piso do app.css): sem clarão ao tocar, toque imediato, campos sem zoom no iPhone */
+html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+button, a, label, select { touch-action: manipulation; }
+button { -webkit-user-select: none; user-select: none; }
+@media (pointer: coarse) { input:not([type="checkbox"]):not([type="radio"]), select { font-size: 16px !important; } }

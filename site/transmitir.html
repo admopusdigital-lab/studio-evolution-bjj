@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Câmera do tatame · Studio Evolution BJJ</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0b0a08">
@@ -61,6 +61,12 @@ button { font: inherit; color: inherit; }
 .tx-btn.ouro { background: var(--ouro); color: #1a1408; box-shadow: none; }
 .tx-btn.perigo { color: var(--aviso); }
 .tx-btn:disabled { opacity: 0.45; cursor: default; }
+/* toque: sem clarão do navegador, resposta no instante em que o dedo encosta, sem selecionar o texto do botão */
+html { -webkit-tap-highlight-color: transparent; }
+.tx-btn, a { touch-action: manipulation; }
+.tx-btn { -webkit-user-select: none; user-select: none; transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1), opacity 160ms ease-out; }
+.tx-btn:not(:disabled):active { transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) { .tx-btn:not(:disabled):active { transform: none; } }
 
 .tx-passos { margin: 0; padding: 0 0 0 20px; color: var(--fg2); font-size: 14.5px; }
 .tx-passos li + li { margin-top: 6px; }

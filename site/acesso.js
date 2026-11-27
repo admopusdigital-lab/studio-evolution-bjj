@@ -76,6 +76,17 @@
     }, function (e) { return { falhou: true, erro: e }; });
   }
 
+  /* a barra de status do celular na cor do topo da tela: o tema é escolhido no app, não pelo sistema */
+  function corDaBarra() {
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (!m || m.getAttribute("content") === "#0b0a08") return;   /* a página da câmera é sempre escura */
+    m.setAttribute("content", document.documentElement.getAttribute("data-look") === "black" ? "#14110d" : "#fbfaf8");
+  }
+  try {
+    new MutationObserver(corDaBarra).observe(document.documentElement, { attributes: true, attributeFilter: ["data-look"] });
+    document.addEventListener("DOMContentLoaded", corDaBarra);
+  } catch (e) {}
+
   var Acesso = {
     real: REAL,
     area: function (papel) { return AREA[papel] || AREA.aluno; },
