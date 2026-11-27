@@ -950,7 +950,7 @@
     });
     /* palavras que escurecem com a leitura */
     $$("[data-fadewords]").forEach(function (p) {
-      gsap.fromTo(split(p, "fade"), { opacity: 0.14 }, { opacity: 1, stagger: 0.08, ease: "none", scrollTrigger: { trigger: p, start: "top 80%", end: "bottom 45%", scrub: true } });
+      gsap.fromTo(split(p, "fade"), { opacity: 0.42 }, { opacity: 1, stagger: 0.08, ease: "none", scrollTrigger: { trigger: p, start: "top 80%", end: "bottom 45%", scrub: true } });
     });
     /* listas e grades que sobem em sequência */
     $$("[data-rise]").forEach(function (box) {

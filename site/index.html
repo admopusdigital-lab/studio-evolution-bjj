@@ -500,6 +500,76 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 .chip.c3 { left: 6%; bottom: 12%; }
 .chip .beltchip { width: 46px; height: 12px; border-radius: 2px; background: linear-gradient(90deg, oklch(0.55 0.17 258) 0 66%, oklch(0.2 0.006 285) 66% 92%, oklch(0.55 0.17 258) 92%); }
 @media (max-width: 700px) { .stage { height: 620px; } .tiltwrap { scale: 0.84; } .chip { font-size: 12.5px; padding: 10px 14px; } .chip.c1 { left: -6px; top: 10%; } .chip.c2 { right: -6px; } .chip.c3 { left: 0; bottom: 9%; } }
+
+/* ===== celular: a página inicial mais curta (era ~23.500 px). O computador não muda.
+   A primeira aula e as fotos viram cartões que deslizam para o lado; o resto fica mais justo,
+   sem repetir o que a página já diz (os horários estão na lista, a faixa troca de cor mais rápido). ===== */
+@media (max-width: 699px) {
+  .bands { display: none; }
+  .manifesto { padding-block: 64px 48px; }
+  .manifesto .numbers { margin-top: 28px; }
+  .true-sec { padding-block: 64px; }
+  .true-grid { gap: 20px; }
+  .true-ph { height: 200px; }
+  .true-tx .h2 { margin-top: 14px; font-size: 34px; }
+  .true-tx .lead { margin-top: 14px; font-size: 15.5px; }
+  .vals { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; margin-top: 22px; }
+  .vals li { padding-block: 14px; }
+  .true-tx .vals b { margin-top: 6px; font-size: 20px; }
+  .vals p { font-size: 13px; }
+  .true-tx .link { margin-top: 18px; }
+  /* fotos do Studio: uma faixa que desliza */
+  .col-sec { padding-inline: 0; }
+  .collage { display: flex; gap: 10px; height: auto; margin-bottom: 40px; padding-inline: var(--gut) var(--gut-r); overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .collage::-webkit-scrollbar { display: none; }
+  .collage .col-it { flex: 0 0 72%; transform: none !important; scroll-snap-align: start; }
+  .collage .col-it .ci { aspect-ratio: 4 / 3 !important; }
+  .collage figcaption { display: none; }
+  /* a primeira aula: um cartão por momento, deslizando */
+  .pa-pin { padding-block: 64px 40px; }
+  .pa-head h2 { margin-top: 14px; font-size: 32px; }
+  .pa-steps { display: flex; gap: 12px; margin-top: 24px; padding-inline: var(--gut) var(--gut-r); overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .pa-steps::-webkit-scrollbar { display: none; }
+  .pa-step { flex: 0 0 82%; gap: 12px; align-content: start; scroll-snap-align: start; }
+  .pa-step .pa-tx { order: 0; }
+  .pa-ph, .pa-ph.v { aspect-ratio: 4 / 3; }
+  .pa-t { font-size: 38px; }
+  .pa-tx h3 { margin-top: 6px; font-size: 24px; }
+  .pa-tx p { margin-top: 8px; font-size: 15px; }
+  .pa-tx .btn { margin-top: 14px; }
+  .pa-note { margin-top: 14px; }
+  .pa-note::before { content: "Deslize para ver a aula inteira · "; color: var(--ink-2); }
+  /* a faixa: sem o vídeo do nó (fica no computador) */
+  .bp { gap: 24px; padding-block: 64px 48px; }
+  .bp-video { display: none; }
+  .bp-stage { margin-top: 28px; }
+  /* benefícios em duas colunas */
+  .ben-sec .blist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; margin-top: 28px; }
+  .blist li { padding-block: 16px; gap: 6px; }
+  .ben-sec .blist h3 { font-size: 18px; line-height: 1.1; letter-spacing: -0.01em; overflow-wrap: break-word; hyphens: auto; }
+  .blist p { font-size: 13.5px; line-height: 1.45; }
+  /* equipe: as duas fotos lado a lado */
+  .team { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 28px; align-items: start; }
+  .team .a, .team .b { grid-column: auto; margin-bottom: 0; transform: none !important; }
+  .team .a .tilt, .team .b .tilt { aspect-ratio: 3 / 4; }
+  .team figcaption { font-size: 12.5px; }
+  /* horários: a lista basta (o parágrafo e a régua repetiam a mesma informação) */
+  .sched-sec { padding-block: 64px; }
+  .sched { gap: 24px; }
+  .sched .lead, .sched .ruler { display: none; }
+  .sched .btn { margin-top: 20px; }
+  /* app do aluno: as quatro funções, sem a maquete do celular */
+  .app-sec { padding-block: 64px; }
+  .app { gap: 0; }
+  .app .stage { display: none; }
+  .features { margin-top: 22px; }
+  .features li { padding-block: 14px; }
+  .features b { font-size: 19px; }
+  .features span { font-size: 14px; }
+  .app .link { margin-top: 18px; }
+  /* mapa mais baixo no fecho */
+  .cta-map { aspect-ratio: 4 / 3; margin-top: 28px; }
+}
 </style>
 <link rel="stylesheet" href="tema.css">
 
@@ -982,6 +1052,8 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
 <script>
 (function () {
   var $ = Site.$, $$ = Site.$$, fine = Site.fine;
+  /* no celular a faixa de fotos desliza para o lado: alcançável pelo teclado */
+  if (window.matchMedia("(max-width: 699px)").matches) { var col = $(".collage"); if (col) { col.tabIndex = 0; col.setAttribute("role", "region"); col.setAttribute("aria-label", "Fotos do Studio (deslize para o lado)"); } }
 
   /* abertura: a próxima aula de verdade, pela hora de quem está vendo (grade em site.js) */
   (function () {
@@ -1324,7 +1396,7 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
         show(0);
         var st = wide
           ? { trigger: ".belt-sec", start: "top top", end: "+=320%", scrub: 0.6, pin: true }
-          : { trigger: ".bp-stage", start: "center 52%", end: "+=" + Math.round(window.innerHeight * 2.8), pin: ".bp-stage", pinSpacing: true, anticipatePin: 1, scrub: 0.6 };
+          : { trigger: ".bp-stage", start: "center 52%", end: "+=" + Math.round(window.innerHeight * (window.innerWidth < 700 ? 1.2 : 2.8)), pin: ".bp-stage", pinSpacing: true, anticipatePin: 1, scrub: 0.6 };
         st.snap = { snapTo: 1 / 4, duration: { min: 0.35, max: 0.9 }, delay: 0.12, ease: "power2.inOut" };
         st.onUpdate = function (self) { pedir(Math.round(self.progress * 4)); };
         var tl = gsap.timeline({ scrollTrigger: st });
