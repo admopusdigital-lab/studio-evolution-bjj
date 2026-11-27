@@ -36,7 +36,7 @@
         "<small>" + esc(ORIGEM[l.origem] + " · " + oQue(l)) + (l.aula_data && l.etapa !== "agendado" ? " · pediu " + aulaTx(l) : "") + " · " + P.quando(P.d10(l.criado_em)).replace("hoje", "chegou hoje") + "</small></div>" +
         '<div class="acts"><select class="sel" data-etapa aria-label="Etapa de ' + esc(l.nome) + '">' + Object.keys(ETAPA).map(function (k) { return '<option value="' + k + '"' + (k === l.etapa ? " selected" : "") + ">" + ETAPA[k] + "</option>"; }).join("") + "</select>" +
         (l.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
-        (l.etapa === "matriculado" ? '<button class="mini-btn" type="button" data-matricula>Cadastrar aluno</button>' : "") + "</div></div>";
+        (l.etapa === "matriculado" ? acaoMatriculado(l) : "") + "</div></div>";
     }).join("");
     var e = $("#ldEmpty");
     e.hidden = vis.length > 0;
@@ -99,7 +99,7 @@
           var acao = c[0] === "novo" ? (x.whatsapp ? '<button class="mini-btn" type="button" data-wa>Responder</button>' : '<button class="mini-btn" type="button" data-av>Atender</button>')
             : c[0] === "atendimento" ? '<button class="mini-btn" type="button" data-ficha>Agendar aula</button>'
             : c[0] === "agendado" ? '<button class="mini-btn" type="button" data-av>Matriculou</button>'
-            : '<button class="mini-btn" type="button" data-matricula>Cadastrar aluno</button>';
+            : acaoMatriculado(x);
           return '<li class="ld-card' + (velho[x.id] ? " velho" : "") + '" data-id="' + x.id + '"><span class="av" aria-hidden="true">' + P.ini(x.nome) + "</span>" +
             '<div class="ld-nm"><button class="nm-btn" type="button" data-ficha>' + esc(x.nome) + "</button>" +
             "<small>" + esc(oQue(x) + " · " + ORIGEM[x.origem].replace("Pelo site", "pelo site")) + "</small></div>" +
@@ -114,6 +114,7 @@
     var b = e.target.closest("button"), row = e.target.closest(".ld-card");
     if (!b || !row) return;
     var l = porId(row.dataset.id);
+    if (cliqueVinculo(b, l)) return;
     if (b.hasAttribute("data-ficha")) return abrir(l.id);
     if (b.hasAttribute("data-wa")) { P.wa(l.whatsapp, msg(l)); registrar(l.id, "WhatsApp: mensagem aberta (" + ETAPA[l.etapa].toLowerCase() + ")"); if (l.etapa === "novo") mudarEtapa(l, "atendimento").catch(function () {}); return; }
     if (b.hasAttribute("data-av") && PROX[l.etapa]) { b.classList.add("loading"); return mudarEtapa(l, PROX[l.etapa]).catch(function (er) { b.classList.remove("loading"); P.erro(er); }); }
@@ -146,6 +147,39 @@
         P.toast(P.first(l.nome) + ": " + ETAPA[etapa] + "." + (etapa === "matriculado" ? " Toque em Cadastrar aluno para criar a ficha e a mensalidade." : ""));
       });
   }
+  /* matriculado: já ligado a um aluno (abre a ficha), ou falta cadastrar ou vincular a quem o professor cadastrou direto */
+  var vinculando = null;
+  function acaoMatriculado(l) {
+    if (l.aluno && P.porId[l.aluno]) return '<button class="mini-btn ghost" type="button" data-veraluno>Ver a ficha do aluno</button>';
+    if (vinculando === l.id) {
+      var alvo = P.semAcento ? P.semAcento(l.crianca || l.nome) : String(l.crianca || l.nome).toLowerCase(), prim = alvo.split(" ")[0];
+      var ligados = {}; LEADS.forEach(function (x) { if (x.aluno) ligados[x.aluno] = 1; });
+      var l2 = P.alunosDeVerdade().filter(function (a) { return !ligados[a.id]; }).map(function (a) { var n = P.semAcento ? P.semAcento(a.nome) : a.nome.toLowerCase(); return { a: a, p: n === alvo ? 0 : n.indexOf(prim) === 0 ? 1 : 2 }; })
+        .sort(function (x, y) { return x.p - y.p || x.a.nome.localeCompare(y.a.nome); });
+      return '<span class="ld-vinc"><label class="sr-only" for="ldVinc' + l.id + '">Aluno já cadastrado</label><select class="crm-in" id="ldVinc' + l.id + '" data-vinc-sel><option value="">Escolha o aluno</option>' +
+        l2.map(function (x) { return '<option value="' + x.a.id + '"' + (x.p === 0 ? " selected" : "") + ">" + esc(x.a.nome) + "</option>"; }).join("") +
+        '</select><button class="mini-btn" type="button" data-vinc-ok>Vincular</button><button class="mini-btn ghost" type="button" data-vinc-nao>Cancelar</button></span>';
+    }
+    return '<button class="mini-btn" type="button" data-matricula>Cadastrar aluno</button><button class="mini-btn ghost" type="button" data-vinc>Já é aluno: vincular</button>';
+  }
+  /* devolve true se o clique era de vínculo */
+  function cliqueVinculo(b, l) {
+    if (b.hasAttribute("data-veraluno")) { P.fecharFicha(); P.go("alunos"); P.abrirAluno(l.aluno); return true; }
+    if (b.hasAttribute("data-vinc")) { vinculando = l.id; paint(); var s0 = $("#ldVinc" + l.id); if (s0) s0.focus(); return true; }
+    if (b.hasAttribute("data-vinc-nao")) { vinculando = null; paint(); return true; }
+    if (b.hasAttribute("data-vinc-ok")) {
+      var sel = b.parentNode.querySelector("[data-vinc-sel]"), a = sel && P.porId[sel.value];
+      if (!a) { if (sel) sel.focus(); P.toast("Escolha o aluno na lista."); return true; }
+      b.disabled = true;
+      P.q(function (sb) { return sb.from("leads").update({ aluno: a.id }).eq("id", l.id); })
+        .then(function () { return registrar(l.id, "Vinculado ao aluno " + a.nome); })
+        .then(function () { vinculando = null; return carregar(); })
+        .then(function () { P.toast(P.first(l.nome) + " vinculado à ficha de " + P.first(a.nome) + "."); })
+        .catch(function (er) { b.disabled = false; if (P.semColuna(er)) P.toast("Falta atualizar o banco de dados para vincular (arquivo atualizar-2026-11-28.sql)."); else P.erro(er, "Não deu para vincular"); });
+      return true;
+    }
+    return false;
+  }
   function matricular(l) {
     var pre = { nome: l.crianca || l.nome, turma: l.programa === "kids" ? (l.turma_aula === "Kids 2" ? "kids2" : "kids1") : l.programa, whatsapp: l.whatsapp, responsavel: l.crianca ? l.nome : null };
     P.fecharFicha();
@@ -160,6 +194,7 @@
     var b = e.target.closest("button"), row = e.target.closest(".lead");
     if (!b || !row) return;
     var l = porId(row.dataset.id);
+    if (cliqueVinculo(b, l)) return;
     if (b.hasAttribute("data-ficha")) abrir(l.id);
     else if (b.hasAttribute("data-wa")) { P.wa(l.whatsapp, msg(l)); registrar(l.id, "WhatsApp: mensagem aberta (" + ETAPA[l.etapa].toLowerCase() + ")"); if (l.etapa === "novo") mudarEtapa(l, "atendimento").catch(function () {}); }
     else if (b.hasAttribute("data-matricula")) matricular(l);

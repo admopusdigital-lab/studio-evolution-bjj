@@ -256,7 +256,11 @@
       }
       if (x.d.graus || x.d.faixa !== "branca") passos.push(P.q(function (sb) { return sb.from("graduacoes").insert({ aluno: novo.id, faixa: x.d.faixa, graus: x.d.graus, data: x.d.inicio, nota: P.NOTA_CADASTRO }); }));
       if (x.taxa > 0) passos.push(P.q(function (sb) { return sb.from("cobrancas").insert({ aluno: novo.id, descricao: "Taxa de matrícula", tipo: "matricula", valor: x.taxa, vencimento: P.hoje() }); }));
-      if (preLead) passos.push(P.q(function (sb) { return sb.from("leads").update({ etapa: "matriculado" }).eq("id", preLead); }), P.q(function (sb) { return sb.from("lead_eventos").insert({ lead: preLead, texto: "Matriculado: cadastro de aluno criado" }); }));
+      /* o interessado passa a apontar para o aluno criado (banco sem a coluna: segue só com a etapa) */
+      if (preLead) passos.push(P.q(function (sb) { return sb.from("leads").update({ etapa: "matriculado", aluno: novo.id }).eq("id", preLead); }).catch(function (er) {
+        if (!P.semColuna(er)) throw er;
+        return P.q(function (sb) { return sb.from("leads").update({ etapa: "matriculado" }).eq("id", preLead); });
+      }), P.q(function (sb) { return sb.from("lead_eventos").insert({ lead: preLead, texto: "Matriculado: cadastro de aluno criado" }); }));
       return Promise.all(passos).then(function () { return novo; });
     }).then(function (novo) {
       form.hidden = true;

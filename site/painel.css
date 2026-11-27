@@ -1344,3 +1344,8 @@ html[data-mode="painel"] { scrollbar-color: color-mix(in oklch, var(--ink) 30%, 
   .pr .seg { max-width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .pr .seg > button { flex: none; white-space: nowrap; }
 }
+
+/* Interessados · matriculado: vincular a um aluno já cadastrado */
+.ld-vinc { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.ld-vinc select { flex: 1 1 100%; min-width: 0; }
+.ld-acts { display: flex; flex-wrap: wrap; gap: 6px; }

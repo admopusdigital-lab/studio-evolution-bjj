@@ -1,6 +1,6 @@
--- Studio Evolution BJJ · atualização do banco de 28/11/2026 (as três migrações do dia, em uma colada só).
+-- Studio Evolution BJJ · atualização do banco de 28/11/2026 (as quatro migrações do dia, em uma colada só).
 -- Colar tudo no Supabase → SQL Editor → New query → Run. Pode rodar mais de uma vez.
--- 1) câmera do tatame: links e estado, só para o professor · 2) piloto no app: quem assiste · 3) notificações push
+-- 1) câmera do tatame: links e estado, só para o professor · 2) piloto no app: quem assiste · 3) notificações push · 4) interessado ligado ao aluno
 
 -- ===================== 20261128120000_camera_links =====================
 -- Studio Evolution BJJ · câmera do tatame, fase 1 (um celular vira a câmera).
@@ -168,3 +168,14 @@ create policy "equipe le os avisos enviados" on public.push_envios for select to
   using ((select privado.equipe()));
 revoke all on table public.push_envios from anon, authenticated;
 grant select on table public.push_envios to authenticated;
+
+-- ===================== 20261128150000_lead_aluno =====================
+-- Studio Evolution BJJ · interessado matriculado ligado ao cadastro de aluno.
+-- Quando o professor cadastra o aluno direto (sem passar pelo "Cadastrar aluno" do interessado), o contato ficava
+-- em Matriculados pedindo um cadastro que já existe. Agora o interessado aponta para o aluno: pelo cadastro feito
+-- a partir dele ou pelo botão "Já é aluno: vincular".
+-- Rodar no SQL Editor do Supabase (pode rodar mais de uma vez).
+
+alter table public.leads add column if not exists aluno uuid references public.alunos (id) on delete set null;
+create index if not exists leads_aluno_idx on public.leads (aluno) where aluno is not null;
+comment on column public.leads.aluno is 'O cadastro de aluno em que este interessado virou (matriculado).';
