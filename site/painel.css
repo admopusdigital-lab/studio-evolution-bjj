@@ -483,8 +483,7 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .fq-k span { display: block; margin-top: 5px; font-size: 12px; color: var(--ink-2); }
 .fq-k small { display: block; margin-top: 2px; font-size: 11px; color: var(--ink-3); }
 .fq-k.gold { border-color: color-mix(in oklch, var(--gold) 45%, transparent); background: radial-gradient(120% 140% at 0% 0%, color-mix(in oklch, var(--gold) 16%, transparent), transparent 65%); }
-.fq-k.gold b { background: linear-gradient(180deg, #fff1b3, #e2b65a 55%, #a87a26); -webkit-background-clip: text; background-clip: text; color: transparent; }
-:root:not([data-look="black"]) .fq-k.gold b { background: linear-gradient(180deg, #b98b35, #7d5a1f); -webkit-background-clip: text; background-clip: text; }
+.fq-k.gold b { color: var(--gold-text); }
 .fq { margin-top: 16px; padding: 14px 14px 10px; border-radius: 14px; border: 1px solid var(--rule); background: color-mix(in oklch, var(--ink) 2%, transparent); }
 .fq-g { display: grid; grid-template-columns: 30px repeat(12, minmax(0, 1fr)); gap: 4px; align-items: center; }
 .fq-g + .fq-g { margin-top: 4px; }
@@ -1099,11 +1098,11 @@ details.mais > div button.perigo { color: var(--warn); }
 .grd-sem { display: grid; grid-template-columns: repeat(var(--n, 6), minmax(0, 1fr)); gap: 8px; margin-top: 18px; }
 .grd-sem > div { min-height: 132px; padding: 10px 8px; border-radius: 12px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); }
 .grd-sem b { display: block; margin-bottom: 8px; font: 600 10.5px/1.2 var(--mono, monospace); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
-.grd-sem span { display: block; margin-top: 6px; padding: 7px 8px; border-radius: 8px; font-size: 12px; line-height: 1.25; color: var(--ink); background: color-mix(in oklch, var(--gold) 20%, transparent); box-shadow: inset 3px 0 0 var(--gold); }
+.grd-sem span { display: block; margin-top: 6px; padding: 7px 8px; border-radius: 8px; font-size: 12px; line-height: 1.25; color: var(--ink); background: color-mix(in oklch, var(--gold) 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--gold) 55%, transparent); }
 .grd-sem span i { display: block; font: 700 12.5px/1.2 var(--sans); font-style: normal; font-variant-numeric: tabular-nums; }
-.grd-sem span.k1 { background: color-mix(in oklch, oklch(0.62 0.13 250) 20%, transparent); box-shadow: inset 3px 0 0 oklch(0.62 0.13 250); }
-.grd-sem span.k2 { background: color-mix(in oklch, oklch(0.62 0.12 160) 20%, transparent); box-shadow: inset 3px 0 0 oklch(0.62 0.12 160); }
-.grd-sem span.om { background: color-mix(in oklch, var(--ink) 10%, transparent); box-shadow: inset 3px 0 0 var(--ink-3); }
+.grd-sem span.k1 { background: color-mix(in oklch, oklch(0.62 0.13 250) 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklch, oklch(0.62 0.13 250) 60%, transparent); }
+.grd-sem span.k2 { background: color-mix(in oklch, oklch(0.62 0.12 160) 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklch, oklch(0.62 0.12 160) 60%, transparent); }
+.grd-sem span.om { background: color-mix(in oklch, var(--ink) 10%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink-3) 60%, transparent); }
 .grd-sem em { display: block; margin-top: 6px; font-size: 11.5px; font-style: normal; color: var(--ink-3); }
 @media (max-width: 860px) { .grd-sem { grid-template-columns: repeat(3, minmax(0, 1fr)); } .grd-sem > div { min-height: 0; } }
 
@@ -1319,3 +1318,29 @@ details.mais > div button.perigo { color: var(--warn); }
 .cam-tx .cam-st::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 7px; border-radius: 50%; background: currentColor; vertical-align: 1px; }
 .cam-tx .cam-st:empty::before { display: none; }
 @media (max-width: 900px) { .cam-tx.pronta .cam-tx-g { grid-template-columns: minmax(0, 1fr); } }
+
+/* ===== Polimento do painel =====
+   Menu lateral: fica no lugar e acompanha a rolagem. O corte (overflow: hidden) do quadro do painel transformava-o
+   no "rolador" do menu: ele descia 56 px nas áreas longas e sumia ao rolar. Com clip, o corte continua e o menu gruda. */
+.pr .dash { overflow: clip; }
+@media (min-width: 861px) {
+  .pr .dash-side { overflow-y: auto; scrollbar-width: none; }
+  .pr .dash-side::-webkit-scrollbar { display: none; }
+}
+/* quem está usando: nome e papel em uma linha cada, sem quebrar em três */
+.dash-side .who { min-width: 0; }
+.dash-side .who #whoNome { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.35; }
+.dash-side .who #whoNome small { display: block; overflow: hidden; text-overflow: ellipsis; }
+/* o que o navegador desenha também é do painel: barra de rolagem, cursor de texto e caixas de marcar */
+html[data-mode="painel"] { scrollbar-color: color-mix(in oklch, var(--ink) 30%, transparent) transparent; scrollbar-width: thin; }
+.pr input, .pr textarea, .pr select { caret-color: var(--gold-text); accent-color: var(--gold); }
+/* números em coluna alinham pelo dígito */
+.pr .tbl td, .pr .tbl th, .pr .kpi b, .pr .ldf b, .pr .es-mx td { font-variant-numeric: tabular-nums; }
+/* celular: filtros e abas em uma linha que desliza, em vez de empilhar e empurrar a lista para baixo */
+@media (max-width: 700px) {
+  .pr .chips { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding-inline: 16px; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding-inline: 16px; }
+  .pr .chips::-webkit-scrollbar, .pr .seg::-webkit-scrollbar { display: none; }
+  .pr .chips > * { flex: none; scroll-snap-align: start; }
+  .pr .seg { max-width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .pr .seg > button { flex: none; white-space: nowrap; }
+}
