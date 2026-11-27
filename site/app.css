@@ -851,3 +851,8 @@ html.ap-vivo-on, html.ap-vivo-on body { overflow: hidden; }
 .ap-exc-b { color: var(--ink-2); }
 .ap-exc-t { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
 .ap-exc button[type="submit"] { background: var(--warn); color: var(--paper); }
+
+/* ===== Notificações (Perfil) ===== */
+.ap-push-t { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+.ap-push-b { display: grid; gap: 4px; margin-bottom: 10px; }
+.ap-push-b .ap-btn { margin-top: 8px; }

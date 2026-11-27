@@ -82,3 +82,14 @@ Antes de abrir para as famílias (fase seguinte): ligar "Require signed URLs" na
 No Perfil do app, o aluno tem "Excluir minha conta": digita EXCLUIR e o login dele é apagado na hora. A matrícula, as presenças e os pagamentos continuam com o Studio (o cadastro só perde o vínculo com a conta). Professor e equipe não são excluídos por ali.
 
 Para ativar: no Supabase, Edge Functions, Deploy a new function, nome `excluir-conta`, colar `supabase/functions/excluir-conta/index.ts` e, em Advanced settings, desligar Verify JWT. Enquanto a função não existir, o app avisa que a exclusão ainda não foi ativada.
+
+## Notificações push (avisos no celular do aluno)
+
+- **Aluno:** no app, Perfil, "Notificações neste aparelho", Ativar. No iPhone só funciona com o app na Tela de Início (Safari, Compartilhar, Adicionar à Tela de Início). "Enviar um teste" mostra o aviso chegando.
+- **Professor e equipe:** no painel, Hoje, "Aviso pelo app": escolher para quem (todos ou uma turma), título e mensagem. Chega na conta do aluno e na do responsável. Limite de 10 avisos por hora.
+
+Para ativar:
+1. Banco: rodar `supabase/atualizar-2026-11-28.sql` (traz as tabelas das notificações).
+2. Função: no Supabase, Edge Functions, Deploy a new function, nome `push`, colar `supabase/functions/push/index.ts`, desligar Verify JWT.
+
+As chaves que assinam os envios são criadas pela função na primeira chamada e ficam em `push_chaves`, que ninguém lê pelo app. Não há chave para copiar nem guardar. Aparelho que não existe mais sai da lista sozinho.

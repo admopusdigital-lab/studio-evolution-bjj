@@ -116,6 +116,7 @@ async function pagina(b, opcoes, papel) {
     await p.evaluate(() => P.go('cam')); await p.clock.runFor(1500); await p.waitForTimeout(500);
     confere('Câmeras (em preparo) abre para o dono com a prévia do app', (await p.$$('.cam-cond li')).length === 4 && !!(await p.$('.cam-fone .cam-app')) && await p.evaluate(() => { var a = P.papel; P.papel = 'gestao'; var r = P.podeAba('cam'); P.papel = a; return r === false; }));
     confere('Câmeras: cartão Transmissão com os 3 passos, o código do celular e o formulário dos endereços', (await p.$$('#camTx .cam-tx-passos li')).length === 3 && !!(await p.$('#camTxQr svg')) && await p.isVisible('#camTxForm') && await p.isDisabled('[data-tx="ver"]'));
+    confere('Hoje: cartão Aviso pelo app (notificações)', !!(await p.$('#hPush #puAbre')));
     confere('Câmeras: piloto no app com a lista e a escolha de quem assiste', !!(await p.$('.cam-pil #camPilSel')) && !!(await p.$('.cam-pil [data-pil="poe"]')));
     confere('painel sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
@@ -142,6 +143,7 @@ async function pagina(b, opcoes, papel) {
     await p.clock.runFor(1500); await p.waitForTimeout(1500);
     confere('app: cartão para Stories gerado', await p.isVisible('#apStory') && /^blob:/.test(await p.getAttribute('#apStoryImg', 'src') || ''));
     confere('app: a câmera do tatame não aparece para quem não foi liberado', !(await p.$('#apCam')));
+    confere('app: Perfil com Notificações neste aparelho', !!(await p.$('#apPush #apPushSt')));
     /* excluir a conta pelo app (exigência das lojas): pede a palavra e só então chama o servidor */
     await p.click('#apStoryX'); await p.clock.runFor(800); await p.waitForTimeout(300);
     await p.click('#apExc'); await p.waitForTimeout(200);

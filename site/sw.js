@@ -4,11 +4,11 @@
    - Imagens, fontes e bibliotecas com versão no endereço: usa a guardada e só busca na rede se não tiver.
    - Login e dados (Supabase) e vídeos: nunca passam pelo cache.
    Ao mudar a lista abaixo, suba a versão (VERSAO) para o celular trocar o cache antigo. */
-var VERSAO = "evo-app-v60";
+var VERSAO = "evo-app-v61";
 var TELAS = [
   "app.html", "painel.html", "painel.js", "painel-hoje.js", "painel-alunos.js", "painel-crm.js", "painel-fin.js", "painel-mov.js", "painel-tecnicas.js", "painel-grau.js", "painel-equipe.js", "painel-rank.js", "painel-estoque.js", "painel.css", "area-do-professor.html", "entrar.html", "nova-senha.html", "acessos.html",
   "site.css", "app.css", "tema.css", "acesso.css",
-  "painel-export.js", "painel-celular.js", "painel-passos.js", "painel-cameras.js", "vivo.js", "app-aovivo.js", "app-conta.js", "transmitir.html", "transmitir.js", "site.js", "acesso.js", "movimentos.js", "fotos.js", "supabase-config.js", "manifest.webmanifest",
+  "painel-export.js", "painel-celular.js", "painel-passos.js", "painel-cameras.js", "vivo.js", "app-aovivo.js", "app-conta.js", "app-push.js", "painel-push.js", "transmitir.html", "transmitir.js", "site.js", "acesso.js", "movimentos.js", "fotos.js", "supabase-config.js", "manifest.webmanifest",
   "img/logo-evolution-mask.webp", "img/logo-evolution-bjj.webp",
   "img/app/icone-192.png", "img/app/favicon-32.png",
   "img/takes/guarda.jpg", "img/takes/tecnica.jpg", "img/takes/aquecimento.jpg", "img/takes/adulto.jpg",
@@ -58,5 +58,22 @@ self.addEventListener("fetch", function (e) {
     return caches.match(req, { ignoreSearch: pagina }).then(function (tem) {
       return tem || (pagina ? caches.match("entrar.html") : Response.error());
     });
+  }));
+});
+
+/* ---------- notificações push: mostra o aviso e, no toque, abre o app ---------- */
+self.addEventListener("push", function (e) {
+  var d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (x) { d = { corpo: e.data ? e.data.text() : "" }; }
+  e.waitUntil(self.registration.showNotification(d.titulo || "Studio Evolution BJJ", {
+    body: d.corpo || "", icon: "img/app/icone-192.png", badge: "img/app/favicon-32.png", data: { url: d.url || "app.html" }, tag: d.tag || undefined
+  }));
+});
+self.addEventListener("notificationclick", function (e) {
+  e.notification.close();
+  var url = new URL((e.notification.data && e.notification.data.url) || "app.html", self.registration.scope).href;
+  e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (l) {
+    for (var i = 0; i < l.length; i++) { if (l[i].url.indexOf(self.registration.scope) === 0 && "focus" in l[i]) { l[i].navigate && l[i].navigate(url); return l[i].focus(); } }
+    return self.clients.openWindow(url);
   }));
 });
