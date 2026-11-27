@@ -404,7 +404,7 @@
       setInterval(recarrega, 5 * 60000);
       setInterval(desloca, 60000); desloca();
     }).catch(function (e) {
-      if (semBanco(e)) aviso("Falta atualizar o banco de dados.", "<p>No Supabase, abra SQL Editor, New query, cole o arquivo <b>20261128120000_camera_links.sql</b> e clique em Run. Depois recarregue esta página.</p>");
+      if (semBanco(e)) aviso("Falta atualizar o banco de dados.", "<p>No Supabase, abra SQL Editor, New query, cole o arquivo <b>atualizar-2026-11-28.sql</b> (pasta supabase) e clique em Run. Depois recarregue esta página.</p>");
       else aviso("Não deu para carregar a câmera.", "<p>Confira a internet e recarregue a página.</p>");
     });
   }

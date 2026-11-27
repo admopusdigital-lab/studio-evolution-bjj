@@ -1273,3 +1273,17 @@ details.mais > div button.perigo { color: var(--warn); }
 .cam-eq li.fase { grid-template-columns: minmax(0, 1fr); padding-top: 14px; }
 .cam-eq li.fase b { font: 600 11px/1.3 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
 @media (max-width: 900px) { .cam-tx-g { grid-template-columns: minmax(0, 1fr); } }
+
+/* Câmeras · piloto no app (lista de quem assiste) */
+.cam-pil { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.cam-pil h5 { margin: 0; font: 600 13.5px/1.3 var(--sans); }
+.cam-pil .cam-nota { margin-top: 6px; }
+.cam-pil .cam-nota a { color: var(--gold-text); text-underline-offset: 3px; }
+.cam-pil-l { display: grid; gap: 0; margin: 10px 0 0; padding: 0; list-style: none; }
+.cam-pil-l li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--rule); }
+.cam-pil-l li:first-child { border-top: 0; }
+.cam-pil-l b { display: block; font-size: 13.5px; font-weight: 600; }
+.cam-pil-l small { font-size: 12.5px; color: var(--ink-3); }
+.cam-pil-0 { margin: 10px 0 0; font-size: 13px; color: var(--ink-3); }
+.cam-pil-add { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.cam-pil-add select { flex: 1 1 220px; max-width: 360px; }

@@ -116,6 +116,7 @@ async function pagina(b, opcoes, papel) {
     await p.evaluate(() => P.go('cam')); await p.clock.runFor(1500); await p.waitForTimeout(500);
     confere('Câmeras (em preparo) abre para o dono com a prévia do app', (await p.$$('.cam-cond li')).length === 4 && !!(await p.$('.cam-fone .cam-app')) && await p.evaluate(() => { var a = P.papel; P.papel = 'gestao'; var r = P.podeAba('cam'); P.papel = a; return r === false; }));
     confere('Câmeras: cartão Transmissão com os 3 passos, o código do celular e o formulário dos endereços', (await p.$$('#camTx .cam-tx-passos li')).length === 3 && !!(await p.$('#camTxQr svg')) && await p.isVisible('#camTxForm') && await p.isDisabled('[data-tx="ver"]'));
+    confere('Câmeras: piloto no app com a lista e a escolha de quem assiste', !!(await p.$('.cam-pil #camPilSel')) && !!(await p.$('.cam-pil [data-pil="poe"]')));
     confere('painel sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }
@@ -140,7 +141,17 @@ async function pagina(b, opcoes, papel) {
     await p.evaluate(() => document.querySelector('.ap-story-btn').click());
     await p.clock.runFor(1500); await p.waitForTimeout(1500);
     confere('app: cartão para Stories gerado', await p.isVisible('#apStory') && /^blob:/.test(await p.getAttribute('#apStoryImg', 'src') || ''));
+    confere('app: a câmera do tatame não aparece para quem não foi liberado', !(await p.$('#apCam')));
     confere('app sem erro de script', !erros.length, erros.join(' | '));
+    await c.close();
+  }
+  {
+    const { c, p, erros } = await pagina(b, { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, 'aluno');
+    await p.route('https://nkscqdhczfeykrtexyzs.supabase.co/rest/v1/rpc/camera_ao_vivo', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ nome: 'Tatame 1', ao_vivo: true, pausada: false, turma: 'Kids 1', assistir_url: 'https://customer-teste.cloudflarestream.com/abc/webRTC/play', marca: true, abre5: true, turmas: { kids1: true, kids2: true, adulto: false } }) }));
+    await p.goto(BASE + '/app', { waitUntil: 'load' });
+    await p.waitForTimeout(3500);
+    confere('app: quem o professor liberou vê a câmera no ar com o botão Assistir', await p.isVisible('#apCam') && /Kids 1 no ar agora/.test(await p.textContent('#apCamT')) && await p.isVisible('#apCamVer'));
+    confere('app com a câmera sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }
 

@@ -14,7 +14,8 @@
   var PADRAO = { instalada: false, nome: "Tatame 1", turmas: { kids1: true, kids2: true, adulto: false }, regras: { abre5: true, nome: true, gravar: false }, aviso: false, revisao: false, aceites: {} };
   var C = null, previa = "fechada", abertas = {}, salvaT = null;
   var ID = "tatame1", L = null, semTabela = false, ver = null, verT = null, verMsg = "", editando = false, pollT = null;
-  var SQL_CAMERA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/migrations/20261128120000_camera_links.sql";
+  var SQL_CAMERA = "https://raw.githubusercontent.com/admopusdigital-lab/studio-evolution-bjj/main/supabase/atualizar-2026-11-28.sql";
+  var semPiloto = false;   /* o banco tem a tabela da câmera, mas ainda não a lista do piloto no app */
 
   function carregar() {
     return P.q(function (sb) { return sb.from("configuracoes").select("valor").eq("chave", "cameras").maybeSingle(); })
@@ -70,7 +71,7 @@
             "<b>" + esc(c[0]) + '<span class="sr-only">' + (c[1] ? ": pronto" : ": falta") + "</span></b>" +
             (c[3] ? tog("cond", c[1], c[0], '="' + c[3] + '"') : '<small>' + esc(c[2]) + "</small>") + "</li>";
         }).join("") + "</ol>" +
-        '<button class="mini-btn" type="button" disabled>Liberar para as famílias</button><p class="cam-nota">Nesta fase só você assiste. A liberação para as famílias vem depois do piloto, com o link protegido por pessoa e por horário. Até lá, ninguém além de você vê esta área.</p></section>' +
+        '<button class="mini-btn" type="button" disabled>Liberar para as famílias</button><p class="cam-nota">Nesta fase só você assiste. A liberação para as famílias vem depois do piloto, com o link protegido por pessoa e por horário. Até lá, ninguém além de você vê esta área.</p>' + piloto() + "</section>" +
 
       /* as turmas e o aceite de cada um */
       '<section class="cam-card" aria-labelledby="camTurT"><div class="cam-h"><h4 id="camTurT">Turmas com câmera</h4></div><p class="cam-nota" style="margin-top:0">A câmera filma o tatame inteiro, então só liga na turma em que todos aceitaram: no Kids, um dos responsáveis; no Adulto, o próprio aluno.</p><ul class="cam-tur">' +
@@ -160,12 +161,44 @@
       '<p class="cam-app-n">A transmissão fica aberta só durante a aula.</p></div>';
   }
 
+  /* ---------- piloto no app: a tela "Ao vivo" só para as pessoas escolhidas ----------
+     A lista guarda cadastros de alunos; o app libera para a conta do próprio aluno e para a do responsável dele.
+     Quem decide é o banco (função camera_ao_vivo); aqui o professor só monta a lista. */
+  function testadores() { return ((L && L.testadores) || []).map(function (id) { return P.porId[id]; }).filter(Boolean); }
+  function comApp(a) { return !!(a.conta || a.responsavel_conta); }
+  function piloto() {
+    if (!L || semTabela) return "";
+    var h = '<div class="cam-pil"><h5 id="camPilT">Piloto no app: liberar só para algumas pessoas</h5>';
+    if (semPiloto) return h + '<p class="cam-nota">Para liberar pessoas no app, falta atualizar o banco de dados: no Supabase, SQL Editor, New query, cole <a href="' + SQL_CAMERA + '" target="_blank" rel="noopener">este arquivo</a> inteiro e clique em Run. Depois recarregue esta página.</p></div>';
+    var l = testadores(), ids = (L.testadores || []);
+    var fora = P.alunosDeVerdade().filter(function (a) { return comApp(a) && ids.indexOf(a.id) < 0; }).sort(function (x, y) { return x.nome.localeCompare(y.nome); });
+    return h + '<p class="cam-nota">Quem estiver nesta lista vê a câmera no app, com a conta dela (ou a do responsável), sempre que a transmissão estiver no ar. Use para testar antes de abrir para as famílias.</p>' +
+      (l.length ? '<ul class="cam-pil-l" aria-labelledby="camPilT">' + l.map(function (a) {
+        return '<li data-id="' + a.id + '"><span class="av"' + Fotos.attr(a.foto) + ">" + P.ini(a.nome) + "</span><div><b>" + esc(a.nome) + "</b><small>" +
+          esc(P.TURMAS[a.turma] || a.turma || "") + (a.conta ? " · assiste com a própria conta" : " · assiste pela conta do responsável") + '</small></div><button class="mini-btn ghost" type="button" data-pil="tira">Tirar</button></li>';
+      }).join("") + "</ul>" : '<p class="cam-pil-0">Ninguém liberado ainda.</p>') +
+      '<div class="cam-pil-add"><label class="sr-only" for="camPilSel">Pessoa para liberar no app</label><select class="crm-in" id="camPilSel"><option value="">' + (fora.length ? "Escolha quem vai assistir" : "Ninguém mais com acesso ao app") + "</option>" +
+        fora.map(function (a) { return '<option value="' + a.id + '">' + esc(a.nome) + "</option>"; }).join("") + '</select><button class="mini-btn" type="button" data-pil="poe"' + (fora.length ? "" : " disabled") + ">Liberar no app</button></div>" +
+      '<p class="cam-nota">Só aparece aqui quem já tem acesso ao app. Para criar o acesso, abra a ficha do aluno.</p></div>';
+  }
+  function gravaPiloto(lista, msg) {
+    P.q(function (sb) { return sb.from("camera_links").upsert({ id: ID, testadores: lista }); })
+      .then(function () { L.testadores = lista; P.toast(msg); paint(); })
+      .catch(function (e) { P.erro(e, "Não deu para mudar a lista do piloto"); });
+  }
+
   /* ---------- a transmissão (fase 1: um celular como câmera) ---------- */
   function instalada() { return !!(L && L.envio_url && L.visto_em); }
   function faltaTabela(e) { var m = (e && (e.message || "")) + " " + ((e && e.code) || ""); return /42P01|PGRST205|camera_links/.test(m); }
   function carregarLinks(soEstado) {
     var antes = instalada();
-    return P.q(function (sb) { return sb.from("camera_links").select("envio_url, assistir_url, pausada, estado, visto_em").eq("id", ID).maybeSingle(); })
+    var CAMPOS = "envio_url, assistir_url, pausada, estado, visto_em";
+    return P.q(function (sb) { return sb.from("camera_links").select(CAMPOS + ", testadores").eq("id", ID).maybeSingle(); })
+      .then(function (r) { semPiloto = false; return r; }, function (e) {
+        if (!/42703|testadores/.test((e && (e.message || "")) + " " + ((e && e.code) || ""))) throw e;
+        semPiloto = true;
+        return P.q(function (sb) { return sb.from("camera_links").select(CAMPOS).eq("id", ID).maybeSingle(); });
+      })
       .then(function (r) { L = r || {}; semTabela = false; }, function (e) { L = L || {}; semTabela = faltaTabela(e); if (!semTabela && window.console) console.warn(e); })
       .then(function () { if (!C) return; if (soEstado && antes === instalada()) pintaTx(); else paint(); });
   }
@@ -320,6 +353,17 @@
       if (tx === "pausa") return pausar();
       if (tx === "trocar") { editando = true; pintaTx(); $("#camTxAssistir").value = (L && L.assistir_url) || ""; return $("#camTxEnvio").focus(); }
       if (tx === "cancelar") { editando = false; $("#camTxErr").hidden = true; return pintaTx(); }
+      return;
+    }
+    if (b.hasAttribute("data-pil")) {
+      var atual = ((L && L.testadores) || []).slice();
+      if (b.dataset.pil === "poe") {
+        var sel = $("#camPilSel"), quem = sel && P.porId[sel.value];
+        if (!quem) { if (sel) sel.focus(); return P.toast("Escolha a pessoa na lista."); }
+        return gravaPiloto(atual.concat(quem.id), P.first(quem.nome) + " liberado no app. A câmera aparece no Início do app dele.");
+      }
+      var li0 = b.closest("[data-id]"), sai = li0 && P.porId[li0.dataset.id];
+      if (sai) gravaPiloto(atual.filter(function (x) { return x !== sai.id; }), P.first(sai.nome) + " saiu do piloto.");
       return;
     }
     if (b.hasAttribute("data-previa")) { previa = b.dataset.previa; return paint(); }

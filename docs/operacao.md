@@ -48,7 +48,7 @@ login ficam no Supabase Auth: num projeto novo, os acessos são recriados pelo p
 
 Piloto: só o professor assiste. Nada aparece no app dos alunos nem para a equipe.
 
-1. **Banco.** No Supabase, SQL Editor, New query: colar `supabase/migrations/20261128120000_camera_links.sql` e Run. Cria a tabela `camera_links`, que só o professor lê.
+1. **Banco.** No Supabase, SQL Editor, New query: colar `supabase/atualizar-2026-11-28.sql` inteiro e Run (pode rodar mais de uma vez). Cria a tabela `camera_links`, que só o professor lê, e a função que o app usa no piloto.
 2. **Cloudflare.** Na conta onde o site está: ativar o Stream (pago), depois Stream, Live inputs, Create live input (nome: Tatame 1). Copiar os dois endereços de WebRTC: o de envio (`.../webRTC/publish`) e o de assistir (`.../webRTC/play`). O de envio é uma chave: quem tem, transmite. Não mandar por mensagem.
 3. **Painel.** Em Câmeras, colar os dois endereços e salvar. Escolher as turmas com câmera.
 4. **Celular que filma.** Abrir `evolutionbjj.com.br/transmitir` (ou o código que aparece no painel), entrar como professor com "Manter conectado", permitir a câmera e tocar em Ligar. Deixar deitado, no suporte e na tomada.
@@ -62,6 +62,16 @@ Se algo falhar:
 - **"O vídeo não passou pela rede deste lugar"**: a Cloudflare aceitou, mas a rede bloqueia transmissão ao vivo (tráfego UDP). Testar com o Wi-Fi desligado, pelo 4G; se funcionar, o bloqueio é do roteador ou do provedor da academia.
 - **"A câmera não está transmitindo agora"** ao clicar em Ver ao vivo: a Cloudflare responde assim (código 409) quando ninguém está enviando. Conferir se o celular mostra "No ar".
 - **Tela apaga**: tocar uma vez na tela. Em aparelho antigo, deixar a tela sempre ligada nos ajustes.
+
+### Piloto no app (algumas pessoas assistem)
+
+No painel, em Câmeras, bloco "Piloto no app": escolher o aluno e clicar em Liberar no app. Só aparece na lista quem já tem acesso ao app. Vale para a conta do próprio aluno e para a do responsável dele.
+
+Quem foi liberado vê o cartão "Câmera do tatame" no Início do app: fora do ar, com a próxima transmissão; no ar, com o botão Assistir ao vivo. O vídeo toca sem som, com o nome de quem assiste por cima. Quem não foi liberado não vê nada. Para tirar alguém, clicar em Tirar na mesma lista.
+
+Como a regra funciona: o app não lê a tabela da câmera. Ele chama a função `camera_ao_vivo()`, que só responde para quem está na lista e só entrega o endereço de assistir enquanto a câmera está no ar (sinal do celular há menos de 90 segundos e sem pausa). O endereço de envio nunca sai por ela.
+
+Limite do piloto: o endereço de assistir é fixo. Quem assistiu uma vez poderia guardá-lo e abrir de novo sempre que a câmera estiver no ar, mesmo depois de sair da lista. Por isso o piloto é para pessoas de confiança; para as famílias, entra o link assinado por pessoa e horário. Ao encerrar o piloto com alguém, o seguro é apagar a entrada na Cloudflare e criar outra.
 
 Custo: a conta precisa da assinatura do Cloudflare Stream (a partir de US$ 5 por mês; um plano Pro ou Business do domínio já inclui) e paga US$ 1 a cada 1.000 minutos assistidos. Enviar o vídeo não é cobrado; transmitir sem ninguém assistindo não gera custo de entrega.
 
