@@ -112,6 +112,9 @@ async function pagina(b, opcoes, papel) {
     const semAntes = await p.isVisible('#tecBox') && await p.isHidden('#mvpBib');
     await p.click('#mvtBib'); await p.waitForTimeout(300);
     confere('Movimentos em abas Semana e Biblioteca', semAntes && await p.isVisible('#mvAdd') && await p.isHidden('#tecBox'));
+    /* Câmeras: só o dono vê; mostra as condições, as turmas e a prévia do app */
+    await p.evaluate(() => P.go('cam')); await p.clock.runFor(1500); await p.waitForTimeout(500);
+    confere('Câmeras (em preparo) abre para o dono com a prévia do app', (await p.$$('.cam-cond li')).length === 4 && !!(await p.$('.cam-fone .cam-app')) && await p.evaluate(() => { var a = P.papel; P.papel = 'gestao'; var r = P.podeAba('cam'); P.papel = a; return r === false; }));
     confere('painel sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }

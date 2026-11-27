@@ -148,6 +148,8 @@ body.pr { background: var(--paper); }
     <symbol id="i-coin" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></symbol>
     <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
     <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11M17 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5M12 14v3.5M8.5 20.5h7M9.5 17.5h5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="13" height="11" rx="2"/><path d="M15.5 10.5l6-3.5v10l-6-3.5"/></symbol>
     <symbol id="i-box" viewBox="0 0 24 24"><path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.3 18.4z"/><path d="M9 9.2c0 2.9 2.9 5.8 5.8 5.8l1.2-1.4-2-1-1 .8a4 4 0 0 1-2.4-2.4l.8-1-1-2z"/></symbol>
@@ -182,6 +184,7 @@ body.pr { background: var(--paper); }
       <button type="button" data-go="fin" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin" hidden></span></button>
       <button type="button" data-go="estoque" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-box"/></svg>Estoque<span class="badge" id="bEst" hidden></span></button>
       <button type="button" data-go="config" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-gear"/></svg>Configurações</button>
+      <button type="button" data-go="cam" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-cam"/></svg>Câmeras<span class="cam-tag">em preparo</span></button>
       <button type="button" data-go="equipe" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-users"/></svg>Equipe</button>
       <div class="who"><span class="av" id="whoAv">··</span><span id="whoNome">Professor<br><small>Studio Evolution</small></span></div>
     </nav>
@@ -414,6 +417,12 @@ body.pr { background: var(--paper); }
         <div class="empty-big" id="esEmpty" hidden></div>
       </section>
 
+      <!-- Câmeras (só o professor): a aula ao vivo para as famílias, em preparo; nada aparece no app até liberar -->
+      <section class="dv" data-v="cam" aria-labelledby="t-cam">
+        <div class="dv-h"><div><p class="dv-k" id="camK">Em preparo · só você vê esta área</p><h3 id="t-cam">Câmeras</h3></div><p>A aula ao vivo no app, para os responsáveis, só no horário da aula e sem gravação. Enquanto não for liberada, os alunos e a equipe não veem nada disso.</p></div>
+        <div id="camBox"></div>
+      </section>
+
       <!-- Equipe (só o professor): usuários de gestão e o que cada um pode ver -->
       <section class="dv" data-v="equipe" aria-labelledby="t-equipe">
         <div class="dv-h"><div><p class="dv-k" id="eqK"></p><h3 id="t-equipe">Equipe</h3></div><p>Acessos de gestão ao painel. Marque o que cada pessoa pode ver e mexer: o resto fica fechado, inclusive no servidor.</p></div>
@@ -453,5 +462,6 @@ body.pr { background: var(--paper); }
 <script src="painel-export.js"></script>
 <script src="painel-celular.js"></script>
 <script src="painel-passos.js"></script>
+<script src="painel-cameras.js"></script>
 </body>
 </html>
