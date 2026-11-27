@@ -59,6 +59,8 @@ Se algo falhar:
 - **"Celular sem sinal"** no painel: a página fechou, o celular reiniciou ou ficou sem internet. Abrir a página de novo; ela volta sozinha ao modo câmera.
 - **"O link de envio não foi aceito"**: endereço colado errado, ou a entrada foi apagada na Cloudflare. Colar de novo em Câmeras.
 - **Imagem travando**: internet de envio fraca. A página mostra a taxa (Mbps); abaixo de 1 Mbps a imagem perde qualidade.
+- **"O vídeo não passou pela rede deste lugar"**: a Cloudflare aceitou, mas a rede bloqueia transmissão ao vivo (tráfego UDP). Testar com o Wi-Fi desligado, pelo 4G; se funcionar, o bloqueio é do roteador ou do provedor da academia.
+- **"A câmera não está transmitindo agora"** ao clicar em Ver ao vivo: a Cloudflare responde assim (código 409) quando ninguém está enviando. Conferir se o celular mostra "No ar".
 - **Tela apaga**: tocar uma vez na tela. Em aparelho antigo, deixar a tela sempre ligada nos ajustes.
 
 Custo: a conta precisa da assinatura do Cloudflare Stream (a partir de US$ 5 por mês; um plano Pro ou Business do domínio já inclui) e paga US$ 1 a cada 1.000 minutos assistidos. Enviar o vídeo não é cobrado; transmitir sem ninguém assistindo não gera custo de entrega.

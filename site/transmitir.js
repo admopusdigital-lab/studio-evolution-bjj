@@ -40,7 +40,7 @@
 
   var db = null, L = null, C = {}, grade = GRADE_PADRAO;
   var armada = false, manualAte = 0, stream = null, sess = null, ligando = false, ger = 0, falhas = 0, proxima = 0, modo = 0;
-  var trava = null, med = null, parado = 0, ultQuadros = -1, ultErro = "", erroCam = "", verImg = false, verT = null, desde = 0, bat = null, alvoAtual = null;
+  var semPassar = 0, trava = null, med = null, parado = 0, ultQuadros = -1, ultErro = "", erroCam = "", verImg = false, verT = null, desde = 0, bat = null, alvoAtual = null;
 
   function le(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function guarda(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
@@ -187,7 +187,9 @@
     else {
       /* a conversa com o servidor não fechou: tenta o próximo jeito de enviar */
       modo = (modo + 1) % MODOS.length;
-      ultErro = (t === "recusado" ? "O serviço recusou a transmissão (código " + st + ")." : t === "nao-ligou" ? "O vídeo não passou pela rede deste lugar." : "A transmissão não começou.") + " Tentando de outro jeito…";
+      if (t === "nao-ligou") semPassar++;
+      /* o serviço aceitou, mas o vídeo não trafega: quase sempre é a rede do lugar bloqueando transmissão ao vivo (UDP) */
+      ultErro = (t === "recusado" ? "O serviço recusou a transmissão (código " + st + ")." : t === "nao-ligou" ? "O vídeo não passou pela rede deste lugar." + (semPassar >= 2 ? " Para tirar a dúvida, desligue o Wi-Fi e teste pelo 4G: algumas redes bloqueiam transmissão ao vivo." : "") : "A transmissão não começou.") + " Tentando de outro jeito…";
     }
     proxima = Date.now() + espera();
   }
@@ -206,7 +208,7 @@
     }).then(function (s) {
       if (!s) return;
       if (g !== ger) { s.parar(); return; }
-      sess = s; ligando = false; falhas = 0; ultErro = ""; desde = Date.now(); parado = 0; ultQuadros = -1;
+      sess = s; ligando = false; falhas = 0; semPassar = 0; ultErro = ""; desde = Date.now(); parado = 0; ultQuadros = -1;
       guarda(K_MODO, String(modo));
       sinal();
     }).catch(function (e) {
