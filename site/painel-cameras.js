@@ -237,11 +237,11 @@
         '<p class="cam-nota cam-tx-det" id="camTxDet"></p>' +
         '<p class="cam-tx-banco" id="camTxBanco" hidden><b>Falta atualizar o banco de dados.</b> Abra o Supabase, SQL Editor, New query, cole <a href="' + SQL_CAMERA + '" target="_blank" rel="noopener">este arquivo</a> inteiro e clique em Run. Depois recarregue esta página.</p>' +
         '<div class="cam-tx-g"><div>' +
-          '<ol class="cam-tx-passos">' +
+          '<details class="cam-tx-como" id="camTxComo" open><summary>Como conectar o celular que filma</summary><ol class="cam-tx-passos">' +
             '<li><b>Crie a entrada ao vivo na Cloudflare.</b> Em <a href="https://dash.cloudflare.com/?to=/:account/stream/inputs" target="_blank" rel="noopener">Stream, Live inputs</a>, clique em Create live input e dê o nome Tatame 1. Na entrada criada, copie os dois endereços de WebRTC. O Stream precisa estar ativado na conta (assinatura a partir de US$ 5 por mês).</li>' +
             "<li><b>Cole os dois endereços aqui.</b> O de envio termina em <code>/webRTC/publish</code> e o de assistir em <code>/webRTC/play</code>.</li>" +
             "<li><b>Ligue o celular que vai filmar.</b> Nele, aponte a câmera para o código ao lado ou abra <code>" + esc(curto) + "</code>, entre com a sua conta de professor e toque em Ligar. Deixe o celular deitado, no suporte e na tomada.</li>" +
-          "</ol>" +
+          '</ol><div id="camTxQrCasa"></div></details>' +
           '<p class="cam-tx-salvo" id="camTxSalvo" hidden><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span>Os dois endereços estão salvos. O de envio não aparece de novo: ele é a chave da transmissão.</span><button class="mini-btn ghost" type="button" data-tx="trocar">Trocar os endereços</button></p>' +
           '<form class="cam-tx-form" id="camTxForm" novalidate hidden>' +
             '<label class="crm-f"><span>Endereço de envio <small>(termina em /webRTC/publish)</small></span><input class="crm-in" id="camTxEnvio" type="url" inputmode="url" autocomplete="off" spellcheck="false" aria-describedby="camTxErr"></label>' +
@@ -251,7 +251,7 @@
           "</form>" +
         '</div><div class="cam-tx-lado">' +
           '<div class="cam-tx-qr"><div id="camTxQr" role="img" aria-label="Código para abrir a câmera no celular"></div><div><p>Aponte a câmera do celular que vai filmar para este código. Ele abre a página da câmera.</p><a class="mini-btn ghost cam-tx-abre" href="transmitir.html">Usar este aparelho como câmera</a></div></div>' +
-          '<div class="cam-tx-video"><video id="camTxVideo" muted playsinline aria-label="Imagem ao vivo do tatame"></video><p class="cam-tx-msg" id="camTxMsg"></p></div>' +
+          '<div class="cam-tx-video" id="camTxCaixa"><video id="camTxVideo" muted playsinline aria-label="Imagem ao vivo do tatame"></video><span class="cam-tx-pill" id="camTxPill" hidden>ao vivo</span><p class="cam-tx-msg" id="camTxMsg"></p><button class="cam-tx-cheia" type="button" data-tx="cheia" id="camTxCheia" hidden>Tela cheia</button></div>' +
           '<div class="cam-tx-bt"><button class="mini-btn" type="button" data-tx="ver">Ver ao vivo</button><button class="mini-btn ghost cam-pausa" type="button" data-tx="pausa" aria-pressed="false">Pausar a transmissão agora</button></div>' +
           '<p class="cam-nota">Sem som e sem gravação. Cada minuto assistido conta na Cloudflare, por isso o vídeo aqui para sozinho depois de 5 minutos.</p>' +
         "</div></div></section>" +
@@ -269,6 +269,16 @@
     if (!$("#camTx")) return;
     var st = estadoTx(), tem = !!(L && L.envio_url), carregou = !!L;
     $("#camTxSt").className = "cam-st " + st.cls; $("#camTxSt").textContent = carregou ? st.t : "";
+    /* conectada: o vídeo vira o centro do cartão e os passos de instalação ficam recolhidos */
+    var tx = $("#camTx");
+    if (carregou && tx.classList.contains("pronta") !== tem) {
+      tx.classList.toggle("pronta", tem);
+      $("#camTxComo").open = !tem;
+      var qr = $(".cam-tx-qr", tx);
+      if (qr) (tem ? $("#camTxQrCasa") : $(".cam-tx-lado", tx)).insertAdjacentElement(tem ? "beforeend" : "afterbegin", qr);
+    }
+    $("#camTxPill").hidden = !(ver && ver.s && !verMsg);
+    $("#camTxCheia").hidden = !(ver && ver.s && !verMsg) || !$("#camTxCaixa").requestFullscreen;
     $("#camTxDet").textContent = carregou ? st.det : ""; $("#camTxDet").hidden = !carregou || !st.det;
     $("#camTxBanco").hidden = !semTabela;
     $("#camTxSalvo").hidden = !tem || editando;
@@ -350,6 +360,7 @@
     if (b.hasAttribute("data-tx")) {
       var tx = b.dataset.tx;
       if (tx === "ver") return verAoVivo();
+      if (tx === "cheia") { var cx = $("#camTxCaixa"); if (document.fullscreenElement) document.exitFullscreen(); else if (cx.requestFullscreen) { var pf = cx.requestFullscreen(); if (pf && pf.catch) pf.catch(function () {}); } return; }
       if (tx === "pausa") return pausar();
       if (tx === "trocar") { editando = true; pintaTx(); $("#camTxAssistir").value = (L && L.assistir_url) || ""; return $("#camTxEnvio").focus(); }
       if (tx === "cancelar") { editando = false; $("#camTxErr").hidden = true; return pintaTx(); }

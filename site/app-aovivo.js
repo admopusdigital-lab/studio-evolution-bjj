@@ -67,15 +67,38 @@
     tela.setAttribute("role", "dialog"); tela.setAttribute("aria-modal", "true"); tela.setAttribute("aria-labelledby", "apVivoT");
     tela.innerHTML = '<div class="ap-vivo-in">' +
       '<div class="ap-vivo-top"><div><p class="ap-lb gold">Ao vivo</p><h2 class="ap-vivo-t" id="apVivoT"></h2></div><button class="ap-vivo-x" type="button" id="apVivoX" aria-label="Fechar o vídeo">Fechar</button></div>' +
-      '<div class="ap-vivo-v" id="apVivoV"><video id="apVivoVideo" muted playsinline aria-label="Imagem ao vivo do tatame"></video><span class="ap-vivo-marca" id="apVivoMarca" aria-hidden="true"></span><p class="ap-vivo-msg" id="apVivoMsg" role="status"></p></div>' +
-      '<button class="ap-btn ghost" type="button" id="apVivoCheia" hidden>Ver em tela cheia</button>' +
+      '<div class="ap-vivo-v" id="apVivoV"><video id="apVivoVideo" muted playsinline aria-label="Imagem ao vivo do tatame"></video><span class="ap-vivo-pill" aria-hidden="true">ao vivo</span><span class="ap-vivo-marca" id="apVivoMarca" aria-hidden="true"></span><p class="ap-vivo-msg" id="apVivoMsg" role="status"></p>' +
+        '<button class="ap-vivo-volta" type="button" id="apVivoVolta" hidden>Voltar ao normal</button></div>' +
+      '<button class="ap-btn" type="button" id="apVivoCheia"><svg class="ic" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M4 9V5h4M20 15v4h-4M16 5h4v4M8 19H4v-4"/></svg><span>Virar a tela</span></button>' +
       '<p class="ap-vivo-n"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg><span>Só quem o professor liberou vê esta câmera, e só enquanto a aula acontece. Sem som e sem gravação.</span></p></div>';
     document.body.appendChild(tela);
     tela.querySelector("#apVivoX").addEventListener("click", function () { fechar(); });
     tela.addEventListener("keydown", function (e) { if (e.key === "Escape") fechar(); });
-    var caixa = tela.querySelector("#apVivoV"), cheia = tela.querySelector("#apVivoCheia");
-    /* tela cheia da caixa inteira (o nome de quem assiste vai junto); o iPhone não tem, então o botão nem aparece */
-    if (caixa.requestFullscreen) { cheia.hidden = false; cheia.addEventListener("click", function () { var p = caixa.requestFullscreen(); if (p && p.catch) p.catch(function () {}); }); }
+    tela.querySelector("#apVivoCheia").addEventListener("click", deitar);
+    tela.querySelector("#apVivoVolta").addEventListener("click", levantar);
+    document.addEventListener("fullscreenchange", function () { if (!document.fullscreenElement && deitada === "tela") levantar(); });
+  }
+  /* virar a tela: o app é travado em pé, então o vídeo deita sozinho e ocupa o celular inteiro.
+     No Android, tela cheia de verdade com a tela girada; onde isso não existe (iPhone), o vídeo gira por estilo. */
+  var deitada = "";
+  function deitar() {
+    if (deitada) return;
+    var caixa = tela.querySelector("#apVivoV"), volta = tela.querySelector("#apVivoVolta");
+    function porEstilo() { deitada = "estilo"; tela.classList.add("deitada"); volta.hidden = false; volta.focus(); }
+    var so = screen.orientation;
+    if (caixa.requestFullscreen && so && so.lock) {
+      caixa.requestFullscreen().then(function () { return so.lock("landscape"); }).then(function () { deitada = "tela"; volta.hidden = false; }, function () {
+        if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+        porEstilo();
+      });
+    } else porEstilo();
+  }
+  function levantar() {
+    if (!deitada) return;
+    var era = deitada; deitada = "";
+    tela.classList.remove("deitada"); tela.querySelector("#apVivoVolta").hidden = true;
+    if (era === "tela") { try { screen.orientation.unlock(); } catch (e) {} if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {}); }
+    var b = tela.querySelector("#apVivoCheia"); if (b && !tela.hidden) b.focus();
   }
   function msg(t) { var m = tela.querySelector("#apVivoMsg"); m.textContent = t || ""; m.hidden = !t; }
   function acorda() { if (navigator.wakeLock && !trava) navigator.wakeLock.request("screen").then(function (w) { trava = w; w.addEventListener("release", function () { if (trava === w) trava = null; }); }).catch(function () {}); }
@@ -108,7 +131,7 @@
   }
   function fechar() {
     if (!tela || tela.hidden) return;
-    if (document.fullscreenElement && document.exitFullscreen) { try { document.exitFullscreen(); } catch (e) {} }
+    levantar();
     var s = sess; sess = null; if (s) s.parar();
     tela.hidden = true; document.documentElement.classList.remove("ap-vivo-on");
     var w = trava; trava = null; if (w) { try { w.release(); } catch (e) {} }

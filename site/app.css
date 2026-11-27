@@ -856,3 +856,13 @@ html.ap-vivo-on, html.ap-vivo-on body { overflow: hidden; }
 .ap-push-t { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
 .ap-push-b { display: grid; gap: 4px; margin-bottom: 10px; }
 .ap-push-b .ap-btn { margin-top: 8px; }
+
+/* Ao vivo: selo, virar a tela e voltar */
+.ap-vivo-pill { position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 999px; background: oklch(0.52 0.2 27); color: #fff; font: 600 10px/1.5 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; pointer-events: none; }
+.ap-vivo-volta { position: absolute; right: 10px; top: 10px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(0, 0, 0, 0.6); color: #fff; font: 600 12.5px/1 var(--sans); cursor: pointer; }
+.ap-vivo-volta[hidden] { display: none; }
+.ap-vivo .ap-btn .ic { fill: none; stroke: currentColor; }
+.ap-vivo-v:fullscreen { width: 100vw; height: 100vh; }
+/* virada por estilo (iPhone): a caixa do vídeo gira 90° e cobre o celular; o nome e os botões giram junto */
+.ap-vivo.deitada { overflow: hidden; }
+.ap-vivo.deitada .ap-vivo-v { position: fixed; z-index: 2; left: 50%; top: 50%; width: 100vh; width: 100dvh; height: 100vw; aspect-ratio: auto; border-radius: 0; transform: translate(-50%, -50%) rotate(90deg); }
