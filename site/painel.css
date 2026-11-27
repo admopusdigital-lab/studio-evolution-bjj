@@ -1287,3 +1287,5 @@ details.mais > div button.perigo { color: var(--warn); }
 .cam-pil-0 { margin: 10px 0 0; font-size: 13px; color: var(--ink-3); }
 .cam-pil-add { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .cam-pil-add select { flex: 1 1 220px; max-width: 360px; }
+
+.cam-tx-abre { display: inline-flex; align-items: center; margin-top: 8px; text-decoration: none; }

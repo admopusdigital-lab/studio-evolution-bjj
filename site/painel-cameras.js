@@ -250,7 +250,7 @@
             '<div class="cam-tx-bt"><button class="mini-btn" type="submit">Salvar os endereços</button><button class="mini-btn ghost" type="button" data-tx="cancelar" hidden>Cancelar</button></div>' +
           "</form>" +
         '</div><div class="cam-tx-lado">' +
-          '<div class="cam-tx-qr"><div id="camTxQr" role="img" aria-label="Código para abrir a câmera no celular"></div><p>Aponte a câmera do celular que vai filmar para este código. Ele abre a página da câmera.</p></div>' +
+          '<div class="cam-tx-qr"><div id="camTxQr" role="img" aria-label="Código para abrir a câmera no celular"></div><div><p>Aponte a câmera do celular que vai filmar para este código. Ele abre a página da câmera.</p><a class="mini-btn ghost cam-tx-abre" href="transmitir.html">Usar este aparelho como câmera</a></div></div>' +
           '<div class="cam-tx-video"><video id="camTxVideo" muted playsinline aria-label="Imagem ao vivo do tatame"></video><p class="cam-tx-msg" id="camTxMsg"></p></div>' +
           '<div class="cam-tx-bt"><button class="mini-btn" type="button" data-tx="ver">Ver ao vivo</button><button class="mini-btn ghost cam-pausa" type="button" data-tx="pausa" aria-pressed="false">Pausar a transmissão agora</button></div>' +
           '<p class="cam-nota">Sem som e sem gravação. Cada minuto assistido conta na Cloudflare, por isso o vídeo aqui para sozinho depois de 5 minutos.</p>' +
