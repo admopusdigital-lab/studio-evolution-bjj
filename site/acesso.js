@@ -120,8 +120,10 @@
           if (!permite(p.papel, papel)) return c.auth.signOut().then(function () { return { ok: false, campo: "usuario", msg: trocado }; });
           gravar(SESSAO, JSON.stringify({ papel: p.papel, nome: p.nome, desde: new Date().toISOString() }));
           var depois = null;
-          try { depois = papel === "aluno" ? sessionStorage.getItem("evo-volta") : null; sessionStorage.removeItem("evo-volta"); } catch (e) {}
-          return { ok: true, papel: p.papel, destino: depois && /^app\.html\?presenca=[A-Za-z0-9]{6}$/.test(depois) ? depois : AREA[papel] };
+          try { depois = sessionStorage.getItem("evo-volta"); sessionStorage.removeItem("evo-volta"); } catch (e) {}
+          /* voltas aceitas: a presença pelo QR (aluno) e a câmera do tatame (professor) */
+          var volta = papel === "aluno" ? /^app\.html\?presenca=[A-Za-z0-9]{6}$/.test(depois || "") : p.papel === "professor" && depois === "transmitir.html";
+          return { ok: true, papel: p.papel, destino: volta ? depois : AREA[papel] };
         });
       }).catch(function () { return { ok: false, campo: "senha", msg: MSG_REDE }; });
     },

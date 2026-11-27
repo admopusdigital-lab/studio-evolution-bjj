@@ -115,6 +115,7 @@ async function pagina(b, opcoes, papel) {
     /* Câmeras: só o dono vê; mostra as condições, as turmas e a prévia do app */
     await p.evaluate(() => P.go('cam')); await p.clock.runFor(1500); await p.waitForTimeout(500);
     confere('Câmeras (em preparo) abre para o dono com a prévia do app', (await p.$$('.cam-cond li')).length === 4 && !!(await p.$('.cam-fone .cam-app')) && await p.evaluate(() => { var a = P.papel; P.papel = 'gestao'; var r = P.podeAba('cam'); P.papel = a; return r === false; }));
+    confere('Câmeras: cartão Transmissão com os 3 passos, o código do celular e o formulário dos endereços', (await p.$$('#camTx .cam-tx-passos li')).length === 3 && !!(await p.$('#camTxQr svg')) && await p.isVisible('#camTxForm') && await p.isDisabled('[data-tx="ver"]'));
     confere('painel sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }
@@ -141,6 +142,21 @@ async function pagina(b, opcoes, papel) {
     confere('app: cartão para Stories gerado', await p.isVisible('#apStory') && /^blob:/.test(await p.getAttribute('#apStoryImg', 'src') || ''));
     confere('app sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
+  }
+
+  /* 5) câmera do tatame (fase 1): a página do celular abre para o professor e, sem os endereços, explica o que falta */
+  {
+    const { c, p, erros } = await pagina(b, { viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true });
+    await p.goto(BASE + '/transmitir', { waitUntil: 'load' });
+    await p.waitForTimeout(2500);
+    confere('câmera: sem os endereços, avisa e não deixa ligar', await p.isVisible('#txAviso') && /Falta colar o link/.test(await p.textContent('#txAviso')) && await p.isDisabled('#txLigar'));
+    confere('câmera sem erro de script', !erros.length, erros.join(' | '));
+    await c.close();
+    const fs = require('fs'), path = require('path'), raiz = path.join(__dirname, '..');
+    const grade = (arq, nome) => { const m = new RegExp(nome + ' = (\\[[\\s\\S]*?\\n  \\]);').exec(fs.readFileSync(path.join(raiz, arq), 'utf8')); return m ? JSON.stringify(eval(m[1])) : arq; };
+    confere('câmera: a grade padrão é a mesma do site', grade('site/transmitir.js', 'GRADE_PADRAO') === grade('site/site.js', 'Site\\.GRADE'));
+    const cab = fs.readFileSync(path.join(raiz, '_site/_headers'), 'utf8');
+    confere('câmera: só a página do celular pode ligar a câmera (e nunca o microfone)', /\n\/transmitir\n  ! Permissions-Policy\n  Permissions-Policy: camera=\(self\), microphone=\(\)/.test(cab) && /\/\*\n[^\n]*\n[^\n]*\n  Permissions-Policy: camera=\(\), microphone=\(\)/.test(cab));
   }
 
   await b.close();

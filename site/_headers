@@ -4,6 +4,15 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
+# a câmera do tatame (transmitir.html, só o professor): a única página que pode ligar a câmera do aparelho.
+# O microfone continua bloqueado: a transmissão é sem som.
+/transmitir
+  ! Permissions-Policy
+  Permissions-Policy: camera=(self), microphone=(), geolocation=()
+/transmitir.html
+  ! Permissions-Policy
+  Permissions-Policy: camera=(self), microphone=(), geolocation=()
+
 # o service worker do app precisa ser conferido sempre, para a versão nova chegar
 /sw.js
   Cache-Control: no-cache

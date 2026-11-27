@@ -9,7 +9,7 @@ cp -r site/. _site/
 { printf '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; cat site/index.html; } > _site/index.html
 # domínio oficial: o Google vê as páginas públicas; as áreas de login ficam de fora
 DOMINIO="https://evolutionbjj.com.br"
-printf 'User-agent: *\nAllow: /\nDisallow: /app\nDisallow: /entrar\nDisallow: /acessos\nDisallow: /nova-senha\nDisallow: /area-do-professor\nDisallow: /area-do-aluno\n\nSitemap: %s/sitemap.xml\n' "$DOMINIO" > _site/robots.txt
+printf 'User-agent: *\nAllow: /\nDisallow: /app\nDisallow: /entrar\nDisallow: /acessos\nDisallow: /nova-senha\nDisallow: /area-do-professor\nDisallow: /area-do-aluno\nDisallow: /transmitir\n\nSitemap: %s/sitemap.xml\n' "$DOMINIO" > _site/robots.txt
 {
   echo '<?xml version="1.0" encoding="UTF-8"?>'
   echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'

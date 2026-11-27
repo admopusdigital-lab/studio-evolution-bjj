@@ -43,3 +43,24 @@ Run workflow**, rode uma vez para conferir.
 
 A cópia traz os dados do Studio (alunos, presenças, graduações, mensalidades, interessados e o resto). As contas de
 login ficam no Supabase Auth: num projeto novo, os acessos são recriados pelo painel (Acessos).
+
+## Câmera do tatame, fase 1 (um celular como câmera)
+
+Piloto: só o professor assiste. Nada aparece no app dos alunos nem para a equipe.
+
+1. **Banco.** No Supabase, SQL Editor, New query: colar `supabase/migrations/20261128120000_camera_links.sql` e Run. Cria a tabela `camera_links`, que só o professor lê.
+2. **Cloudflare.** Na conta onde o site está: ativar o Stream (pago), depois Stream, Live inputs, Create live input (nome: Tatame 1). Copiar os dois endereços de WebRTC: o de envio (`.../webRTC/publish`) e o de assistir (`.../webRTC/play`). O de envio é uma chave: quem tem, transmite. Não mandar por mensagem.
+3. **Painel.** Em Câmeras, colar os dois endereços e salvar. Escolher as turmas com câmera.
+4. **Celular que filma.** Abrir `evolutionbjj.com.br/transmitir` (ou o código que aparece no painel), entrar como professor com "Manter conectado", permitir a câmera e tocar em Ligar. Deixar deitado, no suporte e na tomada.
+
+Como funciona: a página fica aberta com a tela acesa e transmite sozinha 5 minutos antes de cada aula das turmas com câmera, até o fim (1 hora). Sem som e sem gravação. A cada 30 segundos manda um sinal ao painel; é por ele que o painel mostra "No ar", "aguardando" ou "sem sinal" e que o botão Pausar chega ao celular.
+
+Se algo falhar:
+- **"Celular sem sinal"** no painel: a página fechou, o celular reiniciou ou ficou sem internet. Abrir a página de novo; ela volta sozinha ao modo câmera.
+- **"O link de envio não foi aceito"**: endereço colado errado, ou a entrada foi apagada na Cloudflare. Colar de novo em Câmeras.
+- **Imagem travando**: internet de envio fraca. A página mostra a taxa (Mbps); abaixo de 1 Mbps a imagem perde qualidade.
+- **Tela apaga**: tocar uma vez na tela. Em aparelho antigo, deixar a tela sempre ligada nos ajustes.
+
+Custo: a conta precisa da assinatura do Cloudflare Stream (a partir de US$ 5 por mês; um plano Pro ou Business do domínio já inclui) e paga US$ 1 a cada 1.000 minutos assistidos. Enviar o vídeo não é cobrado; transmitir sem ninguém assistindo não gera custo de entrega.
+
+Antes de abrir para as famílias (fase seguinte): ligar "Require signed URLs" na entrada da Cloudflare e criar a função que entrega o link por pessoa, turma, aceite e horário. Hoje o endereço de assistir funciona para quem o tiver, por isso fica guardado só para o professor.

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Câmera do tatame · Studio Evolution BJJ</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b0a08">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Câmera">
+<link rel="icon" href="img/app/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
+<script src="supabase-config.js"></script>
+<script src="acesso.js"></script>
+<script>
+/* a câmera do tatame (fase 1): este aparelho filma e envia a aula. Só o professor entra aqui.
+   Sem login, vai para a entrada e volta para cá depois de entrar. */
+if (!Acesso.real) location.replace("area-do-professor.html?painel");
+else {
+  try { sessionStorage.setItem("evo-volta", "transmitir.html"); } catch (e) {}
+  if (Acesso.portao("professor")) { try { sessionStorage.removeItem("evo-volta"); } catch (e) {} }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap">
+<style>
+/* tela escura de propósito: fica acesa o dia inteiro num celular preso à parede */
+:root { --bg: #0b0a08; --bg2: #16130f; --fg: #f3efe6; --fg2: #c9c2b4; --fg3: #9a9284; --ouro: #e6b85c; --ok: #6fd08c; --aviso: #f0a35e; --fio: rgba(255, 255, 255, 0.12);
+  --sans: "Archivo", "Helvetica Neue", Arial, sans-serif; --disp: "Archivo Black", "Archivo", Arial, sans-serif; --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--fg); font: 400 16px/1.5 var(--sans); -webkit-text-size-adjust: 100%; }
+body { min-height: 100dvh; padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 14px; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+a { color: var(--ouro); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ouro); outline-offset: 3px; }
+
+.tx-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tx-top h1 { margin: 0; font: 400 15px/1.2 var(--disp); letter-spacing: 0.04em; text-transform: uppercase; }
+.tx-top h1 span { display: block; margin-top: 3px; font: 500 11px/1.2 var(--mono); letter-spacing: 0.1em; color: var(--fg3); }
+.tx-top a { font-size: 13.5px; font-weight: 600; text-underline-offset: 3px; padding: 10px 4px; }
+
+.tx-aviso { padding: 14px 16px; border-radius: 14px; background: var(--bg2); box-shadow: inset 0 0 0 1.5px var(--aviso); }
+.tx-aviso b { display: block; margin-bottom: 4px; }
+.tx-aviso p { margin: 0; color: var(--fg2); font-size: 14.5px; }
+.tx-aviso p + p { margin-top: 8px; }
+
+.tx-main { flex: 1; display: grid; gap: 14px; align-content: start; }
+.tx-video { position: relative; border-radius: 16px; overflow: hidden; background: #000; aspect-ratio: 16 / 9; box-shadow: inset 0 0 0 1px var(--fio); }
+.tx-video video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.tx-video .tx-sem { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; text-align: center; color: var(--fg3); font-size: 14px; }
+.tx-video .tx-vivo { position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 999px; background: #c8281e; color: #fff; font: 600 11px/1.5 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.tx-deita { display: none; margin: 0; font-size: 13.5px; color: var(--aviso); }
+@media (orientation: portrait) { .tx-deita { display: block; } }
+
+.tx-acoes { display: flex; flex-wrap: wrap; gap: 10px; }
+.tx-btn { min-height: 48px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; box-shadow: inset 0 0 0 1.5px var(--fio); font-weight: 600; font-size: 15px; cursor: pointer; }
+.tx-btn.ouro { background: var(--ouro); color: #1a1408; box-shadow: none; }
+.tx-btn.perigo { color: var(--aviso); }
+.tx-btn:disabled { opacity: 0.45; cursor: default; }
+
+.tx-passos { margin: 0; padding: 0 0 0 20px; color: var(--fg2); font-size: 14.5px; }
+.tx-passos li + li { margin-top: 6px; }
+.tx-turmas { margin: 0; font-size: 14px; color: var(--fg3); }
+.tx-turmas b { color: var(--fg2); font-weight: 600; }
+
+/* modo câmera: o estado em letras grandes, legível de longe */
+.tx-modo { display: grid; gap: 6px; transform: translate(var(--dx, 0px), var(--dy, 0px)); transition: transform 2s ease; }
+.tx-estado { margin: 0; font: 400 clamp(34px, 9vw, 72px)/0.95 var(--disp); letter-spacing: -0.01em; text-transform: uppercase; }
+.tx-estado.no-ar { color: var(--ok); }
+.tx-estado.espera { color: var(--fg); }
+.tx-estado.atencao { color: var(--aviso); }
+.tx-linha { margin: 4px 0 0; font-size: clamp(17px, 3.4vw, 24px); font-weight: 600; }
+.tx-det { margin: 0; font: 500 12.5px/1.5 var(--mono); color: var(--fg3); }
+.tx-erro { margin: 6px 0 0; font-size: 14.5px; color: var(--aviso); }
+.tx-lista { margin: 10px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--fg2); }
+.tx-lista li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--fio); }
+.tx-lista li span { color: var(--fg3); font-family: var(--mono); font-size: 12.5px; }
+/* celular deitado: duas colunas, para caber tudo sem rolar */
+@media (min-width: 640px) and (orientation: landscape) {
+  .tx-main { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; }
+  .tx-main.modo .tx-acoes { grid-column: 1 / -1; }
+  .tx-main:not(.modo) #txImg { grid-column: 1; grid-row: 1 / span 2; }
+  .tx-main:not(.modo) #txPrep, .tx-main:not(.modo) .tx-acoes { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) { .tx-modo { transition: none; } }
+</style>
+</head>
+<body>
+<header class="tx-top">
+  <h1>Câmera do tatame<span id="txNome">Studio Evolution BJJ</span></h1>
+  <a href="painel.html#cam">Voltar ao painel</a>
+</header>
+
+<div class="tx-aviso" id="txAviso" role="alert" hidden></div>
+
+<main class="tx-main" id="txMain" hidden>
+  <!-- o estado, em letras grandes (só no modo câmera) -->
+  <section class="tx-modo" id="txModo" aria-live="polite" hidden>
+    <p class="tx-estado espera" id="txEstado">Aguardando</p>
+    <p class="tx-linha" id="txLinha"></p>
+    <p class="tx-det" id="txDet"></p>
+    <p class="tx-erro" id="txErro" hidden></p>
+    <ul class="tx-lista" id="txLista" aria-label="Próximas transmissões"></ul>
+  </section>
+
+  <!-- a imagem da câmera -->
+  <section id="txImg" aria-label="Imagem da câmera">
+    <div class="tx-video"><video id="txVideo" muted playsinline autoplay></video><p class="tx-sem" id="txSem">Ligando a câmera…</p><span class="tx-vivo" id="txVivo" hidden>ao vivo</span></div>
+    <p class="tx-deita">Vire o celular de lado: a imagem fica mais larga e pega o tatame inteiro.</p>
+  </section>
+
+  <!-- antes de ligar: o que fazer -->
+  <section id="txPrep">
+    <ol class="tx-passos">
+      <li>Prenda o celular no suporte, deitado, ligado na tomada.</li>
+      <li>Enquadre o tatame inteiro. Se a imagem estiver apertada, toque em Trocar câmera.</li>
+      <li>Toque em Ligar. A tela fica acesa e a transmissão abre e fecha sozinha nos horários das turmas com câmera.</li>
+    </ol>
+    <p class="tx-turmas" id="txTurmas"></p>
+  </section>
+
+  <div class="tx-acoes">
+    <button class="tx-btn ouro" type="button" id="txLigar">Ligar a câmera do tatame</button>
+    <button class="tx-btn" type="button" id="txTrocar">Trocar câmera</button>
+    <button class="tx-btn" type="button" id="txTeste" hidden>Transmitir agora por 10 min</button>
+    <button class="tx-btn" type="button" id="txVer" aria-pressed="false" hidden>Ver a imagem</button>
+    <button class="tx-btn perigo" type="button" id="txDesligar" hidden>Desligar a câmera</button>
+  </div>
+</main>
+
+<script src="vivo.js"></script>
+<script src="transmitir.js"></script>
+</body>
+</html>
