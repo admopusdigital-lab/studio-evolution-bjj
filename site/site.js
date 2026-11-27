@@ -146,6 +146,8 @@
   function mask(inner) { var w = document.createElement("span"); w.className = "w"; inner.classList.add("wi"); w.appendChild(inner); return w; }
   function split(el, mode) {
     if (!el) return [];
+    /* o título é quebrado em palavras para animar: o leitor de tela continua lendo a frase inteira, de uma vez */
+    if (/^H[1-6]$/.test(el.tagName) && !el.hasAttribute("aria-label") && !el.querySelector("a, button")) el.setAttribute("aria-label", el.textContent.replace(/\s+/g, " ").trim());
     (function walk(node) {
       Array.prototype.slice.call(node.childNodes).forEach(function (ch) {
         if (ch.nodeType === 3) {
