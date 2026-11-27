@@ -810,9 +810,33 @@ td .rk-bar { height: 6px; width: 100%; min-width: 80px; border-radius: 3px; back
 .fp-obs p { padding: 12px 14px; border-radius: 10px; background: color-mix(in oklch, var(--gold) 9%, var(--paper-2)); color: var(--ink); font-size: 14px; line-height: 1.5; }
 .fp-perigo { color: var(--warn) !important; }
 @media (min-width: 1000px) {
-  #fpp-resumo:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 0 32px; align-items: start; }
-  #fpp-resumo > .ficha-sec:last-child { grid-column: 2; grid-row: 1 / span 3; }
+  #fpp-resumo:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 0 32px; align-items: start; }
 }
+/* Resumo: as últimas 12 semanas (dia × semana), as mensalidades, a linha do tempo e a família */
+.f12 { display: grid; grid-template-columns: 34px repeat(12, minmax(0, 1fr)); gap: 5px; margin-top: 8px; padding: 12px; border-radius: 12px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); }
+.f12-d { align-self: center; font: 600 10px/1 var(--mono, monospace); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.f12 i { display: block; aspect-ratio: 1.6; border-radius: 4px; background: color-mix(in oklch, var(--ink) 8%, transparent); }
+.f12 i.l1 { background: color-mix(in oklch, var(--gold) 55%, var(--paper-2)); }
+.f12 i.l2 { background: var(--gold); }
+.f12 i.fora { background: none; box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 8%, transparent); }
+.f12 i.agora { outline: 2px solid var(--ink); outline-offset: 1px; }
+.fp-mini { margin: 0 0 10px; padding: 0; list-style: none; }
+.fp-mini li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 14px; }
+.fp-mini li b { font-weight: 600; text-transform: capitalize; }
+.fp-mini li span:not(.pill-s) { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.fp-tl { position: relative; margin: 6px 0 0; padding: 0; list-style: none; }
+.fp-tl li { position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 0 0 12px 22px; font-size: 14px; }
+.fp-tl li::before { content: ""; position: absolute; left: 3px; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--ink-3); }
+.fp-tl li:first-child::before { background: var(--gold); }
+.fp-tl li::after { content: ""; position: absolute; left: 7px; top: 16px; bottom: 0; width: 1px; background: var(--rule); }
+.fp-tl li:last-child::after { display: none; }
+.fp-tl time { font-weight: 600; font-variant-numeric: tabular-nums; }
+.fp-tl span { color: var(--ink-2); }
+.fp-fam { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.fp-fam li { display: flex; align-items: center; gap: 12px; }
+.fp-fam .av { width: 40px; height: 40px; }
+.fp-fam .nm-btn { font-weight: 600; }
+.fp-fam small { display: block; font-size: 12.5px; color: var(--ink-3); }
 @media (max-width: 700px) {
   .fp-cab { grid-template-columns: auto minmax(0, 1fr); }
   .fp-av { width: 56px; height: 56px; }
@@ -1104,3 +1128,32 @@ details.mais > div button.perigo { color: var(--warn); }
 .ps-l .mini-btn { grid-column: 2; justify-self: start; margin-top: 6px; }
 @media (max-width: 1100px) { .ps-l { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .ps-h { grid-template-columns: minmax(0, 1fr) auto; } .ps-bar { grid-column: 1 / -1; grid-row: 2; } .ps-l { grid-template-columns: minmax(0, 1fr); } }
+/* na ficha em página inteira, os quatro números da frequência numa linha só, menores (a grade de 12 semanas vem logo abaixo) */
+@media (min-width: 701px) { #fpp-resumo .fq-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } #fpp-resumo .fq-k { padding: 10px 12px; } #fpp-resumo .fq-k b { font-size: 22px; } #fpp-resumo .fq-k b.sm { font-size: 16px; } #fpp-resumo .fq-k small { display: none; } }
+
+/* ===== Interessados: o funil do mês em números e os cartões com uma ação só ===== */
+.ld-funil { margin-top: 18px; }
+.ldf { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 14px 18px; border-radius: 14px; box-shadow: inset 0 0 0 1.5px color-mix(in oklch, var(--gold) 55%, var(--rule)); background: color-mix(in oklch, var(--gold) 5%, var(--paper-2)); }
+.ldf-m { font: 600 11px/1.3 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-text); }
+.ldf-e { display: grid; justify-items: center; }
+.ldf-e b { font: 400 34px/1 var(--serif); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.ldf-e span { margin-top: 4px; font-size: 13px; color: var(--ink-2); }
+.ldf-s { display: grid; justify-items: center; gap: 4px; min-width: 52px; font-size: 12px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.ldf-s i { position: relative; display: block; width: 52px; height: 1.5px; background: var(--ink-3); }
+.ldf-s i::after { content: ""; position: absolute; right: 0; top: -3.5px; width: 7px; height: 7px; border-top: 1.5px solid var(--ink-3); border-right: 1.5px solid var(--ink-3); transform: rotate(45deg); }
+.ldf-r { margin-left: auto; padding-left: 18px; border-left: 1px solid var(--rule); font-size: 13px; color: var(--ink-2); }
+.ldf-r b { color: var(--ink); }
+.ld-card { grid-template-columns: 34px minmax(0, 1fr) auto; align-items: start; gap: 6px 10px; }
+.ld-card > .av { width: 34px; height: 34px; font-size: 12px; }
+.ld-nm { min-width: 0; }
+.ld-nm small { display: block; margin-top: 2px; }
+.ld-ic { display: flex; gap: 2px; }
+.ld-ic .ic-btn { width: 30px; height: 30px; box-shadow: none; }
+.ld-ic .ic-btn .ic { width: 16px; height: 16px; }
+.ld-card .ld-esp { grid-column: 2 / -1; }
+.ld-esp.aula { justify-self: start; padding: 3px 9px; border-radius: 999px; background: color-mix(in oklch, var(--ok) 16%, transparent); color: var(--ok); font-weight: 600; }
+.ld-card .ld-acts { grid-column: 1 / -1; margin-top: 4px; }
+.ld-card .ld-acts .mini-btn { flex: 1 1 100%; height: 34px; font-size: 12.5px; }
+.ld-card.velho .ld-acts .mini-btn:first-child { background: var(--gold); border-color: var(--gold); color: oklch(0.18 0.01 75); }
+@media (pointer: coarse) { .ld-ic .ic-btn { width: 40px; height: 40px; } .ld-card .ld-acts .mini-btn { height: 42px; } }
+@media (max-width: 760px) { .ldf { gap: 8px 10px; padding: 12px; } .ldf-e b { font-size: 26px; } .ldf-s, .ldf-s i { min-width: 30px; width: 30px; } .ldf-r { margin-left: 0; padding-left: 0; border-left: 0; flex-basis: 100%; } }

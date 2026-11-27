@@ -344,11 +344,46 @@
         '<div class="fq-k"><b>' + n30 + "</b><span>nos últimos 30 dias<small>em " + dias30 + (dias30 === 1 ? " dia" : " dias") + " de treino</small></span></div>" +
         '<div class="fq-k"><b class="sm">' + esc(P.quando(ult)) + "</b><span>última aula</span></div>" +
       "</div>" +
-      '<p class="cal-t">Últimos 30 dias · ' + P.dataBR(ini) + " a " + P.dataBR(hoje) + "</p>" +
-      '<div class="cal" role="img" aria-label="Últimos 30 dias: ' + n30 + (n30 === 1 ? " aula" : " aulas") + " em " + dias30 + (dias30 === 1 ? " dia" : " dias") + '">' +
-        '<div class="cal-g">' + DS.map(function (d) { return '<span class="cal-h">' + d + "</span>"; }).join("") + cel + "</div>" +
+      semanas12(id);
+  }
+  /* as últimas 12 semanas, segunda a sábado: uma coluna por semana (a mais antiga à esquerda), dourado quando veio */
+  function semanas12(id) {
+    var hoje = P.hoje(), dias = {}, seg = P.dia(hoje), tot = 0, comTreino = 0;
+    P.pres.forEach(function (p) { if (p.aluno === id) dias[p.data] = (dias[p.data] || 0) + 1; });
+    seg.setDate(seg.getDate() - ((seg.getDay() + 6) % 7) - 7 * 11);
+    var cols = [];
+    for (var w = 0; w < 12; w++) {
+      var col = [], nW = 0;
+      for (var d = 0; d < 6; d++) {
+        var x = new Date(seg); x.setDate(seg.getDate() + w * 7 + d);
+        var k = P.iso(x), n = k > hoje ? -1 : dias[k] || 0;
+        if (n > 0) nW += n;
+        col.push({ k: k, n: n, d: d });
+      }
+      tot += nW; if (nW) comTreino++;
+      cols.push(col);
+    }
+    return '<p class="cal-t">Últimas 12 semanas · ' + tot + (tot === 1 ? " aula" : " aulas") + " em " + comTreino + (comTreino === 1 ? " semana" : " semanas") + "</p>" +
+      '<div class="f12" role="img" aria-label="Últimas 12 semanas: ' + tot + (tot === 1 ? " aula" : " aulas") + ", treinou em " + comTreino + " de 12 semanas" + '">' +
+        DS.map(function (nome, d) {
+          return "<span class=\"f12-d\">" + nome + "</span>" + cols.map(function (col) {
+            var c = col[d];
+            return '<i class="' + (c.n < 0 ? "fora" : c.n >= 2 ? "l2" : c.n === 1 ? "l1" : "") + (c.k === hoje ? " agora" : "") + '" title="' + nome + " " + P.dataBR(c.k) + (c.n < 0 ? "" : ": " + (c.n ? c.n + (c.n === 1 ? " aula" : " aulas") : "não veio")) + '"></i>';
+          }).join("");
+        }).join("") +
       "</div>" +
-      '<div class="fq-leg"><span><i></i>não veio</span><span><i class="l1"></i>1 aula</span><span><i class="l2"></i>2 aulas</span><span><i class="hj"></i>hoje</span></div>';
+      '<div class="fq-leg"><span><i></i>sem treino</span><span><i class="l1"></i>1 aula</span><span><i class="l2"></i>2 aulas</span></div>';
+  }
+  /* semanas seguidas com pelo menos uma aula (a semana de agora conta quando já teve aula) */
+  function seguidas(id) {
+    var datas = {};
+    P.pres.forEach(function (p) { if (p.aluno === id) datas[p.data] = 1; });
+    var seg = P.dia(P.hoje()); seg.setDate(seg.getDate() - ((seg.getDay() + 6) % 7));
+    function teve(ini) { for (var d = 0; d < 7; d++) { var x = new Date(ini); x.setDate(ini.getDate() + d); if (datas[P.iso(x)]) return true; } return false; }
+    var n = 0, w = new Date(seg);
+    if (!teve(w)) w.setDate(w.getDate() - 7);
+    while (n < 104 && teve(w)) { n++; w.setDate(w.getDate() - 7); }
+    return n;
   }
   /* a mensalidade na ficha: em aberto, dá para receber, passar para o dia cadastrado do aluno ou editar data e valor */
   function mensLi(a, m) {
@@ -481,6 +516,7 @@
     var dr = P.abrirFicha('<p class="muted">Carregando a ficha…</p>', a.nome, { pagina: true }), minha = P.fichaN;
     /* a faixa já vem desenhada no cabeçalho da ficha: o subtítulo fica com a turma e quem é o responsável */
     $("#drSub").textContent = P.turmaTx(a) + (a.responsavel ? " · responsável: " + a.responsavel : "") + (a.ativo ? "" : " · inativo");
+    var subBase = $("#drSub").textContent;
     Promise.all([
       P.q(function (sb) { return sb.from("mensalidades").select("*").eq("aluno", id).order("competencia", { ascending: false }).limit(6); }),
       P.q(function (sb) { return sb.from("graduacoes").select("*").eq("aluno", id).order("data", { ascending: false }); }),
@@ -498,6 +534,9 @@
       var px = proxPasso(a), corF = Site.COR_FAIXA[Site.faixaBase(a.faixa)] || Site.COR_FAIXA.branca;
       var naFx = grads.filter(function (g) { return g.faixa === a.faixa; }), desdeFx = naFx.length ? naFx[naFx.length - 1].data : a.inicio;
       var mFx = desdeFx ? Math.max(0, Math.floor(P.difDias(desdeFx, P.hoje()) / 30.44)) : null;
+      var sem = seguidas(id);
+      $("#drSub").textContent = subBase + (a.inicio ? " · no Studio desde " + P.dataBR(a.inicio) + (a.inicio.slice(0, 4) !== P.hoje().slice(0, 4) ? "/" + a.inicio.slice(0, 4) : "") : "") +
+        " · " + (total + antes) + (total + antes === 1 ? " aula" : " aulas") + (sem > 1 ? " · " + sem + " semanas seguidas" : "");
       var cab = '<div class="fp-cab">' +
         '<span class="av fp-av"' + Fotos.attr(a.foto) + ">" + P.ini(a.nome) + "</span>" +
         '<div class="fp-id"><p class="fp-belt">' + P.belt(a.faixa, a.graus, a.turma) + '</p><p class="fp-selos">' + seloMens +
@@ -505,6 +544,7 @@
         '<div class="fp-acts">' +
           (P.pode("graduacoes") ? '<button class="mini-btn fp-gold" type="button" data-grau>Registrar grau</button>' : "") +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
+          (P.pode("financeiro") && cobs !== null ? '<button class="mini-btn ghost" type="button" data-lanca>Lançar valor</button>' : "") +
           (P.pode("alunos") ? '<button class="mini-btn ghost" type="button" data-edit>Editar dados</button>' : "") +
         "</div></div>";
       /* ---------- as abas ---------- */
@@ -519,13 +559,37 @@
       var caminho = '<div class="ficha-sec fp-cam"><h5>Caminho do grau</h5>' +
         '<p class="fp-cam-t"><b>' + esc(P.beltTxt(a.faixa, a.graus)) + "</b>" + (px ? " · próximo passo: " + esc(px.tx.toLowerCase()) : "") + "</p>" +
         '<span class="gr-bar fp-bar" style="--cor:' + corF + '"><i style="width:' + Math.min(100, Math.round(desdeGrau / 50 * 100)) + '%"></i></span>' +
-        '<p class="muted fp-cam-s">' + desdeGrau + " de 50 aulas desde o último grau" + (mFx !== null ? " · na faixa há " + (mFx < 12 ? mFx + (mFx === 1 ? " mês" : " meses") : Math.floor(mFx / 12) + (mFx < 24 ? " ano" : " anos") + (mFx % 12 ? " e " + (mFx % 12) + (mFx % 12 === 1 ? " mês" : " meses") : "")) : "") + "</p></div>";
+        '<p class="muted fp-cam-s">' + desdeGrau + " de 50 aulas desde o último grau" + (desdeGrau < 50 ? " · faltam " + (50 - desdeGrau) : "") + (grads[0] && !P.doCadastro(grads[0]) ? " · último grau em " + P.dataBR(grads[0].data) + "/" + grads[0].data.slice(0, 4) : "") + (mFx !== null ? " · na faixa há " + (mFx < 12 ? mFx + (mFx === 1 ? " mês" : " meses") : Math.floor(mFx / 12) + (mFx < 24 ? " ano" : " anos") + (mFx % 12 ? " e " + (mFx % 12) + (mFx % 12 === 1 ? " mês" : " meses") : "")) : "") + "</p></div>";
+      /* resumo: as três últimas mensalidades, a linha do tempo das graduações e a família */
+      function resumoMens(l) {
+        if (!P.pode("financeiro") || !(a.mensalidade > 0) && !l.length) return "";
+        return '<div class="ficha-sec fp-rm"><h5>Mensalidades</h5>' + (l.length ? '<ul class="fp-mini">' + l.slice(0, 3).map(function (m) {
+          return "<li><b>" + esc(P.mesNome(m.competencia).split(" ")[0]) + "</b><span>" + P.brl(m.valor) + "</span>" + statusMens(m) + "</li>";
+        }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + '<button class="mini-btn ghost" type="button" data-fp-aba="fin">Ver o financeiro</button></div>';
+      }
+      function resumoLinha(a, gs) {
+        var l = gs.map(function (g) { return { d: g.data, t: P.doCadastro(g) ? "Chegou com " + P.beltTxt(g.faixa, g.graus).toLowerCase() : g.graus ? g.graus + "º grau na faixa " + Site.faixaNome(g.faixa).toLowerCase() : "Faixa " + Site.faixaNome(g.faixa).toLowerCase() }; });
+        if (a.inicio) l.push({ d: a.inicio, t: "Entrou no Studio" });
+        l.sort(function (x, y) { return x.d < y.d ? 1 : x.d > y.d ? -1 : 0; });
+        if (!l.length) return "";
+        return '<div class="ficha-sec"><h5>Linha do tempo</h5><ol class="fp-tl">' + l.slice(0, 6).map(function (x) { return "<li><time>" + P.dataBR(x.d) + "/" + x.d.slice(0, 4) + "</time><span>" + esc(x.t) + "</span></li>"; }).join("") + "</ol></div>";
+      }
+      function resumoFamilia(a) {
+        if (!("responsavel_conta" in a)) return "";
+        var l = a.conta ? P.alunos.filter(function (x) { return x.responsavel_conta === a.conta && x.id !== a.id; })
+          : a.responsavel_conta ? P.alunos.filter(function (x) { return x.conta === a.responsavel_conta; }) : [];
+        if (!l.length) return "";
+        return '<div class="ficha-sec"><h5>Família</h5><ul class="fp-fam">' + l.map(function (x) {
+          return '<li><span class="av"' + Fotos.attr(x.foto) + ">" + P.ini(x.nome) + '</span><div><button class="nm-btn" type="button" data-ficha2="' + x.id + '">' + esc(x.nome) + "</button><small>" + esc(P.turmaTx(x)) + " · " + esc(P.beltTxt(x.faixa, x.graus)) + "</small></div></li>";
+        }).join("") + "</ul></div>";
+      }
       var obs = a.nota ? '<div class="ficha-sec fp-obs"><h5>Observações</h5><p>' + esc(a.nota) + "</p></div>" : "";
       var html =
         (cred ? '<div class="cred"><b>Acesso ao app ' + (cred.reenvio ? "com senha nova" : "criado") + "</b><p>E-mail: <code>" + esc(cred.email) + "</code><br>Senha provisória: <code>" + esc(cred.senha) + '</code></p><div class="msg-acts">' +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-envia>Mandar pelo WhatsApp</button>' : "") + '<button class="mini-btn ghost" type="button" data-copia>Copiar mensagem</button></div><p class="muted" style="margin-top:6px;font-size:12px">A senha aparece só agora. Depois de entrar, o aluno pode trocar em "Esqueci a senha".</p></div>' : "") +
         cab + tabs +
-        painel("resumo", caminho + obs + '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + foraHTML(a, grads[0]) + "</div>") +
+        painel("resumo", '<div class="fp-col">' + caminho + '<div class="ficha-sec"><h5>Frequência</h5>' + freqHTML(id, total, antes, desdeGrau) + foraHTML(a, grads[0]) + "</div></div>" +
+          '<div class="fp-col">' + obs + resumoMens(mens) + resumoLinha(a, grads) + resumoFamilia(a) + "</div>") +
         (!P.pode("financeiro") ? "" : painel("fin",
           '<div class="ficha-sec"><h5>Mensalidades</h5>' + (mens.length ? '<ul class="ficha-list">' + mens.map(function (m) { return mensLi(a, m); }).join("") + "</ul>" : '<p class="muted">Nenhuma mensalidade lançada.</p>') + "</div>" +
           outrosHTML(a, cobs))) +
@@ -604,6 +668,7 @@
         var b = e.target.closest("button");
         if (!b) return;
         if (b.dataset.fpAba) return vaiAba(b.dataset.fpAba);
+        if (b.hasAttribute("data-lanca")) { vaiAba("fin"); var oc = $("#ocDesc", dr); if (oc) { oc.scrollIntoView({ block: "center", behavior: Site.reduce ? "auto" : "smooth" }); P.focusSoft(oc); } return; }
         if (b.hasAttribute("data-edit")) vaiAba("dados");
         if (b.hasAttribute("data-envia")) P.wa(a.whatsapp, w(cred));
         else if (b.hasAttribute("data-copia")) { navigator.clipboard.writeText(w(cred)).then(function () { P.toast("Mensagem copiada."); }, function () { P.toast("Não deu para copiar."); }); }

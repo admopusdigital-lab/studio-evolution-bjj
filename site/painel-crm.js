@@ -10,7 +10,7 @@
   function passa(l, f) { return f === "abertos" ? ["novo", "atendimento", "agendado"].indexOf(l.etapa) >= 0 : l.etapa === f; }
 
   function carregar() {
-    return P.todos(function (sb) { return sb.from("leads").select("*").order("criado_em", { ascending: false }); }).then(function (l) { LEADS = l; paint(); return l; });
+    return P.todos(function (sb) { return sb.from("leads").select("*").order("criado_em", { ascending: false }); }).then(function (l) { LEADS = l; paint(); carregarResposta(); return l; });
   }
   P.recarregarLeads = carregar;
   function aulaTx(l) { return l.aula_data ? Site.DIAS[P.dia(l.aula_data).getDay()].toLowerCase().slice(0, 3) + " " + P.dataBR(l.aula_data) + (l.aula_hora ? ", " + Site.hora(l.aula_hora) : "") : ""; }
@@ -53,12 +53,35 @@
     var m = Math.max(0, Math.round((Date.now() - new Date(ts).getTime()) / 60000));
     return { m: m, tx: m < 60 ? "há " + Math.max(1, m) + " min" : m < 1440 ? "há " + Math.floor(m / 60) + " h" : "há " + Math.floor(m / 1440) + (m < 2880 ? " dia" : " dias") };
   }
+  var RESP = null;
+  /* tempo médio de resposta aos pedidos do site neste mês: do pedido até o primeiro registro no histórico */
+  function carregarResposta() {
+    var mes = P.mesIni(P.hoje()), l = LEADS.filter(function (x) { return x.origem === "site" && P.mesIni(P.d10(x.criado_em)) === mes; });
+    if (!l.length) { RESP = null; return Promise.resolve(); }
+    var ids = l.map(function (x) { return x.id; });
+    return P.q(function (sb) { return sb.from("lead_eventos").select("lead, criado_em").in("lead", ids).order("criado_em").limit(1000); }).then(function (ev) {
+      var prim = {};
+      (ev || []).forEach(function (e) { if (!prim[e.lead]) prim[e.lead] = e.criado_em; });
+      var ms = l.filter(function (x) { return prim[x.id]; }).map(function (x) { return new Date(prim[x.id]) - new Date(x.criado_em); }).filter(function (v) { return v >= 0; });
+      RESP = ms.length ? ms.reduce(function (a, b) { return a + b; }, 0) / ms.length : null;
+      paintFunil(LEADS.filter(function (x) { return P.mesIni(P.d10(x.criado_em)) === mes; }));
+    }).catch(function () { RESP = null; });
+  }
+  function duracao(ms) {
+    var m = Math.round(ms / 60000);
+    return m < 60 ? Math.max(1, m) + " min" : m < 1440 ? Math.floor(m / 60) + " h" + (m % 60 ? " " + (m % 60 < 10 ? "0" : "") + (m % 60) : "") : (Math.round(m / 144) / 10).toString().replace(".", ",") + " dias";
+  }
   function paintFunil(doMes) {
-    var n = doMes.length, at = doMes.filter(function (l) { return l.etapa !== "novo" && l.etapa !== "perdido"; }).length + doMes.filter(function (l) { return l.etapa === "perdido"; }).length;
+    var n = doMes.length, at = doMes.filter(function (l) { return l.etapa !== "novo"; }).length;
     var ag = doMes.filter(function (l) { return l.etapa === "agendado" || l.etapa === "matriculado"; }).length, mt = doMes.filter(function (l) { return l.etapa === "matriculado"; }).length;
     var mes = new Intl.DateTimeFormat("pt-BR", { month: "long" }).format(P.dia(P.hoje()));
-    $("#ldFunil").innerHTML = n ? "<b>" + mes.charAt(0).toUpperCase() + mes.slice(1) + ":</b> " + n + (n === 1 ? " contato" : " contatos") + " → " + at + " atendidos → " + ag + (ag === 1 ? " agendou" : " agendaram") + " → " +
-      mt + (mt === 1 ? " matrícula" : " matrículas") + ' <span class="ld-conv">· conversão de ' + Math.round(mt / n * 100) + "%</span>" : "";
+    function pc(a, b) { return b ? Math.round(a / b * 100) + "%" : "—"; }
+    function et(v, t) { return '<div class="ldf-e"><b>' + v + "</b><span>" + t + "</span></div>"; }
+    function seta(v) { return '<div class="ldf-s" aria-hidden="true"><span>' + v + '</span><i></i></div>'; }
+    $("#ldFunil").innerHTML = n ? '<p class="sr-only">' + mes + ": " + n + " contatos, " + at + " atendidos, " + ag + " agendaram, " + mt + (mt === 1 ? " matrícula" : " matrículas") + ". Conversão de " + pc(mt, n) + ".</p>" +
+      '<div class="ldf" aria-hidden="true"><p class="ldf-m">' + mes.charAt(0).toUpperCase() + mes.slice(1) + "</p>" +
+      et(n, n === 1 ? "chegou" : "chegaram") + seta(pc(at, n)) + et(at, at === 1 ? "atendido" : "atendidos") + seta(pc(ag, at)) + et(ag, ag === 1 ? "agendou" : "agendaram") + seta(pc(mt, ag)) + et(mt, mt === 1 ? "matrícula" : "matrículas") +
+      '<p class="ldf-r">' + (RESP !== null ? "resposta em <b>" + duracao(RESP) + "</b>, em média, aos pedidos do site" : "conversão de <b>" + pc(mt, n) + "</b> no mês") + "</p></div>" : "";
   }
   function paintQuadro() {
     var lim = P.somaDias(P.hoje(), -30);
@@ -77,11 +100,13 @@
             : c[0] === "atendimento" ? '<button class="mini-btn" type="button" data-ficha>Agendar aula</button>'
             : c[0] === "agendado" ? '<button class="mini-btn" type="button" data-av>Matriculou</button>'
             : '<button class="mini-btn" type="button" data-matricula>Cadastrar aluno</button>';
-          return '<li class="ld-card' + (velho[x.id] ? " velho" : "") + '" data-id="' + x.id + '"><button class="nm-btn" type="button" data-ficha>' + esc(x.nome) + "</button>" +
-            "<small>" + esc(ORIGEM[x.origem] + " · " + oQue(x)) + "</small>" +
-            '<span class="ld-esp' + (atraso ? " warn" : "") + '">' + esc(info) + "</span>" +
-            '<span class="ld-acts">' + acao + (x.whatsapp && c[0] !== "novo" ? '<button class="mini-btn ghost wa-ic" type="button" data-wa aria-label="WhatsApp de ' + esc(x.nome) + '">WhatsApp</button>' : "") +
-            (c[0] !== "matriculado" ? '<button class="mini-btn ghost" type="button" data-perdido aria-label="' + esc(x.nome) + ' sem interesse">Sem interesse</button>' : "") + "</span></li>";
+          return '<li class="ld-card' + (velho[x.id] ? " velho" : "") + '" data-id="' + x.id + '"><span class="av" aria-hidden="true">' + P.ini(x.nome) + "</span>" +
+            '<div class="ld-nm"><button class="nm-btn" type="button" data-ficha>' + esc(x.nome) + "</button>" +
+            "<small>" + esc(oQue(x) + " · " + ORIGEM[x.origem].replace("Pelo site", "pelo site")) + "</small></div>" +
+            '<span class="ld-ic">' + (x.whatsapp ? '<button class="ic-btn wa" type="button" data-wa aria-label="WhatsApp de ' + esc(x.nome) + '"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg></button>' : "") +
+            (c[0] !== "matriculado" ? '<button class="ic-btn" type="button" data-perdido aria-label="' + esc(x.nome) + ' sem interesse" title="Sem interesse"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-x"/></svg></button>' : "") + "</span>" +
+            '<span class="ld-esp' + (atraso ? " warn" : "") + (c[0] === "agendado" && x.aula_data ? " aula" : "") + '">' + esc(info) + "</span>" +
+            '<span class="ld-acts">' + acao + "</span></li>";
         }).join("") : '<li class="ld-vazio">' + (c[0] === "novo" ? "Nenhum contato esperando." : "Ninguém aqui.") + "</li>") + "</ul></section>";
     }).join("");
   }

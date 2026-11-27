@@ -97,12 +97,19 @@ html.seen #loader { display: none; }
 .next.live i::after { box-shadow: 0 0 0 1.5px var(--hot); }
 .next b { color: var(--ink); font-weight: 600; }
 /* "Hoje no tatame": as próximas aulas do dia, cada uma levando direto ao agendamento daquela turma e horário */
-.hoje-tt { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; max-width: 460px; }
-.hoje-tt a { display: inline-flex; align-items: baseline; gap: 8px; min-height: 44px; padding: 12px 16px; border-radius: 999px; text-decoration: none; color: var(--ink-2); font: 500 13px/1 var(--sans);
-  background: oklch(1 0 0 / 0.06); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.16); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: background-color 300ms var(--ease), box-shadow 300ms var(--ease); }
-.hoje-tt a b { font: 400 17px/1 var(--serif); color: var(--ink); }
-.hoje-tt a:hover { background: oklch(1 0 0 / 0.12); box-shadow: inset 0 0 0 1px var(--gold); }
-.hoje-tt a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.hoje-tt { width: min(440px, 100%); padding: 16px 18px 12px; border-radius: 16px; background: oklch(0.12 0.006 75 / 0.72); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.14); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: oklch(0.96 0.006 85); }
+.hoje-tt .htt-h { margin: 0 0 6px; font: 600 12px/1.3 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.78 0.01 85); }
+.hoje-tt .htt-h span { color: oklch(0.96 0.006 85); }
+.hoje-tt ul { margin: 0; padding: 0; list-style: none; }
+.hoje-tt li { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 52px; border-top: 1px solid oklch(1 0 0 / 0.12); }
+.hoje-tt li b { font: 400 22px/1 var(--serif); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.hoje-tt .htt-t { font: 600 12px/1.2 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: oklch(0.86 0.008 85); }
+.hoje-tt .htt-t small { display: block; margin-top: 3px; font: 500 12.5px/1.2 var(--sans); letter-spacing: 0; text-transform: none; color: oklch(0.85 0.13 86); }
+.hoje-tt li.agora .htt-t small { color: oklch(0.72 0.17 30); }
+.hoje-tt .htt-ag { display: inline-grid; place-items: center; min-height: 36px; padding: 0 16px; border-radius: 999px; text-decoration: none; font: 700 12px/1 var(--sans); color: oklch(0.96 0.006 85); box-shadow: inset 0 0 0 1.5px oklch(0.85 0.13 86); transition: background-color 300ms var(--ease), color 300ms var(--ease); }
+.hoje-tt .htt-ag.pri, .hoje-tt .htt-ag:hover { background: oklch(0.85 0.13 86); color: oklch(0.15 0.006 75); }
+.hoje-tt .htt-ag:focus-visible, .hoje-tt .htt-ver:focus-visible { outline: 2px solid oklch(0.85 0.13 86); outline-offset: 3px; }
+.hoje-tt .htt-ver { display: inline-block; margin-top: 10px; padding-bottom: 2px; font: 600 13px/1.2 var(--sans); color: oklch(0.96 0.006 85); text-decoration: none; border-bottom: 1.5px solid oklch(0.85 0.13 86); }
 .cue { display: inline-flex; align-items: center; gap: 14px; font: 500 11px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; }
 .cue i { position: relative; width: 1px; height: 58px; background: var(--rule); overflow: hidden; }
 .cue i::after { content: ""; position: absolute; inset: 0; background: var(--gold); transform: translateY(-100%); }
@@ -113,7 +120,7 @@ html.seen #loader { display: none; }
   .hero-title .ln2 { padding-left: 0.3em; }
   .hero-ghost { right: -14vw; font-size: 92vw; opacity: 0.7; }
   .hb-r { justify-items: start; }
-  .hoje-tt { justify-content: flex-start; }
+  .hoje-tt { width: 100%; }
   .cue { display: none; }
   /* no celular o texto ocupa a metade de baixo: a cena fica limpa no alto e a sombra só começa perto do título */
   .hv-shade { background: linear-gradient(180deg, color-mix(in oklch, var(--cine-bg) 60%, transparent) 0%, transparent 16%, transparent 36%, color-mix(in oklch, var(--cine-bg) 84%, transparent) 62%, var(--cine-bg) 100%); }
@@ -986,28 +993,34 @@ html.pa-live .pa-note { position: absolute; z-index: 3; left: 60vw; right: var(-
     el.classList.toggle("live", n.now);
   })();
 
-  /* "Hoje no tatame": as aulas que ainda vão começar hoje (ou no próximo dia com aula), cada uma com o agendamento pronto */
+  /* "Hoje no tatame": um cartão com as aulas do dia (a que está acontecendo e as próximas), cada uma com o
+     agendamento daquela turma e horário pronto; sem aula hoje, o próximo dia com aula */
   (function () {
     var box = $("#hojeTT");
     if (!box) return;
     var PROG = { "Adulto": "adulto", "Kids 1": "kids1", "Kids 2": "kids2" };
-    var d = new Date(), agora = d.getHours() * 60 + d.getMinutes(), l = [], quando = "";
+    var d = new Date(), agora = d.getHours() * 60 + d.getMinutes(), l = [], quando = "", wd = 0;
+    function min(c) { var p = c.t.split(":"); return +p[0] * 60 + +p[1]; }
     for (var k = 0; k < 7 && !l.length; k++) {
-      var wd = (d.getDay() + k) % 7;
-      l = Site.aulasDo(wd).filter(function (c) { var p = c.t.split(":"); return PROG[c.n] && (k > 0 || +p[0] * 60 + +p[1] > agora); });
+      wd = (d.getDay() + k) % 7;
+      /* hoje entram a aula que começou há menos de 1 hora (em aula agora) e as que ainda vão começar */
+      l = Site.aulasDo(wd).filter(function (c) { return PROG[c.n] && (k > 0 || min(c) > agora - 60); });
       quando = k === 0 ? "hoje" : k === 1 ? "amanhã" : Site.DIAS[wd].toLowerCase();
     }
     if (!l.length) return;
-    box.innerHTML = l.slice(0, 4).map(function (c) {
-      return '<a href="agendamento.html#' + PROG[c.n] + "-" + c.t.replace(":", "").replace(/00$/, "").replace(/^0/, "") + '" data-int aria-label="Agendar ' + c.n + " " + quando + " às " + Site.hora(c.t) + '"><b>' + Site.hora(c.t) + "</b>" + c.n + "</a>";
-    }).join("");
+    var dia = Site.DIAS[wd].toLowerCase().replace("-feira", "");
+    var pri = 0;  /* o primeiro botão de agendar sai cheio (dourado) */
+    box.innerHTML = '<p class="htt-h"><span>' + (quando === "hoje" ? "Hoje no tatame" : "Próximas aulas") + "</span> · " + (quando === "hoje" ? dia : quando) + "</p><ul>" +
+      l.slice(0, 4).map(function (c, i) {
+        var dif = min(c) - agora, agoraEm = quando === "hoje" && dif <= 0, link = "agendamento.html#" + PROG[c.n] + "-" + c.t.replace(":", "").replace(/00$/, "").replace(/^0/, "");
+        var st = agoraEm ? "em aula agora" : quando === "hoje" && dif <= 120 ? "começa em " + (dif < 60 ? dif + " min" : Math.floor(dif / 60) + " h" + (dif % 60 ? " " + dif % 60 : "")) : "";
+        return '<li class="' + (agoraEm ? "agora" : "") + '"><b>' + c.t + '</b><span class="htt-t">' + c.n + (st ? "<small>" + st + "</small>" : "") + "</span>" +
+          (agoraEm ? "" : '<a class="htt-ag' + (pri++ ? "" : " pri") + '" href="' + link + '" data-int aria-label="Agendar ' + c.n + " " + quando + " às " + Site.hora(c.t) + '">Agendar</a>') + "</li>";
+      }).join("") + '</ul><a class="htt-ver" href="aulas.html#turmas" data-int>Ver a semana inteira</a>';
     box.hidden = false;
-    /* com as aulas à vista, a pílula vira o título delas (fica "Aula agora" enquanto houver aula acontecendo) */
+    /* o cartão já diz o que está acontecendo: a pílula de "próxima aula" sai de cena */
     var pill = $("#nextClass");
-    if (pill && !pill.classList.contains("live")) {
-      $("span", pill).textContent = quando === "hoje" ? "Hoje no tatame" : "Próximas aulas · " + quando;
-      $("b", pill).textContent = "toque para agendar";
-    }
+    if (pill) pill.hidden = true;
   })();
 
   /* Régua do dia (estática, sempre visível) */

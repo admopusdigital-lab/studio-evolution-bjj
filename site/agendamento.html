@@ -43,6 +43,14 @@
    carimba "pronto" quando tudo está escolhido e inclina com o mouse. */
 .ag-hero-pic img { object-position: 50% 58%; }
 @media (min-aspect-ratio: 1/1) { .ag-hero-pic img { object-position: 50% 47%; } }
+/* celular: a abertura curta, para a escolha da turma aparecer já na primeira tela (o título e os passos bastam) */
+@media (max-width: 700px) {
+  .ag-hero.phero.cin { min-height: 0; padding-top: calc(96px + env(safe-area-inset-top, 0px)); padding-bottom: 12px; }
+  .ag-hero .phero-title { margin-top: 14px; font-size: 40px; }
+  .ag-hero .lede { margin-top: 12px; font-size: 15px; }
+  .ag-hero .cin-row, .ag-hero .phero-meta { display: none; }
+  .ag-hero .ag-steps-wrap { margin-top: 18px; padding-bottom: 14px; }
+}
 .ag-steps-wrap { position: relative; margin-top: clamp(26px, 4vh, 50px); max-width: 760px; padding-bottom: clamp(28px, 4.5vh, 52px); }
 .ag-steps-wrap::before { content: ""; position: absolute; left: 0; right: 0; top: 17px; height: 2px; background: oklch(1 0 0 / 0.12); }
 .ag-steps-wrap .fill { position: absolute; left: 0; right: 0; top: 17px; height: 2px; background: var(--gold-metal); box-shadow: 0 0 14px var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 800ms var(--ease); }

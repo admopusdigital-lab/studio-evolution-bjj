@@ -254,6 +254,7 @@
     qrFeito = cod;
   }
   function paintTV() {
+    $("#ttHora").textContent = P.hm(new Date());
     var x = aulaTV();
     if (!x) { $("#ttAula").textContent = "Nenhuma aula hoje"; $("#ttSt").textContent = ""; $("#ttCode").textContent = "—"; paintQR(null); return; }
     var ch = x.ch, vale = ch && new Date(ch.valido_ate) > new Date();
@@ -279,7 +280,7 @@
     }).join("") + new Array(vagas + 1).join('<li class="vaga" aria-hidden="true"><span class="av"></span><b>&nbsp;</b></li>');
     var prox = aulas.filter(function (c) { return P.mins(c.t) > P.mins(x.c.t); })[0];
     var tt = P.kid(P.turmaAula(x.c.n)) ? "kids" : "adulto", tec = (tecSemana.filter(function (t) { return t.turma === tt; })[0] || tecSemana.filter(function (t) { return t.turma === "todas"; })[0] || {}).titulo || "";
-    $("#ttRod").innerHTML = (tec ? "Técnica da semana: <b>" + esc(tec) + "</b>" : "") + (tec && prox ? '<span aria-hidden="true"> · </span>' : "") + (prox ? "Próxima aula: " + Site.hora(prox.t) + " · " + esc(prox.n) : "");
+    $("#ttRod").innerHTML = (tec ? "<span>Técnica da semana: <b>" + esc(tec) + "</b></span>" : "") + (prox ? "<span>Próxima aula: <b>" + Site.hora(prox.t) + " · " + esc(prox.n) + "</b></span>" : "");
   }
   $("#ttFull").addEventListener("click", function () {
     var tt = $("#tt");
