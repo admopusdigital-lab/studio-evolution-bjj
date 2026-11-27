@@ -142,6 +142,20 @@ async function pagina(b, opcoes, papel) {
     await p.clock.runFor(1500); await p.waitForTimeout(1500);
     confere('app: cartão para Stories gerado', await p.isVisible('#apStory') && /^blob:/.test(await p.getAttribute('#apStoryImg', 'src') || ''));
     confere('app: a câmera do tatame não aparece para quem não foi liberado', !(await p.$('#apCam')));
+    /* excluir a conta pelo app (exigência das lojas): pede a palavra e só então chama o servidor */
+    await p.click('#apStoryX'); await p.clock.runFor(800); await p.waitForTimeout(300);
+    await p.click('#apExc'); await p.waitForTimeout(200);
+    await p.fill('#apExcP', 'sim'); await p.click('#apExcBtn'); await p.waitForTimeout(300);
+    const pedidos = [], idas = [];
+    p.on('request', r => { if (/functions\/v1\/excluir-conta/.test(r.url())) pedidos.push(r.postData()); });
+    p.on('framenavigated', f => { if (f === p.mainFrame()) idas.push(f.url()); });
+    const semPalavra = /Digite EXCLUIR/.test(await p.textContent('#apExcErr')) && !pedidos.length;
+    const errosAntes = erros.slice();
+    await p.fill('#apExcP', 'excluir'); await p.click('#apExcBtn');
+    await p.waitForTimeout(2500);
+    /* (o simulador devolve a sessão a cada página, então a entrada manda de volta ao app; o que vale é ter passado por ela) */
+    confere('app: Excluir minha conta pede a palavra, chama o servidor e sai', semPalavra && pedidos.length === 1 && /"confirma":"excluir"/i.test(pedidos[0] || '') && idas.some(u => /entrar(\.html)?\?app&conta=excluida/.test(u)), JSON.stringify(idas));
+    erros.length = 0; errosAntes.forEach(e => erros.push(e));
     confere('app sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }

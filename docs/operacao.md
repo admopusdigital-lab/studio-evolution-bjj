@@ -76,3 +76,9 @@ Limite do piloto: o endereço de assistir é fixo. Quem assistiu uma vez poderia
 Custo: a conta precisa da assinatura do Cloudflare Stream (a partir de US$ 5 por mês; um plano Pro ou Business do domínio já inclui) e paga US$ 1 a cada 1.000 minutos assistidos. Enviar o vídeo não é cobrado; transmitir sem ninguém assistindo não gera custo de entrega.
 
 Antes de abrir para as famílias (fase seguinte): ligar "Require signed URLs" na entrada da Cloudflare e criar a função que entrega o link por pessoa, turma, aceite e horário. Hoje o endereço de assistir funciona para quem o tiver, por isso fica guardado só para o professor.
+
+## Excluir a conta pelo app (exigência das lojas)
+
+No Perfil do app, o aluno tem "Excluir minha conta": digita EXCLUIR e o login dele é apagado na hora. A matrícula, as presenças e os pagamentos continuam com o Studio (o cadastro só perde o vínculo com a conta). Professor e equipe não são excluídos por ali.
+
+Para ativar: no Supabase, Edge Functions, Deploy a new function, nome `excluir-conta`, colar `supabase/functions/excluir-conta/index.ts` e, em Advanced settings, desligar Verify JWT. Enquanto a função não existir, o app avisa que a exclusão ainda não foi ativada.

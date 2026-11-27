@@ -910,6 +910,14 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
             <button type="submit" id="apSBtn">Salvar senha</button>
           </form>
           <a class="ap-row ap-rowbtn app-sair" href="entrar.html" data-sair><span>Sair</span></a>
+          <!-- excluir a conta do app (exigência das lojas): só com o sistema do Studio ligado; app-conta.js cuida -->
+          <button class="ap-row ap-rowbtn ap-exc-b" type="button" id="apExc" aria-expanded="false" aria-controls="apExcF" hidden><span>Excluir minha conta</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+          <form class="ap-senha ap-exc" id="apExcF" novalidate hidden>
+            <p class="ap-exc-t">Excluir apaga o seu acesso ao app na hora e não tem volta. A sua matrícula, as presenças e os pagamentos continuam com o Studio, que guarda o que a lei exige; para apagar esses dados também, peça ao Studio.</p>
+            <label><span>Para confirmar, digite EXCLUIR</span><input type="text" id="apExcP" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+            <p class="ap-senha-e" id="apExcErr" aria-live="assertive"></p>
+            <button type="submit" id="apExcBtn">Excluir minha conta</button>
+          </form>
           <p class="ap-mut app-demo" id="apDemoNote" hidden>Dados de exemplo: Marina é uma aluna fictícia. Com o sistema do Studio ligado, aparecem os seus.</p>
         </div>
       </section>
@@ -2969,5 +2977,6 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 <!-- câmera do tatame (piloto): só aparece para quem o professor liberou no painel -->
 <script src="vivo.js"></script>
 <script src="app-aovivo.js"></script>
+<script src="app-conta.js"></script>
 </body>
 </html>

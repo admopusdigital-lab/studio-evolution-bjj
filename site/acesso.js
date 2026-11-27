@@ -190,6 +190,18 @@
         }, function () { return { ok: false, msg: MSG_REDE }; });
     },
 
+    /* excluir a própria conta do app (exigência das lojas): a função excluir-conta apaga o login de quem pede */
+    excluirConta: function (palavra) {
+      if (!REAL) return Promise.resolve({ ok: false, msg: "Na demonstração não há conta para excluir." });
+      return sb().then(function (c) { return c.functions.invoke("excluir-conta", { body: { confirma: palavra } }); }).then(function (r) {
+        if (!r.error) return Acesso.sair().then(function () { return { ok: true }; });
+        var ctx = r.error.context, st = ctx && ctx.status;
+        if (st === 404) return { ok: false, msg: "A exclusão pelo app ainda não foi ativada. Fale com o Studio no WhatsApp." };
+        var lerErro = ctx && typeof ctx.json === "function" ? ctx.json().catch(function () { return {}; }) : Promise.resolve({});
+        return lerErro.then(function (b) { return { ok: false, msg: (b && b.erro) || MSG_REDE }; });
+      }).catch(function () { return { ok: false, msg: MSG_REDE }; });
+    },
+
     /* esqueci a senha, sem e-mail: a função trocar-senha confere dados do cadastro e troca a senha */
     trocarSenha: function (d) {
       if (!REAL) return Promise.resolve({ ok: false, msg: "Na demonstração não há senha para trocar." });

@@ -196,6 +196,7 @@
   [user, pass].forEach(function (f) { f.addEventListener("input", function () { if (f.getAttribute("aria-invalid") === "true") say(""); }); });
   /* voltou de nova-senha.html */
   if (/[?&]senha=nova/.test(location.search)) say("Senha nova salva. Agora é só entrar.", null, true);
+  if (/[?&]conta=excluida/.test(location.search)) say("Sua conta do app foi excluída.", null, true);
 
   /* esqueci a senha: o aluno cria uma senha nova ali mesmo, confirmando dados do cadastro (sem e-mail).
      Professor (e a demonstração) continuam pelo WhatsApp */

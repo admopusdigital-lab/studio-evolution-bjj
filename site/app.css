@@ -846,3 +846,8 @@ html.ap-vivo-on, html.ap-vivo-on body { overflow: hidden; }
 .ap-vivo .ap-btn { margin-top: 0; }
 .ap-vivo-n { display: flex; gap: 8px; align-items: flex-start; margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
 .ap-vivo-n .ic { flex: none; width: 15px; height: 15px; margin-top: 2px; color: var(--gold-text); }
+
+/* ===== Excluir minha conta (Perfil) ===== */
+.ap-exc-b { color: var(--ink-2); }
+.ap-exc-t { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+.ap-exc button[type="submit"] { background: var(--warn); color: var(--paper); }
