@@ -129,6 +129,15 @@ async function pagina(b, opcoes, papel) {
     confere('Câmeras (em preparo) abre para o dono com a prévia do app', (await p.$$('.cam-cond li')).length === 4 && !!(await p.$('.cam-fone .cam-app')) && await p.evaluate(() => { var a = P.papel; P.papel = 'gestao'; var r = P.podeAba('cam'); P.papel = a; return r === false; }));
     confere('Câmeras: cartão Transmissão com os 3 passos, o código do celular e o formulário dos endereços', (await p.$$('#camTx .cam-tx-passos li')).length === 3 && !!(await p.$('#camTxQr svg')) && await p.isVisible('#camTxForm') && await p.isDisabled('[data-tx="ver"]'));
     confere('Hoje: cartão Aviso pelo app (notificações)', !!(await p.$('#hPush #puAbre')));
+    confere('Hoje: atalho Aviso para um aluno', !!(await p.$('#hPush #puUm')));
+    await p.evaluate(() => P.go('avisos')); await p.clock.runFor(1500); await p.waitForTimeout(700);
+    confere('Avisos: a aba abre com formulário, prévia, alcance e histórico', !!(await p.$('#recForm')) && !!(await p.$('#recPvT')) && /com aviso ativo no celular/.test(await p.textContent('#recAlc')) && (await p.$$('#recH li')).length > 0);
+    confere('Avisos: sem aviso de atualização com banco e função em dia', await p.isHidden('#recBanco'));
+    await p.click('[data-modelo="0"]'); await p.click('[data-modo="escolher"]'); await p.check('#recL input[data-id="a0"]'); await p.clock.runFor(300); await p.waitForTimeout(200);
+    confere('Avisos: prévia com o primeiro nome do aluno escolhido', (await p.textContent('#recPvT')) === 'Sua aula é hoje, Douglas' && (await p.textContent('#recEnv')) === 'Enviar para Douglas');
+    await p.click('#recEnv'); await p.clock.runFor(1500); await p.waitForTimeout(700);
+    confere('Avisos: envia para o aluno e guarda o recado com o nome', simula.T.avisos.some(x => x.aluno === 'a0' && x.titulo === 'Sua aula é hoje, Douglas' && x.tela === 'presenca') && /para Douglas Lima/.test(await p.textContent('#recH li')));
+    await p.evaluate(() => P.go('hoje')); await p.clock.runFor(500); await p.waitForTimeout(300);
     confere('Câmeras: piloto no app com a lista e a escolha de quem assiste', !!(await p.$('.cam-pil #camPilSel')) && !!(await p.$('.cam-pil [data-pil="poe"]')));
     confere('painel sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
@@ -158,6 +167,10 @@ async function pagina(b, opcoes, papel) {
     confere('app: Perfil com Notificações neste aparelho', !!(await p.$('#apPush #apPushSt')));
     /* excluir a conta pelo app (exigência das lojas): pede a palavra e só então chama o servidor */
     await p.click('#apStoryX'); await p.clock.runFor(800); await p.waitForTimeout(300);
+    /* a conta fica nos Ajustes: a engrenagem só aparece no Perfil e abre a tela própria */
+    const engrenagemSoNoPerfil = await p.isVisible('#apGear');
+    await p.click('#apGear'); await p.clock.runFor(1200); await p.waitForTimeout(300);
+    confere('app: Ajustes abre pela engrenagem do Perfil, com os avisos, a senha e o sair', engrenagemSoNoPerfil && await p.evaluate(() => document.querySelector('.ap-view.on').dataset.view === 'conta') && await p.isVisible('#apPush') && await p.isVisible('#apSenha') && await p.isVisible('.app-sair'));
     await p.click('#apExc'); await p.waitForTimeout(200);
     await p.fill('#apExcP', 'sim'); await p.click('#apExcBtn'); await p.waitForTimeout(300);
     const pedidos = [], idas = [];
@@ -171,6 +184,56 @@ async function pagina(b, opcoes, papel) {
     confere('app: Excluir minha conta pede a palavra, chama o servidor e sai', semPalavra && pedidos.length === 1 && /"confirma":"excluir"/i.test(pedidos[0] || '') && idas.some(u => /entrar(\.html)?\?app&conta=excluida/.test(u)), JSON.stringify(idas));
     erros.length = 0; errosAntes.forEach(e => erros.push(e));
     confere('app sem erro de script', !erros.length, erros.join(' | '));
+    await c.close();
+  }
+
+  /* 4a) app do aluno: os estados (carregando, falha, dados guardados), o Início enxuto e o recado do professor */
+  {
+    const REST = 'https://nkscqdhczfeykrtexyzs.supabase.co/rest/**';
+    const { c, p, erros } = await pagina(b, { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, 'aluno');
+    await p.clock.install({ time: new Date(hoje + 'T09:00:00-03:00') });
+    /* o relógio da página é controlado: anda aos poucos, com tempo real para a rede (a biblioteca do banco tenta de novo com espera) */
+    const anda = async ms => { for (let i = 0; i < Math.ceil(ms / 1000); i++) { await p.clock.runFor(1000); await p.waitForTimeout(200); } };
+    const fora = r => r.fulfill({ status: 503, contentType: 'application/json', body: '{"message":"upstream connect error or disconnect/reset before headers","code":"503"}' });
+    /* um recado novo do professor para este aluno (os de exemplo já foram lidos no bloco anterior) */
+    simula.T.avisos.push({ id: 'fum-recado', aluno: 'a0', titulo: 'Douglas, sábado tem Open Mat', corpo: 'Treino livre às 10h30.', tela: 'presenca', criado_em: new Date().toISOString(), criado_por: null, lido_em: null });
+    /* servidor fora e nada guardado no aparelho: a tela de "sem conexão", nunca os dados de exemplo */
+    await p.route(REST, fora);
+    await p.goto(BASE + '/app', { waitUntil: 'load' }); await anda(8000);
+    confere('app: sem conexão e sem dados guardados mostra a tela própria, nunca o exemplo', await p.isVisible('#apFalha') && !(await p.isVisible('#apHero')) && !/Marina|Azul/.test(await p.evaluate(() => document.querySelector('#ap').innerText)));
+    /* a conexão volta: "Tentar de novo" carrega os dados, e o recado não lido abre em destaque */
+    await p.unroute(REST, fora);
+    await p.click('#apFalhaB'); await anda(6000);
+    confere('app: Tentar de novo carrega os dados e tira o esqueleto', await p.evaluate(() => document.querySelector('#ap').classList.contains('pronto') && getComputedStyle(document.querySelector('.ap-esq')).display === 'none') && await p.isHidden('#apFalha'));
+    const novos = simula.T.avisos.filter(x => x.aluno === 'a0' && !x.lido_em).length;
+    confere('app: recado do professor ainda não lido abre em destaque', novos > 0 && await p.isVisible('#apRecado') && (await p.textContent('#apRecadoT')).trim().length > 2);
+    for (let i = 0; i < novos && await p.isVisible('#apRecado'); i++) { await p.click('#apRecadoOk'); await anda(1000); }
+    confere('app: "Entendi" fecha o recado e marca como lido', await p.isHidden('#apRecado') && !simula.T.avisos.some(x => x.aluno === 'a0' && !x.lido_em));
+    await p.click('#apBell'); await anda(1500);
+    confere('app: o recado fica guardado na lista de avisos', (await p.$$('.app-notes .ap-note[data-note="recado"]')).length >= 1);
+    await p.click('#apBell'); await anda(1500);
+    confere('app: Início com a faixa e a meta lado a lado', !!(await p.$('.ap-duo #apFx')) && !!(await p.$('.ap-duo #apGoalC')) && await p.isHidden('#apGoalMais') && await p.isVisible('#apHero'));
+    await p.click('#apGoalC'); await anda(1000);
+    confere('app: um toque na meta abre a semana e o ajuste', await p.isVisible('#apGoalMais') && await p.isVisible('#apGoal') && (await p.$$('#apGoalMais .ap-wk > div')).length === 6);
+    /* o servidor falha ao marcar a aula: mensagem simples com o ícone de erro, nunca o texto cru do servidor */
+    await p.route(REST, fora);
+    await p.click('#apConfirm'); await p.waitForTimeout(600); await p.clock.runFor(400); await p.waitForTimeout(400);
+    const tx = await p.textContent('#apToast span');
+    confere('app: erro do servidor vira mensagem simples, com ícone de erro', /Não deu para confirmar/.test(tx) && !/upstream/.test(tx) && await p.evaluate(() => document.querySelector('#apToast').classList.contains('erro') && document.querySelector('#apToast use').getAttribute('href') === '#i-alerta'), tx);
+    await p.unroute(REST, fora);
+    /* reabre sem rede: os dados guardados no aparelho aparecem, com a barra de "sem conexão" */
+    const semRede = r => r.abort('internetdisconnected');
+    await p.route(REST, semRede);
+    await p.reload({ waitUntil: 'load' }); await anda(9000);
+    confere('app: sem rede abre com os dados guardados e a barra de sem conexão', await p.isVisible('#apOff') && /Sem conexão · dados/.test(await p.textContent('#apOffT')) && await p.isVisible('#apHero') && /Faixa azul/.test(await p.evaluate(() => document.querySelector('[data-view="perfil"] .ap-fxrow span').textContent)));
+    await p.unroute(REST, semRede);
+    await p.click('#apOffB'); await anda(6000);
+    confere('app: a conexão volta e a barra some', await p.isHidden('#apOff'));
+    /* sair leva junto os dados guardados no aparelho */
+    const guardou = await p.evaluate(() => !!localStorage.getItem('evo-guardado'));
+    await p.evaluate(() => Acesso.sair()); await p.waitForTimeout(300);
+    confere('app: os dados guardados saem junto com a conta', guardou && await p.evaluate(() => !localStorage.getItem('evo-guardado')));
+    confere('app (estados) sem erro de script', !erros.length, erros.join(' | '));
     await c.close();
   }
   {

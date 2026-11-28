@@ -9,7 +9,8 @@
   var box = document.createElement("section");
   box.className = "pu"; box.id = "hPush"; box.setAttribute("aria-labelledby", "puT");
   box.innerHTML = '<div class="pu-h"><div><p class="fin-k" id="puT">Aviso pelo app</p><p class="pu-sub">Chega como notificação no celular de quem ativou os avisos no app (Perfil, Notificações).</p></div>' +
-    '<button class="mini-btn ghost" type="button" id="puAbre" aria-expanded="false" aria-controls="puForm">Escrever um aviso</button></div>' +
+    '<div class="pu-acts"><button class="mini-btn ghost" type="button" id="puAbre" aria-expanded="false" aria-controls="puForm">Escrever um aviso</button>' +
+    '<button class="mini-btn ghost" type="button" id="puUm" hidden>Aviso para um aluno</button></div></div>' +
     '<form class="pu-f" id="puForm" novalidate hidden>' +
       '<label class="crm-f"><span>Para quem</span><select class="crm-in" id="puPara"><option value="todos">Todos os alunos</option><option value="adulto">Adulto</option><option value="feminino">Feminino</option><option value="kids1">Kids 1</option><option value="kids2">Kids 2</option></select></label>' +
       '<label class="crm-f"><span>Título <small>(até 60 letras)</small></span><input class="crm-in" id="puTit" maxlength="60" autocomplete="off"></label>' +
@@ -32,6 +33,12 @@
       }).catch(function () { $("#puL").innerHTML = ""; });
   }
   abre.addEventListener("click", function () { mostra(true); });
+  /* o recado com o nome de cada aluno fica na aba Avisos (painel-avisos.js, carregado depois deste arquivo) */
+  var um = $("#puUm");
+  function pintaUm() { um.hidden = !(P.avisoPara && P.podeAba("avisos")); }
+  um.addEventListener("click", function () { if (P.avisoPara) P.avisoPara(null); });
+  P.aoAbrir("hoje", pintaUm);
+  setTimeout(pintaUm, 0);
   $("#puFecha").addEventListener("click", function () { mostra(false); });
   form.addEventListener("submit", function (e) {
     e.preventDefault();

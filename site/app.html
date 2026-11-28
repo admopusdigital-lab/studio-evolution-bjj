@@ -25,6 +25,8 @@ Acesso.portao("aluno");
   if (location.hash === "#claro") l = "light";
   d.setAttribute("data-look", l);
   d.setAttribute("data-page", "app");
+  /* conta de verdade: até os dados chegarem, a tela mostra o esqueleto (app-estado.css), nunca o exemplo */
+  if (window.Acesso && Acesso.real) d.classList.add("ap-real");
   /* o app não tem a cortina de troca de página do site: só consome o aviso dela */
   try { sessionStorage.removeItem("evo-nav"); sessionStorage.removeItem("evo-nav-img"); } catch (e) {}
 })();
@@ -626,6 +628,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 <link rel="stylesheet" href="tema.css">
 <!-- material e profundidade do app (vidro, bordas que dissolvem, a cor da faixa): depois de tudo -->
 <link rel="stylesheet" href="app-material.css">
+<link rel="stylesheet" href="app-estado.css">
 </head>
 <body class="app-body">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -649,6 +652,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     <symbol id="i-touch" viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 9.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3l-1.6-2.9a1.5 1.5 0 0 1 2.6-1.5L9 15"/></symbol>
     <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.3v.2"/></symbol>
+    <symbol id="i-ajustes" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.6"/><circle cx="8" cy="17" r="2.6"/></symbol>
+    <symbol id="i-semrede" viewBox="0 0 24 24"><path d="M3 9.2a13.5 13.5 0 0 1 4.6-2.9M11 5.5a13.5 13.5 0 0 1 10 3.7M6.4 12.8a8.6 8.6 0 0 1 3.5-2M14.5 11a8.6 8.6 0 0 1 3.1 1.8M9.6 16.2a4 4 0 0 1 4.8 0M12 19.6v.1M4 3.5l16 17"/></symbol>
   </defs>
 </svg>
 
@@ -663,9 +669,30 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   <div class="ap app" id="ap">
     <header class="app-top">
       <span class="logo app-logo" role="img" aria-label="Studio Evolution BJJ"></span>
+      <button class="app-bell app-gear" type="button" id="apGear" aria-label="Ajustes da conta" aria-pressed="false" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ajustes"/></svg></button>
       <button class="app-bell" type="button" id="apBell" aria-label="Avisos, 3 novos" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-bell"/></svg><span class="app-badge" id="apBadge" aria-hidden="true">3</span></button>
     </header>
     <div class="ap-toast" id="apToast" role="status" aria-live="polite"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span></span></div>
+    <!-- sem conexão: a barra fica enquanto os dados na tela são os guardados no aparelho -->
+    <div class="ap-off" id="apOff" hidden><i aria-hidden="true"></i><span id="apOffT" role="status">Sem conexão</span><button type="button" id="apOffB">Atualizar</button></div>
+    <!-- nada para mostrar (sem conexão e sem dados guardados, ou conta sem cadastro): uma tela própria, nunca dados de exemplo -->
+    <div class="ap-falha" id="apFalha" role="alert" hidden>
+      <span class="ap-falha-i" aria-hidden="true"><svg class="ic" focusable="false"><use href="#i-semrede"/></svg></span>
+      <h2 class="ap-hi" id="apFalhaT">Sem conexão com o Studio</h2>
+      <p id="apFalhaS">Confira a internet do celular. O app tenta de novo sozinho assim que ela voltar.</p>
+      <button class="ap-btn" type="button" id="apFalhaB">Tentar de novo</button>
+      <p class="ap-falha-l"><a href="https://wa.me/5515996741812" target="_blank" rel="noopener">Falar com o Studio</a><a href="entrar.html" data-sair>Sair da conta</a></p>
+    </div>
+    <!-- recado do professor: o que ainda não foi lido abre em destaque ao entrar no app -->
+    <div class="ap-recado" id="apRecado" role="dialog" aria-modal="true" aria-labelledby="apRecadoT" hidden>
+      <div class="ap-recado-in">
+        <div class="ap-recado-h"><span class="ico" aria-hidden="true"></span><span><b>Recado do Studio</b><small id="apRecadoQ"></small></span><span class="n" id="apRecadoN"></span></div>
+        <h2 class="ap-hi" id="apRecadoT" tabindex="-1"></h2>
+        <p class="ap-recado-c" id="apRecadoC"></p>
+        <button class="ap-btn" type="button" id="apRecadoOk">Entendi</button>
+        <button class="ap-link" type="button" id="apRecadoIr" hidden></button>
+      </div>
+    </div>
     <!-- cartão para Stories: a imagem 9:16 com a marca do Studio, para o aluno postar -->
     <div class="ap-story" id="apStory" role="dialog" aria-modal="true" aria-labelledby="apStoryT" hidden>
       <div class="ap-story-in">
@@ -696,9 +723,25 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     <div class="ap-views">
       <!-- Início -->
       <section class="ap-view on" data-view="inicio" aria-label="Tela Início">
+        <div class="ap-esq" aria-hidden="true"><i class="l1 sd"></i><i class="l2 sd"></i>
+          <div class="c hero"><i class="w40"></i><i class="g"></i><i class="w80"></i><i class="fino"></i><i class="w60"></i><i class="b"></i></div>
+          <div class="duo"><div class="c"><i class="w60"></i><i class="fino"></i><i class="w80"></i></div><div class="c"><i class="w80"></i><i class="w40"></i></div></div>
+          <i class="sec"></i><div class="row"><div class="c tk"></div><div class="c tk"></div><div class="c tk"></div></div></div>
         <p class="ap-lb" id="apDate">Quinta, 15 de outubro</p>
         <p class="ap-hi" id="apHello">Boa noite, Marina.</p>
         <div class="ap-fam" data-fam hidden role="group" aria-label="Quem vai treinar"></div>
+        <!-- primeiros passos: só para quem ainda não tem aula registrada -->
+        <div class="ap-card ap-bv" id="apBv" hidden>
+          <p class="ap-lb gold">Primeiros passos</p>
+          <p class="ap-bv-t" id="apBvT">Boas-vindas ao tatame.</p>
+          <p class="ap-bv-s">Três toques e o app fica do seu jeito.</p>
+          <ol class="ap-bv-l">
+            <li data-bvi="aula"><button type="button" data-bv="aula"><span class="n">1</span><span class="tx"><b>Marque sua primeira aula</b><span>Um toque garante a sua vaga no tatame.</span></span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></button></li>
+            <li data-bvi="foto"><button type="button" data-bv="foto"><span class="n">2</span><span class="tx"><b>Coloque sua foto</b><span>Ela aparece no passaporte e na lista de quem vai.</span></span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></button></li>
+            <li data-bvi="avisos"><button type="button" data-bv="avisos"><span class="n">3</span><span class="tx"><b id="apBvA">Ative os avisos</b><span id="apBvAs">Lembrete da aula e recados do professor.</span></span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></button></li>
+          </ol>
+          <div class="ap-bv-f"><span id="apBvN">0 de 3 feitos</span><button class="ap-link" type="button" id="apBvX">Agora não</button></div>
+        </div>
         <div class="ap-card ap-hero" id="apHero">
           <p class="ap-lb gold">Sua aula de hoje</p>
           <div class="ap-big"><b>19h</b><span>Adulto</span></div>
@@ -714,31 +757,35 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
             <div class="ap-btnrow"><button class="ap-btn" type="button" id="apRelYes">Liberar</button><button class="ap-btn ghost" type="button" id="apRelNo">Manter</button></div>
           </div>
         </div>
-        <button class="ap-card ap-fx" type="button" id="apFx" aria-label="Sua faixa: azul, 2 graus. Ver no Perfil">
-          <span class="ap-fx-r"><b class="ap-fx-n">Azul</b><span class="ap-fx-g" aria-hidden="true"></span><span class="ap-fx-go" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></span>
-          <span class="ap-fx-bar" aria-hidden="true"><i></i></span>
-          <span class="ap-fx-c">21 de 50 aulas para o próximo grau</span>
-        </button>
-        <!-- marcar aula: as aulas das próximas 48 h em "ingressos"; um toque marca a vaga -->
-        <div class="ap-sec-h"><p class="ap-lb">Marcar aula</p><span class="ap-sec-s">próximas 48 horas</span></div>
-        <div class="ap-tix" id="apTix" role="list" aria-label="Aulas que dá para marcar"></div>
-        <!-- meta da semana: o anel enche a cada treino; − e + mudam a meta (1 a 7) -->
-        <div class="ap-card ap-goalc" id="apGoalC">
-          <div class="ap-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><linearGradient id="gRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1b3"/><stop offset=".55" stop-color="#e2b65a"/><stop offset="1" stop-color="#a87a26"/></linearGradient></defs>
-            <circle class="bg" cx="60" cy="60" r="50"/><circle class="fg" id="apRingFg" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="0 100"/></svg>
-            <div class="ap-ring-n"><b id="apRingN">0</b><span>de <em id="apRingG">3</em></span></div></div>
-          <div class="ap-goal-tx">
-            <p class="ap-lb gold">Meta da semana</p>
-            <p class="ap-goal-t" id="apGoalT"><span id="apWeek">0 de 3</span> treinos</p>
-            <p class="ap-goal-s" id="apGoalS">Faltam 3 para bater a meta</p>
+        <!-- a faixa e a meta da semana lado a lado; um toque na meta abre a semana e o ajuste (1 a 7 treinos) -->
+        <div class="ap-duo">
+          <button class="ap-card ap-fx" type="button" id="apFx" aria-label="Sua faixa: azul, 2 graus. Ver no Perfil">
+            <span class="ap-lb gold">Sua faixa</span>
+            <span class="ap-fx-r"><b class="ap-fx-n">Azul</b><span class="ap-fx-g" aria-hidden="true"></span><span class="ap-fx-go" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></span>
+            <span class="ap-fx-bar" aria-hidden="true"><i></i></span>
+            <span class="ap-fx-c">21 de 50 aulas para o próximo grau</span>
+          </button>
+          <button class="ap-card ap-goalc" type="button" id="apGoalC" aria-expanded="false" aria-controls="apGoalMais">
+            <span class="ap-lb gold">Meta da semana</span>
+            <span class="ap-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><linearGradient id="gRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1b3"/><stop offset=".55" stop-color="#e2b65a"/><stop offset="1" stop-color="#a87a26"/></linearGradient></defs>
+            <circle class="bg" cx="60" cy="60" r="50"/><circle class="fg" id="apRingFg" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="0 100"/></svg><span class="ap-ring-n"><b id="apRingN">0</b></span></span>
+            <span class="ap-goal-t" aria-hidden="true">de <em id="apRingG">3</em><small>treinos</small></span>
+            <span class="ap-goal-ab">Ver a semana<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span>
+            <span class="sr-only" id="apGoalT"><span id="apWeek">0 de 3</span> treinos na semana. Abre a semana e o ajuste da meta</span>
+          </button>
+        </div>
+        <div class="ap-card ap-goalm" id="apGoalMais" hidden>
+          <div class="ap-goalm-h"><p class="ap-goal-s" id="apGoalS">Faltam 3 para bater a meta</p>
             <div class="ap-step" role="group" aria-label="Mudar a meta da semana">
               <button type="button" id="apGoalMenos" aria-label="Diminuir a meta"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-minus"/></svg></button>
               <span id="apGoalV">3 treinos</span>
               <button type="button" id="apGoal" aria-label="Aumentar a meta"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus2"/></svg></button>
-            </div>
-          </div>
+            </div></div>
           <div class="ap-wk"><div><span>Seg</span><b>12</b><i><span class="sr-only">, treinou</span></i></div><div><span>Ter</span><b>13</b></div><div><span>Qua</span><b>14</b><i><span class="sr-only">, treinou</span></i></div><div><span>Qui</span><b>15</b></div><div class="today"><span>Sex</span><b>16</b><span class="sr-only">, hoje</span><i id="apToday" hidden><span class="sr-only">, treinou</span></i></div></div>
         </div>
+        <!-- marcar aula: as aulas das próximas 48 h em "ingressos"; um toque marca a vaga -->
+        <div class="ap-sec-h"><p class="ap-lb">Marcar aula</p><span class="ap-sec-s">próximas 48 horas</span></div>
+        <div class="ap-tix" id="apTix" role="list" aria-label="Aulas que dá para marcar"></div>
         <div class="ap-row" style="margin-top:10px" hidden><span>Próximo treino</span><span class="r" id="apNext">segunda, 19 de outubro, 19h</span></div>
         <button class="ap-row ap-rowbtn" type="button" id="apFee" aria-expanded="false" aria-controls="apSheet"><span>Mensalidade de outubro</span><span class="r"><span class="ok">Em dia</span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
         <!-- ranking de frequência: os que mais treinaram (Adulto e Kids separados) -->
@@ -758,6 +805,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
       <!-- Presença: quem vai na aula de hoje, confirmar ou liberar a vaga e, no tatame, o código da aula -->
       <section class="ap-view" data-view="presenca" aria-label="Tela Presença">
+        <div class="ap-esq" aria-hidden="true"><i class="l1"></i><i class="l2"></i><i class="l1 w60"></i><div class="row"><div class="c ch"></div><div class="c ch"></div><div class="c ch"></div></div><div class="c go"><i class="g"></i><i class="fino"></i><i class="b"></i></div><i class="sec"></i><div class="c"><i class="w60"></i></div></div>
         <p class="ap-lb">Agendar e presença</p>
         <div class="ap-fam" data-fam hidden role="group" aria-label="Quem vai treinar"></div>
         <p class="ap-hi" id="apPrH">Aula das 19h</p>
@@ -803,6 +851,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
       <!-- Movimentos: a biblioteca da faixa do aluno (movimentos.js). Cada movimento abre a tela da aula -->
       <section class="ap-view" data-view="movimentos" aria-label="Tela Movimentos">
+        <div class="ap-esq" aria-hidden="true"><i class="l1"></i><i class="l2"></i><div class="c alt"><i class="w40"></i><i class="w60"></i><i class="w80"></i></div><div class="c alt"><i class="w40"></i><i class="w80"></i><i class="b"></i></div></div>
         <p class="ap-lb" id="apMovLb">Faixa azul</p>
         <p class="ap-hi">Movimentos</p>
         <!-- técnicas da semana (o professor marca no painel) e o que o aluno quer aprender -->
@@ -853,6 +902,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 
       <!-- Perfil -->
       <section class="ap-view" data-view="perfil" aria-label="Tela Perfil">
+        <div class="ap-esq" aria-hidden="true"><div class="c pass" style="margin-top:4px"><i class="w60"></i><i class="n"></i><i class="w80"></i><i class="av"></i><i class="belt"></i><i class="pe w60"></i><i class="pe fino"></i></div><div class="c trio"><i class="w80"></i><i class="w60"></i></div></div>
         <div class="ap-pass">
         <div class="ap-pass-top"><span class="logo ap-pass-logo" role="img" aria-label="Studio Evolution BJJ"></span><span class="ap-pass-k">Passaporte · Equipe TRUE</span></div>
         <div class="ap-pf-h">
@@ -870,6 +920,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         <p class="ap-pass-foot"><span>Studio Evolution BJJ · Sorocaba</span><span id="apPassAulas"></span></p>
         </div>
         <button class="ap-btn ghost ap-story-btn" type="button" data-story="passaporte"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-share"/></svg><span>Postar nos Stories</span></button>
+        <p class="ap-novo" id="apNovo" hidden><span aria-hidden="true"><svg class="ic" focusable="false"><use href="#i-belt"/></svg></span><span><b>Seu passaporte começa na primeira aula</b>Cada treino registrado conta para o próximo grau e aparece aqui.</span></p>
         <!-- "aulas desde o último grau" conta as presenças registradas: a de hoje leva 21 a 22 (register) -->
         <div class="ap-trio"><div><b id="apSince">21</b><span>aulas desde o último grau</span></div><div><b id="apStreak">6</b><span id="apStreakT">semanas seguidas · recorde 9</span></div><div><b id="apMov2">5<small> de 12</small></b><span>movimentos da faixa</span></div></div>
         <!-- os últimos 30 dias em calendário (segunda a sábado): dourado quando veio, dois pontos quando fez duas aulas -->
@@ -896,6 +947,14 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-todo"/></svg>Fuga de lateral<span class="sr-only"> · a conquistar</span></li>
         </ul>
         <p class="ap-mut" id="apNote" style="font:italic 400 13px/1.4 var(--sans);margin-top:12px">Competência é o que o professor vê no tatame; o vídeo é para estudar. O próximo grau é decisão do professor.</p>
+        <button class="ap-row ap-rowbtn" type="button" id="apContaIr" style="margin-top:18px"><span>Ajustes da conta e avisos</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
+      </section>
+
+      <!-- Ajustes (a engrenagem no topo do Perfil): avisos, tema, senha, privacidade, sair e excluir a conta -->
+      <section class="ap-view" data-view="conta" aria-label="Tela Ajustes">
+        <button class="ap-back" type="button" id="apContaBack"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-back"/></svg>Perfil</button>
+        <p class="ap-lb">Ajustes</p>
+        <p class="ap-hi">Sua conta</p>
         <div class="app-conta">
           <p class="ap-lb">Conta</p>
           <button class="ap-row ap-rowbtn" type="button" id="apInstall" hidden><span>Instalar o app no celular</span><span class="r"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></span></button>
@@ -970,7 +1029,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 (function () {
   var $ = Site.$, $$ = Site.$$;
   var ap = $("#ap"), views = $$(".ap-view", ap), dock = $("#apDock"), dockBtns = $$("button", dock), toastEl = $("#apToast"), toastT = null;
-  var bell = $("#apBell"), top = $(".app-top", ap);
+  var bell = $("#apBell"), top = $(".app-top", ap), gear = $("#apGear");
   var anim = !!window.gsap && !Site.reduce;
   var demo = !Acesso.real;
   var CHECK = '<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>';
@@ -996,11 +1055,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { if (document.activeElement && document.activeElement.tagName !== "INPUT") fit(); });
 
   /* ---------- trocar de tela: o dock tem as quatro abas; o sino abre os avisos e volta para onde estava ---------- */
-  var current = "inicio", before = "inicio", sheetOn = false;
+  var current = "inicio", before = "inicio", sheetOn = false, falhouOn = false, modalOn = false;
   function syncInert() {
-    views.forEach(function (v) { v.inert = sheetOn || v.dataset.view !== current; });
-    dock.inert = sheetOn;
-    top.inert = sheetOn;
+    views.forEach(function (v) { v.inert = sheetOn || modalOn || v.dataset.view !== current; });
+    dock.inert = sheetOn || falhouOn || modalOn;
+    top.inert = sheetOn || falhouOn || modalOn;
   }
   function show(name) {
     if (name === current) return;
@@ -1012,11 +1071,16 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     current = name;
     views.forEach(function (v) { v.classList.toggle("on", v.dataset.view === name); });
     $$("[data-belt]", screenOf(name)).forEach(beltPlay);
-    var tab = name === "aula" ? "movimentos" : name === "loja" ? "inicio" : name;
+    var tab = name === "aula" ? "movimentos" : name === "loja" ? "inicio" : name === "conta" ? "perfil" : name;
     dockBtns.forEach(function (b) { b.setAttribute("aria-current", b.dataset.go === tab ? "true" : "false"); });
     bell.setAttribute("aria-pressed", name === "avisos" ? "true" : "false");
+    /* a engrenagem dos Ajustes só aparece no Perfil */
+    gear.hidden = !(name === "perfil" || name === "conta");
+    gear.setAttribute("aria-pressed", name === "conta" ? "true" : "false");
     syncInert();
+    if (name === "inicio") paintBv();
     if (name === "avisos") {
+      lerRecados();
       notes();
       $("#apBadge").hidden = true;
       bell.setAttribute("aria-label", "Avisos");
@@ -1026,14 +1090,23 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   syncInert();
   dockBtns.forEach(function (b) { b.addEventListener("click", function () { show(b.dataset.go); }); });
   bell.addEventListener("click", function () { show(current === "avisos" ? before : "avisos"); });
+  gear.addEventListener("click", function () { show(current === "conta" ? "perfil" : "conta"); });
+  $("#apContaBack").addEventListener("click", function () { show("perfil"); });
+  $("#apContaIr").addEventListener("click", function () { show("conta"); });
 
-  function toast(msg) {
+  function toast(msg, tipo) {
     $("span", toastEl).textContent = msg;
+    /* erro tem ícone e cor próprios: o ✓ fica só para o que deu certo */
+    toastEl.classList.toggle("erro", tipo === "erro");
+    $("use", toastEl).setAttribute("href", tipo === "erro" ? "#i-alerta" : "#i-check");
     toastEl.classList.add("on");
     clearTimeout(toastT);
     /* tempo de leitura: aviso longo fica mais na tela */
     toastT = setTimeout(function () { toastEl.classList.remove("on"); }, Math.max(2800, msg.length * 55));
   }
+  function avisaErro(msg) { toast(msg, "erro"); }
+  /* do servidor só vai para a tela a mensagem escrita para o aluno (as do banco, com código P0…); o resto vira um texto simples */
+  function msgErro(e, padrao) { return e && /^P0/.test(e.code || "") && e.message ? e.message : padrao; }
   /* rola a tela do app até el aparecer inteiro acima do dock */
   function into(el) {
     var v = el && el.closest(".ap-view"), y0 = 0, n = el;
@@ -1054,6 +1127,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var d = new Date(), h = d.getHours(), dia = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(d);
     $("#apHello").textContent = (h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite") + ", " + ses.nome.split(" ")[0] + ".";
     $("#apDate").textContent = dia.charAt(0).toUpperCase() + dia.slice(1);
+    ap.classList.add("oi");
   }
   saudacao();
   if (!demo && ses && ses.nome) $(".ap-hi", screenOf("perfil")).textContent = ses.nome;
@@ -1171,11 +1245,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     tixBusy = true; b.classList.add("loading");
     Acesso.cliente().then(function (sb) { return sb.rpc("reservar", comAluno({ p_data: a.data, p_hora: a.hora })); }).then(function (r) {
       tixBusy = false;
-      if (r.error) { b.classList.remove("loading"); return toast(r.error.message || "Não deu para marcar. Tente de novo."); }
-      MINHAS[k] = 1; paintTix(); paintAulas();
+      if (r.error) { b.classList.remove("loading"); return avisaErro(msgErro(r.error, "Não deu para marcar. Tente de novo.")); }
+      MINHAS[k] = 1; paintTix(); paintAulas(); paintBv(); guardar();
       toast("Vaga marcada: " + diaCurto(a).toLowerCase() + ", " + Site.hora(a.hora) + ". Te esperamos!");
       if (k === chaveAula(AULA)) atualizarQuem();
-    }).catch(function () { tixBusy = false; b.classList.remove("loading"); toast("Sem conexão. Tente de novo."); });
+    }).catch(function () { tixBusy = false; b.classList.remove("loading"); avisaErro("Sem conexão. Tente de novo."); });
   });
   $("#apAulas").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-i]");
@@ -1296,10 +1370,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     busy = true;
     Acesso.cliente().then(function (sb) { return sb.rpc("reservar", comAluno({ p_data: AULA.data, p_hora: AULA.hora })); }).then(function (r) {
       busy = false;
-      if (r.error) { toast(r.error.message || "Não deu para confirmar. Tente de novo."); return atualizarQuem(); }
+      if (r.error) { avisaErro(msgErro(r.error, "Não deu para confirmar. Tente de novo.")); return atualizarQuem(); }
       toast("Vaga confirmada. Te esperamos às " + Site.hora(AULA.hora) + ".");
-      return atualizarQuem();
-    }).catch(function () { busy = false; toast("Sem conexão. Tente de novo."); });
+      return atualizarQuem().then(paintBv);
+    }).catch(function () { busy = false; avisaErro("Sem conexão. Tente de novo."); });
   }
   function release() {
     if (demo) {
@@ -1310,10 +1384,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       return Promise.resolve();
     }
     return Acesso.cliente().then(function (sb) { return sb.from("reservas").delete().eq("aluno", ALUNO.id).eq("data", AULA.data).eq("hora", AULA.hora); }).then(function (r) {
-      if (r.error) toast("Não deu para liberar a vaga. Tente de novo.");
+      if (r.error) avisaErro("Não deu para liberar a vaga. Tente de novo.");
       else toast("Vaga liberada. Obrigado por avisar.");
       return atualizarQuem();
-    }).catch(function () { toast("Sem conexão. Tente de novo."); });
+    }).catch(function () { avisaErro("Sem conexão. Tente de novo."); });
   }
   confBtn.addEventListener("click", function () {
     if (naHora() && !registered) { show("presenca"); if ($("#apCodeWrap").hidden) abrirCheckin(); return Site.focusSoft(inp, { preventScroll: false }); }
@@ -1347,9 +1421,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   /* modo Supabase: o cadastro do aluno, a aula e quem vai (de novo a cada 30 s, com o app na tela) */
   function semCadastro() {
     semAula = true;
-    toast("Sua conta ainda não está ligada a um cadastro de aluno. Fale com o professor.");
     paintAula();
     paintSpot();
+    falhou("cadastro");
   }
   /* a "foto" do que está na tela: uma resposta pedida para outro membro ou outra aula chega tarde e é descartada */
   function vez() { return (ALUNO ? ALUNO.id : "") + "|" + (AULA ? chaveAula(AULA) : ""); }
@@ -1457,11 +1531,11 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     busy = true; b.classList.add("loading");
     Acesso.cliente().then(function (sb) { return sb.rpc("pedir_produto", comAluno({ p_produto: p.id })); }).then(function (r) {
       busy = false; b.classList.remove("loading");
-      if (r.error) return toast(r.error.message || "Não deu para pedir. Tente de novo.");
+      if (r.error) return avisaErro(msgErro(r.error, "Não deu para pedir. Tente de novo."));
       delete ESCOLHA[g.k];
       toast("Pedido feito: " + nomeG(g) + " " + p.tamanho + ". O professor separa e você paga no Studio.");
       carregarLoja();
-    }).catch(function () { busy = false; b.classList.remove("loading"); toast("Sem conexão. Tente de novo."); });
+    }).catch(function () { busy = false; b.classList.remove("loading"); avisaErro("Sem conexão. Tente de novo."); });
   });
 
   /* plano família: os botões "quem vai treinar" (Início e Agendar) e o "registrar a presença de" do check-in */
@@ -1511,7 +1585,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       if (!r || r.error || !ALUNO || ALUNO.id !== quemPediu) return;
       MINHAS = {};
       (r.data || []).forEach(function (x) { MINHAS[x.data + "|" + x.hora] = 1; });
-      paintAulas();
+      paintAulas(); paintBv(); guardar();
     }).catch(function () {});
   }
   /* a aula mostrada já terminou (começo + 1 h)? */
@@ -1535,35 +1609,121 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     paintAula(); paintAulas(); paintSpot();
     return Promise.all([minhasReservas(), atualizarQuem(), extrasReal(), carregarRank()]).catch(function () {});
   }
+  /* ---------- estados da conta de verdade: carregando (esqueleto), pronto, sem conexão (barra) e falha (tela) ---------- */
+  var offEl = $("#apOff"), falhaEl = $("#apFalha"), GUARDA = "evo-guardado", UID = Acesso.uid ? Acesso.uid() : null, naTela = null;
+  function horaDe(iso) {
+    var d = new Date(iso), h = new Date();
+    return d.toDateString() === h.toDateString() ? (d.getHours() === 1 ? "da " : "das ") + Site.hora(p2(d.getHours()) + ":" + p2(d.getMinutes())) : "de " + p2(d.getDate()) + "/" + p2(d.getMonth() + 1);
+  }
+  function pronto() {
+    var era = falhouOn;
+    falhouOn = false; falhaEl.hidden = true;
+    ap.classList.remove("falhou");
+    if (era) syncInert();
+    if (ap.classList.contains("pronto")) return;
+    ap.classList.add("pronto", "chegou");
+    later(function () { ap.classList.remove("chegou"); }, 800);
+    try { document.dispatchEvent(new CustomEvent("evo-app-pronto")); } catch (e) {}
+  }
+  /* desde: de quando são os dados na tela (a barra aparece); vazio: a conexão voltou (a barra some) */
+  function semRede(desde) {
+    if (!desde) { offEl.hidden = true; ap.classList.remove("sem-rede"); return; }
+    $("#apOffT").textContent = "Sem conexão · dados " + horaDe(desde);
+    $("#apOffB").disabled = false; $("#apOffB").textContent = "Atualizar";
+    offEl.hidden = false; ap.classList.add("sem-rede");
+  }
+  function falhou(tipo) {
+    falhouOn = true;
+    ap.classList.remove("pronto"); ap.classList.add("falhou");
+    $("#apFalhaT").textContent = tipo === "cadastro" ? "Falta ligar o seu cadastro" : "Sem conexão com o Studio";
+    $("#apFalhaS").textContent = tipo === "cadastro" ? "Esta conta ainda não está ligada a um cadastro de aluno. Fale com o professor: ele resolve em um minuto."
+      : "Confira a internet do celular. O app tenta de novo sozinho assim que ela voltar.";
+    $("use", falhaEl).setAttribute("href", tipo === "cadastro" ? "#i-lock" : "#i-semrede");
+    $("#apFalhaB").classList.remove("loading");
+    semRede(null);
+    falhaEl.hidden = false; syncInert();
+  }
+  /* o que fica guardado no aparelho para o app abrir sem internet: o cadastro (sem contato nem anotações), as presenças,
+     as mensalidades, os graus e as vagas marcadas. Sai junto com a conta (acesso.js apaga no "Sair") */
+  function enxuga(a) {
+    var c = {};
+    Object.keys(a).forEach(function (k) { if (!/^(whatsapp|email|responsavel|nota|consentimento_em|consentimento_por|saida|atualizado_em)$/.test(k)) c[k] = a[k]; });
+    return c;
+  }
+  function lerGuardado() {
+    try {
+      var g = JSON.parse(localStorage.getItem(GUARDA) || "null");
+      return g && g.v === 1 && UID && g.uid === UID && Array.isArray(g.alunos) && g.extras ? g : null;
+    } catch (e) { return null; }
+  }
+  function guardar() {
+    if (demo || !carregou || !ALUNO || !UID || MEUS.dono !== ALUNO.id) return;
+    try {
+      var g = lerGuardado() || { v: 1, uid: UID, extras: {}, minhas: {} }, vivos = {};
+      g.em = new Date().toISOString();
+      g.alunos = FAMILIA.map(enxuga);
+      FAMILIA.forEach(function (a) { vivos[a.id] = 1; });
+      Object.keys(g.extras).forEach(function (k) { if (!vivos[k]) { delete g.extras[k]; delete g.minhas[k]; } });
+      g.extras[ALUNO.id] = { pres: MEUS.pres.slice(0, 600), mens: MEUS.mens, grads: MEUS.grads, cobs: MEUS.cobs || [] };
+      g.minhas[ALUNO.id] = MINHAS;
+      localStorage.setItem(GUARDA, JSON.stringify(g));
+    } catch (e) {}
+  }
+  /* a rede não respondeu: mostra o que está guardado (com a barra) ou, sem nada guardado, a tela de "sem conexão" */
+  function semResposta() {
+    if (ap.classList.contains("pronto")) return semRede(naTela || new Date().toISOString());
+    var g = lerGuardado(), l = g ? g.alunos.filter(function (a) { return g.extras[a.id]; }) : [];
+    if (!l.length) return falhou();
+    aplicar(l.map(function (a) { return Object.assign({}, a); }), g.uid, g);
+  }
+  function aplicar(l, uid, g) {
+    /* o próprio cadastro primeiro, depois os dependentes */
+    l.sort(function (a, b) { return (b.conta === uid) - (a.conta === uid) || a.nome.localeCompare(b.nome); });
+    FAMILIA = l;
+    var salvo = null;
+    try { salvo = localStorage.getItem("evo-membro"); } catch (e) {}
+    ALUNO = l.filter(function (x) { return x.id === salvo; })[0] || l[0];
+    CK = {}; CK[ALUNO.id] = 1;
+    paintFamilia();
+    AULA = proximaAula(ALUNO.turma, ALUNO.horario);
+    semAula = !AULA;
+    if (!AULA) AULA = { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 };
+    AULAS = semAula ? [] : aulas48(ALUNO.turma);
+    if (!semAula && !longe() && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
+    paintAula();
+    if (semAula) paintSpot();
+    if (g) {
+      /* dados guardados: nada de rede; as vagas marcadas de hoje em diante voltam como estavam */
+      var hoje = isoDia(new Date()), m = (g.minhas && g.minhas[ALUNO.id]) || {};
+      MINHAS = {};
+      Object.keys(m).forEach(function (k) { if (k.slice(0, 10) >= hoje) MINHAS[k] = 1; });
+      confirmed = !semAula && !!MINHAS[chaveAula(AULA)];
+      paintAulas(); paintSpot();
+      pintaExtras(g.extras[ALUNO.id]);
+      naTela = g.em;
+      pronto(); semRede(g.em);
+      return Promise.resolve();
+    }
+    carregou = true;
+    /* com a família carregada, o ranking e os movimentos passam a ser do membro escolhido */
+    if (FAMILIA.length > 1) carregarRank();
+    if (window.recarregarMov) window.recarregarMov();
+    carregarLoja();
+    if (semAula) { toast("Sua turma está sem aula na grade desta semana. Fale com o professor."); return extrasReal().then(carregarRecados).then(telaDoLink); }
+    return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]).then(presencaDoLink).then(abreNaHora).then(carregarRecados).then(telaDoLink);
+  }
   function carregarReal() {
     return Acesso.cliente().then(function (sb) {
       return Promise.all([sb.from("alunos").select("*").order("nome"), sb.auth.getSession()]);
     }).then(function (rs) {
       var r = rs[0], uid = rs[1] && rs[1].data && rs[1].data.session ? rs[1].data.session.user.id : null;
-      /* erro de rede ou do banco não é "conta sem cadastro": avisa e tenta de novo quando a internet voltar */
+      /* erro de rede ou do banco não é "conta sem cadastro": mostra o que está guardado e tenta de novo quando a internet voltar */
       if (!r || r.error) throw r && r.error;
+      if (uid) UID = uid;
       var l = (r.data || []).filter(function (x) { return x.ativo !== false; });
       if (!l.length) return semCadastro();
-      carregou = true;
-      /* o próprio cadastro primeiro, depois os dependentes */
-      l.sort(function (a, b) { return (b.conta === uid) - (a.conta === uid) || a.nome.localeCompare(b.nome); });
-      FAMILIA = l;
-      var salvo = null;
-      try { salvo = localStorage.getItem("evo-membro"); } catch (e) {}
-      ALUNO = l.filter(function (x) { return x.id === salvo; })[0] || l[0];
-      CK = {}; CK[ALUNO.id] = 1;
-      paintFamilia();
-      AULA = proximaAula(ALUNO.turma, ALUNO.horario);
-      if (!AULA) { AULA = { data: "", hora: "19:00", turma: TURMA[ALUNO.turma] || "Adulto", k: 0 }; return semCadastro(); }
-      AULAS = aulas48(ALUNO.turma);
-      if (!longe() && !AULAS.some(function (a) { return chaveAula(a) === chaveAula(AULA); })) AULAS.unshift(AULA);
-      paintAula();
-      /* com a família carregada, o ranking e os movimentos passam a ser do membro escolhido */
-      if (FAMILIA.length > 1) carregarRank();
-      if (window.recarregarMov) window.recarregarMov();
-      carregarLoja();
-      return Promise.all([minhasReservas(), atualizarQuem(), extrasReal()]).then(presencaDoLink).then(abreNaHora);
-    }).catch(function () { toast("Sem conexão com o Studio. Assim que a internet voltar, o app atualiza sozinho."); });
+      return aplicar(l, uid);
+    }).catch(semResposta);
   }
   var carregou = false;
   /* a internet voltou, ou o app voltou para a tela sem ter carregado: tenta de novo */
@@ -1572,12 +1732,26 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   if (demo) setTimeout(presencaDoLink, 400);
   /* a grade de aulas mudou no painel: a aula do cartão e a lista de aulas são refeitas */
   document.addEventListener("evo-grade", function () { if (!demo && carregou) renovar(); });
+  window.addEventListener("offline", function () { if (!demo && ap.classList.contains("pronto")) semRede(naTela || new Date().toISOString()); });
+  /* "Tentar de novo", na barra e na tela de falha: o botão mostra que está tentando */
+  function tentar(b, txt) {
+    if (b.disabled) return;
+    b.disabled = true; if (txt) b.textContent = "Atualizando…"; else b.classList.add("loading");
+    (carregou ? Promise.resolve(renovar()) : carregarReal()).then(function () { later(function () { b.disabled = false; b.classList.remove("loading"); if (txt) b.textContent = txt; }, 600); });
+  }
+  $("#apOffB").addEventListener("click", function () { tentar(this, "Atualizar"); });
+  $("#apFalhaB").addEventListener("click", function () { tentar(this); });
   if (!demo) {
     $("#ap").classList.add("sem-dados");
     carregarReal();
+    /* rede presa: em 15 s sem resposta, sai do esqueleto para os dados guardados (ou para a tela de "sem conexão") */
+    later(function () { if (!ap.classList.contains("pronto") && !falhouOn) semResposta(); }, 15000);
     setInterval(function () {
       if (document.hidden) return;
       if (!carregou) return tentaDeNovo();
+      /* os dados do membro não chegaram, ou a barra de "sem conexão" está na tela: tenta buscar de novo */
+      if (!ap.classList.contains("pronto") || ap.classList.contains("sem-rede")) return renovar();
+      carregarRecados();
       if (aulaAcabou()) return renovar();
       if (current === "presenca" || current === "inicio") atualizarQuem();
     }, 30000);
@@ -1586,6 +1760,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) { saiuEm = Date.now(); return; }
       if (!carregou) return tentaDeNovo();
+      carregarRecados();
       if (aulaAcabou() || (saiuEm && Date.now() - saiuEm > 10 * 60000)) renovar(); else atualizarQuem();
     });
   }
@@ -1669,6 +1844,12 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   $("#apGoal").addEventListener("click", function () { mudaMeta(1); });
   $("#apGoalMenos").addEventListener("click", function () { mudaMeta(-1); });
+  /* a meta fica num cartão pequeno ao lado da faixa; um toque abre a semana e o ajuste */
+  $("#apGoalC").addEventListener("click", function () {
+    var m = $("#apGoalMais"), abre = m.hidden;
+    m.hidden = !abre; this.setAttribute("aria-expanded", String(abre));
+    if (abre) into(m);
+  });
 
   /* ---------- Início: a mensalidade abre uma folha com o plano ---------- */
   var sheet = $("#apSheet"), scrim = $("#apScrim"), fee = $("#apFee");
@@ -1769,7 +1950,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         rs.forEach(function (r, i) { if (r.error) erro = erro || r.error; else ok.push(quem0[i]); });
         if (!ok.length) {
           paintCode();
-          setErr((erro && erro.message) || "Código não confere. Confira na TV do tatame.", true);
+          setErr(msgErro(erro, erro ? "Não deu para registrar agora. Tente de novo." : "Código não confere. Confira na TV do tatame."), true);
           if (document.activeElement === inp) inp.select();
           return;
         }
@@ -1786,7 +1967,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         registered = ok.indexOf(ALUNO) >= 0 || registered;
         regAt = hhmm(meu.data.chegou_em);
         if (registered) mostrarRegistro(true); else { inp.value = ""; typed = ""; paintCode(); }
-        if (FAMILIA.length > 1) setTimeout(function () { toast("Presença registrada: " + ok.map(function (x) { return x.nome.split(" ")[0]; }).join(" e ") + (erro ? ". " + erro.message : ".")); }, 700);
+        if (FAMILIA.length > 1) setTimeout(function () { toast("Presença registrada: " + ok.map(function (x) { return x.nome.split(" ")[0]; }).join(" e ") + (erro ? ". " + msgErro(erro, "Um dos registros não entrou") : ".")); }, 700);
         atualizarQuem(); extrasReal(); carregarRank();
       }).catch(function () { busy = false; paintCode(); setErr("Sem conexão. Tente de novo.", true); });
       return;
@@ -1975,7 +2156,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function paintLib() {
     var n = MOVS.length, feitos = MOVS.filter(function (m) { return estudado(m.id); }).length;
     $("#apMovLb").textContent = "Faixa " + Mov.FAIXAS[FAIXA].toLowerCase() + (n ? " · " + feitos + " de " + n + " estudados" : "");
-    $("#apMov2").innerHTML = feitos + "<small> de " + n + "</small>";
+    $("#apMov2").innerHTML = n ? feitos + "<small> de " + n + "</small>" : "—";
     /* continue assistindo: o último começado; sem nenhum começado, o primeiro com vídeo ainda não estudado */
     var com = MOVS.filter(function (m) { return m.video && !estudado(m.id); });
     var cont = com.filter(function (m) { return pr(m.id).visto > 0; }).sort(function (a, b) { return String(pr(b.id).em).localeCompare(String(pr(a.id).em)); })[0] || com[0];
@@ -2019,7 +2200,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
       PROG = r[1] || {};
       return Mov.lista({ faixa: FAIXA });
     }).then(function (l) { if (n !== movSeq) return; MOVS = l; paintLib(); paintSemanaTec(); })
-      .catch(function () { if (n === movSeq) toast("Não deu para carregar os movimentos. Confira a internet."); });
+      .catch(function () { if (n === movSeq) avisaErro("Não deu para carregar os movimentos. Confira a internet."); });
   }
   $("#apCats").addEventListener("click", function (e) {
     var b = e.target.closest("button");
@@ -2351,7 +2532,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     semBusy = true; b.classList.add("loading");
     (ja ? semApaga(ja.id).then(function () { SEM.meus = SEM.meus.filter(function (m) { return m !== ja; }); })
       : semGrava({ tipo: "aprendi", tecnica: tid }).then(function (row) { SEM.meus.unshift(row); toast("Boa! O professor vê que você aprendeu essa. Oss!"); }))
-      .catch(function () { toast("Não deu para marcar agora. Confira a internet e tente de novo."); })
+      .catch(function () { avisaErro("Não deu para marcar agora. Confira a internet e tente de novo."); })
       .then(function () { semBusy = false; if (ALUNO === membro) paintSemanaTec(); });
   });
   $("#apQueroF").addEventListener("submit", function (e) {
@@ -2363,7 +2544,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     semGrava({ tipo: "quero", titulo: (t.charAt(0).toUpperCase() + t.slice(1)).slice(0, 120) }).then(function (row) {
       SEM.meus.unshift(row); inp.value = "";
       toast("Pedido enviado ao professor: " + row.titulo + ".");
-    }).catch(function () { toast("Não deu para enviar agora. Confira a internet e tente de novo."); })
+    }).catch(function () { avisaErro("Não deu para enviar agora. Confira a internet e tente de novo."); })
       .then(function () { semBusy = false; btn.classList.remove("loading"); paintSemanaTec(); });
   });
   $("#apQueroL").addEventListener("click", function (e) {
@@ -2371,7 +2552,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     if (!b || semBusy) return;
     semBusy = true;
     semApaga(b.dataset.queroX).then(function () { SEM.meus = SEM.meus.filter(function (m) { return m.id !== b.dataset.queroX; }); })
-      .catch(function () { toast("Não deu para tirar agora. Tente de novo."); })
+      .catch(function () { avisaErro("Não deu para tirar agora. Tente de novo."); })
       .then(function () { semBusy = false; paintSemanaTec(); });
   });
   if (demo) carregarSemana();
@@ -2406,7 +2587,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   /* cada aviso traz o botão que resolve: confirmar a aula, mandar o comprovante, assistir ao movimento... */
   function noteHTML(n) {
-    return '<article class="ap-note" data-note="' + n.k + '"><span class="ico" aria-hidden="true"><span></span></span><div class="nb"><span class="hd"><span>Studio Evolution</span><span>' + esc(n.quando || "agora") + "</span></span>" +
+    return '<article class="ap-note' + (n.cls ? " " + n.cls : "") + '" data-note="' + n.k + '"><span class="ico" aria-hidden="true"><span></span></span><div class="nb"><span class="hd"><span>' + esc(n.de || "Studio Evolution") + "</span><span>" + esc(n.quando || "agora") + "</span></span>" +
       "<b>" + esc(n.t) + '</b><span class="tx">' + esc(n.d) + "</span>" +
       (n.a && n.a.length ? '<div class="ap-note-a">' + n.a.map(function (x, i) {
         return '<button type="button" class="ap-na' + (i === 0 ? " pri" : "") + '" data-act="' + x[1] + '"' + (x[2] ? ' data-arg="' + esc(x[2]) + '"' : "") + ">" + esc(x[0]) + "</button>";
@@ -2418,6 +2599,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     inicio: function () { leave("inicio"); },
     mens: function () { leave("inicio", openSheet); },
     perfil: function () { leave("perfil"); },
+    tela: function (arg) { if (TELAS_R[arg]) leave(arg); },
     story: function () { var g = MEUS.grads[0]; if (g) story({ tipo: "grau", fx: g.faixa, tit: g.graus ? g.graus + "º grau na faixa " + Site.faixaNome(g.faixa).toLowerCase() : "Faixa " + Site.faixaNome(g.faixa).toLowerCase(), data: g.data }); },
     mov: function (arg) { leave("movimentos", function () { if (arg) abrir(arg); }); },
     comprovante: function (arg) {
@@ -2436,7 +2618,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   ].map(noteHTML).join("");
 
   /* ---------- modo Supabase: a semana, a mensalidade, o perfil e os avisos com os dados do aluno ---------- */
-  var MEUS = { pres: [], mens: [], grads: [] };
+  var MEUS = { pres: [], mens: [], grads: [] }, RECADOS = [];
   var BC = { branca: "oklch(0.96 0.004 90)", cinza: "oklch(0.66 0.012 260)", amarela: "oklch(0.85 0.15 95)", laranja: "oklch(0.72 0.16 55)", verde: "oklch(0.58 0.13 150)", azul: "oklch(0.55 0.17 258)", roxa: "oklch(0.45 0.15 305)", marrom: "oklch(0.42 0.07 50)", preta: "oklch(0.2 0.006 285)" };
   var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   function diaDe(iso) { var q = String(iso).slice(0, 10).split("-"); return new Date(+q[0], +q[1] - 1, +q[2]); }
@@ -2455,13 +2637,32 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         sb.from("alunos").select("*").eq("id", ALUNO.id).maybeSingle()
       ]);
     }).then(function (r) {
-      /* trocou de membro no meio do caminho, ou faltou sinal: não pinta dados errados por cima */
-      if (ALUNO !== membro || r[0].error || r[1].error || r[2].error) return;
+      /* trocou de membro no meio do caminho: não pinta dados errados por cima */
+      if (ALUNO !== membro) return;
+      if (r[0].error || r[1].error || r[2].error) return extrasFalhou(membro);
       if (r[4] && r[4].data && !r[4].error) Object.keys(r[4].data).forEach(function (k) { membro[k] = r[4].data[k]; });
-      $("#ap").classList.remove("sem-dados");
-      MEUS.pres = r[0].data || []; MEUS.mens = r[1].data || []; MEUS.grads = r[2].data || []; MEUS.cobs = r[3] && !r[3].error ? r[3].data || [] : [];
-      paintSemana(); paintMens(); paintPerfil(); paintAvisosReal(); niver(); carregarSemana();
-    }).catch(function () {});
+      pintaExtras({ pres: r[0].data, mens: r[1].data, grads: r[2].data, cobs: r[3] && !r[3].error ? r[3].data : [] });
+      carregarSemana();
+      naTela = new Date().toISOString();
+      pronto(); semRede(null); guardar();
+    }).catch(function () { extrasFalhou(membro); });
+  }
+  function pintaExtras(x) {
+    x = x || {};
+    $("#ap").classList.remove("sem-dados");
+    MEUS.pres = x.pres || []; MEUS.mens = x.mens || []; MEUS.grads = x.grads || []; MEUS.cobs = x.cobs || []; MEUS.dono = ALUNO.id;
+    paintSemana(); paintMens(); paintPerfil(); paintAvisosReal(); niver(); paintBv();
+  }
+  /* faltou sinal ao buscar os dados do membro: usa os guardados dele (se houver) e mostra a barra; sem nada na tela, a tela de falha */
+  function extrasFalhou(membro) {
+    if (ALUNO !== membro) return;
+    var g = lerGuardado(), x = g && g.extras[membro.id];
+    if (MEUS.dono !== membro.id) {
+      if (x) { pintaExtras(x); naTela = g.em; pronto(); }
+      else if (!ap.classList.contains("pronto")) return falhou();
+      else $("#ap").classList.add("sem-dados");
+    }
+    semRede(naTela || new Date().toISOString());
   }
   /* a próxima aula da turma depois da que está no Início */
   function proximaDepois() {
@@ -2597,7 +2798,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
         im.onload = function () { av.classList.add("com-foto"); pintaFoto(); };
         im.src = URL.createObjectURL(b);
         toast("Foto colocada. Na demonstração ela não fica salva.");
-      }, function (e) { toast(erroFoto(e)); }).then(function () { btn.classList.remove("enviando"); });
+      }, function (e) { avisaErro(erroFoto(e)); }).then(function () { btn.classList.remove("enviando"); });
       return;
     }
     var membro = ALUNO, cli;
@@ -2614,10 +2815,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
           quem.forEach(function (q) { if (q.eu) q.foto = caminho; });
           pintaFoto(); paintSpot();
         }
-        paintFamilia();
+        paintFamilia(); paintBv();
         toast(membro.nome.split(" ")[0] + ", sua foto já aparece na lista de quem vai. Oss!");
       });
-    }).catch(function (e) { toast(erroFoto(e)); }).then(function () { btn.classList.remove("enviando"); });
+    }).catch(function (e) { avisaErro(erroFoto(e)); }).then(function () { btn.classList.remove("enviando"); });
   });
   if (!demo) Fotos.liga(Acesso.cliente());
   /* trocar a senha estando logado: direto no Perfil, sem e-mail */
@@ -2756,6 +2957,10 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     $("#apComp").hidden = true;
     $("#apNote").textContent = "O próximo grau é decisão do professor. Treinar com frequência e estudar os movimentos da faixa ajudam.";
     $("#apPassAulas").textContent = totalStudio + (totalStudio === 1 ? " aula" : " aulas");
+    /* quem ainda não tem aula registrada não vê três zeros: vê por onde o passaporte começa */
+    var novo = totalStudio === 0;
+    $(".ap-trio", pf).hidden = novo; $("#apNovo").hidden = !novo;
+    if (novo) $("#apCalW").hidden = true;
     paintTl(linhaDoTempo(a));
   }
   /* ---------- cartão para Stories: 1080 × 1920, desenhado no aparelho ---------- */
@@ -2835,7 +3040,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   function story(o) {
     stVolta = document.activeElement;
     desenhaStory(o).then(function (b) {
-      if (!b) return toast("Não deu para montar a imagem neste aparelho.");
+      if (!b) return avisaErro("Não deu para montar a imagem neste aparelho.");
       stBlob = b;
       if (stUrl) URL.revokeObjectURL(stUrl);
       stUrl = URL.createObjectURL(b);
@@ -2913,15 +3118,145 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     var g = MEUS.grads[0];
     /* o grau lançado no cadastro é o que o aluno já tinha: não é graduação nova, não dá parabéns */
     if (g && !/ao entrar no Studio|antes do app/i.test(g.nota || "") && (diaDe(hoje) - diaDe(g.data)) / 864e5 <= 14) l.push({ k: "perfil", t: "Parabéns pelo grau!", d: Site.faixaNome(g.faixa) + " · " + (g.graus ? g.graus + (g.graus === 1 ? " grau" : " graus") : "sem grau") + ", em " + br(g.data) + ".", a: [["Postar nos Stories", "story"], ["Ver no Perfil", "perfil"]] });
+    /* os recados do professor: os não lidos no topo; os já lidos ficam guardados no fim da lista */
+    var novos = RECADOS.filter(function (x) { return !x.lido_em || x.agora; }), lidos = RECADOS.filter(function (x) { return x.lido_em && !x.agora; }).slice(0, 10);
+    var nn = l.length + RECADOS.filter(function (x) { return !x.lido_em; }).length;
+    l = novos.map(recadoNota).concat(l, lidos.map(recadoNota));
     var box = $(".app-notes", noteV);
     box.innerHTML = l.map(noteHTML).join("") || '<p class="app-notes-none">Nenhum aviso agora.</p>';
     var badge = $("#apBadge"), vendo = current === "avisos";
-    badge.textContent = l.length;
-    badge.hidden = !l.length || vendo;
-    bell.setAttribute("aria-label", l.length && !vendo ? "Avisos, " + l.length + (l.length === 1 ? " novo" : " novos") : "Avisos");
+    badge.textContent = nn;
+    badge.hidden = !nn || vendo;
+    bell.setAttribute("aria-label", nn && !vendo ? "Avisos, " + nn + (nn === 1 ? " novo" : " novos") : "Avisos");
     if (vendo) notes();
   }
   window.paintAvisosReal = paintAvisosReal;
+
+  /* ---------- recados do professor (tabela avisos): chegam como notificação; aqui ficam guardados e, sem ler, abrem em destaque ---------- */
+  var TELAS_R = { inicio: "Ir para o Início", presenca: "Ver as aulas", movimentos: "Ver os movimentos", perfil: "Ver meu perfil" };
+  var recadoOk = true, recEl = $("#apRecado"), recFila = [], recAtual = null, recTotal = 0;
+  function quandoCurto(iso) {
+    var d = new Date(iso), h = new Date(), dias = Math.round((new Date(h.getFullYear(), h.getMonth(), h.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5);
+    return dias <= 0 ? "hoje, " + Site.hora(p2(d.getHours()) + ":" + p2(d.getMinutes())) : dias === 1 ? "ontem" : p2(d.getDate()) + "/" + p2(d.getMonth() + 1);
+  }
+  function recadoNota(x) {
+    var de = FAMILIA.length > 1 ? FAMILIA.filter(function (a) { return a.id === x.aluno; })[0] : null;
+    return { k: "recado", cls: x.lido_em && !x.agora ? "lida" : "nova", de: "Recado do Studio" + (de ? " · " + de.nome.split(" ")[0] : ""), quando: quandoCurto(x.criado_em).replace(/^hoje, /, ""), t: x.titulo, d: x.corpo || "",
+      a: x.tela && TELAS_R[x.tela] ? [[TELAS_R[x.tela], "tela", x.tela]] : [] };
+  }
+  function carregarRecados() {
+    if (demo || !recadoOk || !carregou || !ses || ses.papel !== "aluno") return Promise.resolve();
+    return Acesso.cliente().then(function (sb) {
+      return sb.from("avisos").select("id, aluno, titulo, corpo, tela, criado_em, lido_em").order("criado_em", { ascending: false }).limit(30);
+    }).then(function (r) {
+      /* a tabela ainda não existe (atualização do banco pendente): o app segue sem os recados */
+      if (r.error) { if (/PGRST205|PGRST204|42P01/.test(r.error.code || "") || /does not exist|schema cache/i.test(r.error.message || "")) recadoOk = false; return; }
+      var meus = {}, vistos = {};
+      FAMILIA.forEach(function (a) { meus[a.id] = 1; });
+      RECADOS.forEach(function (x) { if (x.agora) vistos[x.id] = 1; });
+      RECADOS = (r.data || []).filter(function (x) { return meus[x.aluno]; });
+      RECADOS.forEach(function (x) { if (vistos[x.id]) x.agora = true; });
+      paintAvisosReal(); abreRecado();
+    }).catch(function () {});
+  }
+  /* veio pelo toque na notificação (app.html?aviso=<id>&tela=<tela>): o recado ainda não lido abre em destaque (acima);
+     se já foi lido, o app vai direto para a tela pedida. O endereço fica limpo para não repetir ao recarregar */
+  function telaDoLink() {
+    var q = new URLSearchParams(location.search), t = q.get("tela");
+    if (!q.has("aviso") && !t) return;
+    try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
+    if (t && TELAS_R[t] && recEl.hidden && !porCima() && current !== t) show(t);
+  }
+  function marcaLido(x) {
+    if (!x || x.lido_em) return;
+    x.lido_em = new Date().toISOString(); x.agora = true;
+    Acesso.cliente().then(function (sb) { return sb.rpc("aviso_lido", { p_id: x.id }); }).catch(function () {});
+  }
+  /* abrir a lista de avisos conta como ler: o ponto fica até sair da tela */
+  function lerRecados() { if (demo) return; RECADOS.forEach(marcaLido); }
+  function porCima() { return sheetOn || modalOn || falhouOn || !$("#apOk").hidden || !$("#apStory").hidden || document.documentElement.classList.contains("ap-vivo-on"); }
+  function abreRecado() {
+    if (!recEl.hidden || current === "avisos" || porCima()) return;
+    var nl = RECADOS.filter(function (x) { return !x.lido_em; });
+    if (!nl.length) return;
+    recFila = nl.slice().reverse(); recTotal = recFila.length;
+    modalOn = true; syncInert();
+    proximoRecado();
+  }
+  function proximoRecado() {
+    recAtual = recFila.shift();
+    if (!recAtual) {
+      recEl.hidden = true; modalOn = false; syncInert(); paintAvisosReal();
+      try { document.dispatchEvent(new CustomEvent("evo-recado-fim")); } catch (e) {}
+      return;
+    }
+    var de = FAMILIA.length > 1 ? FAMILIA.filter(function (a) { return a.id === recAtual.aluno; })[0] : null, ir = $("#apRecadoIr");
+    $("#apRecadoQ").textContent = quandoCurto(recAtual.criado_em) + (de ? " · para " + de.nome.split(" ")[0] : "");
+    $("#apRecadoN").textContent = recTotal > 1 ? (recTotal - recFila.length) + " de " + recTotal : "";
+    $("#apRecadoT").textContent = recAtual.titulo;
+    $("#apRecadoC").textContent = recAtual.corpo || "";
+    $("#apRecadoOk").textContent = recFila.length ? "Próximo recado" : "Entendi";
+    ir.hidden = !(recAtual.tela && TELAS_R[recAtual.tela]);
+    if (!ir.hidden) ir.textContent = TELAS_R[recAtual.tela];
+    recEl.hidden = false;
+    Site.focusSoft($("#apRecadoT"), { preventScroll: true });
+  }
+  $("#apRecadoOk").addEventListener("click", function () { marcaLido(recAtual); proximoRecado(); });
+  $("#apRecadoIr").addEventListener("click", function () {
+    var t = recAtual && recAtual.tela;
+    marcaLido(recAtual); recFila = []; proximoRecado();
+    if (t && TELAS_R[t]) show(t);
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !recEl.hidden) { marcaLido(recAtual); proximoRecado(); } });
+
+  /* ---------- primeiros passos: quem ainda não tem aula registrada vê o que fazer primeiro ---------- */
+  var bv = $("#apBv");
+  function paintBv() {
+    if (!bv) return;
+    if (demo || !ALUNO || !ALUNO.id || MEUS.dono !== ALUNO.id) { bv.hidden = true; return; }
+    var total = MEUS.pres.length + (ALUNO.aulas_antes || 0), fechou = false;
+    try { fechou = !!localStorage.getItem("evo-bv-" + ALUNO.id); } catch (e) {}
+    var temAviso = "Notification" in window, pedeInstalar = !instalado && (iphone || !temAviso);
+    var feito = { aula: confirmed || registered || Object.keys(MINHAS).length > 0, foto: !!ALUNO.foto, avisos: pedeInstalar ? false : temAviso && Notification.permission === "granted" };
+    var itens = $$("[data-bvi]", bv), n = 0, tot = 0;
+    $("#apBvA").textContent = pedeInstalar ? "Instale o app no celular" : "Ative os avisos";
+    $("#apBvAs").textContent = pedeInstalar ? "Ele fica na tela inicial e recebe os avisos do Studio." : "Lembrete da aula e recados do professor.";
+    itens.forEach(function (li) {
+      var k = li.dataset.bvi, ok = !!feito[k], num = $(".n", li);
+      li.hidden = k === "avisos" && !pedeInstalar && !temAviso;
+      if (li.hidden) return;
+      tot++; if (ok) n++;
+      li.classList.toggle("ok", ok);
+      num.innerHTML = ok ? CHECK : String(tot);
+      $("button", li).disabled = ok;
+    });
+    $("#apBvT").textContent = "Boas-vindas ao tatame, " + ALUNO.nome.split(" ")[0] + ".";
+    $("#apBvN").textContent = n + " de " + tot + (n === 1 ? " feito" : " feitos");
+    bv.hidden = total > 0 || fechou || n === tot;
+  }
+  bv.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-bv]");
+    if (!b) return;
+    if (b.dataset.bv === "aula") { into($("#apHero")); Site.focusSoft(confBtn, { preventScroll: true }); }
+    else if (b.dataset.bv === "foto") { show("perfil"); $("#apFotoIn").click(); }
+    else if (!instalado && (iphone || !("Notification" in window))) inst.click();
+    else if (window.EvoPush) EvoPush.pedir(true);
+    else show("conta");
+  });
+  $("#apBvX").addEventListener("click", function () {
+    try { localStorage.setItem("evo-bv-" + ALUNO.id, "1"); } catch (e) {}
+    bv.hidden = true;
+    toast("Combinado. Os primeiros passos ficam nos Ajustes do Perfil.");
+  });
+  document.addEventListener("evo-push", function () { paintBv(); });
+  /* o que os módulos de fora (app-push.js) precisam do app: travar o fundo, saber se a tela está livre e avisar */
+  window.EvoApp = {
+    modal: function (on) { modalOn = !!on; syncInert(); if (!on) abreRecado(); },
+    livre: function () { return ap.classList.contains("pronto") && recEl.hidden && !porCima(); },
+    nome: function () { return ALUNO && ALUNO.nome ? ALUNO.nome.split(" ")[0] : (ses && ses.nome ? ses.nome.split(" ")[0] : ""); },
+    aula: function () { return AULA && AULA.data && !semAula ? Site.hora(AULA.hora) : ""; },
+    toast: toast, ir: show
+  };
   if (demo) {
     $("#apPassAulas").textContent = "148 aulas";
     paintTl([
@@ -2975,7 +3310,9 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
     h.addEventListener("touchend", sai);
   })();
   paintSpot();
-  if (anim) gsap.from(".ap.app .ap-view.on > *, .ap-dock", { y: 14, opacity: 0, duration: 0.8, stagger: 0.04, ease: "expo.out" });
+  /* na conta de verdade o conteúdo entra quando os dados chegam (app-estado.css): aqui só a barra; animar os cartões ainda
+     escondidos deixava a opacidade presa em zero */
+  if (anim) gsap.from(demo ? ".ap.app .ap-view.on > *, .ap-dock" : ".ap-dock", { y: 14, opacity: 0, duration: 0.8, stagger: 0.04, ease: "expo.out" });
 })();
 </script>
 <!-- câmera do tatame (piloto): só aparece para quem o professor liberou no painel -->

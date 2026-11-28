@@ -190,7 +190,7 @@
   P.permissoes = [];
   P.AREAS = [["hoje", "Hoje e Modo tatame"], ["alunos", "Alunos"], ["graduacoes", "Graduações"], ["ranking", "Frequência e ranking"], ["movimentos", "Movimentos"],
     ["interessados", "Interessados"], ["financeiro", "Financeiro"], ["estoque", "Estoque e loja"], ["configuracoes", "Configurações"]];
-  var AREA_ABA = { hoje: "hoje", tatame: "hoje", alunos: "alunos", grad: "graduacoes", rank: "ranking", mov: "movimentos", leads: "interessados", fin: "financeiro", estoque: "estoque", config: "configuracoes", equipe: "dono", cam: "dono" };
+  var AREA_ABA = { hoje: "hoje", tatame: "hoje", alunos: "alunos", grad: "graduacoes", rank: "ranking", mov: "movimentos", leads: "interessados", fin: "financeiro", estoque: "estoque", config: "configuracoes", equipe: "dono", cam: "dono", avisos: "alunos" };
   P.ehDono = function () { return P.papel !== "gestao"; };
   P.pode = function (area) { if (P.ehDono()) return true; return area !== "dono" && P.permissoes.indexOf(area) >= 0; };
   P.podeAba = function (aba) { var ar = AREA_ABA[aba]; return !ar || P.pode(ar); };

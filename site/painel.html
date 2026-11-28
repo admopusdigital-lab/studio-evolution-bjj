@@ -156,6 +156,7 @@ body.pr { background: var(--paper); }
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.3 18.4z"/><path d="M9 9.2c0 2.9 2.9 5.8 5.8 5.8l1.2-1.4-2-1-1 .8a4 4 0 0 1-2.4-2.4l.8-1-1-2z"/></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
     <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></symbol>
     <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2.5 12.5h4l2.5-6 4 12 3-8 1.5 2h4"/></symbol>
     <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="12.5" rx="2"/><path d="M8 20.5h8M12 17v3.5"/></symbol>
@@ -183,6 +184,7 @@ body.pr { background: var(--paper); }
       <button type="button" data-go="rank" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pulse"/></svg>Frequência</button>
       <button type="button" data-go="mov" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-play"/></svg>Movimentos</button>
       <button type="button" data-go="leads" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-inbox"/></svg>Interessados<span class="badge" id="bLeads" hidden></span></button>
+      <button type="button" data-go="avisos" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-bell"/></svg>Avisos</button>
       <button type="button" data-go="fin" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-coin"/></svg>Financeiro<span class="badge" id="bFin" hidden></span></button>
       <button type="button" data-go="estoque" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-box"/></svg>Estoque<span class="badge" id="bEst" hidden></span></button>
       <button type="button" data-go="config" aria-current="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-gear"/></svg>Configurações</button>
@@ -420,6 +422,12 @@ body.pr { background: var(--paper); }
       </section>
 
       <!-- Câmeras (só o professor): a aula ao vivo para as famílias, em preparo; nada aparece no app até liberar -->
+      <!-- Avisos: recado para um aluno, uma turma ou todos. Chega como notificação e fica guardado no app (painel-avisos.js) -->
+      <section class="dv" data-v="avisos" aria-labelledby="t-avisos">
+        <div class="dv-h"><div><p class="dv-k">Notificação no celular e recado no app</p><h3 id="t-avisos">Avisos</h3></div><p>Escreva para um aluno, uma turma ou todos. Quem ativou os avisos recebe a notificação na hora; os outros veem o recado ao abrir o app.</p></div>
+        <div id="recBox"></div>
+      </section>
+
       <section class="dv" data-v="cam" aria-labelledby="t-cam">
         <div class="dv-h"><div><p class="dv-k" id="camK">Em preparo · só você vê esta área</p><h3 id="t-cam">Câmeras</h3></div><p>A aula ao vivo no app, para os responsáveis, só no horário da aula e sem gravação. Enquanto não for liberada, os alunos e a equipe não veem nada disso.</p></div>
         <div id="camBox"></div>
@@ -465,6 +473,7 @@ body.pr { background: var(--paper); }
 <script src="painel-celular.js"></script>
 <script src="painel-passos.js"></script>
 <script src="painel-push.js"></script>
+<script src="painel-avisos.js"></script>
 <script src="vivo.js"></script>
 <script src="painel-cameras.js"></script>
 <script src="painel-material.js"></script>

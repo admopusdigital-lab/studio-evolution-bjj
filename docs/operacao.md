@@ -85,11 +85,39 @@ Para ativar: no Supabase, Edge Functions, Deploy a new function, nome `excluir-c
 
 ## Notificações push (avisos no celular do aluno)
 
-- **Aluno:** no app, Perfil, "Notificações neste aparelho", Ativar. No iPhone só funciona com o app na Tela de Início (Safari, Compartilhar, Adicionar à Tela de Início). "Enviar um teste" mostra o aviso chegando.
-- **Professor e equipe:** no painel, Hoje, "Aviso pelo app": escolher para quem (todos ou uma turma), título e mensagem. Chega na conta do aluno e na do responsável. Limite de 10 avisos por hora.
+- **Aluno:** ao abrir o app, quem ainda não tem os avisos ativos vê o pedido "Ative os avisos" ("Agora não" adia por 3 dias; o prazo é `DIAS` em `site/app-push.js`). Também dá para ativar em Perfil, engrenagem (Ajustes), "Avisos neste aparelho". No iPhone só funciona com o app na Tela de Início (Safari, Compartilhar, Adicionar à Tela de Início). "Enviar um teste" mostra o aviso chegando.
+- **Professor e equipe:** no painel, Hoje, "Aviso pelo app": escolher para quem (todos ou uma turma), título e mensagem. Chega na conta do aluno e na do responsável. Para escrever com o nome de cada aluno ou para um aluno só, use a aba Avisos (abaixo).
 
 Para ativar:
 1. Banco: rodar `supabase/atualizar-2026-11-28.sql` (traz as tabelas das notificações).
 2. Função: no Supabase, Edge Functions, Deploy a new function, nome `push`, colar `supabase/functions/push/index.ts`, desligar Verify JWT.
 
 As chaves que assinam os envios são criadas pela função na primeira chamada e ficam em `push_chaves`, que ninguém lê pelo app. Não há chave para copiar nem guardar. Aparelho que não existe mais sai da lista sozinho.
+
+## Avisos por aluno (aba Avisos do painel)
+
+O professor (ou quem da equipe tem a área Alunos) escreve um recado para um aluno, vários, uma turma ou todos.
+
+- **Nome de cada um:** onde o texto tiver `{nome}`, cada aluno lê o próprio primeiro nome. O botão "Inserir o primeiro nome" põe o `{nome}` onde está o cursor. A prévia mostra como chega no celular.
+- **Quem recebe:** quem ativou os avisos no app recebe a notificação na hora (na conta do aluno e na do responsável). Quem não ativou vê o recado ao abrir o app, porque ele fica guardado. Aluno sem conta no app não recebe: a lista marca "Sem conta no app".
+- **Ao tocar no aviso:** o app abre na tela escolhida (Início, Agendar, Movimentos ou Perfil).
+- **Histórico:** os últimos envios, com quantos celulares receberam e quantos alunos já leram.
+- **Atalhos:** na ficha do aluno, "Mandar aviso"; no Hoje, "Aviso para um aluno".
+- **Limites:** 60 envios por hora, 200 alunos por envio, título de 60 letras e mensagem de 240. "Todos" pede confirmação.
+
+Para ativar (as duas partes, em qualquer ordem):
+1. Banco: rodar `supabase/atualizar-2026-11-29.sql` no SQL Editor. Traz de novo o que era de 28/11 e acrescenta a tabela `avisos`. Pode rodar mais de uma vez.
+2. Função: no Supabase, Edge Functions, `push`, colar o `supabase/functions/push/index.ts` novo no lugar do código e clicar em Deploy (Verify JWT continua desligado).
+
+Enquanto faltar uma das duas, a aba mostra o aviso com o link do arquivo. Com a função antiga, o envio sai igual para todos e o painel não deixa mandar texto com `{nome}`. Sem o SQL, a notificação chega, mas o recado não fica guardado no app.
+
+O recado guardado fica em `avisos` (um por aluno, já com o nome). O aluno e o responsável só leem os próprios; marcar como lido passa por `aviso_lido`. Quantos aparelhos cada aluno tem com aviso ativo vem de `push_alcance`, que só responde à equipe.
+
+## App do aluno: carregando, sem conexão e primeiro acesso
+
+- **Carregando:** até os dados do aluno chegarem, o app mostra a forma dos cartões (esqueleto). Dados de exemplo só existem na demonstração (site sem o sistema ligado).
+- **Sem conexão:** o app guarda no aparelho (`evo-guardado`, no armazenamento do navegador) o último estado do aluno: cadastro sem contato, presenças, graus, mensalidades e vagas marcadas. Sem sinal, abre com esses dados e a barra "Sem conexão · dados das …". Sem nada guardado, ou se o servidor falhar na primeira abertura, aparece a tela "Sem conexão com o Studio" com "Tentar de novo". Sair da conta apaga a cópia.
+- **Conta sem cadastro:** a tela "Falta ligar o seu cadastro" aparece quando o e-mail do login não está em nenhum aluno. Resolve no painel, na ficha do aluno.
+- **Erros:** o aluno só vê as mensagens escritas para ele (as do banco com código `P0…`, como "A turma já está cheia"). Qualquer outro erro vira uma frase simples.
+- **Primeiros passos:** o cartão do Início aparece para quem ainda não tem aula registrada (nem aulas de antes do app) e some depois da primeira aula ou com os três passos feitos.
+- **Ajustes:** a conta (avisos, tema, senha, privacidade, sair, excluir) fica na engrenagem do Perfil.

@@ -1352,3 +1352,91 @@ html[data-mode="painel"] { scrollbar-color: color-mix(in oklch, var(--ink) 30%, 
 
 /* celular, folha "Mais": a etiqueta "em preparo" das Câmeras com o mesmo desenho do menu lateral (estava colada no nome) */
 .pn-mais .cam-tag { margin-left: 8px; padding: 2px 7px; border-radius: 999px; font: 600 10px/1.3 var(--sans); letter-spacing: 0.04em; color: var(--gold-text); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--gold) 55%, transparent); }
+
+/* ---------- Avisos (aba): recado para um aluno, uma turma ou todos, com prévia e alcance (painel-avisos.js) ---------- */
+.pu-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.rec-g { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr); gap: 16px; align-items: start; margin-top: 18px; }
+.rec-form { display: grid; gap: 18px; }
+/* a coluna da prévia acompanha a rolagem: o que vai chegar, para quantos e o botão de enviar ficam sempre à vista */
+.rec-lado { display: grid; gap: 16px; position: sticky; top: 84px; }
+.rec-fim { display: grid; gap: 10px; }
+.rec-env .mini-btn[type="submit"] { flex: 1 1 auto; min-height: 44px; }
+.rec-fs { min-width: 0; margin: 0; padding: 0; border: 0; display: grid; gap: 10px; }
+.rec-lg { padding: 0; font: 600 11px/1.3 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-text); }
+.pr .seg.rec-seg { justify-self: start; margin-top: 0; }
+.pr .seg.rec-seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.rec-form .chips { margin-top: 0; }
+.rec-form .crm-in { font-size: 14.5px; }
+.rec-f > span, .rec-f > label > span { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.rec-f small { font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.rec-f textarea { min-height: 96px; resize: vertical; }
+.rec-nome { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 12.5px; line-height: 1.4; color: var(--ink-3); }
+.rec-lk { padding: 0; border: 0; background: none; color: var(--gold-text); font: 600 12.5px/1.3 var(--sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.rec-var { padding: 1px 6px; border-radius: 6px; background: color-mix(in oklch, var(--gold) 18%, transparent); color: var(--gold-text); font-style: normal; font-size: 0.92em; white-space: nowrap; }
+/* escolher alunos */
+.rec-esc { display: grid; gap: 8px; }
+.rec-busca { position: relative; }
+.rec-busca .ic { position: absolute; left: 11px; top: 50%; width: 15px; height: 15px; margin-top: -7.5px; color: var(--ink-3); pointer-events: none; }
+.rec-busca .crm-in { padding-left: 34px; }
+.rec-esc-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 24px; font-size: 12.5px; color: var(--ink-2); }
+.rec-l { margin: 0; padding: 4px; list-style: none; max-height: 318px; overflow-y: auto; overscroll-behavior: contain; border-radius: 12px; background: color-mix(in oklch, var(--ink) 3%, transparent); box-shadow: inset 0 0 0 1px var(--rule); }
+.rec-al { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 48px; padding: 6px 10px; border-radius: 9px; cursor: pointer; }
+.rec-al input { width: 18px; height: 18px; margin: 0; accent-color: var(--gold); cursor: pointer; }
+.rec-al:has(input:checked) { background: color-mix(in oklch, var(--gold) 13%, transparent); }
+.rec-al:has(input:focus-visible) { outline: 2px solid var(--gold); outline-offset: -2px; }
+@media (hover: hover) and (pointer: fine) { .rec-al:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); } .rec-al:has(input:checked):hover { background: color-mix(in oklch, var(--gold) 18%, transparent); } }
+.rec-al-t { min-width: 0; display: grid; gap: 1px; }
+.rec-al-t b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13.5px; font-weight: 600; }
+.rec-al-t small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--ink-3); }
+.rec-st { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; white-space: nowrap; color: var(--ink-3); }
+.rec-st .ic { width: 13px; height: 13px; stroke-width: 2; }
+.rec-st.ok { color: var(--ok); }
+.rec-st.sem { color: var(--warn); }
+.rec-vazio { padding: 16px; text-align: center; font-size: 13px; color: var(--ink-3); }
+/* a prévia: um celular com a notificação (a mesma nos dois temas, é o retrato de uma tela) */
+.rec-tela { padding: 22px 12px 16px; border-radius: 22px; background: radial-gradient(120% 90% at 22% 0%, oklch(0.36 0.045 75), oklch(0.17 0.012 75) 72%); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.1), 0 18px 30px -22px oklch(0 0 0 / 0.7); }
+.rec-hora { margin: 0 0 16px; text-align: center; font: 300 34px/1 var(--sans); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: oklch(1 0 0 / 0.92); }
+.rec-not { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; padding: 11px 12px; border-radius: 16px; background: oklch(1 0 0 / 0.15); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.2); color: oklch(0.985 0 0); }
+.rec-not img { width: 34px; height: 34px; border-radius: 8px; }
+.rec-not-h { display: flex; justify-content: space-between; gap: 8px; margin: 0; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(1 0 0 / 0.62); }
+.rec-not b { display: block; margin-top: 2px; font: 600 13.5px/1.3 var(--sans); overflow-wrap: anywhere; }
+.rec-not p:last-child { margin: 1px 0 0; font-size: 13px; line-height: 1.38; color: oklch(1 0 0 / 0.86); overflow-wrap: anywhere; }
+.rec-not .vazio { font-weight: 400; color: oklch(1 0 0 / 0.5); }
+/* o alcance */
+.rec-alc { margin: 0; font-size: 14px; line-height: 1.3; color: var(--ink-2); }
+.rec-alc b { margin-right: 6px; font: 400 30px/1 var(--serif); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.rec-bar { height: 6px; margin-top: 10px; border-radius: 99px; background: color-mix(in oklch, var(--ink) 10%, transparent); overflow: hidden; }
+.rec-bar i { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--gold); transition: width 400ms cubic-bezier(0.22, 1, 0.36, 1); }
+.rec-env { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.rec-env .mini-btn:disabled { opacity: 0.5; cursor: default; }
+/* o histórico e o aviso de atualização */
+.rec-hist { margin-top: 16px; }
+.rec-h { margin: 0; padding: 0; list-style: none; }
+.rec-h li { display: grid; gap: 3px; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 13.5px; }
+.rec-h li:first-child { padding-top: 0; border-top: 0; }
+.rec-h li:last-child { padding-bottom: 0; }
+.rec-h span { color: var(--ink-2); }
+.rec-h small { font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+.rec-h .rec-vazio { padding: 6px 0; text-align: left; }
+.rec-banco { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: color-mix(in oklch, var(--warn) 12%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--warn) 40%, transparent); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+.rec-banco b { display: block; }
+.rec-banco b:not(:first-child) { margin-top: 8px; }
+.rec-banco a { color: inherit; font-weight: 600; }
+@media (max-width: 980px) {
+  .rec-g { grid-template-columns: minmax(0, 1fr); }
+  .rec-lado { position: static; }
+}
+@media (max-width: 860px) {
+  .rec-l { max-height: 300px; }
+  .rec-al { min-height: 52px; }
+  .rec-lk { min-height: 40px; }
+  .rec-env .mini-btn { flex: 1 1 auto; min-height: 48px; }
+  .rec-st { font-size: 11px; }
+}
+@media (max-width: 420px) {
+  /* nome comprido + estado: o estado desce para a linha de baixo, sem cortar o nome */
+  .rec-al { grid-template-columns: auto auto minmax(0, 1fr); }
+  .rec-st { grid-column: 3; }
+}
+@media (pointer: coarse) { .rec-form .crm-in { font-size: 16px; min-height: 44px; } .pr .seg.rec-seg button { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { .rec-bar i { transition: none; } }

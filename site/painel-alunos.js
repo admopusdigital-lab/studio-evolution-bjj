@@ -548,6 +548,7 @@
         '<div class="fp-acts">' +
           (P.pode("graduacoes") ? '<button class="mini-btn fp-gold" type="button" data-grau>Registrar grau</button>' : "") +
           (a.whatsapp ? '<button class="mini-btn wa" type="button" data-wa>WhatsApp</button>' : "") +
+          (a.ativo && P.avisoPara && P.podeAba("avisos") ? '<button class="mini-btn ghost" type="button" data-aviso>Mandar aviso</button>' : "") +
           (P.pode("financeiro") && cobs !== null ? '<button class="mini-btn ghost" type="button" data-lanca>Lançar valor</button>' : "") +
           (P.pode("alunos") ? '<button class="mini-btn ghost" type="button" data-edit>Editar dados</button>' : "") +
         "</div></div>";
@@ -679,6 +680,7 @@
         else if (b.hasAttribute("data-wa")) P.wa(a.whatsapp, "Oi, " + P.first(a.responsavel || a.nome) + "! Aqui é do Studio Evolution BJJ. ");
         else if (b.hasAttribute("data-edit")) editar(a, dr);
         else if (b.hasAttribute("data-grau")) P.registrarGrau(a.id);
+        else if (b.hasAttribute("data-aviso")) P.avisoPara(a.id);
         else if (b.dataset.ficha2) P.abrirAluno(b.dataset.ficha2);
         else if (b.hasAttribute("data-ja-tinha")) {
           b.classList.add("loading");

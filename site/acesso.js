@@ -139,8 +139,14 @@
       }).catch(function () { return { ok: false, campo: "senha", msg: MSG_REDE }; });
     },
 
+    /* o id da conta, lido da sessão guardada (sem rede): o app usa para saber de quem são os dados guardados no aparelho */
+    uid: function () {
+      try { var t = JSON.parse(ler(TOKEN) || "null"); return (t && t.user && t.user.id) || null; } catch (e) { return null; }
+    },
     sair: function () {
       apagar(SESSAO);
+      /* os dados do aluno guardados para o app abrir sem internet saem junto com a conta */
+      apagar("evo-guardado");
       if (!REAL) return Promise.resolve();
       /* sai mesmo sem rede: o token local é apagado de qualquer jeito */
       var fim = function () { apagar(TOKEN); };
