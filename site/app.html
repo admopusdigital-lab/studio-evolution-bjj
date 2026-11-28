@@ -624,6 +624,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 }
 </style>
 <link rel="stylesheet" href="tema.css">
+<!-- material e profundidade do app (vidro, bordas que dissolvem, a cor da faixa): depois de tudo -->
+<link rel="stylesheet" href="app-material.css">
 </head>
 <body class="app-body">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -2707,6 +2709,8 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
   }
   function paintFaixa(fx, graus, desde, kid) {
     var nome = Site.faixaNome(fx), card = $("#apFx");
+    /* a faixa dá o tom do app: a luz do fundo e os brilhos pegam a cor dela (app-material.css) */
+    $("#ap").setAttribute("data-faixa", Site.faixaBase(fx));
     $$("[data-belt]").forEach(function (el) { beltInto(el, fx, graus, kid); });
     $(".ap-fx-n", card).textContent = nome;
     $(".ap-fx-g", card).innerHTML = fitas(fx, graus, kid);
@@ -2975,6 +2979,7 @@ body.app-body { overflow: hidden; overscroll-behavior: none; background: var(--c
 })();
 </script>
 <!-- câmera do tatame (piloto): só aparece para quem o professor liberou no painel -->
+<script src="app-material.js"></script>
 <script src="vivo.js"></script>
 <script src="app-aovivo.js"></script>
 <script src="app-conta.js"></script>

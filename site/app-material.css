@@ -1,0 +1,171 @@
+/* Studio Evolution BJJ · app do aluno: material e profundidade.
+   Carregado depois de tudo e só no app (regras presas a #ap), refina o vidro que o app já tinha.
+   A ideia: o que flutua sobre o conteúdo (sino, barra de baixo, telas que sobem) é vidro com espessura,
+   com aro de luz, sombra por dentro e o conteúdo dissolvendo por baixo. O conteúdo em si continua em cartões
+   foscos: desfoque em muitos cartões pesa no celular e tira a leitura.
+   A personalidade: a faixa do aluno dá o tom. A luz do fundo, o brilho do cartão principal e a lente da barra
+   pegam a cor da faixa (#ap[data-faixa]); o ouro continua sendo a cor da marca e das ações.
+   Quem pede menos transparência, mais contraste ou menos movimento recebe a versão sólida e parada (no fim). */
+
+/* ---------- a cor da faixa (a preta usa o vermelho da ponteira; a branca, um perolado) ---------- */
+#ap { --faixa-luz: var(--gold); }
+#ap[data-faixa="branca"] { --faixa-luz: oklch(0.93 0.02 85); }
+#ap[data-faixa="cinza"] { --faixa-luz: oklch(0.72 0.03 255); }
+#ap[data-faixa="amarela"] { --faixa-luz: oklch(0.86 0.15 95); }
+#ap[data-faixa="laranja"] { --faixa-luz: oklch(0.74 0.16 55); }
+#ap[data-faixa="verde"] { --faixa-luz: oklch(0.68 0.15 150); }
+#ap[data-faixa="azul"] { --faixa-luz: oklch(0.64 0.17 258); }
+#ap[data-faixa="roxa"] { --faixa-luz: oklch(0.6 0.18 305); }
+#ap[data-faixa="marrom"] { --faixa-luz: oklch(0.58 0.1 55); }
+#ap[data-faixa="preta"] { --faixa-luz: oklch(0.58 0.2 27); }
+
+/* ---------- o material, nos dois temas ---------- */
+#ap {
+  /* tema claro */
+  --m-vidro: color-mix(in oklch, white 62%, transparent);
+  --m-blur: saturate(185%) blur(24px);
+  --m-aro: linear-gradient(140deg, rgb(255 255 255 / 0.98), rgb(255 255 255 / 0.4) 28%, rgb(120 95 40 / 0.1) 60%, rgb(255 255 255 / 0.75));
+  --m-dentro: inset 0 1px 0 rgb(255 255 255 / 0.95), inset 0 -9px 16px -11px rgb(120 95 40 / 0.2);
+  --m-sombra: 0 20px 36px -18px rgb(80 60 20 / 0.36), 0 3px 8px -3px rgb(80 60 20 / 0.18);
+  --m-lente: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.62));
+  --m-lente-s: inset 0 1px 0 #fff, inset 0 0 0 0.5px rgb(0 0 0 / 0.05), 0 5px 12px -6px rgb(80 60 20 / 0.4);
+  --m-luz-1: 20%; --m-luz-2: 16%; --m-luz-3: 9%;
+  --m-grao-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .25 0 0 0 0 .25 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); --m-kanji: 9%;
+  --m-botao: inset 0 1px 0 rgb(255 255 255 / 0.2), inset 0 -2px 0 rgb(0 0 0 / 0.45), 0 12px 22px -14px rgb(0 0 0 / 0.55);
+  --m-cortina: color-mix(in oklch, var(--paper) 78%, transparent);
+}
+:root[data-look="black"] #ap, :root:not([data-look]) #ap {
+  --m-vidro: color-mix(in oklch, oklch(0.3 0.01 75) 56%, transparent);
+  --m-blur: saturate(190%) blur(26px) brightness(1.06);
+  --m-aro: linear-gradient(140deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.1) 26%, rgb(255 255 255 / 0.02) 58%, rgb(255 255 255 / 0.3));
+  --m-dentro: inset 0 1px 0.5px rgb(255 255 255 / 0.34), inset 0 -11px 18px -12px rgb(0 0 0 / 0.5);
+  --m-sombra: 0 24px 42px -18px rgb(0 0 0 / 0.78), 0 4px 10px -4px rgb(0 0 0 / 0.4);
+  --m-lente: linear-gradient(180deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.07));
+  --m-lente-s: inset 0 1px 0 rgb(255 255 255 / 0.42), inset 0 -1px 0 rgb(0 0 0 / 0.22), 0 6px 14px -8px rgb(0 0 0 / 0.65);
+  --m-luz-1: 36%; --m-luz-2: 22%; --m-luz-3: 15%;
+  --m-grao-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); --m-kanji: 11%;
+  --m-botao: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -2px 0 rgb(0 0 0 / 0.16), 0 12px 24px -14px color-mix(in oklch, var(--gold) 72%, transparent);
+  --m-cortina: color-mix(in oklch, var(--paper) 72%, transparent);
+}
+
+/* ---------- o fundo: a luz da faixa, o ouro da marca, o ideograma e um grão fino ---------- */
+/* a primeira mancha de luz é da faixa do aluno; a segunda continua dourada */
+#ap .ap-views::before {
+  background:
+    radial-gradient(48% 42% at 16% 14%, color-mix(in oklch, var(--faixa-luz) var(--m-luz-1), transparent), transparent 70%),
+    radial-gradient(42% 36% at 90% 50%, color-mix(in oklch, var(--gold) var(--m-luz-2), transparent), transparent 70%),
+    radial-gradient(55% 32% at 35% 96%, color-mix(in oklch, var(--faixa-luz) var(--m-luz-3), transparent), transparent 70%);
+}
+/* 柔 ("ju", o "suave" do jiu-jitsu), em contorno, como no site: um detalhe para quem repara, na beirada, atrás dos cartões */
+#ap .ap-views::after {
+  content: "柔"; content: "柔" / "";
+  position: absolute; z-index: 0; right: -34px; top: 96px; pointer-events: none;
+  font: 400 310px/1 "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", "Noto Serif JP", serif;
+  color: transparent; -webkit-text-stroke: 1px color-mix(in oklch, var(--faixa-luz) var(--m-kanji), transparent);
+  -webkit-user-select: none; user-select: none;
+  /* só na beirada direita: some antes de chegar ao meio, para nunca riscar o texto */
+  -webkit-mask-image: linear-gradient(to left, #000 8%, transparent 62%); mask-image: linear-gradient(to left, #000 8%, transparent 62%);
+}
+/* grão: tira o degrau dos degradês no escuro e dá ao vidro o que "morder". Fica no fundo de tudo, parado
+   (sem modo de mistura: uma camada misturando por cima do conteúdo custaria quadros na rolagem) */
+#ap { background-image: var(--m-grao-img); background-size: 180px 180px; }
+
+/* ---------- bordas que dissolvem: o conteúdo some suave no topo e amacia por baixo da barra ---------- */
+@property --m-topo { syntax: "<length>"; inherits: false; initial-value: 0px; }
+#ap .ap-view:not([data-view="aula"]):not(.lockv):not(.quiz) {
+  --m-topo: 0px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--m-topo), #000 calc(100% - var(--dock-b) - var(--dock-h) - 30px), rgb(0 0 0 / 0.34) calc(100% - var(--dock-b) - 6px), rgb(0 0 0 / 0.12) 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--m-topo), #000 calc(100% - var(--dock-b) - var(--dock-h) - 30px), rgb(0 0 0 / 0.34) calc(100% - var(--dock-b) - 6px), rgb(0 0 0 / 0.12) 100%);
+}
+/* só depois de rolar: parado no alto, a primeira linha fica inteira */
+#ap .ap-view.rolou { --m-topo: 22px; }
+/* trocar de aba mais rápido: entra em menos de meio segundo */
+#ap .ap-view { transition: opacity 220ms ease-out, transform 420ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 420ms, --m-topo 260ms ease-out; }
+#ap .ap-view.on { transition: opacity 260ms ease-out, transform 420ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s, --m-topo 260ms ease-out; }
+
+/* ---------- o topo: sem faixa; a marca solta e o sino num botão de vidro ---------- */
+#ap .app-top { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; border: 0; }
+#ap .app-bell { width: 38px; height: 38px; background: var(--m-vidro); -webkit-backdrop-filter: var(--m-blur); backdrop-filter: var(--m-blur);
+  box-shadow: var(--m-dentro), var(--m-sombra); transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), background-color 200ms ease-out; }
+#ap .app-bell::before, #ap .ap-dock::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: var(--m-aro);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+#ap .app-bell:active { transform: scale(0.94); }
+#ap .app-bell[aria-pressed="true"] { background: color-mix(in oklch, var(--gold) 26%, var(--m-vidro)); }
+
+/* ---------- a barra de baixo: vidro grosso, aro de luz e uma lente que desliza até a aba ---------- */
+#ap .ap-dock {
+  background: var(--m-vidro); -webkit-backdrop-filter: var(--m-blur); backdrop-filter: var(--m-blur);
+  box-shadow: var(--m-dentro), var(--m-sombra);
+  transition: scale 340ms cubic-bezier(0.22, 1, 0.36, 1), translate 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: 50% 100%;
+}
+/* rolando para baixo a barra recolhe um pouco e devolve espaço; rolando para cima, volta */
+#ap .ap-dock.mini { scale: 0.93; translate: 0 5px; }
+/* a lente: uma só, que anda de aba em aba (o destaque fixo de cada botão sai de cena) */
+#ap .ap-dock button:not(.ap-dock-go)[aria-current="true"]::before { display: none; }
+#ap .ap-dock-lente {
+  position: absolute; z-index: 0; top: 7px; bottom: 7px; left: 0; width: var(--lw, 25%); border-radius: 19px; pointer-events: none;
+  background: radial-gradient(120% 140% at 50% 0%, color-mix(in oklch, var(--faixa-luz) 20%, transparent), transparent 70%), var(--m-lente);
+  box-shadow: var(--m-lente-s);
+  transform: translateX(var(--lx, 0px)); opacity: var(--lo, 0);
+  transition: transform 460ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease-out;
+}
+#ap .ap-dock button { z-index: 1; }
+#ap .ap-dock button:not(.ap-dock-go) .ic { transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1); }
+#ap .ap-dock button:not(.ap-dock-go)[aria-current="true"] .ic { transform: translateY(-1px) scale(1.06); }
+#ap .ap-dock button:not(.ap-dock-go):active .ic { transform: scale(0.9); }
+
+/* ---------- o cartão principal: a luz da faixa por baixo, como se ele flutuasse sobre ela ---------- */
+#ap .ap-hero {
+  box-shadow: 0 30px 50px -30px oklch(0 0 0 / 0.9), 0 16px 34px -18px color-mix(in oklch, var(--faixa-luz) 55%, transparent), 0 2px 0 -1px color-mix(in oklch, var(--gold) 30%, transparent);
+}
+:root:not([data-look="black"]) #ap .ap-hero {
+  box-shadow: 0 24px 40px -28px oklch(0.3 0.03 75 / 0.45), 0 16px 30px -18px color-mix(in oklch, var(--faixa-luz) 42%, transparent);
+}
+:root[data-look="black"] #ap .ap-hero, :root:not([data-look]) #ap .ap-hero {
+  box-shadow: 0 30px 50px -30px oklch(0 0 0 / 0.9), 0 16px 34px -18px color-mix(in oklch, var(--faixa-luz) 55%, transparent), 0 2px 0 -1px color-mix(in oklch, var(--gold) 30%, transparent);
+}
+
+/* ---------- botões principais: relevo de verdade (luz em cima, sombra embaixo) e afundam ao toque ---------- */
+#ap .ap-btn:not(.ghost):not(.ok):not(.off) { box-shadow: var(--m-botao); transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 140ms ease-out, background-color 200ms ease-out; }
+#ap .ap-btn:not(.ghost):not(.ok):not(.off):active { transform: translateY(1px) scale(0.985); box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.28); }
+
+/* ---------- números: alinhados pelo dígito, para não tremerem quando mudam ---------- */
+#ap .ap-big b, #ap .ap-trio b, #ap .ap-tk b, #ap .ap-row .r, #ap .ap-fx-c { font-variant-numeric: tabular-nums; }
+
+/* ---------- telas que sobem por cima: o app recua e escurece atrás de uma cortina de vidro ---------- */
+.ap-vivo { background: var(--m-cortina, color-mix(in oklch, var(--paper) 76%, transparent)); -webkit-backdrop-filter: saturate(160%) blur(30px); backdrop-filter: saturate(160%) blur(30px); }
+html:not([data-look="black"]) .ap-vivo { background: color-mix(in oklch, var(--paper) 80%, transparent); }
+#ap { transition: scale 420ms cubic-bezier(0.22, 1, 0.36, 1), filter 300ms ease-out; transform-origin: 50% 40%; }
+html.ap-vivo-on #ap { scale: 0.955; filter: brightness(0.72); }
+
+/* ---------- quem pede menos: transparência, contraste, movimento ---------- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  #ap { --m-vidro: var(--paper-2); }
+  .ap-vivo { background: var(--paper); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  #ap { --m-vidro: var(--paper-2); }
+  #ap .app-bell, #ap .ap-dock, .ap-vivo { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .ap-vivo, html:not([data-look="black"]) .ap-vivo { background: var(--paper); }
+  #ap .ap-view:not([data-view="aula"]):not(.lockv):not(.quiz) { -webkit-mask-image: none; mask-image: none; }
+  #ap { background-image: none; }
+}
+@media (prefers-contrast: more) {
+  #ap { --m-vidro: var(--paper); }
+  #ap .app-bell, #ap .ap-dock { -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 0 0 1.5px var(--ink); }
+  #ap .app-bell::before, #ap .ap-dock::after, #ap .ap-views::after { display: none; }
+  #ap { background-image: none; }
+  #ap .ap-view:not([data-view="aula"]):not(.lockv):not(.quiz) { -webkit-mask-image: none; mask-image: none; }
+  .ap-vivo, html:not([data-look="black"]) .ap-vivo { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #ap, #ap .ap-dock, #ap .ap-dock-lente, #ap .ap-dock button .ic, #ap .app-bell, #ap .ap-btn { transition: none !important; }
+  #ap .ap-dock.mini { scale: none; translate: none; }
+  html.ap-vivo-on #ap { scale: none; }
+  #ap .ap-view, #ap .ap-view.on { transition: opacity 160ms ease-out, visibility 0s; }
+  #ap .ap-btn:not(.ghost):not(.ok):not(.off):active { transform: none; }
+}

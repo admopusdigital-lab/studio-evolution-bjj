@@ -2,9 +2,21 @@
    Rodar:  bash scripts/montar-site.sh && node tests/fumaca.js
    Cada verificação imprime "ok" ou "FALHOU"; no fim, sai com erro se alguma falhou (o GitHub Actions marca vermelho).
    O banco de verdade nunca é tocado: tudo que vai para o Supabase é respondido pelo simulador. */
+/* No sábado e no domingo a grade não tem as aulas que os testes conferem (a das 19h, a chamada). Para o teste não
+   ficar vermelho todo fim de semana, a fumaça roda como se fosse a sexta-feira anterior: a data recua 1 ou 2 dias só
+   enquanto os dados de exemplo são montados (depois o relógio do Node volta ao normal, porque o Playwright usa ele),
+   e as páginas recebem a mesma data pelo relógio que o teste instala. */
+const DateReal = Date;
+const RECUO = (d => (d === 6 ? 1 : d === 0 ? 2 : 0) * 864e5)(new Date().getDay());
+if (RECUO) global.Date = class extends DateReal {
+  constructor(...a) { if (a.length) super(...a); else super(DateReal.now() - RECUO); }
+  static now() { return DateReal.now() - RECUO; }
+};
 const { chromium } = require('playwright');
 const simula = require('./simulador.js');
 require('./dados-de-exemplo.js')(simula.T);
+const HOJE = new Date().toISOString().slice(0, 10);
+global.Date = DateReal;
 
 const BASE = 'https://evolutionbjj.com.br';
 const falhas = [];
@@ -29,7 +41,7 @@ async function pagina(b, opcoes, papel) {
 
 (async () => {
   const b = await chromium.launch();
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = HOJE;
 
   /* 1) páginas públicas, no celular e no computador */
   for (const [nome, vp, mob] of [['celular', { width: 390, height: 844 }, true], ['computador', { width: 1440, height: 900 }, false]]) {
