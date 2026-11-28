@@ -1,0 +1,191 @@
+/* Studio Evolution BJJ · painel do professor: material e profundidade.
+   Carregado depois de tudo e só no painel (regras presas a #pr), sem mudar onde as coisas ficam.
+   O painel é ferramenta de trabalho, então a regra é a mesma do app com mais contenção:
+   - o que flutua sobre o conteúdo (topo, menu, barra do celular, folha "Mais", avisos) é vidro com espessura;
+   - os blocos de conteúdo ganham o mesmo material fosco (luz em cima, sombra macia, cantos iguais), sem desfoque;
+   - a cor carrega informação: a luz do fundo e a lente do menu pegam a cor da turma que está no tatame agora
+     (html[data-turma]: dourado no Adulto, azul no Kids 1, verde no Kids 2, as cores da grade), e apagam fora de aula.
+   Quem pede menos transparência, mais contraste ou menos movimento recebe a versão sólida e parada (no fim). */
+
+/* ---------- a cor da turma no tatame ---------- */
+#pr { --turma-luz: var(--gold); --turma-forca: 0.45; }
+html[data-turma="adulto"] #pr { --turma-luz: var(--gold); }
+html[data-turma="kids1"] #pr { --turma-luz: oklch(0.66 0.15 250); }
+html[data-turma="kids2"] #pr { --turma-luz: oklch(0.68 0.14 160); }
+html[data-turma="open"] #pr { --turma-luz: oklch(0.9 0.02 85); }
+html[data-agora="sim"] #pr { --turma-forca: 1; }
+html[data-agora="logo"] #pr { --turma-forca: 0.7; }
+
+/* ---------- o material, nos dois temas ---------- */
+#pr {
+  /* tema claro */
+  --m-vidro: color-mix(in oklch, white 64%, transparent);
+  --m-blur: saturate(180%) blur(22px);
+  --m-aro: linear-gradient(140deg, rgb(255 255 255 / 0.98), rgb(255 255 255 / 0.4) 28%, rgb(120 95 40 / 0.1) 60%, rgb(255 255 255 / 0.75));
+  --m-dentro: inset 0 1px 0 rgb(255 255 255 / 0.95), inset 0 -9px 16px -11px rgb(120 95 40 / 0.2);
+  --m-sombra: 0 20px 36px -18px rgb(80 60 20 / 0.36), 0 3px 8px -3px rgb(80 60 20 / 0.18);
+  --m-lente: linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(255 255 255 / 0.66));
+  --m-lente-s: inset 0 1px 0 #fff, inset 0 0 0 0.5px rgb(0 0 0 / 0.05), 0 5px 12px -7px rgb(80 60 20 / 0.4);
+  --m-luz-1: 15%; --m-luz-2: 10%;
+  /* blocos de conteúdo */
+  --s-fundo: linear-gradient(180deg, rgb(255 255 255 / 0.86), rgb(255 255 255 / 0.62));
+  --s-luz: rgb(255 255 255 / 0.95); --s-borda: rgb(60 45 15 / 0.09);
+  --s-sombra: 0 14px 28px -22px rgb(80 60 20 / 0.34), 0 1px 2px rgb(80 60 20 / 0.06);
+  --s-campo: inset 0 1px 2px rgb(60 45 15 / 0.1);
+  --s-botao: inset 0 1px 0 rgb(255 255 255 / 0.2), inset 0 -1.5px 0 rgb(0 0 0 / 0.4), 0 6px 14px -9px rgb(0 0 0 / 0.5);
+  --s-trilho: inset 0 1px 2px rgb(60 45 15 / 0.12), inset 0 0 0 1px rgb(60 45 15 / 0.05);
+  --m-grao-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .25 0 0 0 0 .25 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-look="black"] #pr, :root:not([data-look]) #pr {
+  --m-vidro: color-mix(in oklch, oklch(0.24 0.008 75) 60%, transparent);
+  --m-blur: saturate(190%) blur(24px) brightness(1.05);
+  --m-aro: linear-gradient(140deg, rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.1) 26%, rgb(255 255 255 / 0.02) 58%, rgb(255 255 255 / 0.28));
+  --m-dentro: inset 0 1px 0.5px rgb(255 255 255 / 0.32), inset 0 -11px 18px -12px rgb(0 0 0 / 0.5);
+  --m-sombra: 0 24px 42px -18px rgb(0 0 0 / 0.78), 0 4px 10px -4px rgb(0 0 0 / 0.4);
+  --m-lente: linear-gradient(180deg, rgb(255 255 255 / 0.17), rgb(255 255 255 / 0.06));
+  --m-lente-s: inset 0 1px 0 rgb(255 255 255 / 0.36), inset 0 -1px 0 rgb(0 0 0 / 0.22), 0 6px 14px -9px rgb(0 0 0 / 0.65);
+  --m-luz-1: 26%; --m-luz-2: 15%;
+  --s-fundo: linear-gradient(180deg, rgb(255 255 255 / 0.062), rgb(255 255 255 / 0.03));
+  --s-luz: rgb(255 255 255 / 0.2); --s-borda: rgb(255 255 255 / 0.09);
+  --s-sombra: 0 18px 34px -24px rgb(0 0 0 / 0.9), 0 1px 3px rgb(0 0 0 / 0.3);
+  --s-campo: inset 0 1px 2px rgb(0 0 0 / 0.35);
+  --s-botao: inset 0 1px 0 rgb(255 255 255 / 0.6), inset 0 -1.5px 0 rgb(0 0 0 / 0.18), 0 6px 14px -9px rgb(0 0 0 / 0.7);
+  --s-trilho: inset 0 1px 2px rgb(0 0 0 / 0.45), inset 0 0 0 1px rgb(255 255 255 / 0.05);
+  --m-grao-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- o fundo: a luz da turma e o ouro, parados atrás de tudo, com um grão fino ---------- */
+#pr { background-image: var(--m-grao-img); background-size: 180px 180px; }
+#pr::before {
+  content: ""; position: fixed; z-index: 0; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(46% 52% at 12% 0%, color-mix(in oklch, var(--turma-luz) calc(var(--m-luz-1) * var(--turma-forca)), transparent), transparent 70%),
+    radial-gradient(40% 44% at 96% 30%, color-mix(in oklch, var(--gold) var(--m-luz-2), transparent), transparent 70%);
+  transition: opacity 600ms ease-out;
+}
+/* as camadas que eram opacas deixam a luz passar */
+#pr .dash, #pr .dash-side { background: none; }
+#pr .dash { position: relative; z-index: 1; }
+
+/* ---------- o topo: vidro, sem a linha dura; a página dissolve por baixo dele ao rolar ---------- */
+#pr .pn-top { background: var(--m-vidro); -webkit-backdrop-filter: var(--m-blur); backdrop-filter: var(--m-blur); border-bottom: 0;
+  box-shadow: inset 0 -0.5px 0 var(--s-borda); }
+#pr .pn-top::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 22px; pointer-events: none; opacity: 0;
+  background: linear-gradient(to bottom, color-mix(in oklch, var(--paper) 70%, transparent), transparent); transition: opacity 240ms ease-out; }
+html.pr-rolou #pr .pn-top::after { opacity: 1; }
+/* a aula no tatame, à vista de qualquer área */
+#pr .pn-agora { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 12px 0 10px; border: 0; border-radius: 999px; cursor: pointer;
+  background: color-mix(in oklch, var(--turma-luz) 14%, transparent); color: var(--ink); font: 600 12.5px/1 var(--sans); white-space: nowrap;
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--turma-luz) 40%, transparent); transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), background-color 200ms ease-out; }
+#pr .pn-agora[hidden] { display: none; }
+#pr .pn-agora i { width: 8px; height: 8px; border-radius: 50%; background: var(--turma-luz); box-shadow: 0 0 0 3px color-mix(in oklch, var(--turma-luz) 28%, transparent); }
+html[data-agora="sim"] #pr .pn-agora i { animation: pr-pulso 2.4s ease-in-out infinite; }
+#pr .pn-agora:active { transform: scale(0.97); }
+@keyframes pr-pulso { 50% { box-shadow: 0 0 0 6px color-mix(in oklch, var(--turma-luz) 0%, transparent); } }
+@media (max-width: 860px) { #pr .pn-agora { display: none; } }
+
+/* ---------- o menu lateral: uma lente de vidro que desliza até a área escolhida ---------- */
+#pr .dash-side { border-right: 0; }
+@media (min-width: 861px) {
+  /* o fio que separa o menu some nas pontas, em vez de riscar a tela de cima a baixo */
+  #pr .dash-side::after { content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 1px; pointer-events: none;
+    background: linear-gradient(to bottom, transparent, var(--rule) 12%, var(--rule) 88%, transparent); }
+  #pr .dash-side button[aria-current="true"] { background: none; }
+  #pr .dash-lente { position: absolute; z-index: 0; left: 12px; right: 12px; top: 0; height: var(--lh, 37px); border-radius: 10px; pointer-events: none;
+    background: radial-gradient(130% 150% at 0% 50%, color-mix(in oklch, var(--turma-luz) 22%, transparent), transparent 72%), var(--m-lente);
+    box-shadow: var(--m-lente-s); transform: translateY(var(--ly, 0px)); opacity: var(--lo, 0);
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), height 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease-out; }
+  #pr .dash-side button, #pr .dash-side .who { position: relative; z-index: 1; }
+  #pr .dash-side button .ic { transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1); }
+  #pr .dash-side button[aria-current="true"] .ic { transform: scale(1.08); color: var(--gold-text); }
+  #pr .dash-side button:active { transform: scale(0.985); }
+}
+
+/* ---------- os blocos de conteúdo: o mesmo material em todos (luz em cima, sombra macia, cantos iguais) ---------- */
+#pr :is(.kpi, .room, .hj-box, .fin-box, .fin-cob, .fin-ext, .bi-card, .bi-meta, .bi-proj, .cfg-card, .cfg-studio, .es-card, .ld-col, .cam-card, .pu, .ps, .gcard, .lead, .crm-form, .mv, .diff, .f12, .fq-k, .empty-big, .crm-empty, .ldf) {
+  background: var(--s-fundo); border-color: transparent; border-radius: 16px;
+  box-shadow: inset 0 1px 0 var(--s-luz), inset 0 0 0 1px var(--s-borda), var(--s-sombra);
+}
+/* os que tinham o fio dourado em cima guardam o ouro como luz na borda de cima (acompanha o canto) */
+#pr :is(.kpi, .room, .hj-box, .fin-box, .fin-cob, .fin-ext, .crm-form, .fq-k) {
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--gold) 55%, var(--s-luz)), inset 0 0 0 1px var(--s-borda), var(--s-sombra);
+}
+/* a aula do momento: o bloco principal do Hoje flutua sobre a luz da turma */
+#pr .hj .room.agora {
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--turma-luz) 70%, var(--s-luz)), inset 0 0 0 1px color-mix(in oklch, var(--turma-luz) 42%, transparent), 0 26px 44px -28px color-mix(in oklch, var(--turma-luz) 60%, transparent), var(--s-sombra);
+}
+/* cartões dentro de colunas (quadro de interessados): mais baixos que a coluna, para não empilhar sombra */
+#pr .ld-card { background: var(--s-fundo); border-radius: 12px; box-shadow: inset 0 1px 0 var(--s-luz), inset 0 0 0 1px var(--s-borda); }
+#pr .ld-card.velho { box-shadow: inset 0 1px 0 var(--s-luz), inset 0 0 0 1.5px var(--gold); }
+#pr .grd-sem > div { background: var(--s-fundo); box-shadow: inset 0 1px 0 var(--s-luz), inset 0 0 0 1px var(--s-borda); }
+
+/* ---------- controles ---------- */
+/* abas e segmentos: um trilho afundado com a opção escolhida em relevo */
+#pr .seg { background: color-mix(in oklch, var(--ink) 5%, transparent); box-shadow: var(--s-trilho); }
+#pr .seg button { transition: background-color 200ms ease-out, color 200ms ease-out, transform 120ms cubic-bezier(0.22, 1, 0.36, 1); }
+#pr .seg button[aria-selected="true"], #pr .seg button[aria-pressed="true"] { box-shadow: var(--s-botao); }
+/* botões principais com relevo; os secundários viram vidro fosco */
+#pr .mini-btn:not(.ghost):not(.wa):not(:disabled) { box-shadow: var(--s-botao); border-radius: 9px; }
+#pr .mini-btn.ghost { border-radius: 9px; background: var(--s-fundo); box-shadow: inset 0 1px 0 var(--s-luz), inset 0 0 0 1px var(--s-borda); }
+#pr .mini-btn.wa { border-radius: 9px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), inset 0 -1.5px 0 rgb(0 0 0 / 0.16), 0 6px 14px -9px rgb(0 0 0 / 0.5); }
+#pr .mini-btn:not(:disabled):active { transform: translateY(0.5px) scale(0.975); }
+#pr .chips button { background: var(--s-fundo); box-shadow: inset 0 1px 0 var(--s-luz); }
+#pr .chips button[aria-pressed="true"] { background: var(--ink); box-shadow: var(--s-botao); }
+/* campos: afundados, com o foco em ouro */
+#pr .crm-in { box-shadow: var(--s-campo); border-radius: 9px; transition: border-color 160ms ease-out, box-shadow 160ms ease-out; }
+#pr .crm-in:focus-visible { outline: 0; border-color: var(--gold); box-shadow: var(--s-campo), 0 0 0 3px color-mix(in oklch, var(--gold) 28%, transparent); }
+/* linhas de tabela respondem ao ponteiro */
+@media (hover: hover) and (pointer: fine) {
+  #pr .tbl tbody tr { transition: background-color 160ms ease-out; }
+  #pr .tbl tbody tr:hover { background: color-mix(in oklch, var(--ink) 3.5%, transparent); }
+}
+
+/* ---------- o que sobe por cima ---------- */
+#pr .dash-toast { background: var(--m-vidro); color: var(--ink); -webkit-backdrop-filter: var(--m-blur); backdrop-filter: var(--m-blur); box-shadow: var(--m-dentro), var(--m-sombra); }
+#pr .dash-toast .ic { color: var(--gold-text); }
+/* a ficha lateral: o painel atrás escurece e desfoca um pouco, a ficha vem para a frente */
+#pr .drawer-scrim { -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
+/* trocar de área: o conteúdo entra curto, desacelerando */
+#pr .dv.on { animation: pr-entra 300ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes pr-entra { from { opacity: 0; transform: translateY(8px); } }
+
+/* ---------- celular: a barra de baixo em vidro grosso, com lente; a folha "Mais" também ---------- */
+@media (max-width: 860px) {
+  #pr .pn-dock { background: var(--m-vidro); -webkit-backdrop-filter: var(--m-blur); backdrop-filter: var(--m-blur); border: 0; box-shadow: var(--m-dentro), var(--m-sombra);
+    transition: scale 340ms cubic-bezier(0.22, 1, 0.36, 1), translate 340ms cubic-bezier(0.22, 1, 0.36, 1); transform-origin: 50% 100%; }
+  #pr .pn-dock::after, #pr .pn-mais:not([hidden])::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; background: var(--m-aro);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+  #pr .pn-dock.mini { scale: 0.94; translate: 0 5px; }
+  #pr .pn-dock button[aria-current="true"] { background: none; }
+  #pr .pn-dock-lente { position: absolute; z-index: 0; top: 6px; bottom: 6px; left: 0; width: var(--lw, 20%); border-radius: 16px; pointer-events: none;
+    background: radial-gradient(120% 140% at 50% 0%, color-mix(in oklch, var(--turma-luz) 20%, transparent), transparent 70%), var(--m-lente);
+    box-shadow: var(--m-lente-s); transform: translateX(var(--lx, 0px)); opacity: var(--lo, 0);
+    transition: transform 440ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease-out; }
+  #pr .pn-dock button { z-index: 1; }
+  #pr .pn-mais:not([hidden]) { background: var(--m-vidro); -webkit-backdrop-filter: var(--m-blur); backdrop-filter: var(--m-blur); border: 0; box-shadow: var(--m-dentro), var(--m-sombra); }
+  /* o conteúdo amacia antes de passar por baixo da barra */
+  html.tem-dock #pr::after { content: ""; position: fixed; z-index: 55; left: 0; right: 0; bottom: 0; height: calc(104px + env(safe-area-inset-bottom, 0px)); pointer-events: none;
+    background: linear-gradient(to top, color-mix(in oklch, var(--paper) 82%, transparent), transparent); }
+}
+
+/* ---------- quem pede menos: transparência, contraste, movimento ---------- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  #pr { --m-vidro: var(--paper); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  #pr { --m-vidro: var(--paper); background-image: none; }
+  #pr .pn-top, #pr .pn-dock, #pr .pn-mais:not([hidden]), #pr .dash-toast, #pr .drawer-scrim { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  #pr .dash-toast { background: var(--paper-2); }
+}
+@media (prefers-contrast: more) {
+  #pr { --m-vidro: var(--paper); --s-fundo: var(--paper-2); --s-borda: var(--ink-3); background-image: none; }
+  #pr::before, #pr .pn-dock::after, #pr .pn-mais:not([hidden])::after { display: none; }
+  #pr .pn-top, #pr .pn-dock, #pr .pn-mais:not([hidden]), #pr .dash-toast, #pr .drawer-scrim { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  #pr .pn-top { box-shadow: inset 0 -1px 0 var(--ink-3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #pr .dash-lente, #pr .pn-dock-lente, #pr .pn-dock, #pr .mini-btn, #pr .seg button, #pr .dash-side button .ic, #pr .pn-agora { transition: none !important; }
+  #pr .dv.on, html[data-agora="sim"] #pr .pn-agora i { animation: none; }
+  #pr .pn-dock.mini { scale: none; translate: none; }
+  #pr .mini-btn:not(:disabled):active, #pr .dash-side button:active { transform: none; }
+}

@@ -1349,3 +1349,6 @@ html[data-mode="painel"] { scrollbar-color: color-mix(in oklch, var(--ink) 30%, 
 .ld-vinc { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
 .ld-vinc select { flex: 1 1 100%; min-width: 0; }
 .ld-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* celular, folha "Mais": a etiqueta "em preparo" das Câmeras com o mesmo desenho do menu lateral (estava colada no nome) */
+.pn-mais .cam-tag { margin-left: 8px; padding: 2px 7px; border-radius: 999px; font: 600 10px/1.3 var(--sans); letter-spacing: 0.04em; color: var(--gold-text); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--gold) 55%, transparent); }
